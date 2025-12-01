@@ -17,7 +17,10 @@ export type AnalyticsEvent =
   | LeadSubmittedEvent
   | PlaceViewEvent
   | CategoryViewEvent
-  | OutboundLinkEvent;
+  | OutboundLinkEvent
+  | DashboardViewEvent
+  | DashboardFilterEvent
+  | DashboardExportEvent;
 
 interface BaseEvent {
   timestamp: number;
@@ -138,6 +141,36 @@ export interface OutboundLinkEvent extends BaseEvent {
     linkType: "website" | "phone" | "email" | "directions" | "social";
     placeId?: number;
     placeName?: string;
+  };
+}
+
+export interface DashboardViewEvent extends BaseEvent {
+  event: "dashboard_view";
+  properties: {
+    page: "overview" | "listings" | "leads" | "settings";
+    listingCount?: number;
+    leadCount?: number;
+  };
+}
+
+export interface DashboardFilterEvent extends BaseEvent {
+  event: "dashboard_filter";
+  properties: {
+    filterType: "listing" | "period";
+    filterValue: string;
+    resultCount: number;
+  };
+}
+
+export interface DashboardExportEvent extends BaseEvent {
+  event: "dashboard_export";
+  properties: {
+    exportType: "leads_csv";
+    filters: {
+      listingId?: number;
+      period?: string;
+    };
+    recordCount: number;
   };
 }
 
@@ -317,6 +350,42 @@ export function trackCategoryView(properties: CategoryViewEvent["properties"]): 
 export function trackOutboundLink(properties: OutboundLinkEvent["properties"]): void {
   track({
     event: "outbound_link",
+    properties,
+    timestamp: Date.now(),
+    url: typeof window !== "undefined" ? window.location.href : "",
+  });
+}
+
+/**
+ * Track dashboard page view
+ */
+export function trackDashboardView(properties: DashboardViewEvent["properties"]): void {
+  track({
+    event: "dashboard_view",
+    properties,
+    timestamp: Date.now(),
+    url: typeof window !== "undefined" ? window.location.href : "",
+  });
+}
+
+/**
+ * Track dashboard filter change
+ */
+export function trackDashboardFilter(properties: DashboardFilterEvent["properties"]): void {
+  track({
+    event: "dashboard_filter",
+    properties,
+    timestamp: Date.now(),
+    url: typeof window !== "undefined" ? window.location.href : "",
+  });
+}
+
+/**
+ * Track dashboard export action
+ */
+export function trackDashboardExport(properties: DashboardExportEvent["properties"]): void {
+  track({
+    event: "dashboard_export",
     properties,
     timestamp: Date.now(),
     url: typeof window !== "undefined" ? window.location.href : "",

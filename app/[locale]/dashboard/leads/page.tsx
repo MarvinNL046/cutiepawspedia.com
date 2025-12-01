@@ -1,6 +1,11 @@
 import { stackServerApp } from "@/lib/auth/stack";
-import { getUserByStackAuthId, getLeadsByOwnerId } from "@/db/queries";
-import { DashboardHeader } from "@/components/dashboard";
+import {
+  getUserByStackAuthId,
+  getLeadsByOwnerId,
+  getListingOptionsForOwner,
+} from "@/db/queries";
+import type { LeadPeriodFilter } from "@/db/queries/dashboard";
+import { DashboardHeader, LeadsFilters } from "@/components/dashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,15 +23,20 @@ import {
   Phone,
   Calendar,
   Building2,
-  ExternalLink,
 } from "lucide-react";
 
 interface LeadsPageProps {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default async function LeadsPage({ params }: LeadsPageProps) {
+export default async function LeadsPage({ params, searchParams }: LeadsPageProps) {
   const { locale } = await params;
+  const search = await searchParams;
+
+  // Parse search params
+  const listingIdParam = typeof search.listingId === "string" ? search.listingId : undefined;
+  const periodParam = (typeof search.period === "string" ? search.period : "all") as LeadPeriodFilter;
 
   // Get current user
   const stackUser = await stackServerApp?.getUser();
@@ -35,10 +45,19 @@ export default async function LeadsPage({ params }: LeadsPageProps) {
   const dbUser = await getUserByStackAuthId(stackUser.id);
   if (!dbUser) return null;
 
-  // Get all leads
-  const leads = await getLeadsByOwnerId(dbUser.id, { limit: 100 });
+  // Get listing options for filter dropdown
+  const listingOptions = await getListingOptionsForOwner(dbUser.id);
 
-  // Calculate stats
+  // Get leads with filters
+  const leads = await getLeadsByOwnerId(dbUser.id, {
+    limit: 100,
+    filters: {
+      listingId: listingIdParam ? parseInt(listingIdParam, 10) : undefined,
+      period: periodParam,
+    },
+  });
+
+  // Calculate stats based on filtered results
   const totalLeads = leads.length;
   const thisMonth = leads.filter((lead) => {
     const leadDate = new Date(lead.createdAt);
@@ -63,7 +82,7 @@ export default async function LeadsPage({ params }: LeadsPageProps) {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-slate-600">
-                Total Leads
+                {listingIdParam || periodParam !== "all" ? "Filtered" : "Total"} Leads
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -94,6 +113,15 @@ export default async function LeadsPage({ params }: LeadsPageProps) {
           </Card>
         </div>
 
+        {/* Filters and Export */}
+        <LeadsFilters
+          locale={locale}
+          listings={listingOptions}
+          currentListingId={listingIdParam}
+          currentPeriod={periodParam}
+          totalLeads={totalLeads}
+        />
+
         {/* Leads Table */}
         <Card>
           <CardContent className="p-0">
@@ -101,21 +129,23 @@ export default async function LeadsPage({ params }: LeadsPageProps) {
               <div className="text-center py-16">
                 <MessageSquare className="h-16 w-16 text-slate-300 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-cpDark mb-2">
-                  No leads yet
+                  No leads found
                 </h3>
                 <p className="text-slate-500 max-w-md mx-auto">
-                  When customers contact you through your listings, their inquiries will appear here.
+                  {listingIdParam || periodParam !== "all"
+                    ? "Try adjusting your filters to see more results."
+                    : "When customers contact you through your listings, their inquiries will appear here."}
                 </p>
               </div>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Message</TableHead>
-                    <TableHead>Listing</TableHead>
-                    <TableHead>Contact</TableHead>
                     <TableHead>Date</TableHead>
+                    <TableHead>Listing</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Message</TableHead>
                     <TableHead>Source</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -123,44 +153,6 @@ export default async function LeadsPage({ params }: LeadsPageProps) {
                 <TableBody>
                   {leads.map((lead) => (
                     <TableRow key={lead.id}>
-                      <TableCell>
-                        <span className="font-medium text-cpDark">{lead.name}</span>
-                      </TableCell>
-                      <TableCell>
-                        {lead.message ? (
-                          <p className="text-sm text-slate-600 truncate max-w-[200px]" title={lead.message}>
-                            {lead.message}
-                          </p>
-                        ) : (
-                          <span className="text-sm text-slate-400 italic">No message</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary" className="gap-1">
-                          <Building2 className="h-3 w-3" />
-                          {lead.place?.name || "Unknown"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col gap-1">
-                          <a
-                            href={`mailto:${lead.email}`}
-                            className="flex items-center gap-1 text-sm text-cpPink hover:underline"
-                          >
-                            <Mail className="h-3 w-3" />
-                            {lead.email}
-                          </a>
-                          {lead.phone && (
-                            <a
-                              href={`tel:${lead.phone}`}
-                              className="flex items-center gap-1 text-sm text-cpAqua hover:underline"
-                            >
-                              <Phone className="h-3 w-3" />
-                              {lead.phone}
-                            </a>
-                          )}
-                        </div>
-                      </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1 text-sm text-slate-500">
                           <Calendar className="h-3 w-3" />
@@ -174,13 +166,49 @@ export default async function LeadsPage({ params }: LeadsPageProps) {
                         </div>
                       </TableCell>
                       <TableCell>
+                        <Badge variant="secondary" className="gap-1">
+                          <Building2 className="h-3 w-3" />
+                          {lead.place?.name || "Unknown"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <span className="font-medium text-cpDark">{lead.name}</span>
+                      </TableCell>
+                      <TableCell>
+                        <a
+                          href={`mailto:${lead.email}`}
+                          className="flex items-center gap-1 text-sm text-cpPink hover:underline"
+                        >
+                          <Mail className="h-3 w-3" />
+                          {lead.email}
+                        </a>
+                      </TableCell>
+                      <TableCell>
+                        {lead.message ? (
+                          <p
+                            className="text-sm text-slate-600 truncate max-w-[200px]"
+                            title={lead.message}
+                          >
+                            {lead.message}
+                          </p>
+                        ) : (
+                          <span className="text-sm text-slate-400 italic">
+                            No message
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell>
                         <Badge variant="outline" className="text-xs">
                           {lead.source || "website"}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <Button size="sm" className="bg-cpPink hover:bg-cpPink/90" asChild>
+                          <Button
+                            size="sm"
+                            className="bg-cpPink hover:bg-cpPink/90"
+                            asChild
+                          >
                             <a href={`mailto:${lead.email}`}>
                               <Mail className="h-4 w-4 mr-1" />
                               Reply

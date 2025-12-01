@@ -1,6 +1,29 @@
-import { eq, desc, sql, count, and } from "drizzle-orm";
+import { eq, desc, sql, count, and, gte, inArray } from "drizzle-orm";
 import { db } from "../index";
 import { places, leads, users } from "../schema";
+
+// ============================================================================
+// FILTER TYPES
+// ============================================================================
+
+export type LeadPeriodFilter = "7days" | "30days" | "all";
+
+export interface LeadFilters {
+  listingId?: number;
+  period?: LeadPeriodFilter;
+}
+
+function getPeriodDate(period: LeadPeriodFilter): Date | null {
+  if (period === "all") return null;
+  const now = new Date();
+  if (period === "7days") {
+    return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  }
+  if (period === "30days") {
+    return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  }
+  return null;
+}
 
 // ============================================================================
 // DASHBOARD QUERIES (for business owners)
@@ -122,14 +145,18 @@ export async function getListingCountByOwnerId(ownerId: number): Promise<number>
 }
 
 /**
- * Get leads for listings owned by a user
+ * Get leads for listings owned by a user with optional filters
  */
 export async function getLeadsByOwnerId(
   ownerId: number,
-  options?: { limit?: number; offset?: number }
+  options?: {
+    limit?: number;
+    offset?: number;
+    filters?: LeadFilters;
+  }
 ) {
   if (!db) return [];
-  const { limit = 50, offset = 0 } = options ?? {};
+  const { limit = 100, offset = 0, filters } = options ?? {};
 
   // First get all place IDs owned by this user
   const ownerPlaces = await db
@@ -137,11 +164,30 @@ export async function getLeadsByOwnerId(
     .from(places)
     .where(eq(places.ownerId, ownerId));
 
-  const placeIds = ownerPlaces.map((p) => p.id);
+  let placeIds = ownerPlaces.map((p) => p.id);
   if (placeIds.length === 0) return [];
 
+  // Apply listing filter if specified
+  if (filters?.listingId) {
+    // Only include the specified listing if user owns it
+    if (placeIds.includes(filters.listingId)) {
+      placeIds = [filters.listingId];
+    } else {
+      return []; // User doesn't own this listing
+    }
+  }
+
+  // Build where conditions
+  const periodDate = filters?.period ? getPeriodDate(filters.period) : null;
+
   return db.query.leads.findMany({
-    where: (leads, { inArray }) => inArray(leads.placeId, placeIds),
+    where: (leadsTable, { inArray, and, gte }) => {
+      const conditions = [inArray(leadsTable.placeId, placeIds)];
+      if (periodDate) {
+        conditions.push(gte(leadsTable.createdAt, periodDate));
+      }
+      return conditions.length > 1 ? and(...conditions) : conditions[0];
+    },
     orderBy: [desc(leads.createdAt)],
     limit,
     offset,
@@ -155,6 +201,69 @@ export async function getLeadsByOwnerId(
       },
     },
   });
+}
+
+/**
+ * Get leads for CSV export (no limit)
+ */
+export async function getLeadsForExport(
+  ownerId: number,
+  filters?: LeadFilters
+) {
+  if (!db) return [];
+
+  // Get all place IDs owned by this user
+  const ownerPlaces = await db
+    .select({ id: places.id, name: places.name })
+    .from(places)
+    .where(eq(places.ownerId, ownerId));
+
+  let placeIds = ownerPlaces.map((p) => p.id);
+  if (placeIds.length === 0) return [];
+
+  // Apply listing filter if specified
+  if (filters?.listingId) {
+    if (placeIds.includes(filters.listingId)) {
+      placeIds = [filters.listingId];
+    } else {
+      return [];
+    }
+  }
+
+  const periodDate = filters?.period ? getPeriodDate(filters.period) : null;
+
+  return db.query.leads.findMany({
+    where: (leadsTable, { inArray, and, gte }) => {
+      const conditions = [inArray(leadsTable.placeId, placeIds)];
+      if (periodDate) {
+        conditions.push(gte(leadsTable.createdAt, periodDate));
+      }
+      return conditions.length > 1 ? and(...conditions) : conditions[0];
+    },
+    orderBy: [desc(leads.createdAt)],
+    with: {
+      place: {
+        columns: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+    },
+  });
+}
+
+/**
+ * Get listing options for filter dropdown (only user's listings)
+ */
+export async function getListingOptionsForOwner(ownerId: number) {
+  if (!db) return [];
+
+  return db
+    .select({ id: places.id, name: places.name })
+    .from(places)
+    .where(eq(places.ownerId, ownerId))
+    .orderBy(places.name);
 }
 
 /**

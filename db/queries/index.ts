@@ -3,3 +3,4 @@ export * from "./listings";
 export * from "./users";
 export * from "./search";
 export * from "./dashboard";
+export * from "./admin";

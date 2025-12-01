@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, DM_Serif_Display } from "next/font/google";
+import { StackProvider, StackTheme } from "@stackframe/stack";
+import { stackServerApp } from "@/lib/auth/stack";
 import "./globals.css";
 
 // Primary font - distinctive sans-serif
@@ -26,11 +28,28 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
+  const content = (
+    <html lang="en" suppressHydrationWarning>
       <body className={`${jakarta.variable} ${dmSerif.variable} min-h-screen bg-slate-50 text-slate-900 font-sans antialiased`}>
         {children}
       </body>
     </html>
   );
+
+  // Only wrap with StackProvider if configured
+  if (stackServerApp) {
+    return (
+      <html lang="en" suppressHydrationWarning>
+        <body className={`${jakarta.variable} ${dmSerif.variable} min-h-screen bg-slate-50 text-slate-900 font-sans antialiased`}>
+          <StackProvider app={stackServerApp}>
+            <StackTheme>
+              {children}
+            </StackTheme>
+          </StackProvider>
+        </body>
+      </html>
+    );
+  }
+
+  return content;
 }

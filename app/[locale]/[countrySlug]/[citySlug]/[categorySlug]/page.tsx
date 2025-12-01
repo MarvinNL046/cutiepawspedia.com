@@ -2,8 +2,8 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getCityBySlugAndCountry, getCategoryBySlug, getPlacesByCitySlugAndCategorySlug } from "@/db/queries";
-import { PlaceCard } from "@/components/directory";
-import { ChevronRight, Filter, SlidersHorizontal } from "lucide-react";
+import { PlaceCard, MapWidget, type MapMarker } from "@/components/directory";
+import { ChevronRight, Filter, SlidersHorizontal, Map } from "lucide-react";
 
 interface CategoryPageProps {
   params: Promise<{ locale: string; countrySlug: string; citySlug: string; categorySlug: string }>;
@@ -61,6 +61,33 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           </div>
         </div>
       </section>
+
+      {/* Map Section */}
+      {places.length > 0 && places.some((p) => p.latitude && p.longitude) && (
+        <section className="container mx-auto px-4 py-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Map className="h-5 w-5 text-cpAqua" />
+            <h2 className="text-lg font-semibold text-cpDark">Map View</h2>
+          </div>
+          <MapWidget
+            markers={places
+              .filter((p): p is typeof p & { latitude: number; longitude: number } =>
+                p.latitude !== null && p.longitude !== null
+              )
+              .map((p): MapMarker => ({
+                id: p.id,
+                lat: p.latitude,
+                lng: p.longitude,
+                name: p.name,
+                slug: p.slug,
+                category: categoryName,
+                isPremium: p.isPremium,
+              }))}
+            height="350px"
+            className="rounded-xl shadow-sm border"
+          />
+        </section>
+      )}
 
       <section className="container mx-auto px-4 py-8">
         {places.length > 0 ? (

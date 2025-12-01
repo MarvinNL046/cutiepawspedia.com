@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { getCityBySlugAndCountry, getCategoryBySlug, getPlacesByCitySlugAndCategorySlug } from "@/db/queries";
 import { getCategoryMetadata } from "@/lib/seo";
 import { PlaceCard, MapWidget, type MapMarker } from "@/components/directory";
+import { CategoryAffiliateBlock } from "@/components/affiliate";
 import { ChevronRight, Filter, SlidersHorizontal, Map } from "lucide-react";
 
 interface CategoryPageProps {
@@ -124,6 +125,11 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
             </Link>
           </div>
         )}
+      </section>
+
+      {/* Affiliate Recommendations */}
+      <section className="container mx-auto px-4 py-6">
+        <CategoryAffiliateBlock categorySlug={categorySlug} variant="banner" />
       </section>
 
       <section className="container mx-auto px-4 py-8 pb-16">

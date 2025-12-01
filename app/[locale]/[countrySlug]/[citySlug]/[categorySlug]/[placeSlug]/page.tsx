@@ -9,6 +9,7 @@ import { getPlaceMetadata, localBusinessSchema, breadcrumbSchema } from "@/lib/s
 import { JsonLd } from "@/components/seo";
 import { MapWidget } from "@/components/directory";
 import { LeadForm } from "@/components/forms";
+import { CategoryAffiliateBlock } from "@/components/affiliate";
 import { ChevronRight, MapPin, Phone, Globe, Mail, Star, Clock, CheckCircle, MessageSquare } from "lucide-react";
 
 interface PlacePageProps {
@@ -195,6 +196,9 @@ export default async function PlacePage({ params }: PlacePageProps) {
             <div id="inquiry-form">
               <LeadForm placeId={place.id} placeName={place.name} />
             </div>
+
+            {/* Affiliate Recommendations */}
+            <CategoryAffiliateBlock categorySlug={categorySlug} variant="card" />
           </div>
         </div>
       </section>

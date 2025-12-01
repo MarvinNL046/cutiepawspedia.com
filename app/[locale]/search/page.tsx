@@ -18,6 +18,7 @@ import { searchPlaces, getCategories, getCountries } from "@/db/queries";
 import { getSearchMetadata } from "@/lib/seo";
 import { PlaceCard, MapWidgetLazy as MapWidget, type MapMarker } from "@/components/directory";
 import { SearchBar } from "@/components/directory";
+import { SearchTracker } from "@/components/analytics";
 import { ChevronRight, Search, MapPin, Map, LayoutGrid } from "lucide-react";
 
 interface SearchPageProps {
@@ -140,6 +141,17 @@ async function SearchResults({
   if (showMap) {
     return (
       <div className="grid lg:grid-cols-2 gap-6">
+        {/* Analytics Tracker */}
+        <SearchTracker
+          query={query}
+          category={categorySlug}
+          city={citySlug}
+          country={countrySlug}
+          sortBy={sortBy}
+          resultCount={results.places.length}
+          viewMode="map"
+          page={page}
+        />
         {/* Map View */}
         <div className="lg:order-2">
           <div className="sticky top-36">
@@ -206,6 +218,17 @@ async function SearchResults({
 
   return (
     <>
+      {/* Analytics Tracker */}
+      <SearchTracker
+        query={query}
+        category={categorySlug}
+        city={citySlug}
+        country={countrySlug}
+        sortBy={sortBy}
+        resultCount={results.places.length}
+        viewMode="grid"
+        page={page}
+      />
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {results.places.map((place) => (
           <PlaceCard

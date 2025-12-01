@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { trackAffiliateClick } from "@/lib/analytics";
 import {
   Shield,
   Heart,
@@ -41,6 +42,7 @@ interface AffiliateBlockProps {
   className?: string;
   customLinks?: AffiliateLink[];
   trackingId?: string;
+  categoryContext?: string; // For tracking which category page the affiliate was shown on
 }
 
 // Default affiliate data for each type
@@ -280,6 +282,7 @@ export function AffiliateBlock({
   className = "",
   customLinks,
   trackingId,
+  categoryContext,
 }: AffiliateBlockProps) {
   const data = affiliateData[type];
   const links = customLinks || data.links;
@@ -292,6 +295,19 @@ export function AffiliateBlock({
     return `${url}${separator}ref=${trackingId}`;
   };
 
+  // Track affiliate click
+  const handleAffiliateClick = (link: AffiliateLink, position: number) => {
+    trackAffiliateClick({
+      affiliateType: type,
+      affiliateName: link.name,
+      affiliateUrl: link.url,
+      variant,
+      categoryContext,
+      position,
+      hasDiscount: !!link.discount,
+    });
+  };
+
   // Compact variant - single line
   if (variant === "compact") {
     return (
@@ -301,7 +317,12 @@ export function AffiliateBlock({
           <p className="text-sm font-medium text-slate-700 truncate">{data.title}</p>
         </div>
         <Button size="sm" variant="outline" className="shrink-0 gap-1" asChild>
-          <a href={getTrackedUrl(links[0]?.url || "#")} target="_blank" rel="noopener noreferrer sponsored">
+          <a
+            href={getTrackedUrl(links[0]?.url || "#")}
+            target="_blank"
+            rel="noopener noreferrer sponsored"
+            onClick={() => links[0] && handleAffiliateClick(links[0], 0)}
+          >
             Learn More <ExternalLink className="h-3 w-3" />
           </a>
         </Button>
@@ -322,15 +343,20 @@ export function AffiliateBlock({
             <p className="text-sm text-slate-600">{data.description}</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            {links.slice(0, 2).map((link) => (
+            {links.slice(0, 2).map((link, index) => (
               <Button
                 key={link.name}
                 size="sm"
-                variant={links.indexOf(link) === 0 ? "default" : "outline"}
-                className={links.indexOf(link) === 0 ? "bg-cpPink hover:bg-cpPink/90" : ""}
+                variant={index === 0 ? "default" : "outline"}
+                className={index === 0 ? "bg-cpPink hover:bg-cpPink/90" : ""}
                 asChild
               >
-                <a href={getTrackedUrl(link.url)} target="_blank" rel="noopener noreferrer sponsored">
+                <a
+                  href={getTrackedUrl(link.url)}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  onClick={() => handleAffiliateClick(link, index)}
+                >
                   {link.name}
                   {link.discount && (
                     <Badge variant="secondary" className="ml-1 text-xs">
@@ -355,12 +381,13 @@ export function AffiliateBlock({
           <h4 className="font-medium text-slate-700">{data.title}</h4>
         </div>
         <div className="grid gap-2">
-          {links.map((link) => (
+          {links.map((link, index) => (
             <a
               key={link.name}
               href={getTrackedUrl(link.url)}
               target="_blank"
               rel="noopener noreferrer sponsored"
+              onClick={() => handleAffiliateClick(link, index)}
               className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 transition-colors group"
             >
               <div className="flex items-center gap-2">
@@ -407,6 +434,7 @@ export function AffiliateBlock({
               href={getTrackedUrl(link.url)}
               target="_blank"
               rel="noopener noreferrer sponsored"
+              onClick={() => handleAffiliateClick(link, index)}
               className="block p-3 rounded-lg border border-slate-200 hover:border-cpPink hover:shadow-sm transition-all group"
             >
               <div className="flex items-start justify-between gap-2">
@@ -515,7 +543,7 @@ export function CategoryAffiliateBlock({
   return (
     <div className={`space-y-4 ${className}`}>
       {matchedTypes.map((type) => (
-        <AffiliateBlock key={type} type={type} variant={variant} />
+        <AffiliateBlock key={type} type={type} variant={variant} categoryContext={categorySlug} />
       ))}
     </div>
   );

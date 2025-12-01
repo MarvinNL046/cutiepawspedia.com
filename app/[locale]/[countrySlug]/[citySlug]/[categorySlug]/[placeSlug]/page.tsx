@@ -20,6 +20,7 @@ import { JsonLd } from "@/components/seo";
 import { MapWidgetLazy as MapWidget } from "@/components/directory";
 import { LeadForm } from "@/components/forms";
 import { CategoryAffiliateBlockLazy as CategoryAffiliateBlock } from "@/components/affiliate";
+import { PlaceViewTracker } from "@/components/analytics";
 import { ChevronRight, MapPin, Phone, Globe, Mail, Star, Clock, CheckCircle, MessageSquare } from "lucide-react";
 
 interface PlacePageProps {
@@ -64,6 +65,19 @@ export default async function PlacePage({ params }: PlacePageProps) {
 
   return (
     <>
+      {/* Analytics Tracker */}
+      <PlaceViewTracker
+        placeId={place.id}
+        placeName={place.name}
+        placeSlug={place.slug}
+        category={primaryCategory?.labelKey}
+        city={cityName}
+        country={countryName}
+        isPremium={place.isPremium}
+        isVerified={place.isVerified}
+        avgRating={place.avgRating ? Number(place.avgRating) : undefined}
+        reviewCount={place.reviewCount}
+      />
       <JsonLd data={[
         localBusinessSchema(place, locale, categorySlug),
         breadcrumbSchema(breadcrumbs),
@@ -205,7 +219,14 @@ export default async function PlacePage({ params }: PlacePageProps) {
 
             {/* Lead Form */}
             <div id="inquiry-form">
-              <LeadForm placeId={place.id} placeName={place.name} />
+              <LeadForm
+                placeId={place.id}
+                placeName={place.name}
+                placeSlug={place.slug}
+                category={primaryCategory?.labelKey}
+                city={cityName}
+                country={countryName}
+              />
             </div>
 
             {/* Affiliate Recommendations */}

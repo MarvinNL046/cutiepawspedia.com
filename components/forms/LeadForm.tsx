@@ -6,11 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { trackLeadSubmitted } from "@/lib/analytics";
 import { Send, Loader2, CheckCircle, AlertCircle, MessageSquare } from "lucide-react";
 
 interface LeadFormProps {
   placeId: number;
   placeName: string;
+  placeSlug?: string;
+  category?: string;
+  city?: string;
+  country?: string;
   variant?: "card" | "inline" | "modal";
   onSuccess?: () => void;
   className?: string;
@@ -19,6 +24,10 @@ interface LeadFormProps {
 export function LeadForm({
   placeId,
   placeName,
+  placeSlug,
+  category,
+  city,
+  country,
   variant = "card",
   onSuccess,
   className = "",
@@ -58,6 +67,19 @@ export function LeadForm({
       if (!response.ok) {
         throw new Error(data.error || "Failed to submit inquiry");
       }
+
+      // Track successful lead submission
+      trackLeadSubmitted({
+        placeId,
+        placeName,
+        placeSlug: placeSlug || "",
+        category,
+        city,
+        country,
+        hasMessage: !!formData.message,
+        hasPhone: !!formData.phone,
+        source: "place_page",
+      });
 
       setStatus("success");
       setFormData({ name: "", email: "", phone: "", message: "" });

@@ -19,9 +19,9 @@ import {
   Star,
   Crown,
   CheckCircle,
-  ExternalLink,
-  Edit,
   Eye,
+  Pencil,
+  Clock,
 } from "lucide-react";
 
 interface ListingsPageProps {
@@ -75,7 +75,7 @@ export default async function ListingsPage({ params }: ListingsPageProps) {
                     <TableHead>Location</TableHead>
                     <TableHead>Categories</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Rating</TableHead>
+                    <TableHead>Updated</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -150,19 +150,16 @@ export default async function ListingsPage({ params }: ListingsPageProps) {
                           </div>
                         </TableCell>
                         <TableCell>
-                          {listing.avgRating && Number(listing.avgRating) > 0 ? (
-                            <div className="flex items-center gap-1">
-                              <Star className="h-4 w-4 fill-cpYellow text-cpYellow" />
-                              <span className="font-medium">
-                                {Number(listing.avgRating).toFixed(1)}
-                              </span>
-                              <span className="text-sm text-slate-500">
-                                ({listing.reviewCount})
-                              </span>
-                            </div>
-                          ) : (
-                            <span className="text-sm text-slate-400">No reviews</span>
-                          )}
+                          <div className="flex items-center gap-1 text-sm text-slate-500">
+                            <Clock className="h-3 w-3" />
+                            <span>
+                              {new Date(listing.updatedAt).toLocaleDateString(locale, {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              })}
+                            </span>
+                          </div>
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-2">
@@ -172,9 +169,11 @@ export default async function ListingsPage({ params }: ListingsPageProps) {
                                 View
                               </Link>
                             </Button>
-                            <Button size="sm" variant="outline" disabled>
-                              <Edit className="h-4 w-4 mr-1" />
-                              Edit
+                            <Button size="sm" variant="outline" asChild>
+                              <Link href={`/${locale}/dashboard/listings/${listing.id}`}>
+                                <Pencil className="h-4 w-4 mr-1" />
+                                Edit
+                              </Link>
                             </Button>
                           </div>
                         </TableCell>

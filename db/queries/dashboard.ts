@@ -1,6 +1,6 @@
-import { eq, desc, sql, count } from "drizzle-orm";
+import { eq, desc, sql, count, and } from "drizzle-orm";
 import { db } from "../index";
-import { places, leads } from "../schema";
+import { places, leads, users } from "../schema";
 
 // ============================================================================
 // DASHBOARD QUERIES (for business owners)
@@ -27,6 +27,86 @@ export async function getListingsByOwnerId(ownerId: number) {
       },
     },
   });
+}
+
+/**
+ * Get a single listing by ID (for editing)
+ */
+export async function getListingById(listingId: number) {
+  if (!db) return null;
+  return db.query.places.findFirst({
+    where: eq(places.id, listingId),
+    with: {
+      city: {
+        with: {
+          country: true,
+        },
+      },
+      placeCategories: {
+        with: {
+          category: true,
+        },
+      },
+      owner: {
+        columns: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      },
+    },
+  });
+}
+
+/**
+ * Check if user can edit a listing (owner or admin)
+ */
+export async function canUserEditListing(userId: number, listingId: number): Promise<boolean> {
+  if (!db) return false;
+
+  // Get user role
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, userId),
+    columns: { role: true },
+  });
+
+  // Admins can edit any listing
+  if (user?.role === "admin") return true;
+
+  // Check if user owns this listing
+  const listing = await db.query.places.findFirst({
+    where: and(eq(places.id, listingId), eq(places.ownerId, userId)),
+    columns: { id: true },
+  });
+
+  return !!listing;
+}
+
+/**
+ * Update a listing
+ */
+export async function updateListing(
+  listingId: number,
+  data: {
+    name?: string;
+    address?: string;
+    website?: string;
+    phone?: string;
+    description?: string;
+  }
+) {
+  if (!db) return null;
+
+  const result = await db
+    .update(places)
+    .set({
+      ...data,
+      updatedAt: new Date(),
+    })
+    .where(eq(places.id, listingId))
+    .returning();
+
+  return result[0] || null;
 }
 
 /**

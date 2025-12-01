@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { searchPlaces, getCategories, getCountries } from "@/db/queries";
 import { getSearchMetadata } from "@/lib/seo";
-import { PlaceCard, MapWidget, type MapMarker } from "@/components/directory";
+import { PlaceCard, MapWidgetLazy as MapWidget, type MapMarker } from "@/components/directory";
 import { SearchBar } from "@/components/directory";
 import { ChevronRight, Search, MapPin, Map, LayoutGrid } from "lucide-react";
 

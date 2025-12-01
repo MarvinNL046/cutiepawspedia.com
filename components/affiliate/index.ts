@@ -11,3 +11,9 @@ export {
   CategoryAffiliateBlock,
   type AffiliateType,
 } from "./AffiliateBlock";
+
+// Lazy-loaded versions for better code splitting
+export {
+  AffiliateBlockLazy,
+  CategoryAffiliateBlockLazy,
+} from "./AffiliateBlockLazy";

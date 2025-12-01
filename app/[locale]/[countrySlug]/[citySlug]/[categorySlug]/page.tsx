@@ -13,8 +13,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getCityBySlugAndCountry, getCategoryBySlug, getPlacesByCitySlugAndCategorySlug } from "@/db/queries";
 import { getCategoryMetadata } from "@/lib/seo";
-import { PlaceCard, MapWidget, type MapMarker } from "@/components/directory";
-import { CategoryAffiliateBlock } from "@/components/affiliate";
+import { PlaceCard, MapWidgetLazy as MapWidget, type MapMarker } from "@/components/directory";
+import { CategoryAffiliateBlockLazy as CategoryAffiliateBlock } from "@/components/affiliate";
 import { ChevronRight, Filter, SlidersHorizontal, Map } from "lucide-react";
 
 interface CategoryPageProps {

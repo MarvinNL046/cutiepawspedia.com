@@ -17,9 +17,9 @@ import { Button } from "@/components/ui/button";
 import { getPlaceBySlug } from "@/db/queries";
 import { getPlaceMetadata, localBusinessSchema, breadcrumbSchema } from "@/lib/seo";
 import { JsonLd } from "@/components/seo";
-import { MapWidget } from "@/components/directory";
+import { MapWidgetLazy as MapWidget } from "@/components/directory";
 import { LeadForm } from "@/components/forms";
-import { CategoryAffiliateBlock } from "@/components/affiliate";
+import { CategoryAffiliateBlockLazy as CategoryAffiliateBlock } from "@/components/affiliate";
 import { ChevronRight, MapPin, Phone, Globe, Mail, Star, Clock, CheckCircle, MessageSquare } from "lucide-react";
 
 interface PlacePageProps {

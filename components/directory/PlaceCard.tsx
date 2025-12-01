@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, MapPin, Phone } from "lucide-react";
+import { Star, MapPin, Phone, Crown, CheckCircle } from "lucide-react";
 
 interface PlaceCardProps {
   place: {
@@ -19,6 +19,7 @@ interface PlaceCardProps {
       category: {
         slug: string;
         labelKey: string;
+        icon?: string | null;
       };
     }>;
   };
@@ -26,37 +27,51 @@ interface PlaceCardProps {
   countrySlug: string;
   citySlug: string;
   categorySlug?: string;
+  variant?: "default" | "compact" | "featured";
 }
 
-export function PlaceCard({ place, locale, countrySlug, citySlug, categorySlug }: PlaceCardProps) {
+export function PlaceCard({ place, locale, countrySlug, citySlug, categorySlug, variant = "default" }: PlaceCardProps) {
   const href = categorySlug
     ? `/${locale}/${countrySlug}/${citySlug}/${categorySlug}/${place.slug}`
     : `/${locale}/${countrySlug}/${citySlug}/${place.placeCategories?.[0]?.category.slug || "all"}/${place.slug}`;
 
+  // Premium card styling
+  const premiumStyles = place.isPremium
+    ? "border-cpYellow border-2 bg-gradient-to-br from-cpYellow/5 to-white shadow-md ring-1 ring-cpYellow/20"
+    : "";
+
   return (
     <Link href={href}>
-      <Card className={`hover:shadow-lg transition-shadow ${place.isPremium ? "border-cpYellow border-2" : ""}`}>
+      <Card className={`group hover:shadow-lg transition-all relative overflow-hidden ${premiumStyles}`}>
+        {/* Premium Ribbon */}
+        {place.isPremium && (
+          <div className="absolute top-0 right-0 z-10">
+            <div className="bg-gradient-to-r from-cpYellow to-amber-400 text-white text-xs font-bold px-3 py-1 transform rotate-0 flex items-center gap-1 rounded-bl-lg shadow-sm">
+              <Crown className="h-3 w-3" />
+              Featured
+            </div>
+          </div>
+        )}
+
         <CardContent className="p-4">
           {/* Header */}
           <div className="flex items-start justify-between gap-2 mb-2">
             <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <h3 className="font-semibold text-cpDark line-clamp-1">{place.name}</h3>
-                {place.isPremium && (
-                  <Badge variant="secondary" className="bg-cpYellow/20 text-cpYellow border-cpYellow text-xs">
-                    Premium
-                  </Badge>
-                )}
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className={`font-semibold line-clamp-1 group-hover:text-cpPink transition-colors ${place.isPremium ? "text-amber-900" : "text-cpDark"}`}>
+                  {place.name}
+                </h3>
                 {place.isVerified && (
-                  <Badge variant="secondary" className="bg-cpAqua/20 text-cpAqua border-cpAqua text-xs">
-                    ✓
+                  <Badge variant="secondary" className="bg-cpAqua/20 text-cpAqua border-cpAqua text-xs gap-0.5">
+                    <CheckCircle className="h-3 w-3" />
+                    Verified
                   </Badge>
                 )}
               </div>
             </div>
             {/* Rating */}
             {place.avgRating && Number(place.avgRating) > 0 && (
-              <div className="flex items-center gap-1 text-sm">
+              <div className="flex items-center gap-1 text-sm shrink-0">
                 <Star className="h-4 w-4 fill-cpYellow text-cpYellow" />
                 <span className="font-medium">{Number(place.avgRating).toFixed(1)}</span>
                 <span className="text-slate-400">({place.reviewCount})</span>

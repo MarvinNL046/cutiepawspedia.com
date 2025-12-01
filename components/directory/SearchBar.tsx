@@ -4,26 +4,60 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, MapPin } from "lucide-react";
+import { Search, MapPin, Loader2 } from "lucide-react";
 
 interface SearchBarProps {
   locale: string;
   placeholder?: string;
   className?: string;
+  initialQuery?: string;
+  initialLocation?: string;
+  compact?: boolean;
 }
 
-export function SearchBar({ locale, placeholder = "Search pet services...", className = "" }: SearchBarProps) {
+export function SearchBar({
+  locale,
+  placeholder = "Search pet services...",
+  className = "",
+  initialQuery = "",
+  initialLocation = "",
+  compact = false,
+}: SearchBarProps) {
   const router = useRouter();
-  const [query, setQuery] = useState("");
-  const [location, setLocation] = useState("");
+  const [query, setQuery] = useState(initialQuery);
+  const [location, setLocation] = useState(initialLocation);
+  const [isSearching, setIsSearching] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!query.trim() && !location.trim()) return;
+
+    setIsSearching(true);
     const params = new URLSearchParams();
-    if (query) params.set("q", query);
-    if (location) params.set("location", location);
+    if (query.trim()) params.set("q", query.trim());
+    if (location.trim()) params.set("city", location.trim().toLowerCase().replace(/\s+/g, "-"));
     router.push(`/${locale}/search?${params.toString()}`);
   };
+
+  if (compact) {
+    return (
+      <form onSubmit={handleSearch} className={`flex gap-2 ${className}`}>
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Input
+            type="text"
+            placeholder={placeholder}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <Button type="submit" size="icon" className="bg-cpPink hover:bg-cpPink/90" disabled={isSearching}>
+          {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+        </Button>
+      </form>
+    );
+  }
 
   return (
     <form onSubmit={handleSearch} className={`flex flex-col sm:flex-row gap-2 ${className}`}>
@@ -47,8 +81,15 @@ export function SearchBar({ locale, placeholder = "Search pet services...", clas
           className="pl-10"
         />
       </div>
-      <Button type="submit" className="bg-cpPink hover:bg-cpPink/90">
-        Search
+      <Button type="submit" className="bg-cpPink hover:bg-cpPink/90" disabled={isSearching}>
+        {isSearching ? (
+          <>
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            Searching...
+          </>
+        ) : (
+          "Search"
+        )}
       </Button>
     </form>
   );

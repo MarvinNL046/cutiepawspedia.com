@@ -1,3 +1,13 @@
+/**
+ * Search Page - Dynamic search results with filters
+ *
+ * CACHING STRATEGY: Force Dynamic (no caching)
+ * - dynamic = "force-dynamic" - Results depend on query parameters
+ * - Each search query produces unique results
+ * - fetchCache = "default-no-store" - Fresh data for every request
+ * - Suspense boundary provides loading state
+ */
+
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
@@ -23,7 +33,9 @@ interface SearchPageProps {
   }>;
 }
 
-export const revalidate = 60; // Revalidate every minute for search
+// Dynamic: Search results depend on query params, must be fresh
+export const dynamic = "force-dynamic";
+export const fetchCache = "default-no-store";
 
 export async function generateMetadata({ params, searchParams }: SearchPageProps): Promise<Metadata> {
   const { locale } = await params;

@@ -1,8 +1,19 @@
+/**
+ * Contact Page - Static contact form page
+ *
+ * CACHING STRATEGY: Force Static
+ * - Form content is static, submission is client-side
+ * - revalidate: 86400 (24 hours) for occasional updates
+ * - Optimal performance with pre-rendered content
+ */
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
-export const revalidate = 300;
+// Static page with daily revalidation - content rarely changes
+export const dynamic = "force-static";
+export const revalidate = 86400;
 
 export default async function ContactPage() {
   return (

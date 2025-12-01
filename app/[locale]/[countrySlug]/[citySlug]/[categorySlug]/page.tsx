@@ -1,3 +1,12 @@
+/**
+ * Category Page - Lists places in a specific category within a city
+ *
+ * CACHING STRATEGY: Static + ISR (Incremental Static Regeneration)
+ * - revalidate: 300s (5 minutes) - Place listings change with new businesses/reviews
+ * - High-traffic page, needs balance between freshness and performance
+ * - Premium sorting ensures important listings are always visible
+ */
+
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +21,7 @@ interface CategoryPageProps {
   params: Promise<{ locale: string; countrySlug: string; citySlug: string; categorySlug: string }>;
 }
 
+// ISR: Category listings need frequent updates for new businesses, 5-minute revalidation
 export const revalidate = 300;
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {

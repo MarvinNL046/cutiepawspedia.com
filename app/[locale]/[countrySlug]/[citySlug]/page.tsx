@@ -1,3 +1,12 @@
+/**
+ * City Page - Lists categories and top-rated places in a city
+ *
+ * CACHING STRATEGY: Static + ISR (Incremental Static Regeneration)
+ * - revalidate: 1800s (30 minutes) - City data + top places change moderately
+ * - Important landing page for local SEO
+ * - Balance between freshness (new businesses) and performance
+ */
+
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,7 +20,8 @@ interface CityPageProps {
   params: Promise<{ locale: string; countrySlug: string; citySlug: string }>;
 }
 
-export const revalidate = 300;
+// ISR: City pages with top places need moderate freshness, 30-minute revalidation
+export const revalidate = 1800;
 
 export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
   const { locale, countrySlug, citySlug } = await params;

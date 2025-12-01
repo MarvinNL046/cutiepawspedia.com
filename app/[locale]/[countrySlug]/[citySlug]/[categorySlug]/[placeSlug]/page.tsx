@@ -1,3 +1,13 @@
+/**
+ * Place Detail Page - Individual business/place profile
+ *
+ * CACHING STRATEGY: Static + ISR (Incremental Static Regeneration)
+ * - revalidate: 300s (5 minutes) - Reviews and business info can change
+ * - Most important page for conversions and SEO
+ * - JSON-LD structured data for rich search results
+ * - Lead form submission is client-side (doesn't affect caching)
+ */
+
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -16,6 +26,7 @@ interface PlacePageProps {
   params: Promise<{ locale: string; countrySlug: string; citySlug: string; categorySlug: string; placeSlug: string }>;
 }
 
+// ISR: Place details need timely updates for reviews/info, 5-minute revalidation
 export const revalidate = 300;
 
 export async function generateMetadata({ params }: PlacePageProps): Promise<Metadata> {

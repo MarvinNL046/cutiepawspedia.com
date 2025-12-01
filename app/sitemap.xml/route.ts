@@ -1,7 +1,20 @@
+/**
+ * Dynamic Sitemap XML Generator
+ *
+ * CACHING STRATEGY: Dynamic with Edge Caching
+ * - Cache-Control: 1 hour with stale-while-revalidate
+ * - Supports chunked sitemaps for >50k URLs (sitemap index)
+ * - Optimized queries: minimal columns, no N+1
+ * - Falls back to static URLs on database errors
+ */
+
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { countries, cities, categories, places, placeCategories } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
+
+// Force dynamic generation - sitemap needs fresh data
+export const dynamic = "force-dynamic";
 
 const BASE_URL = process.env.APP_BASE_URL || "https://cutiepawspedia.com";
 const LOCALES = ["en", "nl"];

@@ -1,4 +1,18 @@
+/**
+ * Robots.txt Generator
+ *
+ * CACHING STRATEGY: Static with Long TTL
+ * - Cache-Control: 24 hours - robots.txt rarely changes
+ * - Blocks crawl traps (search params, API routes)
+ * - Allows Googlebot/Bingbot with no delay
+ * - Blocks AI training bots (optional)
+ */
+
 import { NextResponse } from "next/server";
+
+// Static generation - robots.txt content is predictable
+export const dynamic = "force-static";
+export const revalidate = 86400; // Revalidate once per day
 
 const BASE_URL = process.env.APP_BASE_URL || "https://cutiepawspedia.com";
 

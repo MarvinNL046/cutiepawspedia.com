@@ -1,6 +1,17 @@
+/**
+ * About Page - Static information page
+ *
+ * CACHING STRATEGY: Force Static
+ * - Content rarely changes, can be fully static
+ * - revalidate: 86400 (24 hours) for occasional content updates
+ * - Optimal performance with pre-rendered content
+ */
+
 import { Card, CardContent } from "@/components/ui/card";
 
-export const revalidate = 300;
+// Static page with daily revalidation - content rarely changes
+export const dynamic = "force-static";
+export const revalidate = 86400;
 
 export default async function AboutPage() {
   return (

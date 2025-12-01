@@ -1,8 +1,19 @@
+/**
+ * For Businesses Page - Business pricing and signup
+ *
+ * CACHING STRATEGY: Force Static
+ * - Pricing/features content is relatively static
+ * - revalidate: 86400 (24 hours) for pricing updates
+ * - Optimal performance for conversion-focused page
+ */
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-export const revalidate = 300;
+// Static page with daily revalidation - pricing rarely changes
+export const dynamic = "force-static";
+export const revalidate = 86400;
 
 export default async function ForBusinessesPage() {
   return (

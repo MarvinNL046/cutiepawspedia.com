@@ -1,3 +1,12 @@
+/**
+ * Country Page - Lists cities within a country
+ *
+ * CACHING STRATEGY: Static + ISR (Incremental Static Regeneration)
+ * - revalidate: 3600s (1 hour) - Country/city data changes rarely
+ * - High SEO value page, benefits from fast static serving
+ * - generateStaticParams could pre-render top countries at build time
+ */
+
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,7 +19,8 @@ interface CountryPageProps {
   params: Promise<{ locale: string; countrySlug: string }>;
 }
 
-export const revalidate = 300;
+// ISR: Country data changes infrequently, 1-hour revalidation is sufficient
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: CountryPageProps): Promise<Metadata> {
   const { locale, countrySlug } = await params;

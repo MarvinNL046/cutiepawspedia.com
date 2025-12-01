@@ -1,3 +1,13 @@
+/**
+ * Homepage - Directory Landing Page
+ *
+ * CACHING STRATEGY: Static + ISR (Incremental Static Regeneration)
+ * - revalidate: 300s (5 minutes) - Balances freshness with performance
+ * - Data changes infrequently (countries, categories)
+ * - First request serves stale, triggers background regeneration
+ * - Optimal for SEO and Core Web Vitals (fast TTFB)
+ */
+
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +20,7 @@ interface HomePageProps {
   params: Promise<{ locale: string }>;
 }
 
+// ISR: Revalidate every 5 minutes for fresh content while maintaining performance
 export const revalidate = 300;
 
 export default async function HomePage({ params }: HomePageProps) {

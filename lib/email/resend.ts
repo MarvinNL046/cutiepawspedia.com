@@ -139,3 +139,26 @@ export async function sendEmail(options: {
     return { success: false, error: "Failed to send email" };
   }
 }
+
+// Send lead notification to business
+export async function sendLeadNotification(data: {
+  businessEmail: string;
+  businessName: string;
+  leadName: string;
+  leadEmail: string;
+  leadPhone?: string;
+  leadMessage?: string;
+  placeName: string;
+  placeCity: string;
+}) {
+  const template = emailTemplates.leadNotification({
+    businessEmail: data.businessEmail,
+    businessName: data.businessName,
+    leadName: data.leadName,
+    leadEmail: data.leadEmail,
+    leadPhone: data.leadPhone,
+    message: data.leadMessage,
+  });
+
+  return sendEmail(template);
+}

@@ -8,6 +8,7 @@ import { getPlaceBySlug } from "@/db/queries";
 import { getPlaceMetadata, localBusinessSchema, breadcrumbSchema } from "@/lib/seo";
 import { JsonLd } from "@/components/seo";
 import { MapWidget } from "@/components/directory";
+import { LeadForm } from "@/components/forms";
 import { ChevronRight, MapPin, Phone, Globe, Mail, Star, Clock, CheckCircle, MessageSquare } from "lucide-react";
 
 interface PlacePageProps {
@@ -93,8 +94,14 @@ export default async function PlacePage({ params }: PlacePageProps) {
               )}
             </div>
             <div className="flex flex-col gap-2 min-w-[200px]">
-              {place.phone && <Button className="bg-cpPink hover:bg-cpPink/90 gap-2"><Phone className="h-4 w-4" />Call Now</Button>}
-              <Button variant="outline" className="gap-2"><MessageSquare className="h-4 w-4" />Send Inquiry</Button>
+              {place.phone && (
+                <Button asChild className="bg-cpPink hover:bg-cpPink/90 gap-2">
+                  <a href={`tel:${place.phone}`}><Phone className="h-4 w-4" />Call Now</a>
+                </Button>
+              )}
+              <Button asChild variant="outline" className="gap-2">
+                <a href="#inquiry-form"><MessageSquare className="h-4 w-4" />Send Inquiry</a>
+              </Button>
             </div>
           </div>
         </div>
@@ -183,6 +190,11 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 </CardContent>
               </Card>
             )}
+
+            {/* Lead Form */}
+            <div id="inquiry-form">
+              <LeadForm placeId={place.id} placeName={place.name} />
+            </div>
           </div>
         </div>
       </section>

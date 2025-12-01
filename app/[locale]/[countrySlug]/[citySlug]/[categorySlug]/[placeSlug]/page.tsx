@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getPlaceBySlug } from "@/db/queries";
-import { getPlaceMetadata } from "@/lib/seo";
+import { getPlaceMetadata, localBusinessSchema, breadcrumbSchema } from "@/lib/seo";
+import { JsonLd } from "@/components/seo";
 import { MapWidget } from "@/components/directory";
 import { ChevronRight, MapPin, Phone, Globe, Mail, Star, Clock, CheckCircle, MessageSquare } from "lucide-react";
 
@@ -38,8 +39,22 @@ export default async function PlacePage({ params }: PlacePageProps) {
   const countryName = place.city?.country?.name || countrySlug;
   const primaryCategory = place.placeCategories?.[0]?.category;
 
+  // Generate JSON-LD structured data
+  const BASE_URL = process.env.APP_BASE_URL || "https://cutiepawspedia.com";
+  const breadcrumbs = [
+    { name: "Directory", url: `${BASE_URL}/${locale}` },
+    { name: countryName, url: `${BASE_URL}/${locale}/${countrySlug}` },
+    { name: cityName, url: `${BASE_URL}/${locale}/${countrySlug}/${citySlug}` },
+    { name: primaryCategory?.labelKey || categorySlug, url: `${BASE_URL}/${locale}/${countrySlug}/${citySlug}/${categorySlug}` },
+    { name: place.name, url: `${BASE_URL}/${locale}/${countrySlug}/${citySlug}/${categorySlug}/${place.slug}` },
+  ];
+
   return (
     <>
+      <JsonLd data={[
+        localBusinessSchema(place, locale, categorySlug),
+        breadcrumbSchema(breadcrumbs),
+      ]} />
       <section className="relative overflow-hidden bg-gradient-to-br from-cpPink/10 via-white to-cpAqua/10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,127,161,0.15),transparent_50%)]" />
         <div className="relative container mx-auto px-4 py-8 md:py-12">

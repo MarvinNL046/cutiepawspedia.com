@@ -1,0 +1,141 @@
+import { Resend } from "resend";
+
+// Check if Resend is configured
+const apiKey = process.env.RESEND_API_KEY;
+export const isResendConfigured = Boolean(apiKey);
+
+// Create Resend client (only if configured)
+function createResendClient() {
+  if (!apiKey) {
+    console.warn("Resend not configured - email features will be disabled");
+    return null;
+  }
+  return new Resend(apiKey);
+}
+
+export const resend = createResendClient();
+
+// Email templates
+export const emailTemplates = {
+  /**
+   * Welcome email for newsletter subscribers
+   */
+  welcomeNewsletter: (email: string) => ({
+    from: "CutiePawsPedia <newsletter@cutiepawspedia.com>",
+    to: email,
+    subject: "Welcome to CutiePawsPedia Newsletter! 🐾",
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1F2937; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #FF7FA1; margin-bottom: 10px;">🐾 CutiePawsPedia</h1>
+          </div>
+
+          <h2 style="color: #1F2937;">Welcome to our newsletter!</h2>
+
+          <p>Thank you for subscribing to the CutiePawsPedia newsletter. You'll now receive:</p>
+
+          <ul style="color: #4B5563;">
+            <li>Tips for finding the best pet services in your area</li>
+            <li>New listings and featured businesses</li>
+            <li>Exclusive deals and promotions</li>
+            <li>Pet care tips and advice</li>
+          </ul>
+
+          <p style="margin-top: 30px;">
+            <a href="https://cutiepawspedia.com" style="display: inline-block; background-color: #FF7FA1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600;">
+              Explore CutiePawsPedia
+            </a>
+          </p>
+
+          <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 30px 0;">
+
+          <p style="color: #6B7280; font-size: 12px;">
+            You received this email because you subscribed to our newsletter.
+            <br>
+            <a href="https://cutiepawspedia.com/unsubscribe" style="color: #FF7FA1;">Unsubscribe</a>
+          </p>
+        </body>
+      </html>
+    `,
+  }),
+
+  /**
+   * Lead notification email for businesses
+   */
+  leadNotification: (data: {
+    businessEmail: string;
+    businessName: string;
+    leadName: string;
+    leadEmail: string;
+    leadPhone?: string;
+    message?: string;
+  }) => ({
+    from: "CutiePawsPedia <leads@cutiepawspedia.com>",
+    to: data.businessEmail,
+    subject: `New inquiry for ${data.businessName}! 📬`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1F2937; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #FF7FA1; margin-bottom: 10px;">🐾 CutiePawsPedia</h1>
+          </div>
+
+          <h2 style="color: #1F2937;">You have a new inquiry!</h2>
+
+          <div style="background-color: #F9FAFB; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <p><strong>From:</strong> ${data.leadName}</p>
+            <p><strong>Email:</strong> <a href="mailto:${data.leadEmail}" style="color: #FF7FA1;">${data.leadEmail}</a></p>
+            ${data.leadPhone ? `<p><strong>Phone:</strong> ${data.leadPhone}</p>` : ""}
+            ${data.message ? `<p><strong>Message:</strong><br>${data.message}</p>` : ""}
+          </div>
+
+          <p>Reply directly to this inquiry to connect with your potential customer!</p>
+
+          <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 30px 0;">
+
+          <p style="color: #6B7280; font-size: 12px;">
+            This inquiry was submitted through CutiePawsPedia.
+          </p>
+        </body>
+      </html>
+    `,
+  }),
+};
+
+// Helper function to send emails
+export async function sendEmail(options: {
+  from: string;
+  to: string;
+  subject: string;
+  html: string;
+}) {
+  if (!resend) {
+    console.warn("Resend not configured - email not sent");
+    return { success: false, error: "Email service not configured" };
+  }
+
+  try {
+    const { data, error } = await resend.emails.send(options);
+
+    if (error) {
+      console.error("Failed to send email:", error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error("Error sending email:", error);
+    return { success: false, error: "Failed to send email" };
+  }
+}

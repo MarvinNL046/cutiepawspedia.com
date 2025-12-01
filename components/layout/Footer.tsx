@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NewsletterForm } from "@/components/forms";
 
 interface FooterProps {
   locale: string;
@@ -9,6 +10,21 @@ export function Footer({ locale }: FooterProps) {
 
   return (
     <footer className="border-t bg-slate-50">
+      {/* Newsletter Section */}
+      <div className="bg-cpPink/5 border-b">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-semibold text-cpDark">Stay Updated</h3>
+              <p className="text-sm text-slate-600">Get the latest pet care tips and new listings in your inbox.</p>
+            </div>
+            <div className="md:w-96">
+              <NewsletterForm variant="inline" />
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="container mx-auto px-4 py-12">
         <div className="grid gap-8 md:grid-cols-4">
           {/* Brand */}

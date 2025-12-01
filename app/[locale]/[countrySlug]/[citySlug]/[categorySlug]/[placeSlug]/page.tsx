@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getPlaceBySlug } from "@/db/queries";
+import { MapWidget } from "@/components/directory";
 import { ChevronRight, MapPin, Phone, Globe, Mail, Star, Clock, CheckCircle, MessageSquare } from "lucide-react";
 
 interface PlacePageProps {
@@ -123,9 +124,32 @@ export default async function PlacePage({ params }: PlacePageProps) {
               <Card>
                 <CardHeader><CardTitle>Location</CardTitle></CardHeader>
                 <CardContent>
-                  <div className="bg-slate-100 rounded-lg h-48 flex items-center justify-center">
-                    <div className="text-center"><MapPin className="h-8 w-8 text-slate-400 mx-auto mb-2" /><p className="text-sm text-slate-500">Map coming soon</p></div>
-                  </div>
+                  <MapWidget
+                    markers={[{
+                      id: place.id,
+                      lat: Number(place.lat),
+                      lng: Number(place.lng),
+                      name: place.name,
+                      isPremium: place.isPremium,
+                    }]}
+                    center={{ lat: Number(place.lat), lng: Number(place.lng) }}
+                    zoom={15}
+                    height="200px"
+                    singleMarker
+                    showControls={false}
+                    className="rounded-lg"
+                  />
+                  {place.address && (
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.address)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 mt-3 text-sm text-cpAqua hover:text-cpPink transition-colors"
+                    >
+                      <MapPin className="h-4 w-4" />
+                      Open in Google Maps
+                    </a>
+                  )}
                 </CardContent>
               </Card>
             )}

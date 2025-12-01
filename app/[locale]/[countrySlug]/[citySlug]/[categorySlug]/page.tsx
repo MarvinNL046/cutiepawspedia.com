@@ -63,7 +63,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       </section>
 
       {/* Map Section */}
-      {places.length > 0 && places.some((p) => p.latitude && p.longitude) && (
+      {places.length > 0 && places.some((p) => p.lat && p.lng) && (
         <section className="container mx-auto px-4 py-6">
           <div className="flex items-center gap-2 mb-4">
             <Map className="h-5 w-5 text-cpAqua" />
@@ -71,13 +71,13 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           </div>
           <MapWidget
             markers={places
-              .filter((p): p is typeof p & { latitude: number; longitude: number } =>
-                p.latitude !== null && p.longitude !== null
+              .filter((p): p is typeof p & { lat: string; lng: string } =>
+                p.lat !== null && p.lng !== null
               )
               .map((p): MapMarker => ({
                 id: p.id,
-                lat: p.latitude,
-                lng: p.longitude,
+                lat: Number(p.lat),
+                lng: Number(p.lng),
                 name: p.name,
                 slug: p.slug,
                 category: categoryName,

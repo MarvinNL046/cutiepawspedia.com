@@ -2,17 +2,21 @@ import { requireAdmin } from "@/lib/auth/admin";
 import { AdminHeader } from "@/components/admin";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { getCountriesWithStats, getCitiesWithStats } from "@/db/queries/admin";
-import { Globe, MapPin, Building2, Star } from "lucide-react";
+  getCountriesWithStats,
+  getCitiesWithStats,
+  getCategoriesWithStats,
+  getAdminPlaces,
+  getAdminReviews,
+} from "@/db/queries/admin";
+import { Globe, MapPin, Building2, Star, MessageSquare } from "lucide-react";
+import {
+  CountriesTable,
+  CitiesTable,
+  CategoriesTable,
+  PlacesTable,
+  ReviewsTable,
+} from "@/components/admin/content";
 
 interface ContentPageProps {
   params: Promise<{ locale: string }>;
@@ -22,16 +26,29 @@ export default async function ContentPage({ params }: ContentPageProps) {
   const { locale } = await params;
   const user = await requireAdmin(locale);
 
-  const [countries, cities] = await Promise.all([
+  const [countries, cities, categories, placesResult, reviewsResult] = await Promise.all([
     getCountriesWithStats(),
     getCitiesWithStats(),
+    getCategoriesWithStats(),
+    getAdminPlaces({ limit: 20 }),
+    getAdminReviews({ limit: 20 }),
   ]);
+
+  // Prepare countries for select dropdowns
+  const countriesForSelect = countries.map((c) => ({ id: c.id, name: c.name }));
+
+  // Prepare cities for select dropdowns
+  const citiesForSelect = cities.map((c) => ({
+    id: c.id,
+    name: c.name,
+    countryId: c.countryId,
+  }));
 
   return (
     <div className="min-h-screen">
       <AdminHeader
         title="Content Management"
-        description="Manage countries, cities, categories, and places"
+        description="Manage countries, cities, categories, places, and reviews"
         user={user}
         locale={locale}
       />
@@ -55,6 +72,10 @@ export default async function ContentPage({ params }: ContentPageProps) {
               <Building2 className="h-4 w-4" aria-hidden="true" />
               Places
             </TabsTrigger>
+            <TabsTrigger value="reviews" className="gap-2">
+              <MessageSquare className="h-4 w-4" aria-hidden="true" />
+              Reviews
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="countries">
@@ -62,42 +83,11 @@ export default async function ContentPage({ params }: ContentPageProps) {
               <CardHeader>
                 <CardTitle>Countries</CardTitle>
                 <CardDescription>
-                  All countries in the directory ({countries.length} total)
+                  Manage all countries in the directory
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {countries.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-8">
-                    No countries yet. Add your first country to get started.
-                  </p>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Code</TableHead>
-                        <TableHead>Slug</TableHead>
-                        <TableHead>Cities</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {countries.map((country) => (
-                        <TableRow key={country.id}>
-                          <TableCell className="font-medium">{country.name}</TableCell>
-                          <TableCell>
-                            <Badge variant="outline">{country.code}</Badge>
-                          </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {country.slug}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="secondary">{country.cityCount}</Badge>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
+                <CountriesTable countries={countries} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -107,42 +97,11 @@ export default async function ContentPage({ params }: ContentPageProps) {
               <CardHeader>
                 <CardTitle>Cities</CardTitle>
                 <CardDescription>
-                  All cities in the directory ({cities.length} total)
+                  Manage all cities in the directory
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {cities.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-8">
-                    No cities yet. Add cities to your countries.
-                  </p>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Country</TableHead>
-                        <TableHead>Slug</TableHead>
-                        <TableHead>Places</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {cities.map((city) => (
-                        <TableRow key={city.id}>
-                          <TableCell className="font-medium">{city.name}</TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {city.countryName}
-                          </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {city.slug}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="secondary">{city.placeCount}</Badge>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
+                <CitiesTable cities={cities} countries={countriesForSelect} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -152,13 +111,11 @@ export default async function ContentPage({ params }: ContentPageProps) {
               <CardHeader>
                 <CardTitle>Categories</CardTitle>
                 <CardDescription>
-                  Service categories for places
+                  Manage service categories for places
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground text-center py-8">
-                  Category management coming soon.
-                </p>
+                <CategoriesTable categories={categories} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -168,13 +125,33 @@ export default async function ContentPage({ params }: ContentPageProps) {
               <CardHeader>
                 <CardTitle>Places</CardTitle>
                 <CardDescription>
-                  All business listings in the directory
+                  View and moderate all business listings
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground text-center py-8">
-                  Full place management coming soon. Use the Dashboard to view recent places.
-                </p>
+                <PlacesTable
+                  initialPlaces={placesResult.places}
+                  initialTotal={placesResult.total}
+                  countries={countriesForSelect}
+                  cities={citiesForSelect}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="reviews">
+            <Card>
+              <CardHeader>
+                <CardTitle>Reviews</CardTitle>
+                <CardDescription>
+                  Moderate user reviews
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ReviewsTable
+                  initialReviews={reviewsResult.reviews}
+                  initialTotal={reviewsResult.total}
+                />
               </CardContent>
             </Card>
           </TabsContent>

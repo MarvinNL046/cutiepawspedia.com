@@ -401,10 +401,343 @@ export async function getAdminLeads(options: {
 }
 
 // ============================================================================
+// COUNTRY CRUD
+// ============================================================================
+
+export async function getCountryById(id: number) {
+  if (!db) return null;
+  return db.query.countries.findFirst({
+    where: eq(countries.id, id),
+  });
+}
+
+export async function createCountry(data: { name: string; code: string; slug: string }) {
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(countries).values(data).returning();
+  return result;
+}
+
+export async function updateCountry(id: number, data: Partial<{ name: string; code: string; slug: string }>) {
+  if (!db) throw new Error("Database not available");
+  const [result] = await db
+    .update(countries)
+    .set(data)
+    .where(eq(countries.id, id))
+    .returning();
+  return result;
+}
+
+export async function deleteCountry(id: number) {
+  if (!db) throw new Error("Database not available");
+  await db.delete(countries).where(eq(countries.id, id));
+}
+
+// ============================================================================
+// CITY CRUD
+// ============================================================================
+
+export async function getCityById(id: number) {
+  if (!db) return null;
+  return db.query.cities.findFirst({
+    where: eq(cities.id, id),
+    with: {
+      country: true,
+    },
+  });
+}
+
+export async function createCity(data: {
+  name: string;
+  slug: string;
+  countryId: number;
+  lat?: string | null;
+  lng?: string | null;
+}) {
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(cities).values(data).returning();
+  return result;
+}
+
+export async function updateCity(
+  id: number,
+  data: Partial<{ name: string; slug: string; countryId: number; lat: string | null; lng: string | null }>
+) {
+  if (!db) throw new Error("Database not available");
+  const [result] = await db
+    .update(cities)
+    .set(data)
+    .where(eq(cities.id, id))
+    .returning();
+  return result;
+}
+
+export async function deleteCity(id: number) {
+  if (!db) throw new Error("Database not available");
+  await db.delete(cities).where(eq(cities.id, id));
+}
+
+// ============================================================================
+// CATEGORY CRUD
+// ============================================================================
+
+export async function getCategoriesWithStats() {
+  if (!db) return [];
+
+  const result = await db
+    .select({
+      id: categories.id,
+      slug: categories.slug,
+      labelKey: categories.labelKey,
+      icon: categories.icon,
+      placeCount: count(sql`DISTINCT ${places.id}`),
+    })
+    .from(categories)
+    .leftJoin(
+      sql`place_categories`,
+      sql`place_categories.category_id = ${categories.id}`
+    )
+    .leftJoin(places, sql`${places.id} = place_categories.place_id`)
+    .groupBy(categories.id)
+    .orderBy(categories.slug);
+
+  return result;
+}
+
+export async function getCategoryById(id: number) {
+  if (!db) return null;
+  return db.query.categories.findFirst({
+    where: eq(categories.id, id),
+  });
+}
+
+export async function createCategory(data: { slug: string; labelKey: string; icon?: string | null }) {
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(categories).values(data).returning();
+  return result;
+}
+
+export async function updateCategory(
+  id: number,
+  data: Partial<{ slug: string; labelKey: string; icon: string | null }>
+) {
+  if (!db) throw new Error("Database not available");
+  const [result] = await db
+    .update(categories)
+    .set(data)
+    .where(eq(categories.id, id))
+    .returning();
+  return result;
+}
+
+export async function deleteCategory(id: number) {
+  if (!db) throw new Error("Database not available");
+  await db.delete(categories).where(eq(categories.id, id));
+}
+
+// ============================================================================
+// PLACES ADMIN QUERIES
+// ============================================================================
+
+export async function getAdminPlaces(options: {
+  limit?: number;
+  offset?: number;
+  countryId?: number;
+  cityId?: number;
+  categoryId?: number;
+  isVerified?: boolean;
+  isPremium?: boolean;
+} = {}) {
+  if (!db) return { places: [], total: 0 };
+
+  const { limit = 50, offset = 0, countryId, cityId, isVerified, isPremium } = options;
+
+  // Build conditions
+  const conditions = [];
+  if (cityId) {
+    conditions.push(eq(places.cityId, cityId));
+  }
+  if (isVerified !== undefined) {
+    conditions.push(eq(places.isVerified, isVerified));
+  }
+  if (isPremium !== undefined) {
+    conditions.push(eq(places.isPremium, isPremium));
+  }
+  if (countryId) {
+    conditions.push(eq(cities.countryId, countryId));
+  }
+
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+  // Get total count
+  const totalQuery = db
+    .select({ value: count() })
+    .from(places)
+    .leftJoin(cities, eq(places.cityId, cities.id));
+
+  const totalResult = whereClause
+    ? await totalQuery.where(whereClause)
+    : await totalQuery;
+
+  // Get places with related data
+  const placesQuery = db
+    .select({
+      id: places.id,
+      name: places.name,
+      slug: places.slug,
+      cityId: places.cityId,
+      cityName: cities.name,
+      countryName: countries.name,
+      isVerified: places.isVerified,
+      isPremium: places.isPremium,
+      premiumUntil: places.premiumUntil,
+      avgRating: places.avgRating,
+      reviewCount: places.reviewCount,
+      ownerId: places.ownerId,
+      ownerEmail: users.email,
+      createdAt: places.createdAt,
+    })
+    .from(places)
+    .leftJoin(cities, eq(places.cityId, cities.id))
+    .leftJoin(countries, eq(cities.countryId, countries.id))
+    .leftJoin(users, eq(places.ownerId, users.id))
+    .orderBy(desc(places.createdAt))
+    .limit(limit)
+    .offset(offset);
+
+  const placesResult = whereClause
+    ? await placesQuery.where(whereClause)
+    : await placesQuery;
+
+  return {
+    places: placesResult,
+    total: totalResult[0]?.value ?? 0,
+  };
+}
+
+export async function getPlaceByIdForAdmin(id: number) {
+  if (!db) return null;
+
+  return db.query.places.findFirst({
+    where: eq(places.id, id),
+    with: {
+      city: {
+        with: {
+          country: true,
+        },
+      },
+      owner: true,
+      placeCategories: {
+        with: {
+          category: true,
+        },
+      },
+    },
+  });
+}
+
+export async function updatePlaceAdmin(
+  id: number,
+  data: Partial<{
+    name: string;
+    slug: string;
+    description: string | null;
+    address: string | null;
+    postalCode: string | null;
+    phone: string | null;
+    website: string | null;
+    email: string | null;
+    lat: string | null;
+    lng: string | null;
+    cityId: number;
+    ownerId: number | null;
+    isVerified: boolean;
+    isPremium: boolean;
+    premiumUntil: Date | null;
+  }>
+) {
+  if (!db) throw new Error("Database not available");
+
+  const [result] = await db
+    .update(places)
+    .set({
+      ...data,
+      updatedAt: new Date(),
+    })
+    .where(eq(places.id, id))
+    .returning();
+
+  return result;
+}
+
+export async function togglePlaceVerified(id: number, isVerified: boolean) {
+  return updatePlaceAdmin(id, { isVerified });
+}
+
+export async function togglePlacePremium(id: number, isPremium: boolean, premiumUntil?: Date | null) {
+  return updatePlaceAdmin(id, { isPremium, premiumUntil });
+}
+
+// ============================================================================
+// REVIEWS ADMIN QUERIES
+// ============================================================================
+
+export async function getAdminReviews(options: {
+  limit?: number;
+  offset?: number;
+  placeId?: number;
+} = {}) {
+  if (!db) return { reviews: [], total: 0 };
+
+  const { limit = 50, offset = 0, placeId } = options;
+
+  const whereClause = placeId ? eq(reviews.placeId, placeId) : undefined;
+
+  // Get total count
+  const totalResult = await db
+    .select({ value: count() })
+    .from(reviews)
+    .where(whereClause);
+
+  // Get reviews with related data
+  const reviewsResult = await db
+    .select({
+      id: reviews.id,
+      rating: reviews.rating,
+      comment: reviews.comment,
+      createdAt: reviews.createdAt,
+      placeId: reviews.placeId,
+      placeName: places.name,
+      userId: reviews.userId,
+      userEmail: users.email,
+      userName: users.name,
+    })
+    .from(reviews)
+    .leftJoin(places, eq(reviews.placeId, places.id))
+    .leftJoin(users, eq(reviews.userId, users.id))
+    .where(whereClause)
+    .orderBy(desc(reviews.createdAt))
+    .limit(limit)
+    .offset(offset);
+
+  return {
+    reviews: reviewsResult,
+    total: totalResult[0]?.value ?? 0,
+  };
+}
+
+export async function deleteReview(id: number) {
+  if (!db) throw new Error("Database not available");
+  await db.delete(reviews).where(eq(reviews.id, id));
+}
+
+// ============================================================================
 // TYPES
 // ============================================================================
 
 export type CountryWithStats = Awaited<ReturnType<typeof getCountriesWithStats>>[number];
 export type CityWithStats = Awaited<ReturnType<typeof getCitiesWithStats>>[number];
+export type CategoryWithStats = Awaited<ReturnType<typeof getCategoriesWithStats>>[number];
 export type BusinessWithStats = Awaited<ReturnType<typeof getBusinessesWithStats>>[number];
 export type LeadWithDetails = Awaited<ReturnType<typeof getAdminLeads>>["leads"][number];
+export type AdminPlace = Awaited<ReturnType<typeof getAdminPlaces>>["places"][number];
+export type AdminReview = Awaited<ReturnType<typeof getAdminReviews>>["reviews"][number];

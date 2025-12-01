@@ -1,7 +1,9 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getCityBySlugAndCountry, getCategories, getTopRatedPlacesByCity } from "@/db/queries";
+import { getCityMetadata } from "@/lib/seo";
 import { PlaceCard } from "@/components/directory";
 import { ChevronRight, MapPin, Star } from "lucide-react";
 
@@ -10,6 +12,20 @@ interface CityPageProps {
 }
 
 export const revalidate = 300;
+
+export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
+  const { locale, countrySlug, citySlug } = await params;
+  const city = await getCityBySlugAndCountry(citySlug, countrySlug);
+
+  if (!city) {
+    return {
+      title: citySlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+    };
+  }
+
+  const topPlaces = await getTopRatedPlacesByCity(city.id, 50);
+  return getCityMetadata(city, locale, topPlaces.length);
+}
 
 export default async function CityPage({ params }: CityPageProps) {
   const { locale, countrySlug, citySlug } = await params;

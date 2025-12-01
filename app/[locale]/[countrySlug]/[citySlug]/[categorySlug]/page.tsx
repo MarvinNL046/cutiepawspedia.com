@@ -1,7 +1,9 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getCityBySlugAndCountry, getCategoryBySlug, getPlacesByCitySlugAndCategorySlug } from "@/db/queries";
+import { getCategoryMetadata } from "@/lib/seo";
 import { PlaceCard, MapWidget, type MapMarker } from "@/components/directory";
 import { ChevronRight, Filter, SlidersHorizontal, Map } from "lucide-react";
 
@@ -10,6 +12,23 @@ interface CategoryPageProps {
 }
 
 export const revalidate = 300;
+
+export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+  const { locale, countrySlug, citySlug, categorySlug } = await params;
+  const [city, category, places] = await Promise.all([
+    getCityBySlugAndCountry(citySlug, countrySlug),
+    getCategoryBySlug(categorySlug),
+    getPlacesByCitySlugAndCategorySlug(citySlug, countrySlug, categorySlug, { limit: 1 }),
+  ]);
+
+  if (!city || !category) {
+    return {
+      title: `${categorySlug.replace(/-/g, " ")} in ${citySlug.replace(/-/g, " ")}`.replace(/\b\w/g, (c) => c.toUpperCase()),
+    };
+  }
+
+  return getCategoryMetadata(category, city, locale, places.length);
+}
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { locale, countrySlug, citySlug, categorySlug } = await params;

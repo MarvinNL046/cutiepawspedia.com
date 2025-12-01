@@ -1,9 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getPlaceBySlug } from "@/db/queries";
+import { getPlaceMetadata } from "@/lib/seo";
 import { MapWidget } from "@/components/directory";
 import { ChevronRight, MapPin, Phone, Globe, Mail, Star, Clock, CheckCircle, MessageSquare } from "lucide-react";
 
@@ -12,6 +14,19 @@ interface PlacePageProps {
 }
 
 export const revalidate = 300;
+
+export async function generateMetadata({ params }: PlacePageProps): Promise<Metadata> {
+  const { locale, countrySlug, citySlug, categorySlug, placeSlug } = await params;
+  const place = await getPlaceBySlug(placeSlug, citySlug, countrySlug);
+
+  if (!place) {
+    return {
+      title: placeSlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+    };
+  }
+
+  return getPlaceMetadata(place, citySlug, countrySlug, categorySlug, locale);
+}
 
 export default async function PlacePage({ params }: PlacePageProps) {
   const { locale, countrySlug, citySlug, categorySlug, placeSlug } = await params;

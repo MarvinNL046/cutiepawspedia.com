@@ -1,7 +1,9 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getCountryBySlug, getCitiesByCountrySlug, getCategories } from "@/db/queries";
+import { getCountryMetadata } from "@/lib/seo";
 import { ChevronRight, MapPin } from "lucide-react";
 
 interface CountryPageProps {
@@ -9,6 +11,22 @@ interface CountryPageProps {
 }
 
 export const revalidate = 300;
+
+export async function generateMetadata({ params }: CountryPageProps): Promise<Metadata> {
+  const { locale, countrySlug } = await params;
+  const [country, cities] = await Promise.all([
+    getCountryBySlug(countrySlug),
+    getCitiesByCountrySlug(countrySlug),
+  ]);
+
+  if (!country) {
+    return {
+      title: countrySlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+    };
+  }
+
+  return getCountryMetadata(country, locale, cities.length);
+}
 
 export default async function CountryPage({ params }: CountryPageProps) {
   const { locale, countrySlug } = await params;

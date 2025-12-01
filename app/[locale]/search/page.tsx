@@ -1,9 +1,11 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { searchPlaces, getCategories, getCountries } from "@/db/queries";
+import { getSearchMetadata } from "@/lib/seo";
 import { PlaceCard, MapWidget, type MapMarker } from "@/components/directory";
 import { SearchBar } from "@/components/directory";
 import { ChevronRight, Search, MapPin, Map, LayoutGrid } from "lucide-react";
@@ -22,6 +24,12 @@ interface SearchPageProps {
 }
 
 export const revalidate = 60; // Revalidate every minute for search
+
+export async function generateMetadata({ params, searchParams }: SearchPageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const { q: query, city: citySlug, category: categorySlug } = await searchParams;
+  return getSearchMetadata(locale, query, citySlug, categorySlug);
+}
 
 // Loading skeleton component
 function SearchSkeleton() {

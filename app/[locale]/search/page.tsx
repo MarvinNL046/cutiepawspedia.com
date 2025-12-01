@@ -4,9 +4,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { searchPlaces, getCategories, getCountries } from "@/db/queries";
-import { PlaceCard } from "@/components/directory";
+import { PlaceCard, MapWidget, type MapMarker } from "@/components/directory";
 import { SearchBar } from "@/components/directory";
-import { ChevronRight, Search, Filter, MapPin, SlidersHorizontal } from "lucide-react";
+import { ChevronRight, Search, MapPin, Map, LayoutGrid } from "lucide-react";
 
 interface SearchPageProps {
   params: Promise<{ locale: string }>;
@@ -17,6 +17,7 @@ interface SearchPageProps {
     category?: string;
     sort?: string;
     page?: string;
+    map?: string;
   }>;
 }
 
@@ -74,6 +75,7 @@ async function SearchResults({
   categorySlug,
   sortBy,
   page,
+  showMap,
 }: {
   locale: string;
   query?: string;
@@ -82,8 +84,9 @@ async function SearchResults({
   categorySlug?: string;
   sortBy?: string;
   page: number;
+  showMap: boolean;
 }) {
-  const limit = 12;
+  const limit = showMap ? 50 : 12; // Load more for map view
   const offset = (page - 1) * limit;
 
   const results = await searchPlaces({
@@ -99,6 +102,86 @@ async function SearchResults({
 
   if (results.places.length === 0) {
     return <NoResults query={query} />;
+  }
+
+  // Convert places to map markers
+  const markers: MapMarker[] = results.places
+    .filter((p) => p.lat !== null && p.lng !== null)
+    .map((p) => ({
+      id: p.id,
+      lat: Number(p.lat),
+      lng: Number(p.lng),
+      name: p.name,
+      slug: p.slug,
+      category: p.categories[0]?.labelKey,
+      isPremium: p.isPremium,
+    }));
+
+  if (showMap) {
+    return (
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Map View */}
+        <div className="lg:order-2">
+          <div className="sticky top-36">
+            <MapWidget
+              markers={markers}
+              height="calc(100vh - 200px)"
+              className="rounded-xl shadow-sm border min-h-[400px]"
+            />
+          </div>
+        </div>
+
+        {/* Results List */}
+        <div className="lg:order-1 space-y-4">
+          <p className="text-sm text-slate-500 mb-4">
+            {results.places.length} results{markers.length > 0 && ` (${markers.length} on map)`}
+          </p>
+          {results.places.map((place) => (
+            <PlaceCard
+              key={place.id}
+              place={{
+                id: place.id,
+                slug: place.slug,
+                name: place.name,
+                description: place.description,
+                address: place.address,
+                avgRating: place.avgRating,
+                reviewCount: place.reviewCount,
+                isPremium: place.isPremium,
+                isVerified: place.isVerified,
+                placeCategories: place.categories.map((c) => ({
+                  category: { slug: c.slug, labelKey: c.labelKey, icon: c.icon },
+                })),
+              }}
+              locale={locale}
+              countrySlug={place.city?.country?.slug || countrySlug || ""}
+              citySlug={place.city?.slug || citySlug || ""}
+            />
+          ))}
+
+          {/* Pagination */}
+          {results.hasMore && (
+            <div className="flex justify-center pt-4">
+              <Button variant="outline" asChild>
+                <Link
+                  href={`/${locale}/search?${new URLSearchParams({
+                    ...(query && { q: query }),
+                    ...(citySlug && { city: citySlug }),
+                    ...(countrySlug && { country: countrySlug }),
+                    ...(categorySlug && { category: categorySlug }),
+                    ...(sortBy && { sort: sortBy }),
+                    map: "true",
+                    page: String(page + 1),
+                  }).toString()}`}
+                >
+                  Load More Results
+                </Link>
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -160,9 +243,11 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
     category: categorySlug,
     sort: sortBy,
     page: pageStr,
+    map: mapView,
   } = await searchParams;
 
   const page = parseInt(pageStr || "1", 10) || 1;
+  const showMap = mapView === "true";
 
   // Fetch filter options
   const [categories, countries] = await Promise.all([getCategories(), getCountries()]);
@@ -256,23 +341,46 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
               </div>
             </div>
 
-            {/* Sort Options */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-slate-500">Sort:</span>
-              {[
-                { value: "relevance", label: "Relevance" },
-                { value: "rating", label: "Rating" },
-                { value: "name", label: "Name" },
-                { value: "newest", label: "Newest" },
-              ].map((option) => (
-                <Badge
-                  key={option.value}
-                  variant={(sortBy || "relevance") === option.value ? "default" : "outline"}
-                  className={
-                    (sortBy || "relevance") === option.value
-                      ? "bg-cpAqua"
-                      : "cursor-pointer hover:bg-cpAqua/10"
-                  }
+            {/* Sort Options & View Toggle */}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-slate-500">Sort:</span>
+                {[
+                  { value: "relevance", label: "Relevance" },
+                  { value: "rating", label: "Rating" },
+                  { value: "name", label: "Name" },
+                  { value: "newest", label: "Newest" },
+                ].map((option) => (
+                  <Badge
+                    key={option.value}
+                    variant={(sortBy || "relevance") === option.value ? "default" : "outline"}
+                    className={
+                      (sortBy || "relevance") === option.value
+                        ? "bg-cpAqua"
+                        : "cursor-pointer hover:bg-cpAqua/10"
+                    }
+                    asChild
+                  >
+                    <Link
+                      href={`/${locale}/search?${new URLSearchParams({
+                        ...(query && { q: query }),
+                        ...(citySlug && { city: citySlug }),
+                        ...(countrySlug && { country: countrySlug }),
+                        ...(categorySlug && { category: categorySlug }),
+                        sort: option.value,
+                        ...(showMap && { map: "true" }),
+                      }).toString()}`}
+                    >
+                      {option.label}
+                    </Link>
+                  </Badge>
+                ))}
+              </div>
+              <div className="flex items-center border-l pl-4 gap-1">
+                <Button
+                  variant={showMap ? "ghost" : "secondary"}
+                  size="icon"
+                  className="h-8 w-8"
                   asChild
                 >
                   <Link
@@ -281,13 +389,32 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
                       ...(citySlug && { city: citySlug }),
                       ...(countrySlug && { country: countrySlug }),
                       ...(categorySlug && { category: categorySlug }),
-                      sort: option.value,
+                      ...(sortBy && { sort: sortBy }),
                     }).toString()}`}
                   >
-                    {option.label}
+                    <LayoutGrid className="h-4 w-4" />
                   </Link>
-                </Badge>
-              ))}
+                </Button>
+                <Button
+                  variant={showMap ? "secondary" : "ghost"}
+                  size="icon"
+                  className="h-8 w-8"
+                  asChild
+                >
+                  <Link
+                    href={`/${locale}/search?${new URLSearchParams({
+                      ...(query && { q: query }),
+                      ...(citySlug && { city: citySlug }),
+                      ...(countrySlug && { country: countrySlug }),
+                      ...(categorySlug && { category: categorySlug }),
+                      ...(sortBy && { sort: sortBy }),
+                      map: "true",
+                    }).toString()}`}
+                  >
+                    <Map className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -304,6 +431,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
             categorySlug={categorySlug}
             sortBy={sortBy}
             page={page}
+            showMap={showMap}
           />
         </Suspense>
       </section>

@@ -54,6 +54,7 @@ export const categories = pgTable("categories", {
 // Places table - the core directory listings
 export const places = pgTable("places", {
   id: serial("id").primaryKey(),
+  ownerId: integer("owner_id").references(() => users.id, { onDelete: "set null" }), // Business owner
   cityId: integer("city_id")
     .notNull()
     .references(() => cities.id, { onDelete: "cascade" }),
@@ -162,6 +163,10 @@ export const categoriesRelations = relations(categories, ({ many }) => ({
 }));
 
 export const placesRelations = relations(places, ({ one, many }) => ({
+  owner: one(users, {
+    fields: [places.ownerId],
+    references: [users.id],
+  }),
   city: one(cities, {
     fields: [places.cityId],
     references: [cities.id],
@@ -183,6 +188,7 @@ export const placeCategoriesRelations = relations(placeCategories, ({ one }) => 
 }));
 
 export const usersRelations = relations(users, ({ many }) => ({
+  places: many(places),
   reviews: many(reviews),
 }));
 

@@ -2,8 +2,24 @@ import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "./schema";
 
-const sql = neon(process.env.DATABASE_URL!);
+// Check if DATABASE_URL is set
+const connectionString = process.env.DATABASE_URL;
 
-export const db = drizzle(sql, { schema });
+// Create a lazy-initialized database connection
+function createDb() {
+  if (!connectionString) {
+    console.warn("DATABASE_URL not set - database queries will return empty results");
+    return null;
+  }
+  const sql = neon(connectionString);
+  return drizzle(sql, { schema });
+}
 
-export type Database = typeof db;
+export const db = createDb();
+
+export type Database = NonNullable<typeof db>;
+
+// Helper to check if db is available
+export function isDatabaseAvailable(): boolean {
+  return db !== null;
+}

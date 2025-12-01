@@ -1,0 +1,403 @@
+version: "1.0"
+
+project:
+  name: "CutiePawsPedia Directory Platform"
+  description: >
+    Bouw een schaalbare, internationale huisdieren-directory (CutiePawsPedia)
+    met Next.js App Router, Vercel hosting, NeonDB (Postgres + Drizzle),
+    Tailwind + Shadcn/UI, StackAuth voor auth, Resend voor e-mail en Short.io
+    voor link shortening. Focus op maximale programmatic SEO en miljoenen
+    potentieel genereerbare pagina's.
+
+stack:
+  runtime: "node"
+  frameworks:
+    - "nextjs"
+    - "tailwindcss"
+    - "drizzle-orm"
+  services:
+    - "vercel"
+    - "neon"
+    - "stackauth"
+    - "resend"
+    - "short.io"
+
+agents:
+  - id: "main-dev"
+    name: "CutiePaws Dev"
+    role: >
+      Senior fullstack developer gespecialiseerd in Next.js App Router,
+      Vercel, Neon/Postgres, Drizzle ORM, Tailwind, Shadcn/UI en SEO.
+      Houd de code clean, getypeerd (TypeScript), schaalbaar en goed
+      gestructureerd. Schrijf waar nodig korte toelichting in comments.
+    tools:
+      - "filesystem"     # lezen/schrijven van projectbestanden
+      - "terminal"       # npm/yarn/pnpm, drizzle, git, etc.
+      - "git"            # commits per logische stap
+    style:
+      coding_guidelines: >
+        Gebruik TypeScript, App Router, server components waar mogelijk,
+        client components alleen waar nodig. Gebruik duidelijke bestandsnamen,
+        maak helpers in lib/ of db/queries. Houd code DRY en modulair.
+      ui_guidelines: >
+        Gebruik Tailwind + Shadcn/UI. Clean, modern, rustig design met
+        CutiePawsPedia kleuren (#FF7FA1, #FFD166, #29A0B1, #1F2937).
+        Gebruik genoeg whitespace, afgeronde hoeken en duidelijke typografie.
+
+plan:
+  phases:
+    - id: "phase-1-setup"
+      name: "Project setup & basis layout"
+      description: >
+        Initieer het Next.js project, configureer Tailwind, Shadcn/UI en
+        globale layout/branding.
+      tasks:
+        - id: "init-next-project"
+          agent: "main-dev"
+          title: "Init Next.js 14 App Router project"
+          instructions: |
+            1. Maak in de huidige directory een nieuw Next.js 14+ project aan,
+               bijvoorbeeld met:
+               - npx create-next-app@latest cutiepawspedia
+            2. Gebruik TypeScript, App Router, ESLint aan, Tailwind aan.
+            3. Verwijder boilerplate die niet nodig is (demo pages, api hello, etc.).
+            4. Zet de root zo op dat er géén /src map is (app/ direct in root).
+            5. Maak een eerste commit: "chore: init Next.js project".
+
+        - id: "setup-tailwind"
+          agent: "main-dev"
+          title: "Tailwind & basis theming"
+          instructions: |
+            1. Controleer of Tailwind correct is ingesteld (create-next-app
+               kan dit al gedaan hebben).
+            2. Pas tailwind.config aan:
+               - content: app/**/*.{ts,tsx}, components/**/*.{ts,tsx}
+               - darkMode: "class"
+               - theme.extend.colors: cpPink, cpYellow, cpAqua, cpDark
+                 met waarden:
+                 - cpPink: "#FF7FA1"
+                 - cpYellow: "#FFD166"
+                 - cpAqua: "#29A0B1"
+                 - cpDark: "#1F2937"
+            3. Voeg in globals.css basis body-styling toe
+               (bg-slate-50, text-slate-900, font-sans).
+            4. Maak commit: "chore: configure Tailwind theme".
+
+        - id: "setup-shadcn"
+          agent: "main-dev"
+          title: "Installeer en configureer Shadcn/UI"
+          instructions: |
+            1. Installeer Shadcn/UI volgens de officiële docs
+               (npx shadcn-ui@latest init of vergelijkbaar).
+            2. Configureer de component map als ./components/ui.
+            3. Voeg een paar basis componenten toe:
+               - button
+               - input
+               - card
+               - dropdown-menu
+               - badge
+            4. Zorg dat alles buildt en runt.
+            5. Maak commit: "feat: setup Shadcn UI base components".
+
+        - id: "root-layout"
+          agent: "main-dev"
+          title: "Globale RootLayout en redirect naar default locale"
+          instructions: |
+            1. Maak app/layout.tsx met:
+               - html lang="en"
+               - body met min-h-screen, bg-slate-50, text-slate-900
+            2. Maak app/page.tsx die direct redirect naar /en
+               (of later config-based default locale).
+            3. Maak commit: "feat: root layout and default locale redirect".
+
+    - id: "phase-2-db"
+      name: "Database & Drizzle schema"
+      description: >
+        Koppel NeonDB, configureer Drizzle en definieer de database-schema's
+        voor landen, steden, categorieën, plaatsen, gebruikers en reviews.
+      tasks:
+        - id: "setup-neon-drizzle"
+          agent: "main-dev"
+          title: "Neon + Drizzle client config"
+          instructions: |
+            1. Voeg @neondatabase/serverless en drizzle-orm toe als dependency.
+            2. Maak db/client.ts met:
+               - neon(...) connectie op process.env.DATABASE_URL
+               - drizzle(sql, { schema }) export db
+            3. Voeg drizzle.config en scripts toe:
+               - "db:push"
+               - "db:studio"
+            4. Maak .env.local.example met DATABASE_URL placeholder.
+            5. Maak commit: "chore: setup Neon + Drizzle config".
+
+        - id: "define-schema"
+          agent: "main-dev"
+          title: "Definieer Drizzle schema's (countries, cities, categories, places, users, reviews)"
+          instructions: |
+            1. Maak db/schema.ts met tabellen:
+               - countries: id, slug, code, name
+               - cities: id, countryId, slug, name, lat, lng
+               - categories: id, slug, icon, labelKey
+               - places: id, cityId, slug, name, address, postalCode,
+                         phone, website, email, lat, lng, isVerified,
+                         avgRating, reviewCount
+               - placeCategories: placeId, categoryId (many-to-many)
+               - users: id, stackauthId, email, role
+               - reviews: id, placeId, userId, rating, comment, createdAt
+            2. Zorg voor juiste foreign keys via references.
+            3. Run migratie/push naar Neon.
+            4. Maak commit: "feat: add core directory database schema".
+
+        - id: "db-queries-helpers"
+          agent: "main-dev"
+          title: "DB query-helpers toevoegen"
+          instructions: |
+            1. Maak db/queries/locations.ts voor herbruikbare queries:
+               - getCountries()
+               - getCountryBySlug()
+               - getCitiesByCountryId()
+               - getCityBySlugAndCountry()
+            2. Maak db/queries/listings.ts:
+               - getPlacesByCityAndCategory()
+               - getPlaceBySlugAndCity()
+            3. Zorg dat alle functies typed zijn en Drizzle gebruiken.
+            4. Maak commit: "feat: add base query helpers".
+
+    - id: "phase-3-routing"
+      name: "Routing & directory structuur"
+      description: >
+        Bouw de volledige app/(marketing) en app/(directory) structuur
+        met alle [locale]/[countrySlug]/[citySlug]/[categorySlug]/[placeSlug]
+        routes.
+      tasks:
+        - id: "folder-structure"
+          agent: "main-dev"
+          title: "App Router mappenstructuur aanmaken"
+          instructions: |
+            1. Maak de volgende mappen:
+               - app/(marketing)/[locale]/...
+               - app/(directory)/[locale]/...
+               - binnen directory: [countrySlug]/[citySlug]/[categorySlug]/[placeSlug]/
+            2. Voeg tijdelijke page.tsx bestanden toe met simpele placeholders
+               zodat de routes werken.
+            3. Maak commit: "chore: scaffold marketing and directory route structure".
+
+        - id: "marketing-pages"
+          agent: "main-dev"
+          title: "Marketing pages per locale"
+          instructions: |
+            1. Implementeer app/(marketing)/[locale]/layout.tsx
+               met globale header/footer en branding.
+            2. Implementeer [locale]/page.tsx als marketing-home:
+               - uitleg over CutiePawsPedia
+               - CTA naar directory (/[locale])
+            3. Voeg about, contact, for-businesses pages toe met
+               simpele content en Placeholder-secties.
+            4. Maak commit: "feat: basic marketing pages per locale".
+
+        - id: "directory-layout-home"
+          agent: "main-dev"
+          title: "Directory layout + home per locale"
+          instructions: |
+            1. Implementeer app/(directory)/[locale]/layout.tsx
+               - header (logo, search, language switcher)
+               - footer
+            2. Implementeer app/(directory)/[locale]/page.tsx:
+               - zoekbalk (SearchBar component)
+               - sectie: populaire landen
+               - sectie: populaire categorieën
+            3. Gebruik Shadcn UI components voor cards, buttons, etc.
+            4. Maak commit: "feat: directory layout and locale home".
+
+        - id: "country-city-pages"
+          agent: "main-dev"
+          title: "Land- en stadspagina's met Neon-data"
+          instructions: |
+            1. Implementeer [locale]/[countrySlug]/page.tsx:
+               - haal country + cities op via db/queries/locations.ts
+               - toon grid met steden + highlight van top categorieën.
+            2. Implementeer [locale]/[countrySlug]/[citySlug]/page.tsx:
+               - haal city op
+               - toon lijst van categorieën die in deze stad gebruikt worden.
+            3. Gebruik ISR (revalidate) op deze routes (bijv. 300s).
+            4. Maak commit: "feat: country and city pages powered by Neon".
+
+        - id: "category-and-place-pages"
+          agent: "main-dev"
+          title: "Categorie listing en detailpagina"
+          instructions: |
+            1. Implementeer [locale]/[countrySlug]/[citySlug]/[categorySlug]/page.tsx:
+               - haal via Neon alle places in city+category
+               - toon PlaceCard grid, met filters (later uit te breiden).
+            2. Implementeer [placeSlug]/page.tsx:
+               - detailpagina met naam, adres, contact, map, rating, reviews.
+            3. Voeg eenvoudige fallback toe als er geen resultaten zijn.
+            4. Gebruik ISR (revalidate 300 of 600) op deze routes.
+            5. Maak commit: "feat: category listings and place detail pages".
+
+    - id: "phase-4-integrations"
+      name: "Auth, e-mail en link-shortening"
+      description: >
+        Integreer StackAuth voor gebruikers, Resend voor e-mail en Short.io
+        voor verkorte links.
+      tasks:
+        - id: "stackauth-integration"
+          agent: "main-dev"
+          title: "StackAuth integratie"
+          instructions: |
+            1. Maak lib/auth/stackauth.ts met init van de StackAuth client
+               volgens de officiële docs.
+            2. Implementeer een eenvoudige auth flow:
+               - login
+               - signup
+               - logout
+            3. Bewaar stackauthId + email in users tabel bij first login.
+            4. Maak commit: "feat: basic StackAuth integration".
+
+        - id: "resend-email"
+          agent: "main-dev"
+          title: "Resend e-mail client + newsletter endpoint"
+          instructions: |
+            1. Maak lib/email/resend.ts met Resend client.
+            2. Maak app/api/email/subscribe/route.ts:
+               - POST met { email }
+               - valideer met zod
+               - stuur welkomstmail met Resend
+            3. Maak components/forms/NewsletterForm.tsx
+               die dit endpoint aanroept.
+            4. Maak commit: "feat: newsletter subscription via Resend".
+
+        - id: "shortio-integration"
+          agent: "main-dev"
+          title: "Short.io helper + API route"
+          instructions: |
+            1. Maak lib/links/shortio.ts met createShortLink(path, originalUrl).
+            2. Maak app/api/links/shorten/route.ts:
+               - POST { path?, url }
+               - return { shortUrl }
+            3. Voor nu alleen interne tests, later te gebruiken voor
+               business-dashboard of affiliate links.
+            4. Maak commit: "feat: Short.io link shortening endpoint".
+
+    - id: "phase-5-search-map"
+      name: "Zoekfunctionaliteit en kaart"
+      description: >
+        Voeg fulltext zoekfunctionaliteit en kaartweergave toe op basis
+        van Neon data.
+      tasks:
+        - id: "fulltext-search"
+          agent: "main-dev"
+          title: "Neon fulltext search implementeren"
+          instructions: |
+            1. Voeg in de database de benodigde indices toe (tsvector of trigram).
+            2. Maak db/queries/search.ts met functies zoals:
+               - searchPlaces(query, cityId?, categoryId?)
+            3. Implementeer app/(directory)/[locale]/search/page.tsx:
+               - lees searchParams (query, city, category)
+               - toon resultaten als PlaceCard lijst.
+            4. Maak commit: "feat: basic fulltext search for places".
+
+        - id: "map-widget"
+          agent: "main-dev"
+          title: "MapWidget integreren (Mapbox of Google Maps)"
+          instructions: |
+            1. Maak components/directory/MapWidget.tsx die markers toont
+               op basis van lat/lng van places.
+            2. Voeg kaart toe op:
+               - city+category listing page
+               - place detailpagina (focus op 1 locatie)
+            3. Maak commit: "feat: map widget for listings and details".
+
+    - id: "phase-6-seo"
+      name: "SEO, sitemaps en structured data"
+      description: >
+        Configureer metadata, dynamic sitemaps, robots.txt en JSON-LD schema
+        voor maximale SEO power.
+      tasks:
+        - id: "metadata-generator"
+          agent: "main-dev"
+          title: "Dynamic metadata per route"
+          instructions: |
+            1. Maak lib/seo/metadata.ts met helper functions:
+               - getCountryPageMetadata(...)
+               - getCityPageMetadata(...)
+               - getCategoryPageMetadata(...)
+               - getPlacePageMetadata(...)
+            2. Gebruik Next.js generateMetadata in betreffende pages
+               om title/description/canonical op te bouwen.
+            3. Maak commit: "feat: dynamic SEO metadata generators".
+
+        - id: "sitemap-and-robots"
+          agent: "main-dev"
+          title: "Dynamic sitemap.xml en robots.txt"
+          instructions: |
+            1. Maak app/sitemap.xml/route.ts die:
+               - landen, steden, categorieën en plaatsen uit Neon haalt
+               - URLs genereert per locale
+               - eventueel chunking doet bij veel URLs.
+            2. Maak app/robots.txt/route.ts die:
+               - alle locale roots toestaat
+               - verwijst naar sitemap(s).
+            3. Maak commit: "feat: dynamic sitemap and robots configuration".
+
+        - id: "structured-data"
+          agent: "main-dev"
+          title: "JSON-LD structured data"
+          instructions: |
+            1. Maak lib/seo/schema.ts met helpers:
+               - websiteSchema()
+               - localBusinessSchema(place)
+               - breadcrumbSchema(...)
+            2. Voeg JSON-LD toe aan place detailpagina en eventueel
+               country/city/category pages waar relevant.
+            3. Maak commit: "feat: add JSON-LD structured data".
+
+    - id: "phase-7-monetization"
+      name: "Monetization (Ads, premium, leads)"
+      description: >
+        Maak de directory klaar voor AdSense, premium listings, pay-per-lead
+        en affiliate blokken.
+      tasks:
+        - id: "ads-layout"
+          agent: "main-dev"
+          title: "Ad slots integreren in layout"
+          instructions: |
+            1. Voeg placeholder components toe voor advertentieblokken:
+               - Sticky bottom ad (mobile)
+               - In-feed ad tussen PlaceCards
+               - Sidebar ad (desktop)
+               - Inline ad op detailpagina
+            2. Zorg dat ze optioneel renderen op basis van config/env.
+            3. Maak commit: "feat: ad slot components and placements".
+
+        - id: "premium-listings"
+          agent: "main-dev"
+          title: "Premium vlag en UI highlighting"
+          instructions: |
+            1. Voeg kolommen toe aan places tabel:
+               - isPremium:boolean
+               - premiumUntil:timestamp (optioneel)
+            2. Pas PlaceCard aan:
+               - toon badge voor premium
+               - sorteer premium bovenaan in listings.
+            3. Maak commit: "feat: premium listing support".
+
+        - id: "lead-flow"
+          agent: "main-dev"
+          title: "Leadformulier en opslag (pay-per-lead ready)"
+          instructions: |
+            1. Maak tabel leads (id, placeId, name, email, message, createdAt, source).
+            2. Maak API route /api/leads (POST).
+            3. Voeg leadformulier toe aan place detailpagina.
+            4. Verstuur notificatie naar business of admin via Resend.
+            5. Maak commit: "feat: basic lead capture flow".
+
+env:
+  required:
+    - "DATABASE_URL"
+    - "STACKAUTH_PROJECT_ID"
+    - "STACKAUTH_SECRET_KEY"
+    - "RESEND_API_KEY"
+    - "SHORTIO_API_KEY"
+    - "SHORTIO_DOMAIN"
+    - "APP_BASE_URL"

@@ -11,6 +11,7 @@ import { getCityBySlugAndCountry } from "./locations";
  * Get all categories
  */
 export async function getCategories() {
+  if (!db) return [];
   return db.query.categories.findMany({
     orderBy: (categories, { asc }) => [asc(categories.labelKey)],
   });
@@ -20,6 +21,7 @@ export async function getCategories() {
  * Get a category by slug
  */
 export async function getCategoryBySlug(slug: string) {
+  if (!db) return null;
   return db.query.categories.findFirst({
     where: eq(categories.slug, slug),
   });
@@ -41,6 +43,7 @@ export async function getPlacesByCityAndCategory(
     premiumFirst?: boolean;
   }
 ) {
+  if (!db) return [];
   const { limit = 20, offset = 0, premiumFirst = true } = options ?? {};
 
   // Get place IDs that have the specified category
@@ -92,6 +95,7 @@ export async function getPlacesByCitySlugAndCategorySlug(
  * Get a place by its slug within a specific city
  */
 export async function getPlaceBySlugAndCity(placeSlug: string, cityId: number) {
+  if (!db) return null;
   return db.query.places.findFirst({
     where: and(eq(places.slug, placeSlug), eq(places.cityId, cityId)),
     with: {
@@ -134,6 +138,7 @@ export async function getPlaceBySlug(
  * Get featured/premium places for a city
  */
 export async function getFeaturedPlacesByCity(cityId: number, limit = 6) {
+  if (!db) return [];
   return db.query.places.findMany({
     where: and(eq(places.cityId, cityId), eq(places.isPremium, true)),
     orderBy: (places, { desc }) => [desc(places.avgRating)],
@@ -152,6 +157,7 @@ export async function getFeaturedPlacesByCity(cityId: number, limit = 6) {
  * Get top-rated places for a city
  */
 export async function getTopRatedPlacesByCity(cityId: number, limit = 10) {
+  if (!db) return [];
   return db.query.places.findMany({
     where: eq(places.cityId, cityId),
     orderBy: (places, { desc }) => [desc(places.avgRating), desc(places.reviewCount)],
@@ -174,6 +180,7 @@ export async function getTopRatedPlacesByCity(cityId: number, limit = 10) {
  * Get reviews for a place
  */
 export async function getReviewsByPlaceId(placeId: number, limit = 20, offset = 0) {
+  if (!db) return [];
   return db.query.reviews.findMany({
     where: eq(reviews.placeId, placeId),
     orderBy: (reviews, { desc }) => [desc(reviews.createdAt)],

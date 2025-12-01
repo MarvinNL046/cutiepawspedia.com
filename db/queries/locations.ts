@@ -6,28 +6,22 @@ import { countries, cities } from "../schema";
 // COUNTRIES
 // ============================================================================
 
-/**
- * Get all countries ordered by name
- */
 export async function getCountries() {
+  if (!db) return [];
   return db.query.countries.findMany({
     orderBy: (countries, { asc }) => [asc(countries.name)],
   });
 }
 
-/**
- * Get a country by its slug
- */
 export async function getCountryBySlug(slug: string) {
+  if (!db) return null;
   return db.query.countries.findFirst({
     where: eq(countries.slug, slug),
   });
 }
 
-/**
- * Get a country by its ISO code
- */
 export async function getCountryByCode(code: string) {
+  if (!db) return null;
   return db.query.countries.findFirst({
     where: eq(countries.code, code.toUpperCase()),
   });
@@ -37,31 +31,23 @@ export async function getCountryByCode(code: string) {
 // CITIES
 // ============================================================================
 
-/**
- * Get all cities for a country
- */
 export async function getCitiesByCountryId(countryId: number) {
+  if (!db) return [];
   return db.query.cities.findMany({
     where: eq(cities.countryId, countryId),
     orderBy: (cities, { asc }) => [asc(cities.name)],
   });
 }
 
-/**
- * Get all cities for a country by country slug
- */
 export async function getCitiesByCountrySlug(countrySlug: string) {
   const country = await getCountryBySlug(countrySlug);
   if (!country) return [];
   return getCitiesByCountryId(country.id);
 }
 
-/**
- * Get a city by its slug within a specific country
- */
 export async function getCityBySlugAndCountry(citySlug: string, countrySlug: string) {
   const country = await getCountryBySlug(countrySlug);
-  if (!country) return null;
+  if (!country || !db) return null;
 
   return db.query.cities.findFirst({
     where: (cities, { and, eq }) =>
@@ -72,10 +58,8 @@ export async function getCityBySlugAndCountry(citySlug: string, countrySlug: str
   });
 }
 
-/**
- * Get a city by ID with its country
- */
 export async function getCityById(cityId: number) {
+  if (!db) return null;
   return db.query.cities.findFirst({
     where: eq(cities.id, cityId),
     with: {

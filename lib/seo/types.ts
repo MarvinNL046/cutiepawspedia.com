@@ -1,0 +1,230 @@
+/**
+ * SEO Types & Interfaces
+ *
+ * Central type definitions for SEO metadata and JSON-LD generation.
+ */
+
+// =============================================================================
+// PAGE TYPES
+// =============================================================================
+
+/**
+ * All supported page types for SEO generation
+ */
+export type SeoPageType = "home" | "country" | "city" | "category" | "place";
+
+// =============================================================================
+// CONTEXT & DATA
+// =============================================================================
+
+/**
+ * Context passed to SEO generators to identify the current page
+ */
+export interface SeoContext {
+  locale: string;
+  countrySlug?: string;
+  citySlug?: string;
+  categorySlug?: string;
+  placeSlug?: string;
+}
+
+/**
+ * OpenGraph metadata
+ */
+export interface OpenGraphData {
+  title: string;
+  description: string;
+  url: string;
+  siteName: string;
+  locale: string;
+  type: "website" | "article" | "place";
+  images?: Array<{
+    url: string;
+    width?: number;
+    height?: number;
+    alt?: string;
+  }>;
+}
+
+/**
+ * Twitter card metadata
+ */
+export interface TwitterData {
+  card: "summary" | "summary_large_image";
+  title: string;
+  description: string;
+  images?: string[];
+}
+
+/**
+ * Alternate language links for hreflang
+ */
+export interface AlternateLanguages {
+  languages?: Record<string, string>;
+  canonical?: string;
+}
+
+/**
+ * Complete SEO data returned by generators
+ */
+export interface SeoData {
+  title: string;
+  description: string;
+  canonicalUrl: string;
+  robots?: string;
+  keywords?: string[];
+  openGraph?: OpenGraphData;
+  twitter?: TwitterData;
+  alternates?: AlternateLanguages;
+}
+
+// =============================================================================
+// PAYLOAD TYPES (Lightweight data for SEO generation)
+// =============================================================================
+
+/**
+ * Place data payload for SEO (minimal fields needed)
+ */
+export interface PlaceSeoPayload {
+  id: number;
+  slug: string;
+  name: string;
+  citySlug: string;
+  cityName: string;
+  countrySlug: string;
+  countryCode: string;
+  categories: string[];
+  categorySlugs: string[];
+  description?: string | null;
+  address?: string | null;
+  postalCode?: string | null;
+  phone?: string | null;
+  website?: string | null;
+  avgRating?: number | null;
+  reviewCount?: number | null;
+  images?: string[];
+  lat?: number | null;
+  lng?: number | null;
+}
+
+/**
+ * Category data payload for SEO
+ */
+export interface CategorySeoPayload {
+  id: number;
+  slug: string;
+  name: string;
+  description?: string | null;
+  placeCount?: number;
+}
+
+/**
+ * City data payload for SEO
+ */
+export interface CitySeoPayload {
+  id: number;
+  slug: string;
+  name: string;
+  countrySlug: string;
+  countryCode: string;
+  countryName: string;
+  description?: string | null;
+  placeCount?: number;
+  categoryCount?: number;
+}
+
+/**
+ * Country data payload for SEO
+ */
+export interface CountrySeoPayload {
+  id: number;
+  slug: string;
+  name: string;
+  code: string;
+  description?: string | null;
+  cityCount?: number;
+  placeCount?: number;
+}
+
+// =============================================================================
+// JSON-LD TYPES
+// =============================================================================
+
+/**
+ * Schema.org LocalBusiness subtypes for pet services
+ */
+export type LocalBusinessType =
+  | "LocalBusiness"
+  | "VeterinaryCare"
+  | "PetStore"
+  | "AnimalShelter"
+  | "PetGrooming"
+  | "Kennel";
+
+/**
+ * Mapping from category slugs to Schema.org types
+ */
+export const CATEGORY_SCHEMA_TYPES: Record<string, LocalBusinessType> = {
+  veterinary: "VeterinaryCare",
+  "pet-store": "PetStore",
+  "animal-shelter": "AnimalShelter",
+  grooming: "PetGrooming",
+  boarding: "Kennel",
+  "dog-park": "LocalBusiness",
+  "pet-cafe": "LocalBusiness",
+  cemetery: "LocalBusiness",
+};
+
+/**
+ * Get the Schema.org type for a category
+ */
+export function getSchemaTypeForCategory(
+  categorySlug: string
+): LocalBusinessType {
+  return CATEGORY_SCHEMA_TYPES[categorySlug] || "LocalBusiness";
+}
+
+/**
+ * Breadcrumb item for JSON-LD
+ */
+export interface BreadcrumbItem {
+  name: string;
+  url: string;
+}
+
+/**
+ * ItemList item for JSON-LD (category listings)
+ */
+export interface ItemListItem {
+  name: string;
+  url: string;
+  position?: number;
+  description?: string;
+  image?: string;
+}
+
+// =============================================================================
+// CONFIG
+// =============================================================================
+
+/**
+ * Site-wide SEO configuration
+ */
+export interface SeoConfig {
+  siteName: string;
+  defaultLocale: string;
+  supportedLocales: string[];
+  twitterHandle?: string;
+  defaultImage?: string;
+}
+
+/**
+ * Default SEO configuration
+ */
+export const DEFAULT_SEO_CONFIG: SeoConfig = {
+  siteName: "CutiePawsPedia",
+  defaultLocale: "nl",
+  supportedLocales: ["nl", "en"],
+  twitterHandle: "@cutiepawspedia",
+  defaultImage: "/images/og-default.jpg",
+};

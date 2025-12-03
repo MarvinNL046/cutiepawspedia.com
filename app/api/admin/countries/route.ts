@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     const country = await createCountry(validated);
 
-    logAdminAction("CREATE", "country", country.id, auth.user.id, {
+    await logAdminAction("CREATE", "country", country.id, auth.user.id, {
       name: country.name,
       code: country.code,
     });

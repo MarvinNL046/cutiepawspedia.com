@@ -1,0 +1,222 @@
+"use client";
+
+import { useState } from "react";
+import { formatDistanceToNow } from "date-fns";
+import { Award, MessageSquare, ChevronDown, ChevronUp, User } from "lucide-react";
+import { RatingStars } from "./RatingStars";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+export interface ReviewReply {
+  id: number;
+  authorType: "business" | "admin";
+  body: string;
+  createdAt: string | Date;
+  authorName?: string | null;
+}
+
+export interface ReviewData {
+  id: number;
+  rating: number;
+  title: string | null;
+  body: string;
+  visitDate?: string | Date | null;
+  createdAt: string | Date;
+  isFeatured?: boolean;
+  user?: {
+    name: string | null;
+    image?: string | null;
+  } | null;
+  replies?: ReviewReply[];
+}
+
+interface ReviewCardProps {
+  review: ReviewData;
+  className?: string;
+  showReplies?: boolean;
+}
+
+export function ReviewCard({
+  review,
+  className,
+  showReplies = true,
+}: ReviewCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [showAllReplies, setShowAllReplies] = useState(false);
+
+  const userName = review.user?.name || "Anonymous";
+  const userInitial = userName.charAt(0).toUpperCase();
+  const hasLongBody = review.body && review.body.length > 300;
+  const displayBody = hasLongBody && !isExpanded
+    ? review.body.substring(0, 300) + "..."
+    : review.body;
+
+  const visibleReplies = showAllReplies
+    ? review.replies
+    : review.replies?.slice(0, 1);
+
+  return (
+    <div
+      className={cn(
+        "border rounded-lg p-4 space-y-3",
+        review.isFeatured && "border-yellow-200 bg-yellow-50/30",
+        className
+      )}
+    >
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-10 w-10">
+            {review.user?.image && (
+              <AvatarImage src={review.user.image} alt={userName} />
+            )}
+            <AvatarFallback className="bg-primary/10 text-primary">
+              {userInitial}
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-sm">{userName}</span>
+              {review.isFeatured && (
+                <Badge variant="secondary" className="text-xs bg-yellow-100 text-yellow-800">
+                  <Award className="h-3 w-3 mr-1" />
+                  Featured
+                </Badge>
+              )}
+            </div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span>
+                {formatDistanceToNow(new Date(review.createdAt), { addSuffix: true })}
+              </span>
+              {review.visitDate && (
+                <>
+                  <span>·</span>
+                  <span>
+                    Visited {new Date(review.visitDate).toLocaleDateString(undefined, {
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+        <RatingStars rating={review.rating} size="sm" />
+      </div>
+
+      {/* Content */}
+      <div className="space-y-2">
+        {review.title && (
+          <h4 className="font-medium">{review.title}</h4>
+        )}
+        {review.body && (
+          <div>
+            <p className="text-sm text-muted-foreground whitespace-pre-line">
+              {displayBody}
+            </p>
+            {hasLongBody && (
+              <Button
+                variant="link"
+                size="sm"
+                className="h-auto p-0 text-xs"
+                onClick={() => setIsExpanded(!isExpanded)}
+              >
+                {isExpanded ? (
+                  <>
+                    <ChevronUp className="h-3 w-3 mr-1" />
+                    Show less
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-3 w-3 mr-1" />
+                    Read more
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Replies */}
+      {showReplies && review.replies && review.replies.length > 0 && (
+        <div className="space-y-2 pt-2 border-t">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <MessageSquare className="h-3 w-3" />
+            <span>
+              {review.replies.length} {review.replies.length === 1 ? "response" : "responses"}
+            </span>
+          </div>
+          {visibleReplies?.map((reply) => (
+            <ReplyCard key={reply.id} reply={reply} />
+          ))}
+          {review.replies.length > 1 && (
+            <Button
+              variant="link"
+              size="sm"
+              className="h-auto p-0 text-xs"
+              onClick={() => setShowAllReplies(!showAllReplies)}
+            >
+              {showAllReplies
+                ? "Show fewer responses"
+                : `View all ${review.replies.length} responses`}
+            </Button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ReplyCard({ reply }: { reply: ReviewReply }) {
+  const isBusinessReply = reply.authorType === "business";
+
+  return (
+    <div className="ml-4 pl-4 border-l-2 border-muted">
+      <div className="flex items-center gap-2 mb-1">
+        <div
+          className={cn(
+            "flex items-center gap-1 text-xs font-medium",
+            isBusinessReply ? "text-blue-600" : "text-purple-600"
+          )}
+        >
+          <User className="h-3 w-3" />
+          {isBusinessReply ? "Business Owner" : "Admin"}
+        </div>
+        <span className="text-xs text-muted-foreground">
+          {formatDistanceToNow(new Date(reply.createdAt), { addSuffix: true })}
+        </span>
+      </div>
+      <p className="text-sm text-muted-foreground">{reply.body}</p>
+    </div>
+  );
+}
+
+// Compact version for listing
+export function ReviewCardCompact({ review }: { review: ReviewData }) {
+  const userName = review.user?.name || "Anonymous";
+
+  return (
+    <div className="flex items-start gap-3 py-3 border-b last:border-0">
+      <RatingStars rating={review.rating} size="sm" />
+      <div className="flex-1 min-w-0">
+        {review.title && (
+          <p className="font-medium text-sm truncate">{review.title}</p>
+        )}
+        <p className="text-xs text-muted-foreground line-clamp-2">
+          {review.body}
+        </p>
+        <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+          <span>{userName}</span>
+          <span>·</span>
+          <span>
+            {formatDistanceToNow(new Date(review.createdAt), { addSuffix: true })}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}

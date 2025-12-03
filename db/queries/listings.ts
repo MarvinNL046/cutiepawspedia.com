@@ -173,6 +173,179 @@ export async function getTopRatedPlacesByCity(cityId: number, limit = 10) {
 }
 
 // ============================================================================
+// COUNTRY-LEVEL CATEGORY QUERIES (for SEO expansion C2)
+// ============================================================================
+
+/**
+ * Get places in a country for a specific category
+ */
+export async function getPlacesByCountrySlugAndCategorySlug(
+  countrySlug: string,
+  categorySlug: string,
+  options?: {
+    limit?: number;
+    offset?: number;
+    premiumFirst?: boolean;
+    topRated?: boolean;
+  }
+) {
+  if (!db) return [];
+  const { limit = 50, offset = 0, premiumFirst = true, topRated = false } = options ?? {};
+
+  // Get country
+  const country = await db.query.countries.findFirst({
+    where: (countries, { eq }) => eq(countries.slug, countrySlug),
+  });
+  if (!country) return [];
+
+  // Get cities in this country
+  const countryCities = await db.query.cities.findMany({
+    where: (cities, { eq }) => eq(cities.countryId, country.id),
+    columns: { id: true },
+  });
+  const cityIds = countryCities.map(c => c.id);
+  if (cityIds.length === 0) return [];
+
+  // Get category
+  const category = await getCategoryBySlug(categorySlug);
+  if (!category) return [];
+
+  // Get place IDs that have the specified category
+  const placeCategoryResults = await db
+    .select({ placeId: placeCategories.placeId })
+    .from(placeCategories)
+    .where(eq(placeCategories.categoryId, category.id));
+
+  const placeIds = placeCategoryResults.map((pc) => pc.placeId);
+  if (placeIds.length === 0) return [];
+
+  // Return with appropriate ordering - inline with clause for proper type inference
+  if (topRated) {
+    return db.query.places.findMany({
+      where: (places, { and, inArray }) =>
+        and(inArray(places.cityId, cityIds), inArray(places.id, placeIds)),
+      orderBy: (places, { desc }) => [desc(places.avgRating), desc(places.reviewCount)],
+      limit,
+      offset,
+      with: {
+        city: { with: { country: true } },
+        placeCategories: { with: { category: true } },
+      },
+    });
+  }
+
+  if (premiumFirst) {
+    return db.query.places.findMany({
+      where: (places, { and, inArray }) =>
+        and(inArray(places.cityId, cityIds), inArray(places.id, placeIds)),
+      orderBy: (places, { desc, asc }) => [desc(places.isPremium), desc(places.avgRating), asc(places.name)],
+      limit,
+      offset,
+      with: {
+        city: { with: { country: true } },
+        placeCategories: { with: { category: true } },
+      },
+    });
+  }
+
+  return db.query.places.findMany({
+    where: (places, { and, inArray }) =>
+      and(inArray(places.cityId, cityIds), inArray(places.id, placeIds)),
+    orderBy: (places, { desc, asc }) => [desc(places.avgRating), asc(places.name)],
+    limit,
+    offset,
+    with: {
+      city: { with: { country: true } },
+      placeCategories: { with: { category: true } },
+    },
+  });
+}
+
+/**
+ * Get top-rated places in a country for a specific category
+ */
+export async function getTopPlacesByCountrySlugAndCategorySlug(
+  countrySlug: string,
+  categorySlug: string,
+  limit = 10
+) {
+  return getPlacesByCountrySlugAndCategorySlug(countrySlug, categorySlug, {
+    limit,
+    topRated: true,
+    premiumFirst: false,
+  });
+}
+
+/**
+ * Get top-rated places in a city for a specific category
+ */
+export async function getTopPlacesByCitySlugAndCategorySlug(
+  citySlug: string,
+  countrySlug: string,
+  categorySlug: string,
+  limit = 10
+) {
+  const city = await getCityBySlugAndCountry(citySlug, countrySlug);
+  if (!city) return [];
+
+  const category = await getCategoryBySlug(categorySlug);
+  if (!category) return [];
+
+  // Get place IDs that have the specified category
+  const placeCategoryResults = await db!
+    .select({ placeId: placeCategories.placeId })
+    .from(placeCategories)
+    .where(eq(placeCategories.categoryId, category.id));
+
+  const placeIds = placeCategoryResults.map((pc) => pc.placeId);
+  if (placeIds.length === 0) return [];
+
+  return db!.query.places.findMany({
+    where: (places, { and, eq, inArray }) =>
+      and(eq(places.cityId, city.id), inArray(places.id, placeIds)),
+    orderBy: (places, { desc }) => [desc(places.avgRating), desc(places.reviewCount)],
+    limit,
+    with: {
+      city: {
+        with: {
+          country: true,
+        },
+      },
+      placeCategories: {
+        with: {
+          category: true,
+        },
+      },
+    },
+  });
+}
+
+// ============================================================================
+// COUNTS / STATS
+// ============================================================================
+
+/**
+ * Get total place count
+ */
+export async function getPlaceCount() {
+  if (!db) return 0;
+  const result = await db.query.places.findMany({ columns: { id: true } });
+  return result.length;
+}
+
+/**
+ * Get place count for a city
+ */
+export async function getPlaceCountByCity(cityId: number) {
+  if (!db) return 0;
+  const result = await db.query.places.findMany({
+    where: eq(places.cityId, cityId),
+    columns: { id: true },
+  });
+  return result.length;
+}
+
+// ============================================================================
 // REVIEWS
 // ============================================================================
 
@@ -188,6 +361,28 @@ export async function getReviewsByPlaceId(placeId: number, limit = 20, offset = 
     offset,
     with: {
       user: true,
+    },
+  });
+}
+
+/**
+ * Get a place by its ID with full details
+ */
+export async function getPlaceById(placeId: number) {
+  if (!db) return null;
+  return db.query.places.findFirst({
+    where: eq(places.id, placeId),
+    with: {
+      city: {
+        with: {
+          country: true,
+        },
+      },
+      placeCategories: {
+        with: {
+          category: true,
+        },
+      },
     },
   });
 }

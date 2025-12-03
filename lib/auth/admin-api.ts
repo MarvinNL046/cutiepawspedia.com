@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { headers } from "next/headers";
 import { stackServerApp, isStackAuthConfigured } from "./stack";
 import { getUserByStackAuthId } from "@/db/queries";
+import { createAuditLog } from "@/db/queries/admin";
 
 /**
  * Verify admin access for API routes
@@ -58,17 +60,39 @@ export async function verifyAdminAccess(request: NextRequest): Promise<
 }
 
 /**
- * Log admin action for audit trail
+ * Log admin action for audit trail - saves to database
  */
-export function logAdminAction(
+export async function logAdminAction(
   action: string,
   entityType: string,
   entityId: number | string,
   userId: number,
   details?: Record<string, unknown>
-) {
-  console.log(
-    `ADMIN_ACTION: ${action} | Entity: ${entityType}#${entityId} | User: ${userId}`,
-    details ? `| Details: ${JSON.stringify(details)}` : ""
-  );
+): Promise<void> {
+  try {
+    // Get request headers for IP and user agent
+    const headersList = await headers();
+    const ipAddress =
+      headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      headersList.get("x-real-ip") ||
+      null;
+    const userAgent = headersList.get("user-agent") || null;
+
+    await createAuditLog({
+      adminId: userId,
+      action,
+      entityType,
+      entityId: typeof entityId === "string" ? parseInt(entityId, 10) : entityId,
+      details,
+      ipAddress,
+      userAgent,
+    });
+  } catch (error) {
+    // Log to console as fallback, but don't throw
+    console.error("Failed to log admin action to database:", error);
+    console.log(
+      `ADMIN_ACTION: ${action} | Entity: ${entityType}#${entityId} | User: ${userId}`,
+      details ? `| Details: ${JSON.stringify(details)}` : ""
+    );
+  }
 }

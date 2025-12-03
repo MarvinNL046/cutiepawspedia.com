@@ -9,19 +9,35 @@
  */
 
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getPlaceBySlug } from "@/db/queries";
-import { getPlaceMetadata, localBusinessSchema, breadcrumbSchema } from "@/lib/seo";
-import { JsonLd } from "@/components/seo";
-import { MapWidgetLazy as MapWidget } from "@/components/directory";
+import { getClaims } from "@/db/queries/claims";
+import { getReviewsForPlace } from "@/db/queries/reviews";
+import { stackServerApp } from "@/lib/auth/stack";
+import { getUserByStackAuthId } from "@/db/queries/users";
+import {
+  getPlaceMetadata,
+  localBusinessSchema,
+  localBusinessWithReviewsSchema,
+  breadcrumbSchema,
+  getLocalizedCategoryName,
+  buildFaqJsonLd,
+  type ContentLocale,
+} from "@/lib/seo";
+import { generateContent } from "@/lib/ai/generateContent";
+import { extractFaqsFromAiContent, generateDefaultFaqs } from "@/lib/ai/faq";
+import { getInternalLinksForPage } from "@/lib/internalLinks";
+import { JsonLd, PageIntroInline, FaqStatic, InternalLinksSection } from "@/components/seo";
+import { StaticMap } from "@/components/directory";
 import { LeadForm } from "@/components/forms";
+import { ClaimPlaceCTA } from "@/components/claims";
 import { CategoryAffiliateBlockLazy as CategoryAffiliateBlock } from "@/components/affiliate";
 import { PlaceViewTracker } from "@/components/analytics";
-import { ChevronRight, MapPin, Phone, Globe, Mail, Star, Clock, CheckCircle, MessageSquare } from "lucide-react";
+import { Breadcrumbs } from "@/components/layout";
+import { MapPin, Phone, Globe, Mail, Star, Clock, CheckCircle, MessageSquare } from "lucide-react";
 
 interface PlacePageProps {
   params: Promise<{ locale: string; countrySlug: string; citySlug: string; categorySlug: string; placeSlug: string }>;
@@ -53,15 +69,94 @@ export default async function PlacePage({ params }: PlacePageProps) {
   const countryName = place.city?.country?.name || countrySlug;
   const primaryCategory = place.placeCategories?.[0]?.category;
 
+  // Check if current user has a pending claim for this place
+  let hasPendingClaim = false;
+  try {
+    const stackUser = await stackServerApp?.getUser();
+    if (stackUser) {
+      const dbUser = await getUserByStackAuthId(stackUser.id);
+      if (dbUser) {
+        const { claims } = await getClaims({
+          placeId: place.id,
+          userId: dbUser.id,
+          status: "pending",
+          limit: 1,
+        });
+        hasPendingClaim = claims.length > 0;
+      }
+    }
+  } catch {
+    // Silently fail if auth check fails
+  }
+
+  // Generate AI content for the place (cached or generated on demand)
+  const { content } = await generateContent({
+    type: "place",
+    locale: locale as ContentLocale,
+    data: {
+      placeName: place.name,
+      placeSlug: place.slug,
+      cityName,
+      citySlug,
+      countryName,
+      countrySlug,
+      categories: place.placeCategories?.map((pc) => pc.category.slug) || [categorySlug],
+      rating: place.avgRating ? Number(place.avgRating) : undefined,
+      reviewCount: place.reviewCount || undefined,
+      description: place.description || undefined,
+      address: place.address || undefined,
+    },
+  });
+
+  // Extract FAQs from AI content or use defaults
+  const categoryName = getLocalizedCategoryName(categorySlug, locale as ContentLocale);
+  const aiFaqs = extractFaqsFromAiContent(content);
+  const faqs = aiFaqs.length >= 2 ? aiFaqs : generateDefaultFaqs({
+    type: "place",
+    locale,
+    placeName: place.name,
+    categoryName,
+    cityName,
+    countryName,
+  });
+
+  // Get internal links for this place
+  const internalLinks = await getInternalLinksForPage({
+    pageType: "place",
+    locale,
+    countrySlug,
+    citySlug,
+    categorySlug,
+    placeId: String(place.id),
+    placeName: place.name,
+  });
+
+  // Fetch published reviews for this place
+  const publishedReviews = await getReviewsForPlace(place.id, {
+    status: "published",
+    limit: 10,
+    orderBy: "newest",
+  });
+
   // Generate JSON-LD structured data
   const BASE_URL = process.env.APP_BASE_URL || "https://cutiepawspedia.com";
-  const breadcrumbs = [
+  const breadcrumbsData = [
     { name: "Directory", url: `${BASE_URL}/${locale}` },
     { name: countryName, url: `${BASE_URL}/${locale}/${countrySlug}` },
     { name: cityName, url: `${BASE_URL}/${locale}/${countrySlug}/${citySlug}` },
     { name: primaryCategory?.labelKey || categorySlug, url: `${BASE_URL}/${locale}/${countrySlug}/${citySlug}/${categorySlug}` },
     { name: place.name, url: `${BASE_URL}/${locale}/${countrySlug}/${citySlug}/${categorySlug}/${place.slug}` },
   ];
+
+  // Prepare reviews for JSON-LD schema (map to expected format)
+  const reviewsForSchema = publishedReviews.map((r) => ({
+    id: r.id,
+    rating: r.rating,
+    title: r.title,
+    body: r.body,
+    createdAt: r.createdAt,
+    author: r.user ? { name: r.user.name } : null,
+  }));
 
   return (
     <>
@@ -79,39 +174,60 @@ export default async function PlacePage({ params }: PlacePageProps) {
         reviewCount={place.reviewCount}
       />
       <JsonLd data={[
-        localBusinessSchema(place, locale, categorySlug),
-        breadcrumbSchema(breadcrumbs),
-      ]} />
+        // Use enhanced schema with reviews if available, otherwise basic LocalBusiness
+        reviewsForSchema.length > 0
+          ? localBusinessWithReviewsSchema(place, locale, categorySlug, reviewsForSchema)
+          : localBusinessSchema(place, locale, categorySlug),
+        breadcrumbSchema(breadcrumbsData),
+        ...(faqs.length >= 2 ? [buildFaqJsonLd(faqs)] : []),
+      ].filter(Boolean)} />
+
+      {/* Hero Header */}
       <section className="relative overflow-hidden bg-gradient-to-br from-cpPink/10 via-white to-cpAqua/10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,127,161,0.15),transparent_50%)]" />
-        <div className="relative container mx-auto px-4 py-8 md:py-12">
-          <div className="flex items-center gap-2 text-sm text-slate-500 mb-6 flex-wrap">
-            <Link href={`/${locale}`} className="hover:text-cpPink">Directory</Link>
-            <ChevronRight className="h-4 w-4" />
-            <Link href={`/${locale}/${countrySlug}`} className="hover:text-cpPink">{countryName}</Link>
-            <ChevronRight className="h-4 w-4" />
-            <Link href={`/${locale}/${countrySlug}/${citySlug}`} className="hover:text-cpPink">{cityName}</Link>
-            <ChevronRight className="h-4 w-4" />
-            <Link href={`/${locale}/${countrySlug}/${citySlug}/${categorySlug}`} className="hover:text-cpPink">{primaryCategory?.labelKey || categorySlug}</Link>
-            <ChevronRight className="h-4 w-4" />
-            <span className="text-cpDark font-medium truncate max-w-[150px]">{place.name}</span>
-          </div>
+        <div className="relative container mx-auto max-w-6xl px-4 py-8 md:py-12">
+          {/* Breadcrumbs */}
+          <Breadcrumbs
+            items={[
+              { label: "Directory", href: `/${locale}` },
+              { label: countryName, href: `/${locale}/${countrySlug}` },
+              { label: cityName, href: `/${locale}/${countrySlug}/${citySlug}` },
+              { label: primaryCategory?.labelKey || categorySlug, href: `/${locale}/${countrySlug}/${citySlug}/${categorySlug}` },
+              { label: place.name },
+            ]}
+          />
 
+          {/* Place Header */}
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
             <div>
-              <div className="flex items-center gap-3 mb-2 flex-wrap">
-                <h1 className="text-3xl md:text-4xl font-bold text-cpDark">{place.name}</h1>
-                {place.isVerified && <Badge className="bg-cpAqua/20 text-cpAqua border-cpAqua gap-1"><CheckCircle className="h-3 w-3" />Verified</Badge>}
-                {place.isPremium && <Badge className="bg-cpYellow/20 text-cpYellow border-cpYellow">Premium</Badge>}
+              <div className="flex items-center gap-3 mb-3 flex-wrap">
+                <h1 className="text-3xl md:text-4xl font-bold text-cpDark tracking-tight">
+                  {place.name}
+                </h1>
+                {place.isVerified && (
+                  <Badge className="bg-cpAqua/20 text-cpAqua border-cpAqua gap-1">
+                    <CheckCircle className="h-3 w-3" />Verified
+                  </Badge>
+                )}
+                {place.isPremium && (
+                  <Badge className="bg-cpYellow/20 text-cpYellow border-cpYellow">Premium</Badge>
+                )}
               </div>
               <div className="flex flex-wrap gap-2 mb-4">
-                {place.placeCategories?.map((pc) => <Badge key={pc.category.slug} variant="secondary">{pc.category.labelKey}</Badge>)}
+                {place.placeCategories?.map((pc) => (
+                  <Badge key={pc.category.slug} variant="secondary">
+                    {getLocalizedCategoryName(pc.category.slug, locale as ContentLocale)}
+                  </Badge>
+                ))}
               </div>
               {place.avgRating && Number(place.avgRating) > 0 && (
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-0.5">
                     {[1, 2, 3, 4, 5].map((star) => (
-                      <Star key={star} className={`h-5 w-5 ${star <= Math.round(Number(place.avgRating)) ? "fill-cpYellow text-cpYellow" : "text-slate-300"}`} />
+                      <Star
+                        key={star}
+                        className={`h-5 w-5 ${star <= Math.round(Number(place.avgRating)) ? "fill-cpYellow text-cpYellow" : "text-slate-300"}`}
+                      />
                     ))}
                   </div>
                   <span className="font-semibold text-cpDark">{Number(place.avgRating).toFixed(1)}</span>
@@ -133,73 +249,168 @@ export default async function PlacePage({ params }: PlacePageProps) {
         </div>
       </section>
 
-      <section className="container mx-auto px-4 py-8">
+      <section className="container mx-auto max-w-6xl px-4 py-8">
         <div className="grid lg:grid-cols-3 gap-8">
+          {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {place.description && (
-              <Card>
-                <CardHeader><CardTitle>About</CardTitle></CardHeader>
-                <CardContent><p className="text-slate-600 whitespace-pre-wrap">{place.description}</p></CardContent>
-              </Card>
-            )}
+            {/* About section with AI-enhanced content */}
+            <Card>
+              <CardHeader>
+                <CardTitle>{locale === "nl" ? "Over dit bedrijf" : "About"}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* AI-generated intro (uses description if available, otherwise generates) */}
+                <PageIntroInline
+                  intro={content.intro}
+                  secondary={content.secondary}
+                  className="text-slate-600"
+                />
+                {/* Show bullets if available (services, pet types, etc.) */}
+                {content.bullets && content.bullets.length > 0 && (
+                  <ul className="mt-4 space-y-2">
+                    {content.bullets.map((bullet, index) => (
+                      <li key={index} className="flex items-start gap-2 text-slate-600">
+                        <CheckCircle className="h-4 w-4 text-cpAqua shrink-0 mt-0.5" />
+                        <span>{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Reviews</CardTitle>
-                <Button variant="outline" size="sm">Write a Review</Button>
+                <CardTitle>{locale === "nl" ? "Beoordelingen" : "Reviews"}</CardTitle>
+                <Button variant="outline" size="sm">
+                  {locale === "nl" ? "Schrijf een Review" : "Write a Review"}
+                </Button>
               </CardHeader>
               <CardContent>
-                {place.reviews && place.reviews.length > 0 ? (
+                {publishedReviews.length > 0 ? (
                   <div className="space-y-4">
-                    {place.reviews.map((review) => (
+                    {publishedReviews.map((review) => (
                       <div key={review.id} className="border-b pb-4 last:border-0">
                         <div className="flex items-center gap-2 mb-2">
-                          <div className="flex">{[1, 2, 3, 4, 5].map((star) => <Star key={star} className={`h-4 w-4 ${star <= review.rating ? "fill-cpYellow text-cpYellow" : "text-slate-300"}`} />)}</div>
-                          <span className="text-sm text-slate-500">{review.user?.email?.split("@")[0] || "Anonymous"}</span>
+                          <div className="flex">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className={`h-4 w-4 ${star <= review.rating ? "fill-cpYellow text-cpYellow" : "text-slate-300"}`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-sm text-slate-500">
+                            {review.user?.name || "Anonymous"}
+                          </span>
+                          <span className="text-xs text-slate-400">
+                            {new Date(review.createdAt).toLocaleDateString(locale, { year: "numeric", month: "short", day: "numeric" })}
+                          </span>
                         </div>
-                        {review.comment && <p className="text-slate-600">{review.comment}</p>}
+                        {review.title && (
+                          <p className="font-medium text-cpDark mb-1">{review.title}</p>
+                        )}
+                        {review.body && <p className="text-slate-600">{review.body}</p>}
+                        {/* Show business replies */}
+                        {review.replies && review.replies.length > 0 && (
+                          <div className="mt-3 pl-4 border-l-2 border-cpPink/30">
+                            {review.replies.map((reply) => (
+                              <div key={reply.id} className="bg-slate-50 rounded p-3 mt-2">
+                                <p className="text-xs text-cpPink font-medium mb-1">
+                                  {reply.authorType === "business" ? (locale === "nl" ? "Reactie van bedrijf" : "Business Response") : (locale === "nl" ? "Reactie van beheerder" : "Admin Response")}
+                                </p>
+                                <p className="text-sm text-slate-600">{reply.body}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
                 ) : (
                   <div className="text-center py-8">
                     <MessageSquare className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-                    <p className="text-slate-500">No reviews yet. Be the first!</p>
+                    <p className="text-slate-500">
+                      {locale === "nl" ? "Nog geen reviews. Wees de eerste!" : "No reviews yet. Be the first!"}
+                    </p>
                   </div>
                 )}
               </CardContent>
             </Card>
           </div>
+
+          {/* Sidebar */}
           <div className="space-y-6">
             <Card>
-              <CardHeader><CardTitle>Contact Information</CardTitle></CardHeader>
+              <CardHeader>
+                <CardTitle>{locale === "nl" ? "Contactgegevens" : "Contact Information"}</CardTitle>
+              </CardHeader>
               <CardContent className="space-y-4">
-                {place.address && <div className="flex items-start gap-3"><MapPin className="h-5 w-5 text-cpPink shrink-0 mt-0.5" /><div><p className="text-slate-600">{place.address}</p>{place.postalCode && <p className="text-slate-500 text-sm">{place.postalCode}</p>}</div></div>}
-                {place.phone && <div className="flex items-center gap-3"><Phone className="h-5 w-5 text-cpPink" /><a href={`tel:${place.phone}`} className="text-cpDark hover:text-cpPink transition-colors">{place.phone}</a></div>}
-                {place.email && <div className="flex items-center gap-3"><Mail className="h-5 w-5 text-cpPink" /><a href={`mailto:${place.email}`} className="text-cpDark hover:text-cpPink transition-colors truncate">{place.email}</a></div>}
-                {place.website && <div className="flex items-center gap-3"><Globe className="h-5 w-5 text-cpPink" /><a href={place.website} target="_blank" rel="noopener noreferrer" className="text-cpDark hover:text-cpPink transition-colors">Visit Website</a></div>}
+                {place.address && (
+                  <div className="flex items-start gap-3">
+                    <MapPin className="h-5 w-5 text-cpPink shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-slate-600">{place.address}</p>
+                      {place.postalCode && <p className="text-slate-500 text-sm">{place.postalCode}</p>}
+                    </div>
+                  </div>
+                )}
+                {place.phone && (
+                  <div className="flex items-center gap-3">
+                    <Phone className="h-5 w-5 text-cpPink" />
+                    <a href={`tel:${place.phone}`} className="text-cpDark hover:text-cpPink transition-colors">
+                      {place.phone}
+                    </a>
+                  </div>
+                )}
+                {place.email && (
+                  <div className="flex items-center gap-3">
+                    <Mail className="h-5 w-5 text-cpPink" />
+                    <a href={`mailto:${place.email}`} className="text-cpDark hover:text-cpPink transition-colors truncate">
+                      {place.email}
+                    </a>
+                  </div>
+                )}
+                {place.website && (
+                  <div className="flex items-center gap-3">
+                    <Globe className="h-5 w-5 text-cpPink" />
+                    <a href={place.website} target="_blank" rel="noopener noreferrer" className="text-cpDark hover:text-cpPink transition-colors">
+                      {locale === "nl" ? "Bezoek Website" : "Visit Website"}
+                    </a>
+                  </div>
+                )}
               </CardContent>
             </Card>
+
             <Card>
-              <CardHeader><CardTitle className="flex items-center gap-2"><Clock className="h-5 w-5" />Business Hours</CardTitle></CardHeader>
-              <CardContent><p className="text-slate-500 text-sm">Contact the business directly for opening hours.</p></CardContent>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  {locale === "nl" ? "Openingstijden" : "Business Hours"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-slate-500 text-sm">
+                  {locale === "nl"
+                    ? "Neem rechtstreeks contact op met het bedrijf voor openingstijden."
+                    : "Contact the business directly for opening hours."}
+                </p>
+              </CardContent>
             </Card>
+
             {place.lat && place.lng && (
               <Card>
-                <CardHeader><CardTitle>Location</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle>{locale === "nl" ? "Locatie" : "Location"}</CardTitle>
+                </CardHeader>
                 <CardContent>
-                  <MapWidget
-                    markers={[{
-                      id: place.id,
-                      lat: Number(place.lat),
-                      lng: Number(place.lng),
-                      name: place.name,
-                      isPremium: place.isPremium,
-                    }]}
-                    center={{ lat: Number(place.lat), lng: Number(place.lng) }}
+                  <StaticMap
+                    lat={Number(place.lat)}
+                    lng={Number(place.lng)}
+                    name={place.name}
                     zoom={15}
-                    height="200px"
-                    singleMarker
-                    showControls={false}
+                    width={400}
+                    height={200}
                     className="rounded-lg"
                   />
                   {place.address && (
@@ -210,7 +421,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                       className="flex items-center justify-center gap-2 mt-3 text-sm text-cpAqua hover:text-cpPink transition-colors"
                     >
                       <MapPin className="h-4 w-4" />
-                      Open in Google Maps
+                      {locale === "nl" ? "Open in Google Maps" : "Open in Google Maps"}
                     </a>
                   )}
                 </CardContent>
@@ -231,8 +442,39 @@ export default async function PlacePage({ params }: PlacePageProps) {
 
             {/* Affiliate Recommendations */}
             <CategoryAffiliateBlock categorySlug={categorySlug} variant="card" />
+
+            {/* Claim this place CTA */}
+            <ClaimPlaceCTA
+              placeSlug={place.slug}
+              businessId={place.businessId}
+              hasPendingClaim={hasPendingClaim}
+              locale={locale}
+              countrySlug={countrySlug}
+              citySlug={citySlug}
+              categorySlug={categorySlug}
+            />
           </div>
         </div>
+
+        {/* FAQ Section */}
+        {faqs.length > 0 && (
+          <FaqStatic
+            faqs={faqs}
+            locale={locale}
+            includeJsonLd={false}
+            className="mt-8"
+          />
+        )}
+
+        {/* Internal Links Section */}
+        {internalLinks.groups && internalLinks.groups.length > 0 && (
+          <InternalLinksSection
+            result={internalLinks}
+            variant="default"
+            locale={locale}
+            className="mt-8"
+          />
+        )}
       </section>
     </>
   );

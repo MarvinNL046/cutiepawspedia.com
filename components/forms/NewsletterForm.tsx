@@ -52,9 +52,11 @@ export function NewsletterForm({ variant = "inline", className = "" }: Newslette
 
   if (status === "success") {
     return (
-      <div className={`flex items-center gap-2 text-green-600 ${className}`}>
-        <CheckCircle className="h-5 w-5" />
-        <span className="font-medium">{message}</span>
+      <div className={`flex items-center gap-2 text-cpAqua animate-fade-in ${className}`}>
+        <div className="animate-bounce-in">
+          <CheckCircle className="h-5 w-5" aria-hidden="true" />
+        </div>
+        <span className="font-medium animate-slide-up">{message}</span>
       </div>
     );
   }
@@ -63,7 +65,7 @@ export function NewsletterForm({ variant = "inline", className = "" }: Newslette
     <form onSubmit={handleSubmit} className={className}>
       <div className={variant === "inline" ? "flex gap-2" : "space-y-3"}>
         <div className="relative flex-1">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
           <Input
             type="email"
             placeholder="Enter your email"
@@ -80,7 +82,7 @@ export function NewsletterForm({ variant = "inline", className = "" }: Newslette
         >
           {status === "loading" ? (
             <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
               Subscribing...
             </>
           ) : (
@@ -90,8 +92,8 @@ export function NewsletterForm({ variant = "inline", className = "" }: Newslette
       </div>
 
       {status === "error" && (
-        <div className="flex items-center gap-2 text-red-600 text-sm mt-2">
-          <AlertCircle className="h-4 w-4" />
+        <div className="flex items-center gap-2 text-red-600 text-sm mt-2" role="alert">
+          <AlertCircle className="h-4 w-4" aria-hidden="true" />
           <span>{message}</span>
         </div>
       )}

@@ -162,3 +162,80 @@ export async function sendLeadNotification(data: {
 
   return sendEmail(template);
 }
+
+// Send new claim notification to admin
+export async function sendNewClaimNotification(data: {
+  claimId: number;
+  placeName: string;
+  placeAddress?: string;
+  placeCity: string;
+  placeCountry: string;
+  userName?: string;
+  userEmail: string;
+  businessName: string;
+  businessRole: string;
+  message?: string;
+}) {
+  const adminEmail = process.env.ADMIN_CLAIMS_EMAIL || "admin@cutiepawspedia.com";
+  const adminUrl = process.env.APP_BASE_URL || "https://cutiepawspedia.com";
+
+  return sendEmail({
+    from: "CutiePawsPedia <claims@cutiepawspedia.com>",
+    to: adminEmail,
+    subject: `[New Claim] ${data.placeName} - ${data.placeCity}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1F2937; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #FF7FA1; margin-bottom: 10px;">🐾 CutiePawsPedia</h1>
+          </div>
+
+          <h2 style="color: #1F2937;">New Place Claim Request</h2>
+
+          <div style="background-color: #FEF3C7; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #F59E0B;">
+            <strong>Claim ID:</strong> #${data.claimId}
+          </div>
+
+          <h3 style="color: #4B5563; margin-top: 25px;">Place Details</h3>
+          <div style="background-color: #F9FAFB; padding: 20px; border-radius: 8px; margin: 10px 0;">
+            <p style="margin: 0 0 8px 0;"><strong>Name:</strong> ${data.placeName}</p>
+            ${data.placeAddress ? `<p style="margin: 0 0 8px 0;"><strong>Address:</strong> ${data.placeAddress}</p>` : ""}
+            <p style="margin: 0;"><strong>Location:</strong> ${data.placeCity}, ${data.placeCountry}</p>
+          </div>
+
+          <h3 style="color: #4B5563; margin-top: 25px;">Claimant Information</h3>
+          <div style="background-color: #F9FAFB; padding: 20px; border-radius: 8px; margin: 10px 0;">
+            <p style="margin: 0 0 8px 0;"><strong>Name:</strong> ${data.userName || "Not provided"}</p>
+            <p style="margin: 0 0 8px 0;"><strong>Email:</strong> <a href="mailto:${data.userEmail}" style="color: #FF7FA1;">${data.userEmail}</a></p>
+            <p style="margin: 0 0 8px 0;"><strong>Business Name:</strong> ${data.businessName}</p>
+            <p style="margin: 0;"><strong>Role:</strong> ${data.businessRole}</p>
+          </div>
+
+          ${data.message ? `
+          <h3 style="color: #4B5563; margin-top: 25px;">Message</h3>
+          <div style="background-color: #F9FAFB; padding: 20px; border-radius: 8px; margin: 10px 0;">
+            <p style="margin: 0; white-space: pre-wrap;">${data.message}</p>
+          </div>
+          ` : ""}
+
+          <p style="margin-top: 30px;">
+            <a href="${adminUrl}/en/admin/claims" style="display: inline-block; background-color: #FF7FA1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600;">
+              Review Claim in Admin Panel
+            </a>
+          </p>
+
+          <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 30px 0;">
+
+          <p style="color: #6B7280; font-size: 12px;">
+            This is an automated notification from CutiePawsPedia.
+          </p>
+        </body>
+      </html>
+    `,
+  });
+}

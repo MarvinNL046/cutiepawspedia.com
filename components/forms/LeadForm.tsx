@@ -102,20 +102,25 @@ export function LeadForm({
     }
   };
 
-  // Success state
+  // Success state with animation
   if (status === "success") {
     return (
-      <Card className={`border-cpAqua/50 bg-cpAqua/5 ${className}`}>
+      <Card className={`border-cpAqua/50 bg-cpAqua/5 animate-fade-in ${className}`}>
         <CardContent className="p-6 text-center">
-          <CheckCircle className="h-12 w-12 text-cpAqua mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-cpDark mb-2">Message Sent!</h3>
-          <p className="text-slate-600 mb-4">
+          <div className="animate-bounce-in">
+            <CheckCircle className="h-12 w-12 text-cpAqua mx-auto mb-4" aria-hidden="true" />
+          </div>
+          <h3 className="text-lg font-semibold text-foreground mb-2 animate-slide-up">
+            Message Sent!
+          </h3>
+          <p className="text-muted-foreground mb-4 animate-slide-up" style={{ animationDelay: "0.1s" }}>
             Your inquiry has been sent to {placeName}. They will contact you soon.
           </p>
           <Button
             variant="outline"
             onClick={() => setStatus("idle")}
-            className="border-cpAqua text-cpAqua hover:bg-cpAqua/10"
+            className="border-cpAqua text-cpAqua hover:bg-cpAqua/10 animate-slide-up"
+            style={{ animationDelay: "0.2s" }}
           >
             Send Another Message
           </Button>
@@ -128,8 +133,8 @@ export function LeadForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Error Message */}
       {status === "error" && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
-          <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+        <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2" role="alert">
+          <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" aria-hidden="true" />
           <p className="text-sm text-red-700">{errorMessage}</p>
         </div>
       )}
@@ -199,12 +204,12 @@ export function LeadForm({
       >
         {isSubmitting ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
             Sending...
           </>
         ) : (
           <>
-            <Send className="h-4 w-4" />
+            <Send className="h-4 w-4" aria-hidden="true" />
             Send Inquiry
           </>
         )}
@@ -226,7 +231,7 @@ export function LeadForm({
       <Card className={className}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5 text-cpPink" />
+            <MessageSquare className="h-5 w-5 text-cpPink" aria-hidden="true" />
             Contact {placeName}
           </CardTitle>
           <CardDescription>

@@ -18,6 +18,7 @@
 
 # Environment variables
 .env
+.env.example
 .env.local
 .env.*.local
 .mcp.json
@@ -51,3 +52,15 @@ next-env.d.ts
 
 # Vercel
 .vercel
+
+# Data Pipeline
+# Raw and staged data files (can be regenerated)
+/data/raw/
+/data/staged/
+/data/processed/
+# Keep the directory structure
+!/data/
+!/data/.gitkeep
+
+# User uploads (local storage)
+/public/uploads/

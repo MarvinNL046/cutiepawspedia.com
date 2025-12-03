@@ -5,15 +5,15 @@
 
 /* CutiePawsPedia Color Theme */
 @theme inline {
-  /* Brand Colors */
+  /* Brand Colors - Light Mode */
   --color-cpPink: #FF7FA1;
   --color-cpYellow: #FFD166;
   --color-cpAqua: #29A0B1;
   --color-cpDark: #1F2937;
 
   /* Background/Foreground */
-  --color-background: #f8fafc;
-  --color-foreground: #1f2937;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
 
   /* Fonts - Plus Jakarta Sans (body) + DM Serif Display (headings) */
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
@@ -53,75 +53,118 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* Base styles */
-
+/* Light Mode Variables */
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+
+  /* Background and Text */
+  --background: #f8fafc;
+  --foreground: #1f2937;
+
+  /* Card */
+  --card: #ffffff;
+  --card-foreground: #1f2937;
+
+  /* Popover */
+  --popover: #ffffff;
+  --popover-foreground: #1f2937;
+
+  /* Primary */
+  --primary: #1f2937;
+  --primary-foreground: #f8fafc;
+
+  /* Secondary */
+  --secondary: #f1f5f9;
+  --secondary-foreground: #1f2937;
+
+  /* Muted */
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+
+  /* Accent */
+  --accent: #f1f5f9;
+  --accent-foreground: #1f2937;
+
+  /* Destructive */
+  --destructive: #ef4444;
+
+  /* Border and Input */
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #94a3b8;
+
+  /* Chart colors */
+  --chart-1: #FF7FA1;
+  --chart-2: #29A0B1;
+  --chart-3: #FFD166;
+  --chart-4: #8b5cf6;
+  --chart-5: #f97316;
+
+  /* Sidebar */
+  --sidebar: #f8fafc;
+  --sidebar-foreground: #1f2937;
+  --sidebar-primary: #1f2937;
+  --sidebar-primary-foreground: #f8fafc;
+  --sidebar-accent: #f1f5f9;
+  --sidebar-accent-foreground: #1f2937;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #94a3b8;
 }
 
+/* Dark Mode Variables */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Background and Text */
+  --background: #0f172a;
+  --foreground: #f1f5f9;
+
+  /* Card */
+  --card: #1e293b;
+  --card-foreground: #f1f5f9;
+
+  /* Popover */
+  --popover: #1e293b;
+  --popover-foreground: #f1f5f9;
+
+  /* Primary - cpPink in dark mode */
+  --primary: #f1f5f9;
+  --primary-foreground: #1e293b;
+
+  /* Secondary */
+  --secondary: #334155;
+  --secondary-foreground: #f1f5f9;
+
+  /* Muted */
+  --muted: #334155;
+  --muted-foreground: #94a3b8;
+
+  /* Accent */
+  --accent: #334155;
+  --accent-foreground: #f1f5f9;
+
+  /* Destructive */
+  --destructive: #f87171;
+
+  /* Border and Input */
+  --border: #334155;
+  --input: #334155;
+  --ring: #64748b;
+
+  /* Chart colors - brighter for dark mode */
+  --chart-1: #FF8FAE;
+  --chart-2: #3DB3C2;
+  --chart-3: #FFD980;
+  --chart-4: #a78bfa;
+  --chart-5: #fb923c;
+
+  /* Sidebar */
+  --sidebar: #1e293b;
+  --sidebar-foreground: #f1f5f9;
+  --sidebar-primary: #FF7FA1;
+  --sidebar-primary-foreground: #1e293b;
+  --sidebar-accent: #334155;
+  --sidebar-accent-foreground: #f1f5f9;
+  --sidebar-border: #334155;
+  --sidebar-ring: #64748b;
 }
 
 @layer base {
@@ -130,5 +173,222 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Enhanced focus states for accessibility */
+  a:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  [tabindex]:focus-visible {
+    @apply outline-2 outline-offset-2 outline-cpPink ring-2 ring-cpPink/30;
+  }
+
+  /* Skip link for keyboard users */
+  .skip-link {
+    @apply absolute -top-10 left-4 z-[100] bg-cpPink text-white px-4 py-2 rounded-md font-medium;
+    transition: top 0.2s ease;
+  }
+  .skip-link:focus {
+    @apply top-4;
+  }
+}
+
+/* Animation utilities */
+@layer utilities {
+  /* Hover lift effect for cards */
+  .hover-lift {
+    @apply transition-all duration-200 ease-out;
+  }
+  .hover-lift:hover {
+    @apply -translate-y-1 shadow-lg;
+  }
+
+  /* Gentle scale on hover */
+  .hover-scale {
+    @apply transition-transform duration-200 ease-out;
+  }
+  .hover-scale:hover {
+    @apply scale-[1.02];
+  }
+
+  /* Fade in animation */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+
+  /* Slide up and fade in */
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out forwards;
+  }
+
+  /* Bounce in for success states */
+  .animate-bounce-in {
+    animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+  }
+
+  /* Pulse glow for emphasis */
+  .animate-pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+
+  /* Shimmer effect for loading states */
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+}
+
+/* Keyframe definitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 127, 161, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px 5px rgba(255, 127, 161, 0.2);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .hover-lift:hover,
+  .hover-scale:hover {
+    transform: none !important;
+  }
+}
+
+/* Dark mode overrides for brand-specific elements */
+@layer utilities {
+  /* Ensure brand colors remain vibrant in dark mode */
+  .dark .text-cpDark {
+    color: #f1f5f9;
+  }
+
+  /* Gradient backgrounds for dark mode */
+  .dark .from-cpPink\/20 {
+    --tw-gradient-from: rgb(255 127 161 / 0.15);
+  }
+  .dark .from-cpYellow\/20 {
+    --tw-gradient-from: rgb(255 209 102 / 0.15);
+  }
+  .dark .from-cpAqua\/20 {
+    --tw-gradient-from: rgb(41 160 177 / 0.15);
+  }
+  .dark .to-cpPink\/10 {
+    --tw-gradient-to: rgb(255 127 161 / 0.1);
+  }
+  .dark .to-cpYellow\/10 {
+    --tw-gradient-to: rgb(255 209 102 / 0.1);
+  }
+  .dark .to-cpAqua\/10 {
+    --tw-gradient-to: rgb(41 160 177 / 0.1);
+  }
+  .dark .via-cpYellow\/10 {
+    --tw-gradient-via: rgb(255 209 102 / 0.1);
+  }
+
+  /* Slate backgrounds for dark mode */
+  .dark .bg-slate-50 {
+    background-color: #1e293b;
+  }
+  .dark .bg-slate-50\/50 {
+    background-color: rgb(30 41 59 / 0.5);
+  }
+  .dark .bg-slate-100 {
+    background-color: #334155;
+  }
+
+  /* Text colors for dark mode */
+  .dark .text-slate-600 {
+    color: #94a3b8;
+  }
+  .dark .text-slate-500 {
+    color: #94a3b8;
+  }
+  .dark .text-slate-400 {
+    color: #64748b;
+  }
+  .dark .text-slate-300 {
+    color: #94a3b8;
+  }
+
+  /* White backgrounds become dark */
+  .dark .bg-white {
+    background-color: #1e293b;
+  }
+  .dark .bg-white\/95 {
+    background-color: rgb(30 41 59 / 0.95);
+  }
+  .dark .bg-white\/90 {
+    background-color: rgb(30 41 59 / 0.9);
+  }
+  .dark .bg-white\/80 {
+    background-color: rgb(30 41 59 / 0.8);
+  }
+  .dark .bg-white\/60 {
+    background-color: rgb(30 41 59 / 0.6);
   }
 }

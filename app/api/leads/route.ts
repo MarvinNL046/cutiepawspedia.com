@@ -4,6 +4,17 @@ import { db } from "@/db";
 import { leads, places } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { sendLeadNotification } from "@/lib/email/resend";
+import { chargeForLead } from "@/db/queries/credits";
+import {
+  getLeadPriceForBusiness,
+  shouldAutoCharge,
+} from "@/lib/pricing/getLeadPriceForBusiness";
+import {
+  getClientIP,
+  leadsRateLimiter,
+  rateLimitExceededResponse,
+} from "@/lib/rateLimit";
+import { logAuditEvent } from "@/db/queries/auditLogs";
 
 // Lead submission schema
 const leadSchema = z.object({
@@ -17,6 +28,17 @@ const leadSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: max 5 leads per 10 minutes per IP
+    const clientIP = getClientIP(request);
+    const rateLimitResult = await leadsRateLimiter(clientIP);
+
+    if (!rateLimitResult.allowed) {
+      console.warn(`Rate limit exceeded for leads from IP: ${clientIP}`);
+      return rateLimitExceededResponse(
+        "Too many lead submissions. Please wait a few minutes before trying again."
+      );
+    }
+
     const body = await request.json();
     const result = leadSchema.safeParse(body);
 
@@ -37,7 +59,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get place details for the notification
+    // Get place details for the notification and business for charging
     const place = await db.query.places.findFirst({
       where: eq(places.id, placeId),
       with: {
@@ -46,6 +68,7 @@ export async function POST(request: NextRequest) {
             country: true,
           },
         },
+        business: true, // Include business for auto-charging
       },
     });
 
@@ -56,11 +79,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Insert the lead
+    // Insert the lead (include businessId for denormalization)
     const [newLead] = await db
       .insert(leads)
       .values({
         placeId,
+        businessId: place.businessId, // Denormalized for quick lookups
         name,
         email,
         phone: phone || null,
@@ -68,6 +92,59 @@ export async function POST(request: NextRequest) {
         source: source || "website",
       })
       .returning();
+
+    // Log LEAD_CREATED audit event
+    logAuditEvent({
+      actorRole: "public",
+      eventType: "LEAD_CREATED",
+      targetType: "lead",
+      targetId: newLead.id,
+      metadata: {
+        placeId,
+        businessId: place.businessId,
+        source: source || "website",
+      },
+      ipAddress: clientIP,
+    });
+
+    // Auto-charge credits if business has auto-charge enabled
+    let chargeResult: { success: boolean; error?: string } | null = null;
+    if (place.business && shouldAutoCharge(place.business)) {
+      // Calculate lead price using pricing engine
+      const leadPriceCents = getLeadPriceForBusiness({
+        business: place.business,
+        place: { isPremium: place.isPremium, premiumLevel: place.premiumLevel },
+      });
+
+      // Attempt to charge credits
+      chargeResult = await chargeForLead({
+        businessId: place.business.id,
+        leadId: newLead.id,
+        priceCents: leadPriceCents,
+      });
+
+      if (chargeResult.success) {
+        // Log LEAD_CHARGED audit event
+        logAuditEvent({
+          actorBusinessId: place.business.id,
+          actorRole: "system",
+          eventType: "LEAD_CHARGED",
+          targetType: "lead",
+          targetId: newLead.id,
+          metadata: {
+            placeId,
+            priceCents: leadPriceCents,
+          },
+          ipAddress: clientIP,
+        });
+      } else {
+        // Log the failure but don't block lead creation
+        console.warn(
+          `Failed to charge credits for lead ${newLead.id}:`,
+          chargeResult.error
+        );
+      }
+    }
 
     // Send email notification to the business
     if (place.email) {

@@ -35,6 +35,11 @@ export type BusinessWithStats = {
 export type BusinessDetails = BusinessWithStats & {
   totalRevenue: number; // Placeholder for billing integration
   conversionRate: number;
+  // Additional business info
+  slug: string | null;
+  description: string | null;
+  website: string | null;
+  logo: string | null;
 };
 
 // ============================================================================
@@ -166,7 +171,11 @@ export async function getBusinessById(id: number): Promise<BusinessDetails | nul
     .select({
       id: businesses.id,
       userId: businesses.userId,
+      slug: businesses.slug,
       name: businesses.name,
+      description: businesses.description,
+      website: businesses.website,
+      logo: businesses.logo,
       contactEmail: businesses.contactEmail,
       contactPhone: businesses.contactPhone,
       status: businesses.status,
@@ -227,7 +236,7 @@ export async function getBusinessById(id: number): Promise<BusinessDetails | nul
 }
 
 /**
- * Get business by user ID
+ * Get business by user ID (legacy - returns first/only business)
  */
 export async function getBusinessByUserId(userId: number) {
   if (!db) return null;
@@ -235,6 +244,119 @@ export async function getBusinessByUserId(userId: number) {
   return db.query.businesses.findFirst({
     where: eq(businesses.userId, userId),
   });
+}
+
+/**
+ * Get all businesses for a user
+ * Used in business dashboard to show all businesses owned by user
+ */
+export async function getBusinessesForUser(userId: number): Promise<{
+  id: number;
+  slug: string | null;
+  name: string;
+  logo: string | null;
+  status: string;
+  plan: string;
+  creditBalanceCents: number;
+  createdAt: Date;
+}[]> {
+  if (!db) return [];
+
+  const result = await db
+    .select({
+      id: businesses.id,
+      slug: businesses.slug,
+      name: businesses.name,
+      logo: businesses.logo,
+      status: businesses.status,
+      plan: businesses.plan,
+      creditBalanceCents: businesses.creditBalanceCents,
+      createdAt: businesses.createdAt,
+    })
+    .from(businesses)
+    .where(eq(businesses.userId, userId))
+    .orderBy(desc(businesses.createdAt));
+
+  return result;
+}
+
+/**
+ * Get business by ID with user ownership check
+ * Returns null if user doesn't own the business (security check)
+ */
+export async function getBusinessByIdForUser(options: {
+  businessId: number;
+  userId: number;
+}): Promise<BusinessDetails | null> {
+  if (!db) return null;
+
+  const { businessId, userId } = options;
+
+  // First verify ownership
+  const business = await db
+    .select({
+      id: businesses.id,
+      userId: businesses.userId,
+      slug: businesses.slug,
+      name: businesses.name,
+      description: businesses.description,
+      website: businesses.website,
+      logo: businesses.logo,
+      contactEmail: businesses.contactEmail,
+      contactPhone: businesses.contactPhone,
+      status: businesses.status,
+      plan: businesses.plan,
+      billingStatus: businesses.billingStatus,
+      leadPriceCents: businesses.leadPriceCents,
+      creditBalanceCents: businesses.creditBalanceCents,
+      notes: businesses.notes,
+      createdAt: businesses.createdAt,
+      updatedAt: businesses.updatedAt,
+      ownerEmail: users.email,
+      ownerName: users.name,
+    })
+    .from(businesses)
+    .leftJoin(users, eq(businesses.userId, users.id))
+    .where(and(eq(businesses.id, businessId), eq(businesses.userId, userId)));
+
+  if (!business[0]) return null;
+
+  const biz = business[0];
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+  // Get stats
+  const [placesResult, leadsResult, leadsLast30DaysResult] = await Promise.all([
+    db.select({ value: count() }).from(places).where(eq(places.businessId, businessId)),
+    db
+      .select({ value: count() })
+      .from(leads)
+      .innerJoin(places, eq(leads.placeId, places.id))
+      .where(eq(places.businessId, businessId)),
+    db
+      .select({ value: count() })
+      .from(leads)
+      .innerJoin(places, eq(leads.placeId, places.id))
+      .where(
+        and(
+          eq(places.businessId, businessId),
+          gte(leads.createdAt, thirtyDaysAgo)
+        )
+      ),
+  ]);
+
+  const placesCount = placesResult[0]?.value ?? 0;
+  const leadsCount = leadsResult[0]?.value ?? 0;
+  const leadsLast30Days = leadsLast30DaysResult[0]?.value ?? 0;
+  const conversionRate = placesCount > 0 ? (leadsCount / placesCount) * 100 : 0;
+
+  return {
+    ...biz,
+    placesCount,
+    leadsCount,
+    leadsLast30Days,
+    totalRevenue: 0,
+    conversionRate: Math.round(conversionRate * 10) / 10,
+  };
 }
 
 /**

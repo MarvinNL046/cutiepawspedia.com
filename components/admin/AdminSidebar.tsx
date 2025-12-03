@@ -13,6 +13,12 @@ import {
   ChevronLeft,
   LogOut,
   Shield,
+  ClipboardCheck,
+  Coins,
+  ClipboardList,
+  Brain,
+  Camera,
+  Activity,
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -26,9 +32,9 @@ const navItems = [
     icon: LayoutDashboard,
   },
   {
-    href: "/admin/content",
-    label: "Content",
-    icon: FileText,
+    href: "/admin/claims",
+    label: "Claims",
+    icon: ClipboardCheck,
   },
   {
     href: "/admin/businesses",
@@ -39,6 +45,36 @@ const navItems = [
     href: "/admin/leads",
     label: "Leads",
     icon: MessageSquare,
+  },
+  {
+    href: "/admin/credits",
+    label: "Credits",
+    icon: Coins,
+  },
+  {
+    href: "/admin/audit",
+    label: "Audit Logs",
+    icon: ClipboardList,
+  },
+  {
+    href: "/admin/photos",
+    label: "Photos",
+    icon: Camera,
+  },
+  {
+    href: "/admin/data-quality",
+    label: "Data Quality",
+    icon: Activity,
+  },
+  {
+    href: "/admin/ai",
+    label: "AI Tools",
+    icon: Brain,
+  },
+  {
+    href: "/admin/content",
+    label: "Content",
+    icon: FileText,
   },
   {
     href: "/admin/analytics",

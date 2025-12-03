@@ -240,16 +240,18 @@ export function MapWidget({
             size="icon"
             className="bg-white shadow-md"
             onClick={toggleFullscreen}
+            aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
           >
-            {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+            {isFullscreen ? <Minimize2 className="h-4 w-4" aria-hidden="true" /> : <Maximize2 className="h-4 w-4" aria-hidden="true" />}
           </Button>
           <Button
             variant="secondary"
             size="icon"
             className="bg-white shadow-md"
             onClick={centerOnUser}
+            aria-label="Center map on my location"
           >
-            <Navigation className="h-4 w-4" />
+            <Navigation className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>
       )}

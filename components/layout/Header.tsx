@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Globe, Menu, User, LogOut, Settings } from "lucide-react";
 import { useAuth, isAuthConfigured } from "@/lib/auth/use-auth";
+import { ThemeToggle } from "@/components/theme";
 
 interface HeaderProps {
   locale: string;
@@ -28,12 +29,12 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
   const user = useAuth();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
-        <Link href={`/${locale}`} className="flex items-center gap-2">
-          <span className="text-2xl">🐾</span>
-          <span className="text-xl font-bold text-cpDark">
+        <Link href={`/${locale}`} className="flex items-center gap-2" aria-label="CutiePawsPedia - Go to homepage">
+          <span className="text-2xl" role="img" aria-hidden="true">🐾</span>
+          <span className="text-xl font-bold text-foreground">
             Cutie<span className="text-cpPink">Paws</span>Pedia
           </span>
         </Link>
@@ -44,25 +45,25 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
             <>
               <Link
                 href={`/${locale}`}
-                className="text-sm font-medium text-slate-600 hover:text-cpPink transition-colors"
+                className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors"
               >
                 Home
               </Link>
               <Link
                 href={`/${locale}/about`}
-                className="text-sm font-medium text-slate-600 hover:text-cpPink transition-colors"
+                className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors"
               >
                 About
               </Link>
               <Link
                 href={`/${locale}/for-businesses`}
-                className="text-sm font-medium text-slate-600 hover:text-cpPink transition-colors"
+                className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors"
               >
                 For Businesses
               </Link>
               <Link
                 href={`/${locale}/contact`}
-                className="text-sm font-medium text-slate-600 hover:text-cpPink transition-colors"
+                className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors"
               >
                 Contact
               </Link>
@@ -71,13 +72,13 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
             <>
               <Link
                 href={`/${locale}`}
-                className="text-sm font-medium text-slate-600 hover:text-cpPink transition-colors"
+                className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors"
               >
                 Directory
               </Link>
               <Link
                 href={`/${locale}/search`}
-                className="text-sm font-medium text-slate-600 hover:text-cpPink transition-colors"
+                className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors"
               >
                 Search
               </Link>
@@ -86,12 +87,15 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
         </nav>
 
         {/* Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          {/* Theme Toggle */}
+          <ThemeToggle />
+
           {/* Language Switcher */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="gap-2">
-                <Globe className="h-4 w-4" />
+              <Button variant="ghost" size="sm" className="gap-2" aria-label="Select language">
+                <Globe className="h-4 w-4" aria-hidden="true" />
                 <span className="hidden sm:inline uppercase">{locale}</span>
               </Button>
             </DropdownMenuTrigger>
@@ -108,8 +112,8 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
           {isAuthConfigured && user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2">
-                  <User className="h-4 w-4" />
+                <Button variant="ghost" size="sm" className="gap-2" aria-label="User menu">
+                  <User className="h-4 w-4" aria-hidden="true" />
                   <span className="hidden sm:inline max-w-[100px] truncate">
                     {user.displayName || user.primaryEmail?.split("@")[0]}
                   </span>
@@ -150,8 +154,9 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
           )}
 
           {/* Mobile Menu */}
-          <Button variant="ghost" size="sm" className="md:hidden">
-            <Menu className="h-5 w-5" />
+          <Button variant="ghost" size="sm" className="md:hidden" aria-label="Open menu">
+            <Menu className="h-5 w-5" aria-hidden="true" />
+            <span className="sr-only">Menu</span>
           </Button>
         </div>
       </div>

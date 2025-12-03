@@ -16,6 +16,7 @@ import {
   getLatestLeads,
   getLatestBusinesses,
 } from "@/db/queries/admin";
+import { getClaimStats } from "@/db/queries/claims";
 import {
   Globe,
   MapPin,
@@ -26,7 +27,11 @@ import {
   Crown,
   CheckCircle,
   Clock,
+  ClipboardCheck,
+  Coins,
 } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface AdminDashboardProps {
   params: Promise<{ locale: string }>;
@@ -37,11 +42,12 @@ export default async function AdminDashboard({ params }: AdminDashboardProps) {
   const user = await requireAdmin(locale);
 
   // Fetch all data in parallel
-  const [stats, latestPlaces, latestLeads, latestBusinesses] = await Promise.all([
+  const [stats, latestPlaces, latestLeads, latestBusinesses, claimStats] = await Promise.all([
     getAdminStats(),
     getLatestPlaces(5),
     getLatestLeads(5),
     getLatestBusinesses(5),
+    getClaimStats(),
   ]);
 
   return (
@@ -139,6 +145,35 @@ export default async function AdminDashboard({ params }: AdminDashboardProps) {
             color="slate"
           />
         </div>
+
+        {/* Stats Cards Row 4 - Claims (with action button) */}
+        {claimStats.pending > 0 && (
+          <Card className="border-amber-200 bg-amber-50/50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-lg bg-amber-100">
+                    <ClipboardCheck className="h-6 w-6 text-amber-600" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-semibold text-amber-800">
+                      {claimStats.pending} Pending Claim{claimStats.pending !== 1 ? "s" : ""}
+                    </p>
+                    <p className="text-sm text-amber-600">
+                      {claimStats.total} total claims ({claimStats.approved} approved, {claimStats.rejected} rejected)
+                    </p>
+                  </div>
+                </div>
+                <Link href={`/${locale}/admin/claims?status=pending`}>
+                  <Button className="bg-amber-600 hover:bg-amber-700">
+                    <ClipboardCheck className="h-4 w-4 mr-2" />
+                    Review Claims
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Latest Activity Tables */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -270,32 +305,47 @@ export default async function AdminDashboard({ params }: AdminDashboardProps) {
               </p>
             ) : (
               <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Listings</TableHead>
-                    <TableHead>Joined</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {latestBusinesses.map((business) => (
-                    <TableRow key={business.id}>
-                      <TableCell className="font-medium">{business.email}</TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {business.name || "—"}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary" className="bg-slate-100">
-                          {business.placesCount} listings
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground text-sm">
-                        {formatDate(business.createdAt)}
-                      </TableCell>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Business</TableHead>
+                      <TableHead>Owner</TableHead>
+                      <TableHead>Plan</TableHead>
+                      <TableHead>Listings</TableHead>
+                      <TableHead>Joined</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
+                  </TableHeader>
+                  <TableBody>
+                    {latestBusinesses.map((business) => (
+                      <TableRow key={business.id}>
+                        <TableCell className="font-medium">{business.name}</TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {business.ownerEmail || "—"}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant="secondary"
+                            className={
+                              business.plan === "enterprise"
+                                ? "bg-cpYellow/20 text-cpYellow border-0"
+                                : business.plan === "pro"
+                                  ? "bg-cpAqua/20 text-cpAqua border-0"
+                                  : "bg-slate-100"
+                            }
+                          >
+                            {business.plan}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="secondary" className="bg-slate-100">
+                            {business.placesCount} listings
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground text-sm">
+                          {formatDate(business.createdAt)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
               </Table>
             )}
           </CardContent>

@@ -69,6 +69,30 @@ export async function getCityById(cityId: number) {
 }
 
 // ============================================================================
+// COUNTS / STATS
+// ============================================================================
+
+export async function getCountryCount() {
+  if (!db) return 0;
+  const result = await db.query.countries.findMany();
+  return result.length;
+}
+
+export async function getCityCount() {
+  if (!db) return 0;
+  const result = await db.query.cities.findMany();
+  return result.length;
+}
+
+export async function getCityCountByCountry(countryId: number) {
+  if (!db) return 0;
+  const result = await db.query.cities.findMany({
+    where: eq(cities.countryId, countryId),
+  });
+  return result.length;
+}
+
+// ============================================================================
 // TYPES
 // ============================================================================
 

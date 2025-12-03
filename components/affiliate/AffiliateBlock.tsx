@@ -410,7 +410,7 @@ export function AffiliateBlock({
 
   // Card variant (default) - full featured
   return (
-    <Card className={`overflow-hidden ${className}`}>
+    <Card className={`overflow-hidden hover-lift ${className}`}>
       <CardHeader className={`${data.bgColor} pb-4`}>
         <CardTitle className="flex items-center gap-3">
           <div className="p-2 rounded-full bg-white shadow-sm">
@@ -435,7 +435,7 @@ export function AffiliateBlock({
               target="_blank"
               rel="noopener noreferrer sponsored"
               onClick={() => handleAffiliateClick(link, index)}
-              className="block p-3 rounded-lg border border-slate-200 hover:border-cpPink hover:shadow-sm transition-all group"
+              className="block p-3 rounded-lg border border-slate-200 hover:border-cpPink hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group"
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1">

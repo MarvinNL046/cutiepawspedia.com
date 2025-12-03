@@ -41,8 +41,8 @@ export function PlaceCard({ place, locale, countrySlug, citySlug, categorySlug, 
     : "";
 
   return (
-    <Link href={href}>
-      <Card className={`group hover:shadow-lg transition-all relative overflow-hidden ${premiumStyles}`}>
+    <Link href={href} className="block">
+      <Card className={`group hover-lift hover:shadow-lg relative overflow-hidden ${premiumStyles}`}>
         {/* Premium Ribbon */}
         {place.isPremium && (
           <div className="absolute top-0 right-0 z-10">

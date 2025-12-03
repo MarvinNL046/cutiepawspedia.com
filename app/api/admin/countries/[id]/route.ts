@@ -58,7 +58,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: "Country not found" }, { status: 404 });
     }
 
-    logAdminAction("UPDATE", "country", countryId, auth.user.id, validated);
+    await logAdminAction("UPDATE", "country", countryId, auth.user.id, validated);
 
     return NextResponse.json({ country });
   } catch (error) {
@@ -91,7 +91,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
   try {
     await deleteCountry(countryId);
 
-    logAdminAction("DELETE", "country", countryId, auth.user.id);
+    await logAdminAction("DELETE", "country", countryId, auth.user.id);
 
     return NextResponse.json({ success: true });
   } catch (error) {

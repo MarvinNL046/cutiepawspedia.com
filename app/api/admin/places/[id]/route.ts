@@ -65,7 +65,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: "Place not found" }, { status: 404 });
     }
 
-    logAdminAction("UPDATE", "place", placeId, auth.user.id, validated);
+    await logAdminAction("UPDATE", "place", placeId, auth.user.id, validated);
 
     return NextResponse.json({ place });
   } catch (error) {
@@ -104,7 +104,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     switch (action) {
       case "toggleVerified":
         place = await togglePlaceVerified(placeId, params.isVerified);
-        logAdminAction(
+        await logAdminAction(
           params.isVerified ? "VERIFY" : "UNVERIFY",
           "place",
           placeId,
@@ -118,7 +118,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
           params.isPremium,
           params.premiumUntil ? new Date(params.premiumUntil) : null
         );
-        logAdminAction(
+        await logAdminAction(
           params.isPremium ? "SET_PREMIUM" : "REMOVE_PREMIUM",
           "place",
           placeId,

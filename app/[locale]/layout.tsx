@@ -15,10 +15,14 @@ export default async function LocaleLayout({
 
   return (
     <div className="flex min-h-screen flex-col">
+      {/* Skip link for keyboard navigation */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       {/* Global JSON-LD structured data */}
       <JsonLd data={[websiteSchema(), organizationSchema()]} />
       <Header locale={locale} variant="directory" />
-      <main className="flex-1">{children}</main>
+      <main id="main-content" className="flex-1" tabIndex={-1}>{children}</main>
       <Footer locale={locale} />
     </div>
   );

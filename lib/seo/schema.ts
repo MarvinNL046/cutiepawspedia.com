@@ -277,6 +277,124 @@ export function faqSchema(
 }
 
 /**
+ * Individual Review schema for JSON-LD
+ * Used for featured reviews on place pages
+ */
+interface ReviewSchemaData {
+  id: number;
+  rating: number;
+  title?: string | null;
+  body: string;
+  createdAt: Date | string;
+  author?: {
+    name?: string | null;
+  } | null;
+  itemReviewed: {
+    name: string;
+    url: string;
+  };
+}
+
+/**
+ * Build Review JSON-LD schema for a single review
+ */
+export function reviewSchema(review: ReviewSchemaData): object {
+  const dateCreated = typeof review.createdAt === "string"
+    ? review.createdAt
+    : review.createdAt.toISOString();
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Review",
+    ...(review.title && { name: review.title }),
+    reviewBody: review.body,
+    reviewRating: {
+      "@type": "Rating",
+      ratingValue: review.rating,
+      bestRating: "5",
+      worstRating: "1",
+    },
+    datePublished: dateCreated.split("T")[0],
+    author: {
+      "@type": "Person",
+      name: review.author?.name || "Anonymous",
+    },
+    itemReviewed: {
+      "@type": "LocalBusiness",
+      name: review.itemReviewed.name,
+      url: review.itemReviewed.url,
+    },
+  };
+}
+
+/**
+ * Build array of Review JSON-LD schemas for multiple reviews
+ * Typically used for featured reviews on place pages
+ */
+export function reviewsSchema(
+  reviews: Array<Omit<ReviewSchemaData, "itemReviewed">>,
+  itemReviewed: { name: string; url: string }
+): object[] {
+  return reviews.map((review) =>
+    reviewSchema({
+      ...review,
+      itemReviewed,
+    })
+  );
+}
+
+/**
+ * Enhanced LocalBusiness schema with embedded reviews
+ * Includes both aggregateRating and individual review snippets
+ */
+export function localBusinessWithReviewsSchema(
+  place: PlaceSchemaData,
+  locale: string,
+  categorySlug: string,
+  reviews: Array<{
+    id: number;
+    rating: number;
+    title?: string | null;
+    body: string;
+    createdAt: Date | string;
+    author?: { name?: string | null } | null;
+  }>
+): object {
+  // Get base LocalBusiness schema
+  const baseSchema = localBusinessSchema(place, locale, categorySlug) as Record<string, unknown>;
+
+  // Add reviews to the schema (Google supports up to ~10 reviews)
+  if (reviews.length > 0) {
+    const reviewItems = reviews.slice(0, 10).map((review) => {
+      const dateCreated = typeof review.createdAt === "string"
+        ? review.createdAt
+        : review.createdAt.toISOString();
+
+      return {
+        "@type": "Review",
+        ...(review.title && { name: review.title }),
+        reviewBody: review.body.slice(0, 500), // Truncate for SEO
+        reviewRating: {
+          "@type": "Rating",
+          ratingValue: review.rating,
+          bestRating: "5",
+          worstRating: "1",
+        },
+        datePublished: dateCreated.split("T")[0],
+        author: {
+          "@type": "Person",
+          name: review.author?.name || "Anonymous",
+        },
+      };
+    });
+
+    baseSchema.review = reviewItems;
+  }
+
+  return baseSchema;
+}
+
+/**
  * Map category slug to schema.org type
  */
 function mapCategoryToSchemaType(categorySlug: string): string {

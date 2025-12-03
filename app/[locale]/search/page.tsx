@@ -15,7 +15,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { searchPlaces, getCategories, getCountries } from "@/db/queries";
-import { getSearchMetadata } from "@/lib/seo";
+import { getSearchMetadata, getLocalizedCategoryName, type ContentLocale } from "@/lib/seo";
 import { PlaceCard, MapWidgetLazy as MapWidget, type MapMarker } from "@/components/directory";
 import { SearchBar } from "@/components/directory";
 import { SearchTracker } from "@/components/analytics";
@@ -299,8 +299,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
   const searchSummary = [];
   if (query) searchSummary.push(`"${query}"`);
   if (categorySlug) {
-    const cat = categories.find((c) => c.slug === categorySlug);
-    if (cat) searchSummary.push(cat.labelKey);
+    searchSummary.push(getLocalizedCategoryName(categorySlug, locale as ContentLocale));
   }
   if (citySlug) searchSummary.push(citySlug.replace(/-/g, " "));
   if (countrySlug) searchSummary.push(countrySlug.replace(/-/g, " "));
@@ -310,9 +309,9 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
       {/* Search Header */}
       <section className="relative overflow-hidden bg-gradient-to-br from-cpAqua/10 via-white to-cpPink/10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(41,160,177,0.1),transparent_50%)]" />
-        <div className="relative container mx-auto px-4 py-12 md:py-16">
+        <div className="relative container mx-auto max-w-6xl px-4 py-12 md:py-16">
           <div className="flex items-center gap-2 text-sm text-slate-500 mb-4 flex-wrap">
-            <Link href={`/${locale}`} className="hover:text-cpPink">
+            <Link href={`/${locale}`} className="hover:text-cpPink transition-colors">
               Directory
             </Link>
             <ChevronRight className="h-4 w-4" />
@@ -324,7 +323,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
               <Search className="h-8 w-8 text-cpAqua" />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-cpDark">
+              <h1 className="text-3xl md:text-4xl font-bold text-cpDark tracking-tight">
                 {searchSummary.length > 0 ? `Search: ${searchSummary.join(" in ")}` : "Search Pet Services"}
               </h1>
               <p className="text-slate-600 mt-1">Find the best pet services near you</p>
@@ -340,7 +339,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
 
       {/* Filters Bar */}
       <section className="sticky top-16 z-40 bg-white border-b shadow-sm">
-        <div className="container mx-auto px-4 py-3">
+        <div className="container mx-auto max-w-6xl px-4 py-3">
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-2 flex-wrap">
               {/* Category Filter */}
@@ -377,7 +376,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
                         ...(sortBy && { sort: sortBy }),
                       }).toString()}`}
                     >
-                      {cat.labelKey}
+                      {getLocalizedCategoryName(cat.slug, locale as ContentLocale)}
                     </Link>
                   </Badge>
                 ))}
@@ -464,7 +463,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
       </section>
 
       {/* Search Results */}
-      <section className="container mx-auto px-4 py-8">
+      <section className="container mx-auto max-w-6xl px-4 py-8">
         <Suspense fallback={<SearchSkeleton />}>
           <SearchResults
             locale={locale}
@@ -481,8 +480,8 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
 
       {/* Popular Countries */}
       {countries.length > 0 && (
-        <section className="container mx-auto px-4 py-8 pb-16">
-          <h2 className="text-xl font-bold text-cpDark mb-4">Browse by Country</h2>
+        <section className="container mx-auto max-w-6xl px-4 py-8 pb-16">
+          <h2 className="text-xl font-bold text-cpDark mb-4 tracking-tight">Browse by Country</h2>
           <div className="flex flex-wrap gap-2">
             {countries.map((country) => (
               <Link key={country.slug} href={`/${locale}/${country.slug}`}>

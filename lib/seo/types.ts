@@ -10,12 +10,39 @@
 
 /**
  * All supported page types for SEO generation
+ *
+ * Page type hierarchy:
+ * - home: Landing page
+ * - country: Country overview
+ * - city: City overview
+ * - category: Category in city (existing)
+ * - place: Individual place/business
+ *
+ * New SEO expansion routes (C2):
+ * - countryCategory: National category page (/{country}/c/{category})
+ * - bestInCountry: Best places in country (/{country}/best/{category})
+ * - topInCountry: Top N in country (/{country}/top/{category})
+ * - bestInCity: Best places in city (/{country}/{city}/best/{category})
  */
-export type SeoPageType = "home" | "country" | "city" | "category" | "place";
+export type SeoPageType =
+  | "home"
+  | "country"
+  | "city"
+  | "category"
+  | "place"
+  | "countryCategory"
+  | "bestInCountry"
+  | "topInCountry"
+  | "bestInCity";
 
 // =============================================================================
 // CONTEXT & DATA
 // =============================================================================
+
+/**
+ * List variants for SEO pages (best-of, top-N, etc.)
+ */
+export type SeoListVariant = "default" | "best" | "top";
 
 /**
  * Context passed to SEO generators to identify the current page
@@ -26,6 +53,10 @@ export interface SeoContext {
   citySlug?: string;
   categorySlug?: string;
   placeSlug?: string;
+  /** For list pages (best-of, top-N) */
+  listVariant?: SeoListVariant;
+  /** For top-N pages, how many to show */
+  topCount?: number;
 }
 
 /**

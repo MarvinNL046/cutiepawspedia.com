@@ -2,6 +2,7 @@
  * Core SEO Data Generator
  *
  * Main function for generating SEO metadata based on page type and context.
+ * Integrates with AI content generators for enhanced meta descriptions.
  */
 
 import type {
@@ -22,12 +23,46 @@ import {
 import {
   getCountryBySlug,
   getCityBySlugAndCountry,
+  getCityCountByCountry,
 } from "@/db/queries/locations";
 import {
   getCategoryBySlug,
   getPlaceBySlug,
   getPlacesByCitySlugAndCategorySlug,
+  getPlaceCountByCity,
 } from "@/db/queries/listings";
+import type { ContentLocale } from "./aiContent";
+import {
+  generateHomeContent,
+  generateCountryContent,
+  generateCityContent,
+  generateCategoryCityContent,
+  generatePlaceContent,
+} from "./contentGenerators";
+
+// =============================================================================
+// SEO DEBUG LOGGING
+// =============================================================================
+
+const SEO_DEBUG = process.env.NEXT_PUBLIC_SEO_DEBUG === "true";
+
+/**
+ * Debug helper to log SEO data in development
+ */
+function logSeoDebug(pageType: SeoPageType, ctx: SeoContext, seoData: SeoData): void {
+  if (!SEO_DEBUG) return;
+
+  console.log("\n[SEO DEBUG]", "─".repeat(50));
+  console.log("Page Type:", pageType);
+  console.log("Context:", JSON.stringify(ctx, null, 2));
+  console.log("Title:", seoData.title);
+  console.log("Description:", seoData.description?.slice(0, 100) + "...");
+  console.log("Canonical:", seoData.canonicalUrl);
+  if (seoData.keywords?.length) {
+    console.log("Keywords:", seoData.keywords.join(", "));
+  }
+  console.log("─".repeat(60), "\n");
+}
 
 // =============================================================================
 // TITLE TEMPLATES
@@ -150,25 +185,36 @@ export async function generateSeoData(
   };
 
   // Generate page-specific data
+  let result: SeoData;
   switch (pageType) {
     case "home":
-      return generateHomeSeo(seoData, locale);
+      result = generateHomeSeo(seoData, locale);
+      break;
 
     case "country":
-      return await generateCountrySeo(seoData, ctx, locale);
+      result = await generateCountrySeo(seoData, ctx, locale);
+      break;
 
     case "city":
-      return await generateCitySeo(seoData, ctx, locale);
+      result = await generateCitySeo(seoData, ctx, locale);
+      break;
 
     case "category":
-      return await generateCategorySeo(seoData, ctx, locale);
+      result = await generateCategorySeo(seoData, ctx, locale);
+      break;
 
     case "place":
-      return await generatePlaceSeo(seoData, ctx, locale);
+      result = await generatePlaceSeo(seoData, ctx, locale);
+      break;
 
     default:
-      return seoData;
+      result = seoData;
   }
+
+  // Debug logging (when NEXT_PUBLIC_SEO_DEBUG=true)
+  logSeoDebug(pageType, ctx, result);
+
+  return result;
 }
 
 // =============================================================================
@@ -178,11 +224,22 @@ export async function generateSeoData(
 function generateHomeSeo(seoData: SeoData, locale: string): SeoData {
   const loc = locale as "nl" | "en";
 
+  // Use content generator for enhanced meta description
+  const content = generateHomeContent({
+    locale: locale as ContentLocale,
+    totalCountries: 8,
+    totalCities: 50,
+    totalPlaces: 1000,
+    topCategories: [],
+  });
+
+  const title = TITLE_TEMPLATES.home[loc] || TITLE_TEMPLATES.home.nl;
+  const description = content.metaDescription || DESCRIPTION_TEMPLATES.home[loc] || DESCRIPTION_TEMPLATES.home.nl;
+
   return {
     ...seoData,
-    title: TITLE_TEMPLATES.home[loc] || TITLE_TEMPLATES.home.nl,
-    description:
-      DESCRIPTION_TEMPLATES.home[loc] || DESCRIPTION_TEMPLATES.home.nl,
+    title,
+    description,
     keywords: [
       "huisdierservices",
       "dierenarts",
@@ -192,9 +249,8 @@ function generateHomeSeo(seoData: SeoData, locale: string): SeoData {
       "veterinarian",
     ],
     openGraph: {
-      title: TITLE_TEMPLATES.home[loc] || TITLE_TEMPLATES.home.nl,
-      description:
-        DESCRIPTION_TEMPLATES.home[loc] || DESCRIPTION_TEMPLATES.home.nl,
+      title,
+      description,
       url: seoData.canonicalUrl,
       siteName: DEFAULT_SEO_CONFIG.siteName,
       locale,
@@ -214,13 +270,20 @@ async function generateCountrySeo(
   if (!country) return seoData;
 
   const loc = locale as "nl" | "en";
-  const cityCount = 10; // TODO: Get actual count from DB
+  const cityCount = await getCityCountByCountry(country.id);
+
+  // Use content generator for enhanced meta description
+  const content = generateCountryContent({
+    locale: locale as ContentLocale,
+    countryName: country.name,
+    countrySlug: country.slug,
+    totalCities: cityCount,
+    totalPlaces: cityCount * 10, // Estimate
+    topCategories: [],
+  });
 
   const title = TITLE_TEMPLATES.country[loc](country.name);
-  const description = DESCRIPTION_TEMPLATES.country[loc](
-    country.name,
-    cityCount
-  );
+  const description = content.metaDescription || DESCRIPTION_TEMPLATES.country[loc](country.name, cityCount);
 
   return {
     ...seoData,
@@ -253,10 +316,20 @@ async function generateCitySeo(
   if (!city) return seoData;
 
   const loc = locale as "nl" | "en";
-  const placeCount = 50; // TODO: Get actual count from DB
+  const placeCount = await getPlaceCountByCity(city.id);
+
+  // Use content generator for enhanced meta description
+  const content = generateCityContent({
+    locale: locale as ContentLocale,
+    cityName: city.name,
+    countryName: city.country?.name || "",
+    countrySlug: ctx.countrySlug,
+    totalPlaces: placeCount,
+    categoryStats: [],
+  });
 
   const title = TITLE_TEMPLATES.city[loc](city.name, city.country?.name || "");
-  const description = DESCRIPTION_TEMPLATES.city[loc](city.name, placeCount);
+  const description = content.metaDescription || DESCRIPTION_TEMPLATES.city[loc](city.name, placeCount);
 
   return {
     ...seoData,
@@ -302,8 +375,18 @@ async function generateCategorySeo(
   const loc = locale as "nl" | "en";
   const categoryLabel = getCategoryLabel(ctx.categorySlug, locale);
 
+  // Use content generator for enhanced meta description
+  const content = generateCategoryCityContent({
+    locale: locale as ContentLocale,
+    categoryName: category.labelKey || categoryLabel,
+    categorySlug: ctx.categorySlug,
+    cityName: city.name,
+    countryName: city.country?.name || "",
+    totalPlaces: placeCount,
+  });
+
   const title = TITLE_TEMPLATES.category[loc](categoryLabel, city.name);
-  const description = DESCRIPTION_TEMPLATES.category[loc](
+  const description = content.metaDescription || DESCRIPTION_TEMPLATES.category[loc](
     categoryLabel,
     city.name,
     placeCount
@@ -353,9 +436,24 @@ async function generatePlaceSeo(
   const loc = locale as "nl" | "en";
   const categoryLabel = getCategoryLabel(ctx.categorySlug, locale);
   const cityName = place.city?.name || ctx.citySlug;
+  const countryName = place.city?.country?.name || ctx.countrySlug;
+
+  // Use content generator for enhanced meta description
+  const content = generatePlaceContent({
+    locale: locale as ContentLocale,
+    placeName: place.name,
+    placeSlug: place.slug,
+    cityName,
+    countryName,
+    categories: place.placeCategories?.map((pc) => pc.category?.slug || "") || [ctx.categorySlug],
+    rating: place.avgRating ? parseFloat(place.avgRating) : undefined,
+    reviewCount: place.reviewCount || undefined,
+    description: place.description || undefined,
+    address: place.address || undefined,
+  });
 
   const title = TITLE_TEMPLATES.place[loc](place.name, cityName);
-  const description = DESCRIPTION_TEMPLATES.place[loc](
+  const description = content.metaDescription || DESCRIPTION_TEMPLATES.place[loc](
     place.name,
     categoryLabel,
     cityName,

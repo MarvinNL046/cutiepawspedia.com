@@ -58,7 +58,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: "Category not found" }, { status: 404 });
     }
 
-    logAdminAction("UPDATE", "category", categoryId, auth.user.id, validated);
+    await logAdminAction("UPDATE", "category", categoryId, auth.user.id, validated);
 
     return NextResponse.json({ category });
   } catch (error) {
@@ -91,7 +91,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
   try {
     await deleteCategory(categoryId);
 
-    logAdminAction("DELETE", "category", categoryId, auth.user.id);
+    await logAdminAction("DELETE", "category", categoryId, auth.user.id);
 
     return NextResponse.json({ success: true });
   } catch (error) {

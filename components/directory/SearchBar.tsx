@@ -41,50 +41,53 @@ export function SearchBar({
 
   if (compact) {
     return (
-      <form onSubmit={handleSearch} className={`flex gap-2 ${className}`}>
+      <form onSubmit={handleSearch} className={`flex gap-2 ${className}`} role="search" aria-label="Search pet services">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
           <Input
             type="text"
             placeholder={placeholder}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="pl-10"
+            aria-label="Search query"
           />
         </div>
-        <Button type="submit" size="icon" className="bg-cpPink hover:bg-cpPink/90" disabled={isSearching}>
-          {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+        <Button type="submit" size="icon" className="bg-cpPink hover:bg-cpPink/90" disabled={isSearching} aria-label="Submit search">
+          {isSearching ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Search className="h-4 w-4" aria-hidden="true" />}
         </Button>
       </form>
     );
   }
 
   return (
-    <form onSubmit={handleSearch} className={`flex flex-col sm:flex-row gap-2 ${className}`}>
+    <form onSubmit={handleSearch} className={`flex flex-col sm:flex-row gap-2 ${className}`} role="search" aria-label="Search pet services">
       <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
         <Input
           type="text"
           placeholder={placeholder}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="pl-10"
+          aria-label="Search query"
         />
       </div>
       <div className="relative flex-1">
-        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
         <Input
           type="text"
           placeholder="City or region..."
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           className="pl-10"
+          aria-label="City or region"
         />
       </div>
       <Button type="submit" className="bg-cpPink hover:bg-cpPink/90" disabled={isSearching}>
         {isSearching ? (
           <>
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
             Searching...
           </>
         ) : (

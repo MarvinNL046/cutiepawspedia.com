@@ -345,3 +345,32 @@ export function localBusinessSchema(
 export function breadcrumbSchema(items: BreadcrumbItem[]): object {
   return buildBreadcrumbJsonLd({ items });
 }
+
+/**
+ * Build ItemList JSON-LD schema (simplified helper for SEO pages)
+ * Ideal for "Best of" and "Top N" listing pages
+ */
+export function itemListSchema(
+  items: Array<{
+    name: string;
+    url: string;
+    position?: number;
+    description?: string;
+    image?: string;
+  }>,
+  name: string,
+  description?: string
+): object {
+  return buildItemListJsonLd({
+    url: items[0]?.url?.split("/").slice(0, -1).join("/") || "",
+    name,
+    description,
+    items: items.map((item, index) => ({
+      name: item.name,
+      url: item.url,
+      position: item.position ?? index + 1,
+      description: item.description,
+      image: item.image,
+    })),
+  });
+}

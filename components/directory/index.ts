@@ -1,5 +1,10 @@
 export { SearchBar } from "./SearchBar";
 export { PlaceCard } from "./PlaceCard";
+export { CategoryCard, getCategoryIcon } from "./CategoryCard";
+export { CountryCard, getCountryFlag } from "./CountryCard";
+export { CityCard } from "./CityCard";
 export { MapWidget } from "./MapWidget";
 export { MapWidgetLazy } from "./MapWidgetLazy";
+export { StaticMap, StaticMapWithDirections } from "./StaticMap";
 export type { MapMarker } from "./MapWidget";
+export type { StaticMapProps } from "./StaticMap";

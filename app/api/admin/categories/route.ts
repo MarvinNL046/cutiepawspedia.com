@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     const category = await createCategory(validated);
 
-    logAdminAction("CREATE", "category", category.id, auth.user.id, {
+    await logAdminAction("CREATE", "category", category.id, auth.user.id, {
       slug: category.slug,
       labelKey: category.labelKey,
     });

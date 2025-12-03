@@ -95,3 +95,36 @@ export const reviewStatusSchema = z.object({
 });
 
 export type ReviewStatusInput = z.infer<typeof reviewStatusSchema>;
+
+// ============================================================================
+// BUSINESS SCHEMAS
+// ============================================================================
+
+export const businessStatusEnum = z.enum(["active", "pending", "suspended"]);
+export const businessPlanEnum = z.enum(["free", "starter", "pro", "enterprise"]);
+export const billingStatusEnum = z.enum(["trial", "paid", "overdue", "cancelled"]);
+
+export const businessSchema = z.object({
+  name: z.string().min(2, "Business name must be at least 2 characters"),
+  contactEmail: z.string().email("Invalid email address").optional().nullable().or(z.literal("")),
+  contactPhone: z.string().optional().nullable(),
+  status: businessStatusEnum.default("active"),
+  plan: businessPlanEnum.default("free"),
+  billingStatus: billingStatusEnum.default("trial"),
+  leadPriceCents: z.coerce.number().int().min(0).optional().nullable(),
+  notes: z.string().optional().nullable(),
+});
+
+export const createBusinessSchema = businessSchema.extend({
+  userId: z.number().int().positive("User is required"),
+});
+
+export const updateBusinessSchema = businessSchema.partial();
+
+export const businessNotesSchema = z.object({
+  notes: z.string().nullable(),
+});
+
+export type CreateBusinessInput = z.infer<typeof createBusinessSchema>;
+export type UpdateBusinessInput = z.infer<typeof updateBusinessSchema>;
+export type BusinessNotesInput = z.infer<typeof businessNotesSchema>;

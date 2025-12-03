@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       lng: validated.lng?.toString() ?? null,
     });
 
-    logAdminAction("CREATE", "city", city.id, auth.user.id, {
+    await logAdminAction("CREATE", "city", city.id, auth.user.id, {
       name: city.name,
       countryId: city.countryId,
     });

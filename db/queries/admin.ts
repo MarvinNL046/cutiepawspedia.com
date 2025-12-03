@@ -1,4 +1,4 @@
-import { sql, eq, desc, count, gte, and } from "drizzle-orm";
+import { sql, eq, desc, count, gte, and, like, or } from "drizzle-orm";
 import { db } from "../index";
 import {
   countries,
@@ -8,6 +8,8 @@ import {
   users,
   leads,
   reviews,
+  businesses,
+  adminAuditLogs,
 } from "../schema";
 
 // ============================================================================
@@ -88,10 +90,10 @@ export async function getAdminStats(): Promise<AdminStats> {
     db.select({ value: count() }).from(places).where(eq(places.isVerified, true)),
     // Places unverified (pending review)
     db.select({ value: count() }).from(places).where(eq(places.isVerified, false)),
-    // Business users total
-    db.select({ value: count() }).from(users).where(eq(users.role, "business")),
-    // Business users with at least one place (active)
-    db.selectDistinct({ ownerId: places.ownerId }).from(places).where(sql`${places.ownerId} IS NOT NULL`),
+    // Business accounts total
+    db.select({ value: count() }).from(businesses),
+    // Active businesses (with at least one place)
+    db.selectDistinct({ businessId: places.businessId }).from(places).where(sql`${places.businessId} IS NOT NULL`),
     // Leads total
     db.select({ value: count() }).from(leads),
     // Leads last 7 days
@@ -199,8 +201,10 @@ export async function getLatestLeads(limit: number = 10): Promise<LatestLead[]> 
 
 export type LatestBusiness = {
   id: number;
-  email: string;
-  name: string | null;
+  name: string;
+  ownerEmail: string | null;
+  status: string;
+  plan: string;
   placesCount: number;
   createdAt: Date;
 };
@@ -211,31 +215,33 @@ export type LatestBusiness = {
 export async function getLatestBusinesses(limit: number = 10): Promise<LatestBusiness[]> {
   if (!db) return [];
 
-  const database = db; // Store reference for use in closure
+  const database = db;
 
-  // Get business users with their places count
+  // Get businesses with owner info
   const result = await database
     .select({
-      id: users.id,
-      email: users.email,
-      name: users.name,
-      createdAt: users.createdAt,
+      id: businesses.id,
+      name: businesses.name,
+      ownerEmail: users.email,
+      status: businesses.status,
+      plan: businesses.plan,
+      createdAt: businesses.createdAt,
     })
-    .from(users)
-    .where(eq(users.role, "business"))
-    .orderBy(desc(users.createdAt))
+    .from(businesses)
+    .leftJoin(users, eq(businesses.userId, users.id))
+    .orderBy(desc(businesses.createdAt))
     .limit(limit);
 
-  // Get places count for each user
+  // Get places count for each business
   const businessesWithCounts = await Promise.all(
-    result.map(async (user) => {
+    result.map(async (business) => {
       const placesCount = await database
         .select({ value: count() })
         .from(places)
-        .where(eq(places.ownerId, user.id));
+        .where(eq(places.businessId, business.id));
 
       return {
-        ...user,
+        ...business,
         placesCount: placesCount[0]?.value ?? 0,
       };
     })
@@ -304,33 +310,36 @@ export async function getCitiesWithStats(countryId?: number) {
 export async function getBusinessesWithStats() {
   if (!db) return [];
 
-  const database = db; // Store reference for use in closure
+  const database = db;
 
-  const businessUsers = await database
+  const businessList = await database
     .select({
-      id: users.id,
-      email: users.email,
-      name: users.name,
-      createdAt: users.createdAt,
+      id: businesses.id,
+      name: businesses.name,
+      ownerEmail: users.email,
+      status: businesses.status,
+      plan: businesses.plan,
+      billingStatus: businesses.billingStatus,
+      createdAt: businesses.createdAt,
     })
-    .from(users)
-    .where(eq(users.role, "business"))
-    .orderBy(desc(users.createdAt));
+    .from(businesses)
+    .leftJoin(users, eq(businesses.userId, users.id))
+    .orderBy(desc(businesses.createdAt));
 
   // Get stats for each business
   const withStats = await Promise.all(
-    businessUsers.map(async (user) => {
+    businessList.map(async (business) => {
       const [placesResult, leadsResult] = await Promise.all([
-        database.select({ value: count() }).from(places).where(eq(places.ownerId, user.id)),
+        database.select({ value: count() }).from(places).where(eq(places.businessId, business.id)),
         database
           .select({ value: count() })
           .from(leads)
           .innerJoin(places, eq(leads.placeId, places.id))
-          .where(eq(places.ownerId, user.id)),
+          .where(eq(places.businessId, business.id)),
       ]);
 
       return {
-        ...user,
+        ...business,
         placesCount: placesResult[0]?.value ?? 0,
         leadsCount: leadsResult[0]?.value ?? 0,
       };
@@ -374,21 +383,30 @@ export async function getAdminLeads(options: {
   const leadsResult = await db
     .select({
       id: leads.id,
+      placeId: leads.placeId,
+      businessId: leads.businessId,
       name: leads.name,
       email: leads.email,
       phone: leads.phone,
       message: leads.message,
       source: leads.source,
+      status: leads.status,
+      priceCents: leads.priceCents,
+      chargedAt: leads.chargedAt,
+      chargedTransactionId: leads.chargedTransactionId,
+      viewedAt: leads.viewedAt,
       createdAt: leads.createdAt,
       placeName: places.name,
       placeSlug: places.slug,
       cityName: cities.name,
       countryName: countries.name,
+      businessName: businesses.name,
     })
     .from(leads)
     .leftJoin(places, eq(leads.placeId, places.id))
     .leftJoin(cities, eq(places.cityId, cities.id))
     .leftJoin(countries, eq(cities.countryId, countries.id))
+    .leftJoin(businesses, eq(leads.businessId, businesses.id))
     .where(whereClause)
     .orderBy(desc(leads.createdAt))
     .limit(limit)
@@ -685,12 +703,18 @@ export async function getAdminReviews(options: {
   limit?: number;
   offset?: number;
   placeId?: number;
+  status?: "pending" | "published" | "rejected" | "flagged";
 } = {}) {
   if (!db) return { reviews: [], total: 0 };
 
-  const { limit = 50, offset = 0, placeId } = options;
+  const { limit = 50, offset = 0, placeId, status } = options;
 
-  const whereClause = placeId ? eq(reviews.placeId, placeId) : undefined;
+  // Build where conditions
+  const conditions = [];
+  if (placeId) conditions.push(eq(reviews.placeId, placeId));
+  if (status) conditions.push(eq(reviews.status, status));
+
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
   // Get total count
   const totalResult = await db
@@ -703,10 +727,17 @@ export async function getAdminReviews(options: {
     .select({
       id: reviews.id,
       rating: reviews.rating,
-      comment: reviews.comment,
+      title: reviews.title,
+      body: reviews.body,
+      status: reviews.status,
+      isFeatured: reviews.isFeatured,
+      locale: reviews.locale,
+      visitDate: reviews.visitDate,
       createdAt: reviews.createdAt,
+      updatedAt: reviews.updatedAt,
       placeId: reviews.placeId,
       placeName: places.name,
+      placeSlug: places.slug,
       userId: reviews.userId,
       userEmail: users.email,
       userName: users.name,
@@ -741,3 +772,249 @@ export type BusinessWithStats = Awaited<ReturnType<typeof getBusinessesWithStats
 export type LeadWithDetails = Awaited<ReturnType<typeof getAdminLeads>>["leads"][number];
 export type AdminPlace = Awaited<ReturnType<typeof getAdminPlaces>>["places"][number];
 export type AdminReview = Awaited<ReturnType<typeof getAdminReviews>>["reviews"][number];
+
+// ============================================================================
+// ADMIN AUDIT LOGS
+// ============================================================================
+
+export type AuditLogEntry = {
+  id: number;
+  adminId: number;
+  adminEmail: string | null;
+  adminName: string | null;
+  action: string;
+  entityType: string;
+  entityId: number | null;
+  details: string | null;
+  ipAddress: string | null;
+  userAgent: string | null;
+  createdAt: Date;
+};
+
+/**
+ * Create an audit log entry
+ */
+export async function createAuditLog(data: {
+  adminId: number;
+  action: string;
+  entityType: string;
+  entityId?: number | null;
+  details?: Record<string, unknown> | null;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+}): Promise<void> {
+  if (!db) {
+    // Fallback to console logging if DB not available
+    console.log(
+      `ADMIN_ACTION: ${data.action} | Entity: ${data.entityType}#${data.entityId ?? "N/A"} | Admin: ${data.adminId}`,
+      data.details ? `| Details: ${JSON.stringify(data.details)}` : ""
+    );
+    return;
+  }
+
+  await db.insert(adminAuditLogs).values({
+    adminId: data.adminId,
+    action: data.action,
+    entityType: data.entityType,
+    entityId: data.entityId ?? null,
+    details: data.details ? JSON.stringify(data.details) : null,
+    ipAddress: data.ipAddress ?? null,
+    userAgent: data.userAgent ?? null,
+  });
+}
+
+/**
+ * Get audit logs with filtering and pagination
+ */
+export async function getAuditLogs(options: {
+  limit?: number;
+  offset?: number;
+  adminId?: number;
+  action?: string;
+  entityType?: string;
+  entityId?: number;
+  startDate?: Date;
+  endDate?: Date;
+  search?: string;
+} = {}): Promise<{ logs: AuditLogEntry[]; total: number }> {
+  if (!db) return { logs: [], total: 0 };
+
+  const {
+    limit = 50,
+    offset = 0,
+    adminId,
+    action,
+    entityType,
+    entityId,
+    startDate,
+    endDate,
+    search,
+  } = options;
+
+  // Build conditions
+  const conditions = [];
+  if (adminId) {
+    conditions.push(eq(adminAuditLogs.adminId, adminId));
+  }
+  if (action) {
+    conditions.push(eq(adminAuditLogs.action, action));
+  }
+  if (entityType) {
+    conditions.push(eq(adminAuditLogs.entityType, entityType));
+  }
+  if (entityId) {
+    conditions.push(eq(adminAuditLogs.entityId, entityId));
+  }
+  if (startDate) {
+    conditions.push(gte(adminAuditLogs.createdAt, startDate));
+  }
+  if (endDate) {
+    conditions.push(sql`${adminAuditLogs.createdAt} <= ${endDate}`);
+  }
+  if (search) {
+    conditions.push(
+      or(
+        like(adminAuditLogs.action, `%${search}%`),
+        like(adminAuditLogs.entityType, `%${search}%`),
+        like(adminAuditLogs.details, `%${search}%`)
+      )
+    );
+  }
+
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+  // Get total count
+  const totalResult = await db
+    .select({ value: count() })
+    .from(adminAuditLogs)
+    .where(whereClause);
+
+  // Get logs with admin info
+  const logsResult = await db
+    .select({
+      id: adminAuditLogs.id,
+      adminId: adminAuditLogs.adminId,
+      adminEmail: users.email,
+      adminName: users.name,
+      action: adminAuditLogs.action,
+      entityType: adminAuditLogs.entityType,
+      entityId: adminAuditLogs.entityId,
+      details: adminAuditLogs.details,
+      ipAddress: adminAuditLogs.ipAddress,
+      userAgent: adminAuditLogs.userAgent,
+      createdAt: adminAuditLogs.createdAt,
+    })
+    .from(adminAuditLogs)
+    .leftJoin(users, eq(adminAuditLogs.adminId, users.id))
+    .where(whereClause)
+    .orderBy(desc(adminAuditLogs.createdAt))
+    .limit(limit)
+    .offset(offset);
+
+  return {
+    logs: logsResult,
+    total: totalResult[0]?.value ?? 0,
+  };
+}
+
+/**
+ * Get recent audit log activity for dashboard
+ */
+export async function getRecentAuditActivity(limit: number = 10): Promise<AuditLogEntry[]> {
+  if (!db) return [];
+
+  const result = await db
+    .select({
+      id: adminAuditLogs.id,
+      adminId: adminAuditLogs.adminId,
+      adminEmail: users.email,
+      adminName: users.name,
+      action: adminAuditLogs.action,
+      entityType: adminAuditLogs.entityType,
+      entityId: adminAuditLogs.entityId,
+      details: adminAuditLogs.details,
+      ipAddress: adminAuditLogs.ipAddress,
+      userAgent: adminAuditLogs.userAgent,
+      createdAt: adminAuditLogs.createdAt,
+    })
+    .from(adminAuditLogs)
+    .leftJoin(users, eq(adminAuditLogs.adminId, users.id))
+    .orderBy(desc(adminAuditLogs.createdAt))
+    .limit(limit);
+
+  return result;
+}
+
+/**
+ * Get audit log statistics
+ */
+export async function getAuditLogStats(): Promise<{
+  totalLogs: number;
+  logsToday: number;
+  logsThisWeek: number;
+  topActions: { action: string; count: number }[];
+  topAdmins: { adminId: number; adminEmail: string | null; count: number }[];
+}> {
+  if (!db) {
+    return {
+      totalLogs: 0,
+      logsToday: 0,
+      logsThisWeek: 0,
+      topActions: [],
+      topAdmins: [],
+    };
+  }
+
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+  const [
+    totalResult,
+    todayResult,
+    weekResult,
+    actionsResult,
+    adminsResult,
+  ] = await Promise.all([
+    // Total logs
+    db.select({ value: count() }).from(adminAuditLogs),
+    // Logs today
+    db.select({ value: count() }).from(adminAuditLogs).where(gte(adminAuditLogs.createdAt, today)),
+    // Logs this week
+    db.select({ value: count() }).from(adminAuditLogs).where(gte(adminAuditLogs.createdAt, weekAgo)),
+    // Top actions
+    db
+      .select({
+        action: adminAuditLogs.action,
+        count: count(),
+      })
+      .from(adminAuditLogs)
+      .groupBy(adminAuditLogs.action)
+      .orderBy(desc(count()))
+      .limit(5),
+    // Top admins
+    db
+      .select({
+        adminId: adminAuditLogs.adminId,
+        adminEmail: users.email,
+        count: count(),
+      })
+      .from(adminAuditLogs)
+      .leftJoin(users, eq(adminAuditLogs.adminId, users.id))
+      .groupBy(adminAuditLogs.adminId, users.email)
+      .orderBy(desc(count()))
+      .limit(5),
+  ]);
+
+  return {
+    totalLogs: totalResult[0]?.value ?? 0,
+    logsToday: todayResult[0]?.value ?? 0,
+    logsThisWeek: weekResult[0]?.value ?? 0,
+    topActions: actionsResult.map((r) => ({ action: r.action, count: r.count })),
+    topAdmins: adminsResult.map((r) => ({
+      adminId: r.adminId,
+      adminEmail: r.adminEmail,
+      count: r.count,
+    })),
+  };
+}

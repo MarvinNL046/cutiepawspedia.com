@@ -16,10 +16,13 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Loader2, MoreHorizontal, Eye, MapPin, Star, Crown, CheckCircle } from "lucide-react";
+import { Loader2, MoreHorizontal, Eye, MapPin, Star, Crown, CheckCircle, CrownIcon } from "lucide-react";
 import Link from "next/link";
+import { togglePlacePremiumAction } from "@/app/[locale]/admin/businesses/actions";
+import { useRouter } from "next/navigation";
 
 interface Listing {
   id: number;
@@ -46,11 +49,36 @@ export function BusinessListingsTab({
   initialListings,
   initialTotal,
 }: BusinessListingsTabProps) {
+  const router = useRouter();
   const [listings, setListings] = useState(initialListings);
   const [total, setTotal] = useState(initialTotal);
   const [isLoading, setIsLoading] = useState(false);
+  const [togglingPremium, setTogglingPremium] = useState<number | null>(null);
   const [page, setPage] = useState(0);
   const pageSize = 10;
+
+  const handleTogglePremium = async (listingId: number, currentPremium: boolean) => {
+    setTogglingPremium(listingId);
+    try {
+      const result = await togglePlacePremiumAction(listingId, !currentPremium);
+      if (result.success) {
+        // Update local state
+        setListings((prev) =>
+          prev.map((l) =>
+            l.id === listingId ? { ...l, isPremium: !currentPremium } : l
+          )
+        );
+        router.refresh();
+      } else {
+        alert(result.error || "Failed to toggle premium status");
+      }
+    } catch (error) {
+      console.error("Error toggling premium:", error);
+      alert("Failed to toggle premium status");
+    } finally {
+      setTogglingPremium(null);
+    }
+  };
 
   const fetchListings = async () => {
     setIsLoading(true);
@@ -212,6 +240,29 @@ export function BusinessListingsTab({
                               <Eye className="h-4 w-4 mr-2" />
                               View Public Page
                             </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => handleTogglePremium(listing.id, listing.isPremium)}
+                            disabled={togglingPremium === listing.id}
+                            className={listing.isPremium ? "text-red-600" : "text-amber-600"}
+                          >
+                            {togglingPremium === listing.id ? (
+                              <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                Processing...
+                              </>
+                            ) : listing.isPremium ? (
+                              <>
+                                <Crown className="h-4 w-4 mr-2" />
+                                Remove Premium
+                              </>
+                            ) : (
+                              <>
+                                <Crown className="h-4 w-4 mr-2" />
+                                Make Premium
+                              </>
+                            )}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

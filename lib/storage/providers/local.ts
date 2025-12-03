@@ -2,7 +2,7 @@
  * Local Filesystem Storage Provider
  *
  * For development and testing. Stores files in the public directory.
- * NOT recommended for production - use S3/Vercel/Netlify instead.
+ * NOT recommended for production - use S3 (Cloudflare R2) or Vercel Blob instead.
  */
 
 import { existsSync, mkdirSync, writeFileSync, unlinkSync, readdirSync, statSync } from "fs";

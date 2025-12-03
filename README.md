@@ -19,7 +19,7 @@ Get:
 - **Dynamic routing** for all pages
 - **Search & filter functionality**
 - **Responsive design**
-- **Ready to deploy** to Vercel, Digital Ocean, Netlify, etc.
+- **Ready to deploy** to Vercel
 
 ## ⚡ Quick Start
 
@@ -379,18 +379,6 @@ User visits site → Super fast static pages
 ```bash
 cd your-directory-site
 vercel deploy
-```
-
-### Digital Ocean App Platform
-1. Push to GitHub (done automatically)
-2. Connect repository in DO dashboard
-3. Configure build settings
-4. Deploy
-
-### Netlify
-```bash
-cd your-directory-site
-netlify deploy
 ```
 
 ### Traditional Hosting

@@ -2,7 +2,7 @@
  * AI Content Regeneration Cron Endpoint
  *
  * Scheduled job for regenerating stale/outdated AI content.
- * Run via Vercel/Netlify cron every 6 hours.
+ * Run via Vercel cron every 6 hours.
  *
  * Security:
  * - Protected by CRON_SECRET header

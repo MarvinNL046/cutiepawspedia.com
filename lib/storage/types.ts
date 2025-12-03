@@ -5,7 +5,6 @@
  * - Local filesystem (development)
  * - AWS S3 / S3-compatible (DigitalOcean Spaces, Cloudflare R2, etc.)
  * - Vercel Blob Storage
- * - Netlify Blobs
  */
 
 export interface StorageFile {
@@ -80,7 +79,7 @@ export interface StorageProvider {
   list?(prefix: string): Promise<StorageFile[]>;
 }
 
-export type StorageProviderType = "local" | "s3" | "vercel" | "netlify";
+export type StorageProviderType = "local" | "s3" | "vercel";
 
 export interface StorageConfig {
   provider: StorageProviderType;

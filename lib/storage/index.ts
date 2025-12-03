@@ -59,10 +59,6 @@ export function createStorageProvider(config: Partial<StorageConfig> = {}): Stor
       // TODO: Implement Vercel Blob Storage provider
       throw new Error("Vercel Blob storage not yet implemented");
 
-    case "netlify":
-      // TODO: Implement Netlify Blobs provider
-      throw new Error("Netlify Blobs storage not yet implemented");
-
     default:
       throw new Error(`Unknown storage provider: ${mergedConfig.provider}`);
   }

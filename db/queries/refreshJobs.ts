@@ -152,7 +152,7 @@ export async function getNextRefreshBatch(limit = 10): Promise<RefreshJobWithPla
     LIMIT ${limit}
   `);
 
-  return result.rows as RefreshJobWithPlace[];
+  return (result.rows as unknown) as RefreshJobWithPlace[];
 }
 
 /**
@@ -313,7 +313,7 @@ export async function getRecentRefreshActivity(
     LIMIT ${limit}
   `);
 
-  return result.rows as RefreshJobWithPlace[];
+  return (result.rows as unknown) as RefreshJobWithPlace[];
 }
 
 // ============================================================================

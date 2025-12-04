@@ -12,6 +12,15 @@
  * - Multi-locale support
  */
 
+import * as dotenv from "dotenv";
+import * as path from "path";
+
+// Force load .env from project root, overriding any shell environment variables
+dotenv.config({
+  path: path.resolve(process.cwd(), ".env"),
+  override: true
+});
+
 import OpenAI from "openai";
 import {
   AI_VERSION,
@@ -102,6 +111,14 @@ export interface PlaceData {
   rating?: number;
   reviewCount?: number;
   address?: string;
+  /** Scraped about-us content from website for personalized descriptions */
+  aboutUs?: string;
+  /** Scraped facts from website (founded year, specializations, etc.) */
+  aboutUsFacts?: {
+    foundedYear?: number;
+    specializations?: string[];
+    awards?: string[];
+  };
 }
 
 export interface ComboData {
@@ -437,6 +454,26 @@ Write content about finding the best ${catData.categoryName.toLowerCase()} acros
 
     case "place":
       const placeData = data as PlaceData;
+      // Build about-us context if available
+      let aboutUsContext = "";
+      if (placeData.aboutUs) {
+        aboutUsContext = `\n\nAbout this business (from their website):
+${placeData.aboutUs.slice(0, 1500)}`;
+
+        if (placeData.aboutUsFacts) {
+          const facts = placeData.aboutUsFacts;
+          if (facts.foundedYear) {
+            aboutUsContext += `\n- Founded: ${facts.foundedYear}`;
+          }
+          if (facts.specializations?.length) {
+            aboutUsContext += `\n- Specializations: ${facts.specializations.join(", ")}`;
+          }
+          if (facts.awards?.length) {
+            aboutUsContext += `\n- Awards/Recognition: ${facts.awards.join(", ")}`;
+          }
+        }
+      }
+
       return `Generate SEO content for a business listing page: ${placeData.placeName} in ${placeData.cityName}, ${placeData.countryName}.
 
 Context:
@@ -446,9 +483,9 @@ Context:
 ${placeData.rating ? `- Rating: ${placeData.rating}/5` : ""}
 ${placeData.reviewCount ? `- Reviews: ${placeData.reviewCount}` : ""}
 ${placeData.address ? `- Address: ${placeData.address}` : ""}
-${placeData.description ? `- Description: ${placeData.description}` : ""}
+${placeData.description ? `- Description: ${placeData.description}` : ""}${aboutUsContext}
 
-Write content that helps pet owners learn about this business and decide if it's right for their needs.`;
+${placeData.aboutUs ? "Use the about-us information to write personalized, unique content that highlights what makes this business special. Include specific details from their website where relevant." : "Write content that helps pet owners learn about this business and decide if it's right for their needs."}`;
 
     case "combo":
       const comboData = data as ComboData;
@@ -687,6 +724,14 @@ export async function getPlacePageContent(
     rating?: number;
     reviewCount?: number;
     address?: string;
+    /** Scraped about-us content from website */
+    aboutUs?: string;
+    /** Scraped facts from website */
+    aboutUsFacts?: {
+      foundedYear?: number;
+      specializations?: string[];
+      awards?: string[];
+    };
   },
   city: { name: string; slug: string },
   country: { name: string; slug: string },
@@ -708,6 +753,8 @@ export async function getPlacePageContent(
       rating: place.rating,
       reviewCount: place.reviewCount,
       address: place.address,
+      aboutUs: place.aboutUs,
+      aboutUsFacts: place.aboutUsFacts,
     },
   });
   return result.content;

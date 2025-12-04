@@ -26,6 +26,18 @@ import {
 } from "@/db/queries/refreshJobs";
 import { computeAndUpdatePlaceQuality } from "@/db/queries/dataQuality";
 import { updateBadgesForPlace } from "@/lib/trustBadges";
+// D1.1 Enrichment modules
+import {
+  parseOpeningHours,
+  toSimpleFormat,
+  parseRatings,
+  extractAboutSection,
+  extractSchemaOrg,
+  schemaOrgToInternalHours,
+  ENRICHMENT_FLAGS,
+  generateEnrichmentFlags,
+  type EnrichmentFlag,
+} from "@/lib/enrichment";
 
 const REVALIDATION_SECRET = process.env.REVALIDATION_SECRET;
 const BRIGHT_DATA_API_TOKEN = process.env.BRIGHT_DATA_API_TOKEN;
@@ -50,6 +62,7 @@ interface ExternalData {
   rating?: number;
   reviewCount?: number;
   status?: "active" | "temporarily_closed" | "permanently_closed";
+  enrichmentFlags?: EnrichmentFlag[];
 }
 
 // ============================================================================
@@ -90,12 +103,14 @@ async function fetchFromBrightData(
 }
 
 /**
- * Fetch and parse data from business website using Jina
+ * Enhanced website data extraction using D1.1 enrichment modules
  */
-async function fetchFromWebsite(websiteUrl: string | null): Promise<Partial<ExternalData>> {
+async function fetchFromWebsite(websiteUrl: string | null): Promise<Partial<ExternalData> & { enrichmentFlags?: EnrichmentFlag[] }> {
   if (!websiteUrl || !JINA_API_KEY) {
     return {};
   }
+
+  const enrichmentFlags: EnrichmentFlag[] = [];
 
   try {
     // Use Jina Reader API to fetch and parse website content
@@ -108,86 +123,146 @@ async function fetchFromWebsite(websiteUrl: string | null): Promise<Partial<Exte
 
     if (!response.ok) {
       console.log(`Jina fetch failed for ${websiteUrl}: ${response.status}`);
-      return {};
+      enrichmentFlags.push(ENRICHMENT_FLAGS.WEBSITE_ERROR);
+      return { enrichmentFlags };
     }
 
     const data = await response.json();
     const content = data.content || data.text || "";
+    const html = data.html || "";
 
-    // Parse opening hours patterns from content
-    const openingHours = parseOpeningHours(content);
+    if (!content || content.length < 50) {
+      enrichmentFlags.push(ENRICHMENT_FLAGS.WEBSITE_NO_CONTENT);
+      return { enrichmentFlags };
+    }
 
-    // Parse phone numbers
-    const phone = parsePhoneNumber(content);
+    const result: Partial<ExternalData> & { enrichmentFlags?: EnrichmentFlag[]; description?: string } = {};
 
-    // Parse email addresses
-    const email = parseEmail(content);
+    // 1. Try Schema.org extraction first (highest priority)
+    const schemaResult = html ? extractSchemaOrg(html) : null;
+    if (schemaResult) {
+      enrichmentFlags.push(ENRICHMENT_FLAGS.SCHEMA_ORG_FOUND);
 
-    // Check for closure indicators
-    const isClosed = checkForClosureIndicators(content);
+      // Extract from Schema.org
+      if (schemaResult.aggregateRating) {
+        result.rating = parseFloat(String(schemaResult.aggregateRating.ratingValue));
+        result.reviewCount = parseInt(String(schemaResult.aggregateRating.reviewCount || schemaResult.aggregateRating.ratingCount), 10) || undefined;
+        enrichmentFlags.push(ENRICHMENT_FLAGS.SCHEMA_ORG_RATING);
+      }
 
-    return {
-      openingHours: Object.keys(openingHours).length > 0 ? openingHours : undefined,
-      phone: phone || undefined,
-      email: email || undefined,
-      status: isClosed ? "permanently_closed" : undefined,
-    };
-  } catch (error) {
-    console.error(`Website fetch error for ${websiteUrl}:`, error);
-    return {};
-  }
-}
+      if (schemaResult.openingHours?.length) {
+        const hours = schemaOrgToInternalHours(schemaResult.openingHours);
+        if (Object.keys(hours).length > 0) {
+          result.openingHours = Object.fromEntries(
+            Object.entries(hours).map(([day, h]) => [day, `${h.opens}-${h.closes}`])
+          );
+          enrichmentFlags.push(ENRICHMENT_FLAGS.SCHEMA_ORG_HOURS);
+        }
+      }
 
-/**
- * Parse opening hours from text content
- */
-function parseOpeningHours(content: string): Record<string, string> {
-  const hours: Record<string, string> = {};
-
-  // Common patterns for opening hours
-  const patterns = [
-    // Dutch patterns
-    /(?:maandag|ma)[:\s]*(\d{1,2}[.:]\d{2})\s*[-–]\s*(\d{1,2}[.:]\d{2})/gi,
-    /(?:dinsdag|di)[:\s]*(\d{1,2}[.:]\d{2})\s*[-–]\s*(\d{1,2}[.:]\d{2})/gi,
-    /(?:woensdag|wo)[:\s]*(\d{1,2}[.:]\d{2})\s*[-–]\s*(\d{1,2}[.:]\d{2})/gi,
-    /(?:donderdag|do)[:\s]*(\d{1,2}[.:]\d{2})\s*[-–]\s*(\d{1,2}[.:]\d{2})/gi,
-    /(?:vrijdag|vr)[:\s]*(\d{1,2}[.:]\d{2})\s*[-–]\s*(\d{1,2}[.:]\d{2})/gi,
-    /(?:zaterdag|za)[:\s]*(\d{1,2}[.:]\d{2})\s*[-–]\s*(\d{1,2}[.:]\d{2})/gi,
-    /(?:zondag|zo)[:\s]*(\d{1,2}[.:]\d{2})\s*[-–]\s*(\d{1,2}[.:]\d{2})/gi,
-    // English patterns
-    /(?:monday|mon)[:\s]*(\d{1,2}[.:]\d{2})\s*[-–]\s*(\d{1,2}[.:]\d{2})/gi,
-    /(?:tuesday|tue)[:\s]*(\d{1,2}[.:]\d{2})\s*[-–]\s*(\d{1,2}[.:]\d{2})/gi,
-    /(?:wednesday|wed)[:\s]*(\d{1,2}[.:]\d{2})\s*[-–]\s*(\d{1,2}[.:]\d{2})/gi,
-    /(?:thursday|thu)[:\s]*(\d{1,2}[.:]\d{2})\s*[-–]\s*(\d{1,2}[.:]\d{2})/gi,
-    /(?:friday|fri)[:\s]*(\d{1,2}[.:]\d{2})\s*[-–]\s*(\d{1,2}[.:]\d{2})/gi,
-    /(?:saturday|sat)[:\s]*(\d{1,2}[.:]\d{2})\s*[-–]\s*(\d{1,2}[.:]\d{2})/gi,
-    /(?:sunday|sun)[:\s]*(\d{1,2}[.:]\d{2})\s*[-–]\s*(\d{1,2}[.:]\d{2})/gi,
-  ];
-
-  const dayMapping: Record<string, string> = {
-    maandag: "mon", ma: "mon", monday: "mon", mon: "mon",
-    dinsdag: "tue", di: "tue", tuesday: "tue", tue: "tue",
-    woensdag: "wed", wo: "wed", wednesday: "wed", wed: "wed",
-    donderdag: "thu", do: "thu", thursday: "thu", thu: "thu",
-    vrijdag: "fri", vr: "fri", friday: "fri", fri: "fri",
-    zaterdag: "sat", za: "sat", saturday: "sat", sat: "sat",
-    zondag: "sun", zo: "sun", sunday: "sun", sun: "sun",
-  };
-
-  for (const pattern of patterns) {
-    const matches = content.matchAll(pattern);
-    for (const match of matches) {
-      const dayMatch = match[0].toLowerCase().match(/^[a-z]+/);
-      if (dayMatch) {
-        const day = dayMapping[dayMatch[0]] || dayMatch[0];
-        const open = match[1].replace(".", ":");
-        const close = match[2].replace(".", ":");
-        hours[day] = `${open}-${close}`;
+      if (schemaResult.business?.telephone) {
+        result.phone = schemaResult.business.telephone;
+      }
+      if (schemaResult.business?.email) {
+        result.email = schemaResult.business.email;
       }
     }
-  }
 
-  return hours;
+    // 2. Parse opening hours if not found in Schema.org
+    if (!result.openingHours) {
+      const hoursResult = await parseOpeningHours({
+        content,
+        jinaApiKey: JINA_API_KEY,
+        websiteUrl,
+      });
+
+      if (Object.keys(hoursResult.hours).length > 0) {
+        result.openingHours = toSimpleFormat(hoursResult.hours);
+
+        // Add source flag
+        const sourceMap: Record<string, EnrichmentFlag> = {
+          jina_ai: ENRICHMENT_FLAGS.OPENING_HOURS_VIA_JINA,
+          regex: ENRICHMENT_FLAGS.OPENING_HOURS_VIA_REGEX,
+          table: ENRICHMENT_FLAGS.OPENING_HOURS_VIA_TABLE,
+          list: ENRICHMENT_FLAGS.OPENING_HOURS_VIA_REGEX,
+          schema_org: ENRICHMENT_FLAGS.OPENING_HOURS_VIA_SCHEMA,
+        };
+        const flag = sourceMap[hoursResult.source];
+        if (flag) enrichmentFlags.push(flag);
+
+        if (hoursResult.confidence < 60) {
+          enrichmentFlags.push(ENRICHMENT_FLAGS.OPENING_HOURS_LOW_CONFIDENCE);
+        }
+        if (Object.keys(hoursResult.hours).length < 5) {
+          enrichmentFlags.push(ENRICHMENT_FLAGS.OPENING_HOURS_INCOMPLETE);
+        }
+      }
+    }
+
+    // 3. Parse ratings if not found in Schema.org
+    if (!result.rating) {
+      const ratingResult = parseRatings({ content, html });
+      if (ratingResult.rating) {
+        result.rating = ratingResult.rating;
+        result.reviewCount = ratingResult.reviewCount || undefined;
+
+        // Add source flag
+        const sourceMap: Record<string, EnrichmentFlag> = {
+          google: ENRICHMENT_FLAGS.RATING_VIA_GOOGLE,
+          facebook: ENRICHMENT_FLAGS.RATING_VIA_FACEBOOK,
+          trustpilot: ENRICHMENT_FLAGS.RATING_VIA_TRUSTPILOT,
+          schema_org: ENRICHMENT_FLAGS.RATING_VIA_SCHEMA,
+          star_symbols: ENRICHMENT_FLAGS.RATING_VIA_STARS,
+          text_pattern: ENRICHMENT_FLAGS.RATING_VIA_TEXT,
+        };
+        const flag = sourceMap[ratingResult.source];
+        if (flag) enrichmentFlags.push(flag);
+      }
+    }
+
+    // 4. Extract about section for description
+    const aboutResult = await extractAboutSection({ content, html });
+    if (aboutResult) {
+      result.description = aboutResult.summary || aboutResult.fullText.substring(0, 500);
+      enrichmentFlags.push(ENRICHMENT_FLAGS.ABOUT_SECTION_FOUND);
+      if (aboutResult.summary) {
+        enrichmentFlags.push(ENRICHMENT_FLAGS.ABOUT_SECTION_SUMMARIZED);
+      }
+      if (aboutResult.facts && Object.keys(aboutResult.facts).length > 0) {
+        enrichmentFlags.push(ENRICHMENT_FLAGS.ABOUT_FACTS_EXTRACTED);
+      }
+    }
+
+    // 5. Legacy parsing for phone/email if not found yet
+    if (!result.phone) {
+      result.phone = parsePhoneNumber(content) || undefined;
+    }
+    if (!result.email) {
+      result.email = parseEmail(content) || undefined;
+    }
+
+    // 6. Check for closure indicators
+    const isClosed = checkForClosureIndicators(content);
+    if (isClosed) {
+      result.status = "permanently_closed";
+      enrichmentFlags.push(ENRICHMENT_FLAGS.POSSIBLY_CLOSED);
+    }
+
+    // 7. Determine enrichment status
+    const hasData = result.openingHours || result.rating || result.description;
+    if (hasData) {
+      const isComplete = result.openingHours && result.rating && result.description;
+      enrichmentFlags.push(
+        isComplete ? ENRICHMENT_FLAGS.ENRICHMENT_COMPLETE : ENRICHMENT_FLAGS.ENRICHMENT_PARTIAL
+      );
+    }
+
+    result.enrichmentFlags = enrichmentFlags;
+    return result;
+  } catch (error) {
+    console.error(`Website fetch error for ${websiteUrl}:`, error);
+    return { enrichmentFlags: [ENRICHMENT_FLAGS.ENRICHMENT_FAILED] };
+  }
 }
 
 /**
@@ -321,6 +396,41 @@ async function processRefreshJob(job: RefreshJobWithPlace): Promise<RefreshResul
       updates.status = externalData.status;
       updates.statusLastCheckedAt = new Date();
       updatedFields.push("status");
+    }
+
+    // Update rating if found
+    if (externalData.rating && externalData.rating > 0) {
+      updates.avgRating = externalData.rating;
+      updatedFields.push("avgRating");
+    }
+
+    // Update review count if found
+    if (externalData.reviewCount && externalData.reviewCount > 0) {
+      updates.reviewCount = externalData.reviewCount;
+      updatedFields.push("reviewCount");
+    }
+
+    // Update description if found and missing
+    if (externalData.description) {
+      updates.description = externalData.description;
+      updatedFields.push("description");
+    }
+
+    // Merge enrichment flags with existing quality flags
+    if (externalData.enrichmentFlags && externalData.enrichmentFlags.length > 0) {
+      // Get current flags and merge with new ones
+      const currentFlagsResult = await db
+        .select({ flags: places.dataQualityFlags })
+        .from(places)
+        .where(eq(places.id, job.placeId))
+        .limit(1);
+      const currentFlags: string[] = Array.isArray(currentFlagsResult[0]?.flags)
+        ? currentFlagsResult[0].flags
+        : [];
+
+      const mergedFlags = [...new Set([...currentFlags, ...externalData.enrichmentFlags])];
+      updates.dataQualityFlags = mergedFlags;
+      updatedFields.push("dataQualityFlags");
     }
 
     // Always update lastRefreshedAt

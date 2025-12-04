@@ -161,7 +161,11 @@ export async function addCredits(data: {
     })
     .returning();
 
-  const transaction = Array.isArray(result) ? result[0] : null;
+  const transaction = Array.isArray(result) ? result[0] : undefined;
+
+  if (!transaction) {
+    throw new Error("Failed to create transaction");
+  }
 
   // Update business balance
   await db
@@ -230,7 +234,11 @@ export async function chargeForLead(data: {
     })
     .returning();
 
-  const transaction = Array.isArray(chargeResult) ? chargeResult[0] : null;
+  const transaction = Array.isArray(chargeResult) ? chargeResult[0] : undefined;
+
+  if (!transaction) {
+    return { success: false, error: "Failed to create charge transaction" };
+  }
 
   // Update business balance
   await db
@@ -290,7 +298,11 @@ export async function refundCredits(data: {
     })
     .returning();
 
-  const transaction = Array.isArray(refundResult) ? refundResult[0] : null;
+  const transaction = Array.isArray(refundResult) ? refundResult[0] : undefined;
+
+  if (!transaction) {
+    throw new Error("Failed to create refund transaction");
+  }
 
   await db
     .update(businesses)

@@ -76,7 +76,7 @@ export async function upgradeToPremium(
   // 3. Deduct credits via premium_subscription transaction
   const newBalance = currentBalance - PREMIUM_UPGRADE_PRICE_CENTS;
 
-  const [transaction] = await db
+  const transactionResult = await db
     .insert(creditTransactions)
     .values({
       businessId,
@@ -92,6 +92,7 @@ export async function upgradeToPremium(
       },
     })
     .returning();
+  const transaction = transactionResult[0];
 
   // 4. Update business balance
   await db

@@ -37,8 +37,11 @@ import { ClaimPlaceCTA } from "@/components/claims";
 import { CategoryAffiliateBlockLazy as CategoryAffiliateBlock } from "@/components/affiliate";
 import { PlaceViewTracker } from "@/components/analytics";
 import { Breadcrumbs } from "@/components/layout";
-import { MapPin, Phone, Globe, Mail, Star, Clock, CheckCircle, MessageSquare } from "lucide-react";
+import { FavoriteButton } from "@/components/favorites/FavoriteButton";
+import { isFavorite } from "@/db/queries/favorites";
+import { MapPin, Phone, Globe, Mail, Star, CheckCircle, MessageSquare } from "lucide-react";
 import { getCityName, getCountryName } from "@/lib/utils/place-helpers";
+import { AboutSection, ServicesSection, HighlightsSection, BusinessSnapshot } from "@/components/place";
 
 interface PlacePageProps {
   params: Promise<{ locale: string; countrySlug: string; citySlug: string; categorySlug: string; placeSlug: string }>;
@@ -70,25 +73,44 @@ export default async function PlacePage({ params }: PlacePageProps) {
   const countryName = getCountryName(place, countrySlug);
   const primaryCategory = place.placeCategories?.[0]?.category;
 
-  // Check if current user has a pending claim for this place
+  // Check if current user has a pending claim for this place and if they favorited it
   let hasPendingClaim = false;
+  let isPlaceFavorited = false;
   try {
     const stackUser = await stackServerApp?.getUser();
     if (stackUser) {
       const dbUser = await getUserByStackAuthId(stackUser.id);
       if (dbUser) {
-        const { claims } = await getClaims({
-          placeId: place.id,
-          userId: dbUser.id,
-          status: "pending",
-          limit: 1,
-        });
-        hasPendingClaim = claims.length > 0;
+        // Check for pending claims and favorites in parallel
+        const [claimsResult, favoriteStatus] = await Promise.all([
+          getClaims({
+            placeId: place.id,
+            userId: dbUser.id,
+            status: "pending",
+            limit: 1,
+          }),
+          isFavorite(dbUser, place.id),
+        ]);
+        hasPendingClaim = claimsResult.claims.length > 0;
+        isPlaceFavorited = favoriteStatus;
       }
     }
   } catch {
     // Silently fail if auth check fails
   }
+
+  // Extract scraped content for personalized AI generation
+  const scrapedContent = place.scrapedContent as {
+    aboutUs?: string;
+    googleRating?: number;
+    googleReviewCount?: number;
+    scrapedAt?: string;
+    facts?: {
+      foundedYear?: number;
+      specializations?: string[];
+      awards?: string[];
+    };
+  } | null;
 
   // Generate AI content for the place (cached or generated on demand)
   const { content } = await generateContent({
@@ -106,6 +128,9 @@ export default async function PlacePage({ params }: PlacePageProps) {
       reviewCount: place.reviewCount || undefined,
       description: place.description || undefined,
       address: place.address || undefined,
+      // Pass scraped about-us content for personalized AI generation
+      aboutUs: scrapedContent?.aboutUs,
+      aboutUsFacts: scrapedContent?.facts,
     },
   });
 
@@ -241,6 +266,12 @@ export default async function PlacePage({ params }: PlacePageProps) {
               )}
             </div>
             <div className="flex flex-col gap-2 min-w-[200px]">
+              {/* Favorite Button */}
+              <FavoriteButton
+                placeId={place.id}
+                initialIsFavorite={isPlaceFavorited}
+                variant="default"
+              />
               {place.phone && (
                 <Button asChild className="bg-cpPink hover:bg-cpPink/90 gap-2">
                   <a href={`tel:${place.phone}`}><Phone className="h-4 w-4" />Call Now</a>
@@ -258,31 +289,47 @@ export default async function PlacePage({ params }: PlacePageProps) {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* About section with AI-enhanced content */}
-            <Card>
-              <CardHeader>
-                <CardTitle>{locale === "nl" ? "Over dit bedrijf" : "About"}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* AI-generated intro (uses description if available, otherwise generates) */}
-                <PageIntroInline
-                  intro={content.intro}
-                  secondary={content.secondary}
-                  className="text-slate-600"
-                />
-                {/* Show bullets if available (services, pet types, etc.) */}
-                {content.bullets && content.bullets.length > 0 && (
-                  <ul className="mt-4 space-y-2">
-                    {content.bullets.map((bullet, index) => (
-                      <li key={index} className="flex items-start gap-2 text-slate-600">
-                        <CheckCircle className="h-4 w-4 text-cpAqua shrink-0 mt-0.5" />
-                        <span>{bullet}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </CardContent>
-            </Card>
+            {/* Enriched About Section with fallback to AI content */}
+            <AboutSection
+              place={{
+                name: place.name,
+                description: place.description,
+                openingHours: place.openingHours as Record<string, string> | undefined,
+                avgRating: place.avgRating,
+                reviewCount: place.reviewCount,
+                dataQualityFlags: place.dataQualityFlags as string[] | undefined,
+              }}
+              aiContent={{
+                intro: content.intro,
+                secondary: content.secondary,
+                bullets: content.bullets,
+              }}
+              locale={locale}
+            />
+
+            {/* Services Section */}
+            <ServicesSection
+              categories={place.placeCategories?.map((pc) => pc.category)}
+              description={place.description}
+              locale={locale}
+            />
+
+            {/* Highlights Section */}
+            <HighlightsSection
+              place={{
+                name: place.name,
+                description: place.description,
+                avgRating: place.avgRating,
+                reviewCount: place.reviewCount,
+                dataQualityFlags: place.dataQualityFlags as string[] | undefined,
+              }}
+              aiContent={{
+                intro: content.intro,
+                secondary: content.secondary,
+                bullets: content.bullets,
+              }}
+              locale={locale}
+            />
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
@@ -390,21 +437,18 @@ export default async function PlacePage({ params }: PlacePageProps) {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  {locale === "nl" ? "Openingstijden" : "Business Hours"}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-slate-500 text-sm">
-                  {locale === "nl"
-                    ? "Neem rechtstreeks contact op met het bedrijf voor openingstijden."
-                    : "Contact the business directly for opening hours."}
-                </p>
-              </CardContent>
-            </Card>
+            {/* Business Info Snapshot with Rating & Opening Hours */}
+            <BusinessSnapshot
+              place={{
+                name: place.name,
+                description: place.description,
+                openingHours: place.openingHours as Record<string, string> | undefined,
+                avgRating: place.avgRating,
+                reviewCount: place.reviewCount,
+                dataQualityFlags: place.dataQualityFlags as string[] | undefined,
+              }}
+              locale={locale}
+            />
 
             {place.lat && place.lng && (
               <Card>

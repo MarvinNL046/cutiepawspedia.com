@@ -156,6 +156,7 @@ async function getPlaces(): Promise<ContentItem[]> {
   const rows = await sql`
     SELECT
       p.id, p.name, p.slug, p.description, p.avg_rating, p.review_count, p.address,
+      p.scraped_content,
       c.name as city_name, c.slug as city_slug,
       co.name as country_name, co.slug as country_slug,
       ARRAY_AGG(DISTINCT cat.slug) FILTER (WHERE cat.slug IS NOT NULL) as categories
@@ -165,34 +166,51 @@ async function getPlaces(): Promise<ContentItem[]> {
     LEFT JOIN place_categories pc ON pc.place_id = p.id
     LEFT JOIN categories cat ON pc.category_id = cat.id
     GROUP BY p.id, p.name, p.slug, p.description, p.avg_rating, p.review_count, p.address,
-             c.name, c.slug, co.name, co.slug
+             p.scraped_content, c.name, c.slug, co.name, co.slug
   `;
 
-  return rows.map((row: any) => ({
-    type: "place" as const,
-    cacheKey: `place:${row.slug}:${row.city_slug}:${row.country_slug}:${LOCALE}`,
-    data: {
-      placeName: row.name,
-      placeSlug: row.slug,
-      cityName: row.city_name,
-      citySlug: row.city_slug,
-      countryName: row.country_name,
-      countrySlug: row.country_slug,
-      categories: row.categories || [],
-      description: row.description,
-      rating: row.avg_rating ? parseFloat(row.avg_rating) : undefined,
-      reviewCount: row.review_count ? parseInt(row.review_count) : undefined,
-      address: row.address,
-    },
-    prompt: buildPrompt("place", {
-      placeName: row.name,
-      cityName: row.city_name,
-      countryName: row.country_name,
-      categories: row.categories || [],
-      rating: row.avg_rating,
-      description: row.description,
-    }),
-  }));
+  return rows.map((row: any) => {
+    // Parse scraped content for about-us information
+    const scrapedContent = row.scraped_content as {
+      aboutUs?: string;
+      googleRating?: number;
+      facts?: {
+        foundedYear?: number;
+        specializations?: string[];
+        awards?: string[];
+      };
+    } | null;
+
+    return {
+      type: "place" as const,
+      cacheKey: `place:${row.slug}:${row.city_slug}:${row.country_slug}:${LOCALE}`,
+      data: {
+        placeName: row.name,
+        placeSlug: row.slug,
+        cityName: row.city_name,
+        citySlug: row.city_slug,
+        countryName: row.country_name,
+        countrySlug: row.country_slug,
+        categories: row.categories || [],
+        description: row.description,
+        rating: row.avg_rating ? parseFloat(row.avg_rating) : undefined,
+        reviewCount: row.review_count ? parseInt(row.review_count) : undefined,
+        address: row.address,
+        aboutUs: scrapedContent?.aboutUs,
+        aboutUsFacts: scrapedContent?.facts,
+      },
+      prompt: buildPrompt("place", {
+        placeName: row.name,
+        cityName: row.city_name,
+        countryName: row.country_name,
+        categories: row.categories || [],
+        rating: row.avg_rating,
+        description: row.description,
+        aboutUs: scrapedContent?.aboutUs,
+        aboutUsFacts: scrapedContent?.facts,
+      }),
+    };
+  });
 }
 
 async function getCategories(): Promise<ContentItem[]> {
@@ -468,6 +486,30 @@ Context:
 Write content that helps pet owners find local pet services in ${data.cityName}.`;
 
     case "place":
+      // Build about-us context if available from scraped content
+      let aboutUsContext = "";
+      if (data.aboutUs) {
+        aboutUsContext = `\n\nAbout this business (from their website):
+${(data.aboutUs as string).slice(0, 1500)}`;
+
+        if (data.aboutUsFacts) {
+          const facts = data.aboutUsFacts as {
+            foundedYear?: number;
+            specializations?: string[];
+            awards?: string[];
+          };
+          if (facts.foundedYear) {
+            aboutUsContext += `\n- Founded: ${facts.foundedYear}`;
+          }
+          if (facts.specializations?.length) {
+            aboutUsContext += `\n- Specializations: ${facts.specializations.join(", ")}`;
+          }
+          if (facts.awards?.length) {
+            aboutUsContext += `\n- Awards/Recognition: ${facts.awards.join(", ")}`;
+          }
+        }
+      }
+
       return `Generate SEO content for a business listing page: ${data.placeName} in ${data.cityName}, ${data.countryName}.
 
 Context:
@@ -475,9 +517,9 @@ Context:
 - Location: ${data.cityName}, ${data.countryName}
 - Categories: ${(data.categories as string[]).join(", ")}
 ${data.rating ? `- Rating: ${data.rating}/5` : ""}
-${data.description ? `- Description: ${data.description}` : ""}
+${data.description ? `- Description: ${data.description}` : ""}${aboutUsContext}
 
-Write content that helps pet owners learn about this business.`;
+${data.aboutUs ? "Use the about-us information to write personalized, unique content that highlights what makes this business special. Include specific details from their website where relevant." : "Write content that helps pet owners learn about this business."}`;
 
     case "category":
       return `Generate SEO content for a category page about ${data.categoryName} in ${data.countryName}.

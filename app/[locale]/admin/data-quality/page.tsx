@@ -22,9 +22,89 @@ import {
   AlertCircle,
   XCircle,
   Activity,
+  Zap,
+  Star,
+  Globe,
 } from "lucide-react";
 import Link from "next/link";
 import { DataQualityActions } from "./DataQualityActions";
+import { EnrichmentFlagsDialog } from "./EnrichmentFlagsDialog";
+
+// Helper to extract opening hours source from flags
+function getOpeningHoursSource(flags: string[] | null): { source: string; badge: "success" | "warning" | "error" } | null {
+  if (!flags) return null;
+
+  if (flags.includes("OPENING_HOURS_VIA_SCHEMA")) {
+    return { source: "Schema.org", badge: "success" };
+  }
+  if (flags.includes("OPENING_HOURS_VIA_TABLE")) {
+    return { source: "Table", badge: "success" };
+  }
+  if (flags.includes("OPENING_HOURS_VIA_JINA")) {
+    return { source: "Jina AI", badge: "success" };
+  }
+  if (flags.includes("OPENING_HOURS_VIA_REGEX")) {
+    return { source: "Regex", badge: "warning" };
+  }
+  if (flags.includes("NO_OPENING_HOURS")) {
+    return { source: "Missing", badge: "error" };
+  }
+  return null;
+}
+
+// Helper to extract rating source from flags
+function getRatingSource(flags: string[] | null): { source: string; badge: "success" | "warning" | "error" } | null {
+  if (!flags) return null;
+
+  if (flags.includes("RATING_VIA_SCHEMA")) {
+    return { source: "Schema.org", badge: "success" };
+  }
+  if (flags.includes("RATING_VIA_GOOGLE")) {
+    return { source: "Google", badge: "success" };
+  }
+  if (flags.includes("RATING_VIA_FACEBOOK")) {
+    return { source: "Facebook", badge: "success" };
+  }
+  if (flags.includes("RATING_VIA_TRUSTPILOT")) {
+    return { source: "Trustpilot", badge: "success" };
+  }
+  if (flags.includes("RATING_VIA_STARS")) {
+    return { source: "Stars", badge: "warning" };
+  }
+  if (flags.includes("RATING_VIA_TEXT")) {
+    return { source: "Text", badge: "warning" };
+  }
+  if (flags.includes("NO_RATING")) {
+    return { source: "Missing", badge: "error" };
+  }
+  return null;
+}
+
+// Helper to extract enrichment result from flags
+function getEnrichmentResult(flags: string[] | null): { status: string; badge: "success" | "warning" | "error" } {
+  if (!flags) return { status: "Not processed", badge: "warning" };
+
+  if (flags.includes("ENRICHMENT_COMPLETE")) {
+    return { status: "Complete", badge: "success" };
+  }
+  if (flags.includes("ENRICHMENT_PARTIAL")) {
+    return { status: "Partial", badge: "warning" };
+  }
+  if (flags.includes("ENRICHMENT_FAILED")) {
+    return { status: "Failed", badge: "error" };
+  }
+  if (flags.includes("MANUAL_REVIEW_NEEDED")) {
+    return { status: "Review needed", badge: "warning" };
+  }
+
+  // If we have any source flags, it's at least partial
+  const sourceFlags = flags.filter(f => f.includes("_VIA_") || f.includes("SCHEMA_ORG"));
+  if (sourceFlags.length > 0) {
+    return { status: "Partial", badge: "warning" };
+  }
+
+  return { status: "Pending", badge: "warning" };
+}
 
 interface AdminDataQualityPageProps {
   params: Promise<{ locale: string }>;
@@ -305,61 +385,149 @@ export default async function AdminDataQualityPage({
                 No low quality places found
               </p>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Place</TableHead>
-                    <TableHead>Location</TableHead>
-                    <TableHead>Score</TableHead>
-                    <TableHead>Issues</TableHead>
-                    <TableHead>Last Refresh</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {lowQualityPlaces.map((place) => (
-                    <TableRow key={place.id}>
-                      <TableCell>
-                        <p className="font-medium">{place.name}</p>
-                        <p className="text-xs text-muted-foreground">{place.slug}</p>
-                      </TableCell>
-                      <TableCell>
-                        <p className="text-sm">
-                          {place.cityName}, {place.countryName}
-                        </p>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-sm">{place.dataQualityScore}%</span>
-                          {getQualityBadge(place.dataQualityScore)}
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Place</TableHead>
+                      <TableHead>Location</TableHead>
+                      <TableHead>Score</TableHead>
+                      <TableHead>
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          Hours
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {(place.dataQualityFlags as string[] || []).slice(0, 3).map((flag) => (
-                            <Badge key={flag} variant="outline" className="text-xs">
-                              {flag.replace(/_/g, " ").toLowerCase()}
-                            </Badge>
-                          ))}
-                          {(place.dataQualityFlags as string[] || []).length > 3 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{(place.dataQualityFlags as string[]).length - 3}
-                            </Badge>
-                          )}
+                      </TableHead>
+                      <TableHead>
+                        <div className="flex items-center gap-1">
+                          <Star className="h-3 w-3" />
+                          Rating
                         </div>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {place.lastRefreshedAt
-                          ? new Date(place.lastRefreshedAt).toLocaleDateString()
-                          : "Never"}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <DataQualityActions placeId={place.id} />
-                      </TableCell>
+                      </TableHead>
+                      <TableHead>
+                        <div className="flex items-center gap-1">
+                          <Zap className="h-3 w-3" />
+                          Enrichment
+                        </div>
+                      </TableHead>
+                      <TableHead>Flags</TableHead>
+                      <TableHead>Last Refresh</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {lowQualityPlaces.map((place) => {
+                      const hoursSource = getOpeningHoursSource(place.dataQualityFlags as string[] | null);
+                      const ratingSource = getRatingSource(place.dataQualityFlags as string[] | null);
+                      const enrichmentResult = getEnrichmentResult(place.dataQualityFlags as string[] | null);
+                      const flags = place.dataQualityFlags as string[] || [];
+
+                      return (
+                        <TableRow key={place.id}>
+                          <TableCell>
+                            <div className="min-w-[150px]">
+                              <p className="font-medium">{place.name}</p>
+                              <p className="text-xs text-muted-foreground">{place.slug}</p>
+                              {place.website && (
+                                <a
+                                  href={place.website}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-cpAqua hover:underline flex items-center gap-1 mt-1"
+                                >
+                                  <Globe className="h-3 w-3" />
+                                  Website
+                                </a>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <p className="text-sm whitespace-nowrap">
+                              {place.cityName}, {place.countryName}
+                            </p>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-sm">{place.dataQualityScore}%</span>
+                              {getQualityBadge(place.dataQualityScore)}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {hoursSource ? (
+                              <Badge
+                                variant="outline"
+                                className={
+                                  hoursSource.badge === "success"
+                                    ? "bg-green-100 text-green-700 border-green-200"
+                                    : hoursSource.badge === "warning"
+                                    ? "bg-yellow-100 text-yellow-700 border-yellow-200"
+                                    : "bg-red-100 text-red-700 border-red-200"
+                                }
+                              >
+                                {hoursSource.source}
+                              </Badge>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {ratingSource ? (
+                              <div className="flex items-center gap-1">
+                                <Badge
+                                  variant="outline"
+                                  className={
+                                    ratingSource.badge === "success"
+                                      ? "bg-green-100 text-green-700 border-green-200"
+                                      : ratingSource.badge === "warning"
+                                      ? "bg-yellow-100 text-yellow-700 border-yellow-200"
+                                      : "bg-red-100 text-red-700 border-red-200"
+                                  }
+                                >
+                                  {ratingSource.source}
+                                </Badge>
+                                {place.avgRating && parseFloat(place.avgRating) > 0 && (
+                                  <span className="text-xs font-mono">{parseFloat(place.avgRating).toFixed(1)}</span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant="outline"
+                              className={
+                                enrichmentResult.badge === "success"
+                                  ? "bg-green-100 text-green-700 border-green-200"
+                                  : enrichmentResult.badge === "warning"
+                                  ? "bg-yellow-100 text-yellow-700 border-yellow-200"
+                                  : "bg-red-100 text-red-700 border-red-200"
+                              }
+                            >
+                              {enrichmentResult.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {flags.length > 0 ? (
+                              <EnrichmentFlagsDialog flags={flags} placeName={place.name} />
+                            ) : (
+                              <span className="text-xs text-muted-foreground">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                            {place.lastRefreshedAt
+                              ? new Date(place.lastRefreshedAt).toLocaleDateString()
+                              : "Never"}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <DataQualityActions placeId={place.id} />
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
             )}
           </CardContent>
         </Card>

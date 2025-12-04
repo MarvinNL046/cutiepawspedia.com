@@ -29,6 +29,9 @@ export interface PlaceQualityData {
   status: string;
   cityName?: string;
   countryName?: string;
+  website?: string | null;
+  openingHours?: Record<string, string> | null;
+  avgRating?: string | null;
 }
 
 export interface QualityStats {
@@ -190,6 +193,9 @@ export async function getLowQualityPlaces(
       p.data_quality_flags as "dataQualityFlags",
       p.last_refreshed_at as "lastRefreshedAt",
       p.status,
+      p.website,
+      p.opening_hours as "openingHours",
+      p.avg_rating as "avgRating",
       c.name as "cityName",
       co.name as "countryName"
     FROM places p

@@ -12,6 +12,8 @@ export * from "./reviews";
 export * from "./reviewPhotos";
 export * from "./dataQuality";
 export * from "./refreshJobs";
+export * from "./favorites";
+export * from "./recentViews";
 
 // Admin queries are exported separately from "@/db/queries/admin"
 // to avoid naming conflicts with getCityById, getCountryById, etc.

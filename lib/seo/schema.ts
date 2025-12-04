@@ -55,6 +55,15 @@ function getPlaceCityInfo(place: PlaceSchemaData) {
   return city as { name?: string; slug?: string; country?: { name?: string; slug?: string; code?: string } | null };
 }
 
+// Helper to safely extract primary category from place
+function getPlacePrimaryCategory(place: PlaceSchemaData) {
+  if (!place.placeCategories || !Array.isArray(place.placeCategories)) return null;
+  const firstItem = place.placeCategories[0];
+  if (!firstItem || typeof firstItem !== "object") return null;
+  const item = firstItem as { category?: { labelKey?: string; slug?: string } };
+  return item.category || null;
+}
+
 /**
  * Website schema for the main site
  */
@@ -150,7 +159,7 @@ export function localBusinessSchema(
   const countryCode = cityInfo?.country?.code || "";
   const countrySlug = cityInfo?.country?.slug || "";
   const citySlug = cityInfo?.slug || "";
-  const primaryCategory = place.placeCategories?.[0]?.category;
+  const primaryCategory = getPlacePrimaryCategory(place);
 
   // Map category to schema.org type
   const schemaType = mapCategoryToSchemaType(primaryCategory?.slug || categorySlug);

@@ -64,3 +64,5 @@ next-env.d.ts
 
 # User uploads (local storage)
 /public/uploads/
+.playwright-mcp/
+Bedrijfsinfo

@@ -24,7 +24,18 @@
     "stage:merge": "npx tsx scripts/normalize-merge.ts",
     "stage:merge:help": "npx tsx scripts/normalize-merge.ts --help",
     "seed:staged": "npx tsx scripts/seed-from-staged.ts",
-    "seed:staged:help": "npx tsx scripts/seed-from-staged.ts --help"
+    "seed:staged:help": "npx tsx scripts/seed-from-staged.ts --help",
+    "test:enrichment": "npx tsx scripts/test-enrichment.ts",
+    "test:enrichment:verbose": "npx tsx scripts/test-enrichment.ts --verbose",
+    "google:scrape": "npx tsx scripts/google-maps-scraper.ts",
+    "enrich:brightdata": "npx tsx scripts/enrich-brightdata.ts",
+    "enrich:check": "npx tsx scripts/check-enriched.ts",
+    "enrich:sync": "npx tsx scripts/sync-enriched-ratings.ts",
+    "enrich:places": "npx tsx scripts/enrich-places.ts",
+    "enrich:content": "npx tsx scripts/enrich-content.ts",
+    "enrich:content:help": "npx tsx scripts/enrich-content.ts --help",
+    "enrich:google": "npx tsx scripts/enrich-google-places.ts",
+    "enrich:google:help": "npx tsx scripts/enrich-google-places.ts --help"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",

@@ -14,6 +14,7 @@ import {
   jsonb,
   index,
 } from "drizzle-orm/pg-core";
+import type { AnyPgColumn } from "drizzle-orm/pg-core";
 
 // ============================================================================
 // ENUMS
@@ -138,6 +139,8 @@ export const places = pgTable(
     dataQualityScore: integer("data_quality_score").default(0).notNull(), // 0-100 score
     dataQualityFlags: jsonb("data_quality_flags"), // Array of quality issue flags
     lastRefreshedAt: timestamp("last_refreshed_at"), // When data was last refreshed
+    // Scraped enrichment content (for AI content generation)
+    scrapedContent: jsonb("scraped_content"), // { aboutUs?: string, googleRating?: number, googleReviewCount?: number, scrapedAt?: string }
     // Place status (for closed/moved detection)
     status: placeStatusEnum("status").default("active").notNull(),
     statusLastCheckedAt: timestamp("status_last_checked_at"),
@@ -181,6 +184,53 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+// ============================================================================
+// USER FAVORITES (P1 - Users & Favorites)
+// ============================================================================
+
+// User favorites table - saved places for users
+export const userFavorites = pgTable(
+  "user_favorites",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    placeId: integer("place_id")
+      .notNull()
+      .references(() => places.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("user_favorites_user_id_idx").on(table.userId),
+    index("user_favorites_place_id_idx").on(table.placeId),
+    // Unique constraint: one favorite per user/place combination
+    index("user_favorites_unique_idx").on(table.userId, table.placeId),
+  ]
+);
+
+// User recent views table - recently viewed places
+export const userRecentViews = pgTable(
+  "user_recent_views",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    placeId: integer("place_id")
+      .notNull()
+      .references(() => places.id, { onDelete: "cascade" }),
+    viewedAt: timestamp("viewed_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("user_recent_views_user_id_idx").on(table.userId),
+    index("user_recent_views_place_id_idx").on(table.placeId),
+    index("user_recent_views_viewed_at_idx").on(table.viewedAt),
+    // Unique constraint: one view record per user/place (upsert on view)
+    index("user_recent_views_unique_idx").on(table.userId, table.placeId),
+  ]
+);
 
 // ============================================================================
 // BUSINESSES (for B2B management)
@@ -336,7 +386,7 @@ export const leads = pgTable(
     // Charging info
     priceCents: integer("price_cents"), // Price charged for this lead (snapshot at time of creation)
     chargedAt: timestamp("charged_at"), // When credit was deducted
-    chargedTransactionId: integer("charged_transaction_id").references(() => creditTransactions.id, { onDelete: "set null" }), // FK to credit transaction
+    chargedTransactionId: integer("charged_transaction_id").references((): AnyPgColumn => creditTransactions.id, { onDelete: "set null" }), // FK to credit transaction
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
@@ -390,7 +440,7 @@ export const creditTransactions = pgTable("credit_transactions", {
   stripePaymentIntentId: varchar("stripe_payment_intent_id", { length: 255 }), // For purchases
   stripeInvoiceId: varchar("stripe_invoice_id", { length: 255 }), // For subscriptions
   // Related entities
-  leadId: integer("lead_id").references(() => leads.id, { onDelete: "set null" }), // For lead charges
+  leadId: integer("lead_id").references((): AnyPgColumn => leads.id, { onDelete: "set null" }), // For lead charges
   placeId: integer("place_id").references(() => places.id, { onDelete: "set null" }), // For premium subscriptions
   // Metadata for additional context
   metadata: jsonb("metadata"), // Store leadId, placeId, stripe session info, etc.
@@ -438,6 +488,8 @@ export const placesRelations = relations(places, ({ one, many }) => ({
   leads: many(leads),
   claims: many(placeClaims),
   refreshJobs: many(placeRefreshJobs),
+  favorites: many(userFavorites),
+  recentViews: many(userRecentViews),
 }));
 
 export const placeCategoriesRelations = relations(placeCategories, ({ one }) => ({
@@ -458,6 +510,32 @@ export const usersRelations = relations(users, ({ many }) => ({
   businesses: many(businesses),
   placeClaims: many(placeClaims),
   reviewedClaims: many(placeClaims, { relationName: "reviewedClaims" }),
+  favorites: many(userFavorites),
+  recentViews: many(userRecentViews),
+}));
+
+// User favorites relations (P1)
+export const userFavoritesRelations = relations(userFavorites, ({ one }) => ({
+  user: one(users, {
+    fields: [userFavorites.userId],
+    references: [users.id],
+  }),
+  place: one(places, {
+    fields: [userFavorites.placeId],
+    references: [places.id],
+  }),
+}));
+
+// User recent views relations (P1)
+export const userRecentViewsRelations = relations(userRecentViews, ({ one }) => ({
+  user: one(users, {
+    fields: [userRecentViews.userId],
+    references: [users.id],
+  }),
+  place: one(places, {
+    fields: [userRecentViews.placeId],
+    references: [places.id],
+  }),
 }));
 
 export const businessesRelations = relations(businesses, ({ one, many }) => ({

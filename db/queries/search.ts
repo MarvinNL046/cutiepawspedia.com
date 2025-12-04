@@ -3,6 +3,17 @@ import { db } from "../index";
 import { places, cities, categories, placeCategories, countries } from "../schema";
 
 // ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+// Helper to safely extract a non-array relation
+function getRelation<T>(rel: T | T[] | null | undefined): T | null {
+  if (!rel) return null;
+  if (Array.isArray(rel)) return rel[0] || null;
+  return rel;
+}
+
+// ============================================================================
 // SEARCH TYPES
 // ============================================================================
 
@@ -88,7 +99,8 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
       where: eq(cities.slug, citySlug),
       with: { country: true },
     });
-    if (city && city.country?.slug === countrySlug) {
+    const countryRel = getRelation(city?.country);
+    if (city && countryRel?.slug === countrySlug) {
       resolvedCityId = city.id;
     }
   }
@@ -247,39 +259,43 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
   const finalResults = results.slice(0, limit);
 
   // Transform results
-  const transformedResults = finalResults.map((place) => ({
-    id: place.id,
-    slug: place.slug,
-    name: place.name,
-    description: place.description,
-    address: place.address,
-    phone: place.phone,
-    website: place.website,
-    lat: place.lat,
-    lng: place.lng,
-    avgRating: place.avgRating,
-    reviewCount: place.reviewCount,
-    isPremium: place.isPremium,
-    isVerified: place.isVerified,
-    city: place.city
-      ? {
-          id: place.city.id,
-          slug: place.city.slug,
-          name: place.city.name,
-          country: place.city.country
-            ? {
-                slug: place.city.country.slug,
-                name: place.city.country.name,
-              }
-            : null,
-        }
-      : null,
-    categories: place.placeCategories.map((pc) => ({
-      slug: pc.category.slug,
-      labelKey: pc.category.labelKey,
-      icon: pc.category.icon,
-    })),
-  }));
+  const transformedResults = finalResults.map((place) => {
+    const cityRel = getRelation(place.city);
+    const countryRel = cityRel ? getRelation(cityRel.country) : null;
+    return {
+      id: place.id,
+      slug: place.slug,
+      name: place.name,
+      description: place.description,
+      address: place.address,
+      phone: place.phone,
+      website: place.website,
+      lat: place.lat,
+      lng: place.lng,
+      avgRating: place.avgRating,
+      reviewCount: place.reviewCount,
+      isPremium: place.isPremium,
+      isVerified: place.isVerified,
+      city: cityRel
+        ? {
+            id: cityRel.id,
+            slug: cityRel.slug,
+            name: cityRel.name,
+            country: countryRel
+              ? {
+                  slug: countryRel.slug,
+                  name: countryRel.name,
+                }
+              : null,
+          }
+        : null,
+      categories: place.placeCategories.map((pc) => ({
+        slug: pc.category.slug,
+        labelKey: pc.category.labelKey,
+        icon: pc.category.icon,
+      })),
+    };
+  });
 
   return {
     places: transformedResults,
@@ -330,18 +346,24 @@ export async function getSearchSuggestions(
   });
 
   return {
-    places: placeResults.map((p) => ({
-      id: p.id,
-      slug: p.slug,
-      name: p.name,
-      cityName: p.city?.name || "",
-    })),
-    cities: cityResults.map((c) => ({
-      id: c.id,
-      slug: c.slug,
-      name: c.name,
-      countrySlug: c.country?.slug || "",
-    })),
+    places: placeResults.map((p) => {
+      const cityRel = getRelation(p.city);
+      return {
+        id: p.id,
+        slug: p.slug,
+        name: p.name,
+        cityName: cityRel?.name || "",
+      };
+    }),
+    cities: cityResults.map((c) => {
+      const countryRel = getRelation(c.country);
+      return {
+        id: c.id,
+        slug: c.slug,
+        name: c.name,
+        countrySlug: countryRel?.slug || "",
+      };
+    }),
     categories: categoryResults.map((c) => ({
       id: c.id,
       slug: c.slug,

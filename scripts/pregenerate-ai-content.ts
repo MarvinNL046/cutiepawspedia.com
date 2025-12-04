@@ -25,7 +25,8 @@ import { neon, NeonQueryFunction } from "@neondatabase/serverless";
 import { config } from "dotenv";
 import OpenAI from "openai";
 
-config();
+// Force load .env, overriding shell environment variables
+config({ override: true });
 
 // Parse command line arguments
 const args = process.argv.slice(2);

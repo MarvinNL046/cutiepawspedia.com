@@ -11,8 +11,8 @@ function createDb(): NeonHttpDatabase<typeof schema> {
     // For build-time type checking, return a mock db
     // At runtime, this will be checked by isDatabaseAvailable
     console.warn("DATABASE_URL not set - database queries will fail at runtime");
-    // Return a non-null db for type safety
-    const mockSql = neon("postgresql://localhost:5432/mock") as NeonQueryFunction<false, false>;
+    // Return a non-null db for type safety - use proper Neon URL format
+    const mockSql = neon("postgresql://mock:mock@mock.neon.tech/mock") as NeonQueryFunction<false, false>;
     return drizzle(mockSql, { schema });
   }
   const sql = neon(connectionString);

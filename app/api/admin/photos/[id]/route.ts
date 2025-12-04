@@ -31,13 +31,16 @@ export async function GET(
       return NextResponse.json({ error: "Invalid photo ID" }, { status: 400 });
     }
 
+    if (!db) {
+      return NextResponse.json({ error: "Database not available" }, { status: 500 });
+    }
+
     // Get photo with related data
     const [photo] = await db
       .select({
         id: reviewPhotos.id,
         storageKey: reviewPhotos.storageKey,
         mimeType: reviewPhotos.mimeType,
-        sizeBytes: reviewPhotos.sizeBytes,
         status: reviewPhotos.status,
         createdAt: reviewPhotos.createdAt,
         updatedAt: reviewPhotos.updatedAt,
@@ -84,6 +87,10 @@ export async function DELETE(
     const photoId = parseInt(id, 10);
     if (isNaN(photoId)) {
       return NextResponse.json({ error: "Invalid photo ID" }, { status: 400 });
+    }
+
+    if (!db) {
+      return NextResponse.json({ error: "Database not available" }, { status: 500 });
     }
 
     // Get photo to delete from storage

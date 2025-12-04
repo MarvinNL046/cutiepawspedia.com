@@ -112,12 +112,17 @@ export async function createPlaceClaimAction(
 
     // Send admin notification email
     try {
+      // Extract city info (handle potential array/object type from Drizzle)
+      const city = Array.isArray(place.city) ? place.city[0] : place.city;
+      const cityName = city?.name || "Unknown";
+      const countryName = city?.country?.name || "Unknown";
+
       await sendNewClaimNotification({
         claimId: claim.id,
-        placeName: place.name,
-        placeAddress: place.address || undefined,
-        placeCity: place.city?.name || "Unknown",
-        placeCountry: place.city?.country?.name || "Unknown",
+        placeName: place.name as string,
+        placeAddress: (place.address as string | null) || undefined,
+        placeCity: cityName,
+        placeCountry: countryName,
         userName: user.name || undefined,
         userEmail: user.email,
         businessName: input.businessName,

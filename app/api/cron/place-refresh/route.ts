@@ -252,6 +252,14 @@ function checkForClosureIndicators(content: string): boolean {
 async function processRefreshJob(job: RefreshJobWithPlace): Promise<RefreshResult> {
   const updatedFields: string[] = [];
 
+  if (!db) {
+    return {
+      success: false,
+      error: "Database not available",
+      updatedFields: [],
+    };
+  }
+
   try {
     // Get current place data
     const [place] = await db
@@ -425,18 +433,20 @@ export async function GET(request: NextRequest) {
       });
 
       // Log audit event for each job
-      await db.insert(auditLogs).values({
-        actorRole: "system",
-        eventType: result.success ? "PLACE_REFRESH_COMPLETED" : "PLACE_REFRESH_FAILED",
-        targetType: "place",
-        targetId: job.placeId.toString(),
-        metadata: {
-          jobId: job.id,
-          reason: job.reason,
-          updatedFields: result.updatedFields,
-          error: result.error,
-        },
-      });
+      if (db) {
+        await db.insert(auditLogs).values({
+          actorRole: "system",
+          eventType: result.success ? "PLACE_REFRESH_COMPLETED" : "PLACE_REFRESH_FAILED",
+          targetType: "place",
+          targetId: job.placeId.toString(),
+          metadata: {
+            jobId: job.id,
+            reason: job.reason,
+            updatedFields: result.updatedFields,
+            error: result.error,
+          },
+        });
+      }
     }
 
     return NextResponse.json({

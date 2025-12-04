@@ -21,6 +21,7 @@ import {
   getTopPlacesByCountrySlugAndCategorySlug,
 } from "@/db/queries";
 import { getCategoryIcon } from "@/components/directory";
+import { getCityName, getCitySlug } from "@/lib/utils/place-helpers";
 import { PageHeader, SectionHeader } from "@/components/layout";
 import { Trophy, Star, MapPin, ExternalLink } from "lucide-react";
 import {
@@ -99,7 +100,7 @@ export async function generateMetadata({ params }: TopInCountryPageProps): Promi
         name: p.name,
         rating: p.avgRating ? parseFloat(p.avgRating) : undefined,
         reviewCount: p.reviewCount || undefined,
-        cityName: p.city?.name || "",
+        cityName: (() => { const city = Array.isArray(p.city) ? p.city[0] : p.city; return city?.name || ""; })(),
       })),
       year: new Date().getFullYear(),
     },
@@ -178,7 +179,7 @@ export default async function TopInCountryPage({ params }: TopInCountryPageProps
         name: p.name,
         rating: p.avgRating ? parseFloat(p.avgRating) : undefined,
         reviewCount: p.reviewCount || undefined,
-        cityName: p.city?.name || "",
+        cityName: (() => { const city = Array.isArray(p.city) ? p.city[0] : p.city; return city?.name || ""; })(),
       })),
       year: new Date().getFullYear(),
     },
@@ -188,7 +189,7 @@ export default async function TopInCountryPage({ params }: TopInCountryPageProps
   const itemListJsonLd = itemListSchema(
     places.map((place, index) => ({
       name: place.name,
-      url: `/${locale}/${countrySlug}/${place.city?.slug}/${categorySlug}/${place.slug}`,
+      url: `/${locale}/${countrySlug}/${getCitySlug(place)}/${categorySlug}/${place.slug}`,
       position: index + 1,
       description: place.description || undefined,
     })),
@@ -261,7 +262,7 @@ export default async function TopInCountryPage({ params }: TopInCountryPageProps
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <Link
-                        href={`/${locale}/${countrySlug}/${place.city?.slug}/${categorySlug}/${place.slug}`}
+                        href={`/${locale}/${countrySlug}/${getCitySlug(place)}/${categorySlug}/${place.slug}`}
                         className="text-xl font-bold text-slate-900 hover:text-cpPink transition-colors"
                       >
                         {place.name}
@@ -269,7 +270,7 @@ export default async function TopInCountryPage({ params }: TopInCountryPageProps
 
                       <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
                         <MapPin className="h-4 w-4" />
-                        <span>{place.city?.name}, {countryName}</span>
+                        <span>{getCityName(place)}, {countryName}</span>
                       </div>
 
                       {place.description && (
@@ -294,7 +295,7 @@ export default async function TopInCountryPage({ params }: TopInCountryPageProps
 
                     {/* View Button */}
                     <Link
-                      href={`/${locale}/${countrySlug}/${place.city?.slug}/${categorySlug}/${place.slug}`}
+                      href={`/${locale}/${countrySlug}/${getCitySlug(place)}/${categorySlug}/${place.slug}`}
                       className="flex-shrink-0 inline-flex items-center gap-1 px-4 py-2 bg-cpPink text-white rounded-lg hover:bg-cpPink/90 transition-colors text-sm font-medium"
                     >
                       {locale === "nl" ? "Bekijk" : "View"}

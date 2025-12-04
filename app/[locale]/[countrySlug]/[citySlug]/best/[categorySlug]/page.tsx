@@ -87,7 +87,8 @@ export async function generateMetadata({ params }: BestInCityPageProps): Promise
   }
 
   const categoryLabel = getLocalizedCategoryName(categorySlug, locale as ContentLocale);
-  const countryName = city.country?.name || countrySlug;
+  const country = Array.isArray(city.country) ? city.country[0] : city.country;
+  const countryName = country?.name || countrySlug;
 
   // Generate AI-driven content (cached or generated on demand)
   const { content } = await generateContent({
@@ -166,7 +167,8 @@ export default async function BestInCityPage({ params }: BestInCityPageProps) {
   }
 
   const cityName = city.name;
-  const countryName = city.country?.name || countrySlug;
+  const countryData = Array.isArray(city.country) ? city.country[0] : city.country;
+  const countryName = countryData?.name || countrySlug;
   const categoryLabel = getLocalizedCategoryName(categorySlug, locale as ContentLocale);
   const categoryIcon = getCategoryIcon(category.icon || categorySlug);
 

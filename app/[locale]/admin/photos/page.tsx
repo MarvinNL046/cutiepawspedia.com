@@ -30,6 +30,10 @@ export default async function AdminPhotosPage({ params, searchParams }: AdminPho
   const { status: filterStatus } = await searchParams;
   const user = await requireAdmin(locale);
 
+  if (!db) {
+    return <div className="p-8 text-center">Database not available</div>;
+  }
+
   // Get photo stats
   const stats = await db
     .select({

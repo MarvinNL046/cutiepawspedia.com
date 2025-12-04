@@ -31,6 +31,10 @@ interface ReviewReply {
   createdAt: Date | string;
 }
 
+// Drizzle ORM returns relations as either single objects or arrays
+type DrizzleRelation<T> = T | T[] | { [x: string]: any } | { [x: string]: any }[] | null | undefined;
+type DrizzleArray<T> = T[] | { [x: string]: any }[];
+
 interface Review {
   id: number;
   rating: number;
@@ -40,17 +44,24 @@ interface Review {
   isFeatured: boolean;
   createdAt: Date | string;
   visitDate: Date | string | null;
-  place: {
+  place: DrizzleRelation<{
     id: number;
     name: string;
     slug: string;
-  } | null;
-  user: {
+  }>;
+  user: DrizzleRelation<{
     id: number;
     name: string | null;
     email: string | null;
-  } | null;
-  replies: ReviewReply[];
+  }>;
+  replies: DrizzleArray<ReviewReply>;
+}
+
+// Helper to safely get relation value
+function getRelation<T>(rel: DrizzleRelation<T>): T | null {
+  if (!rel) return null;
+  if (Array.isArray(rel)) return rel[0] as T || null;
+  return rel as T;
 }
 
 interface BusinessReviewsTableProps {
@@ -188,10 +199,10 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
           {localReviews.map((review) => (
             <TableRow key={review.id}>
               <TableCell className="font-medium">
-                {review.place?.name || "Unknown"}
+                {getRelation(review.place)?.name || "Unknown"}
               </TableCell>
               <TableCell>
-                <div className="text-sm">{review.user?.name || "Anonymous"}</div>
+                <div className="text-sm">{getRelation(review.user)?.name || "Anonymous"}</div>
               </TableCell>
               <TableCell>{renderStars(review.rating)}</TableCell>
               <TableCell className="max-w-[200px]">
@@ -247,7 +258,7 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
           <DialogHeader>
             <DialogTitle>Review Details</DialogTitle>
             <DialogDescription>
-              {selectedReview?.place?.name || "Unknown place"}
+              {selectedReview && getRelation(selectedReview.place)?.name || "Unknown place"}
             </DialogDescription>
           </DialogHeader>
 
@@ -260,7 +271,7 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
                 </div>
                 <div>
                   <p className="font-medium">
-                    {selectedReview.user?.name || "Anonymous"}
+                    {getRelation(selectedReview.user)?.name || "Anonymous"}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     {formatDistanceToNow(new Date(selectedReview.createdAt), {
@@ -353,7 +364,7 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
                 <div className="flex items-center gap-2 mb-2">
                   {renderStars(selectedReview.rating)}
                   <span className="text-sm font-medium">
-                    {selectedReview.user?.name || "Anonymous"}
+                    {getRelation(selectedReview.user)?.name || "Anonymous"}
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground line-clamp-3">

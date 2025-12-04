@@ -148,7 +148,7 @@ export async function addCredits(data: {
   const newBalance = currentBalance + data.amountCents;
 
   // Create transaction record
-  const [transaction] = await db
+  const result = await db
     .insert(creditTransactions)
     .values({
       businessId: data.businessId,
@@ -160,6 +160,8 @@ export async function addCredits(data: {
       balanceAfterCents: newBalance,
     })
     .returning();
+
+  const transaction = Array.isArray(result) ? result[0] : null;
 
   // Update business balance
   await db
@@ -216,7 +218,7 @@ export async function chargeForLead(data: {
   const newBalance = currentBalance - priceCents;
 
   // Create transaction record (negative amount for charge)
-  const [transaction] = await db
+  const chargeResult = await db
     .insert(creditTransactions)
     .values({
       businessId: data.businessId,
@@ -227,6 +229,8 @@ export async function chargeForLead(data: {
       balanceAfterCents: newBalance,
     })
     .returning();
+
+  const transaction = Array.isArray(chargeResult) ? chargeResult[0] : null;
 
   // Update business balance
   await db
@@ -274,7 +278,7 @@ export async function refundCredits(data: {
   const currentBalance = business[0].creditBalanceCents ?? 0;
   const newBalance = currentBalance + data.amountCents;
 
-  const [transaction] = await db
+  const refundResult = await db
     .insert(creditTransactions)
     .values({
       businessId: data.businessId,
@@ -285,6 +289,8 @@ export async function refundCredits(data: {
       balanceAfterCents: newBalance,
     })
     .returning();
+
+  const transaction = Array.isArray(refundResult) ? refundResult[0] : null;
 
   await db
     .update(businesses)

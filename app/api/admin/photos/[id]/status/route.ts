@@ -43,6 +43,10 @@ export async function PATCH(
       );
     }
 
+    if (!db) {
+      return NextResponse.json({ error: "Database not available" }, { status: 500 });
+    }
+
     // Get photo to find the place ID
     const [photo] = await db
       .select({ placeId: reviewPhotos.placeId })

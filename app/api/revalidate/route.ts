@@ -74,14 +74,14 @@ export async function POST(request: NextRequest) {
 
     // Revalidate single tag
     if (tag) {
-      revalidateTag(tag);
+      revalidateTag(tag, "default");
       revalidated.tags.push(tag);
     }
 
     // Revalidate multiple tags
     if (tags?.length) {
       for (const t of tags) {
-        revalidateTag(t);
+        revalidateTag(t, "default");
         revalidated.tags.push(t);
       }
     }
@@ -132,7 +132,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (tag) {
-    revalidateTag(tag);
+    revalidateTag(tag, "default");
   }
 
   return NextResponse.json({

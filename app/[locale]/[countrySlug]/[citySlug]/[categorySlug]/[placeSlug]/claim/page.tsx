@@ -11,6 +11,7 @@ import { getUserByStackAuthId } from "@/db/queries/users";
 import { Breadcrumbs } from "@/components/layout";
 import { MapPin, Building2, AlertCircle } from "lucide-react";
 import { ClaimForm } from "./ClaimForm";
+import { getCityName, getCountryName } from "@/lib/utils/place-helpers";
 import type { Metadata } from "next";
 
 interface ClaimPageProps {
@@ -95,8 +96,8 @@ export default async function ClaimPage({ params }: ClaimPageProps) {
     redirect(`/${locale}/${countrySlug}/${citySlug}/${categorySlug}/${placeSlug}?claim=pending`);
   }
 
-  const cityName = place.city?.name || citySlug;
-  const countryName = place.city?.country?.name || countrySlug;
+  const cityName = getCityName(place, citySlug);
+  const countryName = getCountryName(place, countrySlug);
 
   const labels = {
     en: {

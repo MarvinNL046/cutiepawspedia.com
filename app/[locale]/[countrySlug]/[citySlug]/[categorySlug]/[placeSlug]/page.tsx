@@ -38,6 +38,7 @@ import { CategoryAffiliateBlockLazy as CategoryAffiliateBlock } from "@/componen
 import { PlaceViewTracker } from "@/components/analytics";
 import { Breadcrumbs } from "@/components/layout";
 import { MapPin, Phone, Globe, Mail, Star, Clock, CheckCircle, MessageSquare } from "lucide-react";
+import { getCityName, getCountryName } from "@/lib/utils/place-helpers";
 
 interface PlacePageProps {
   params: Promise<{ locale: string; countrySlug: string; citySlug: string; categorySlug: string; placeSlug: string }>;
@@ -65,8 +66,8 @@ export default async function PlacePage({ params }: PlacePageProps) {
 
   if (!place) notFound();
 
-  const cityName = place.city?.name || citySlug;
-  const countryName = place.city?.country?.name || countrySlug;
+  const cityName = getCityName(place, citySlug);
+  const countryName = getCountryName(place, countrySlug);
   const primaryCategory = place.placeCategories?.[0]?.category;
 
   // Check if current user has a pending claim for this place
@@ -149,14 +150,18 @@ export default async function PlacePage({ params }: PlacePageProps) {
   ];
 
   // Prepare reviews for JSON-LD schema (map to expected format)
-  const reviewsForSchema = publishedReviews.map((r) => ({
-    id: r.id,
-    rating: r.rating,
-    title: r.title,
-    body: r.body,
-    createdAt: r.createdAt,
-    author: r.user ? { name: r.user.name } : null,
-  }));
+  const reviewsForSchema = publishedReviews.map((r) => {
+    // Handle potential array type from Drizzle relations
+    const user = Array.isArray(r.user) ? r.user[0] : r.user;
+    return {
+      id: r.id,
+      rating: r.rating,
+      title: r.title,
+      body: r.body,
+      createdAt: r.createdAt,
+      author: user ? { name: (user as { name?: string }).name || "Anonymous" } : null,
+    };
+  });
 
   return (
     <>
@@ -301,7 +306,10 @@ export default async function PlacePage({ params }: PlacePageProps) {
                             ))}
                           </div>
                           <span className="text-sm text-slate-500">
-                            {review.user?.name || "Anonymous"}
+                            {(() => {
+                              const user = Array.isArray(review.user) ? review.user[0] : review.user;
+                              return user?.name || "Anonymous";
+                            })()}
                           </span>
                           <span className="text-xs text-slate-400">
                             {new Date(review.createdAt).toLocaleDateString(locale, { year: "numeric", month: "short", day: "numeric" })}

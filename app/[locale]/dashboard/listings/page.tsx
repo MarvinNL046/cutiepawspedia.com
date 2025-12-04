@@ -81,8 +81,10 @@ export default async function ListingsPage({ params }: ListingsPageProps) {
                 </TableHeader>
                 <TableBody>
                   {listings.map((listing) => {
-                    const citySlug = listing.city?.slug || "";
-                    const countrySlug = listing.city?.country?.slug || "";
+                    const city = Array.isArray(listing.city) ? listing.city[0] : listing.city;
+                    const country = Array.isArray(city?.country) ? city.country[0] : city?.country;
+                    const citySlug = city?.slug || "";
+                    const countrySlug = country?.slug || "";
                     const categorySlug = listing.placeCategories?.[0]?.category?.slug || "all";
                     const publicUrl = `/${locale}/${countrySlug}/${citySlug}/${categorySlug}/${listing.slug}`;
 
@@ -117,7 +119,7 @@ export default async function ListingsPage({ params }: ListingsPageProps) {
                           <div className="flex items-center gap-1 text-sm">
                             <MapPin className="h-3 w-3 text-slate-400" />
                             <span>
-                              {listing.city?.name}, {listing.city?.country?.name}
+                              {city?.name || ''}, {country?.name || ''}
                             </span>
                           </div>
                         </TableCell>

@@ -21,6 +21,7 @@ import {
   getTopPlacesByCountrySlugAndCategorySlug,
 } from "@/db/queries";
 import { PlaceCard, getCategoryIcon } from "@/components/directory";
+import { getCityName, getCitySlug } from "@/lib/utils/place-helpers";
 import { PageHeader, SectionHeader } from "@/components/layout";
 import { Star, Award, TrendingUp } from "lucide-react";
 import {
@@ -96,7 +97,7 @@ export async function generateMetadata({ params }: BestInCountryPageProps): Prom
         name: p.name,
         rating: p.avgRating ? parseFloat(p.avgRating) : undefined,
         reviewCount: p.reviewCount || undefined,
-        cityName: p.city?.name,
+        cityName: (() => { const city = Array.isArray(p.city) ? p.city[0] : p.city; return city?.name; })(),
       })),
     },
   });
@@ -174,7 +175,7 @@ export default async function BestInCountryPage({ params }: BestInCountryPagePro
         name: p.name,
         rating: p.avgRating ? parseFloat(p.avgRating) : undefined,
         reviewCount: p.reviewCount || undefined,
-        cityName: p.city?.name,
+        cityName: (() => { const city = Array.isArray(p.city) ? p.city[0] : p.city; return city?.name; })(),
       })),
     },
   });
@@ -183,7 +184,7 @@ export default async function BestInCountryPage({ params }: BestInCountryPagePro
   const itemListJsonLd = itemListSchema(
     places.map((place, index) => ({
       name: place.name,
-      url: `/${locale}/${countrySlug}/${place.city?.slug}/${categorySlug}/${place.slug}`,
+      url: `/${locale}/${countrySlug}/${getCitySlug(place)}/${categorySlug}/${place.slug}`,
       position: index + 1,
       description: place.description || undefined,
     })),
@@ -266,7 +267,7 @@ export default async function BestInCountryPage({ params }: BestInCountryPagePro
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <a
-                      href={`/${locale}/${countrySlug}/${place.city?.slug}/${categorySlug}/${place.slug}`}
+                      href={`/${locale}/${countrySlug}/${getCitySlug(place)}/${categorySlug}/${place.slug}`}
                       className="font-semibold text-lg hover:text-cpPink transition-colors truncate"
                     >
                       {place.name}
@@ -279,7 +280,7 @@ export default async function BestInCountryPage({ params }: BestInCountryPagePro
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground mb-2">
-                    {place.city?.name}, {countryName}
+                    {getCityName(place)}, {countryName}
                   </p>
                   {place.description && (
                     <p className="text-sm text-slate-600 line-clamp-2">

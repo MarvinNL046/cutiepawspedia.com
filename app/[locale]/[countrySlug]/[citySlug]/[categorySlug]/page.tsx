@@ -56,7 +56,8 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   ]);
 
   const cityName = city?.name || citySlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  const countryName = city?.country?.name || countrySlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const country = Array.isArray(city?.country) ? city.country[0] : city?.country;
+  const countryName = country?.name || countrySlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   const categoryName = getLocalizedCategoryName(categorySlug, locale as ContentLocale);
   const categoryIcon = getCategoryIcon(category?.icon || categorySlug);
 

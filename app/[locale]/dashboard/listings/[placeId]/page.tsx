@@ -106,7 +106,11 @@ export default async function EditListingPage({ params }: EditListingPageProps) 
                   </CardTitle>
                   <CardDescription className="flex items-center gap-1 mt-1">
                     <MapPin className="h-3 w-3" />
-                    {listing.city?.name}, {listing.city?.country?.name}
+                    {(() => { const city = Array.isArray(listing.city) ? listing.city[0] : listing.city; return city?.name || ''; })()}, {(() => {
+                      const city = Array.isArray(listing.city) ? listing.city[0] : listing.city;
+                      const country = Array.isArray(city?.country) ? city.country[0] : city?.country;
+                      return country?.name || '';
+                    })()}
                   </CardDescription>
                 </div>
               </div>

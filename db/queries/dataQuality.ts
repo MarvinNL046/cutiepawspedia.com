@@ -202,7 +202,7 @@ export async function getLowQualityPlaces(
     OFFSET ${offset}
   `);
 
-  return result.rows as PlaceQualityData[];
+  return result.rows as unknown as PlaceQualityData[];
 }
 
 /**

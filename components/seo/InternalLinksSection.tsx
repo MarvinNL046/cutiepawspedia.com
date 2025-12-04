@@ -52,7 +52,6 @@ function getLinkIcon(type: InternalLinkItem["type"]) {
   switch (type) {
     case "city_category":
     case "place_city_category":
-    case "combo":
       return <Tag className="h-4 w-4 text-cpPink" />;
     case "category_city":
     case "country_city":

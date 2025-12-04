@@ -12,6 +12,9 @@ interface BreadcrumbItem {
   url: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DrizzleRelation<T> = T | T[] | { [x: string]: any } | { [x: string]: any }[] | null | undefined;
+
 interface PlaceSchemaData {
   name: string;
   slug: string;
@@ -27,7 +30,7 @@ interface PlaceSchemaData {
   reviewCount?: number;
   isPremium?: boolean;
   isVerified?: boolean;
-  city?: {
+  city?: DrizzleRelation<{
     name: string;
     slug: string;
     country?: {
@@ -35,13 +38,21 @@ interface PlaceSchemaData {
       slug: string;
       code?: string;
     } | null;
-  } | null;
-  placeCategories?: Array<{
+  }>;
+  placeCategories?: DrizzleRelation<{
     category: {
       labelKey: string;
       slug: string;
     };
-  }>;
+  }>[];
+}
+
+// Helper to safely extract city from place
+function getPlaceCityInfo(place: PlaceSchemaData) {
+  if (!place.city) return null;
+  const city = Array.isArray(place.city) ? place.city[0] : place.city;
+  if (!city || typeof city !== "object") return null;
+  return city as { name?: string; slug?: string; country?: { name?: string; slug?: string; code?: string } | null };
 }
 
 /**
@@ -133,11 +144,12 @@ export function localBusinessSchema(
   locale: string,
   categorySlug: string
 ): object {
-  const cityName = place.city?.name || "";
-  const countryName = place.city?.country?.name || "";
-  const countryCode = place.city?.country?.code || "";
-  const countrySlug = place.city?.country?.slug || "";
-  const citySlug = place.city?.slug || "";
+  const cityInfo = getPlaceCityInfo(place);
+  const cityName = cityInfo?.name || "";
+  const countryName = cityInfo?.country?.name || "";
+  const countryCode = cityInfo?.country?.code || "";
+  const countrySlug = cityInfo?.country?.slug || "";
+  const citySlug = cityInfo?.slug || "";
   const primaryCategory = place.placeCategories?.[0]?.category;
 
   // Map category to schema.org type

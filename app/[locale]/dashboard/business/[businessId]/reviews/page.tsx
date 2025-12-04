@@ -22,7 +22,7 @@ export default async function BusinessReviewsPage({ params }: PageProps) {
     notFound();
   }
 
-  const stackUser = await stackServerApp.getUser();
+  const stackUser = await stackServerApp?.getUser();
   if (!stackUser) {
     redirect(`/${locale}/handler/sign-in`);
   }
@@ -43,7 +43,7 @@ export default async function BusinessReviewsPage({ params }: PageProps) {
   }
 
   // Fetch reviews for this business
-  const reviews = await getReviewsForBusiness(businessIdNum, 50, 0);
+  const reviews = await getReviewsForBusiness(businessIdNum, { limit: 50 });
 
   // Calculate stats
   const totalReviews = reviews.length;

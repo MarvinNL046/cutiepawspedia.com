@@ -98,6 +98,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Check authentication
+    if (!stackServerApp) {
+      return NextResponse.json(
+        { error: "Authentication not configured" },
+        { status: 500 }
+      );
+    }
     const stackUser = await stackServerApp.getUser();
     if (!stackUser) {
       return NextResponse.json(

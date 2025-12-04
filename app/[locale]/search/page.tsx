@@ -186,8 +186,8 @@ async function SearchResults({
                 })),
               }}
               locale={locale}
-              countrySlug={place.city?.country?.slug || countrySlug || ""}
-              citySlug={place.city?.slug || citySlug || ""}
+              countrySlug={(() => { const city = Array.isArray(place.city) ? place.city[0] : place.city; const country = Array.isArray(city?.country) ? city.country[0] : city?.country; return country?.slug || countrySlug || ""; })()}
+              citySlug={(() => { const city = Array.isArray(place.city) ? place.city[0] : place.city; return city?.slug || citySlug || ""; })()}
             />
           ))}
 
@@ -248,8 +248,8 @@ async function SearchResults({
               })),
             }}
             locale={locale}
-            countrySlug={place.city?.country?.slug || countrySlug || ""}
-            citySlug={place.city?.slug || citySlug || ""}
+            countrySlug={(() => { const city = Array.isArray(place.city) ? place.city[0] : place.city; const country = Array.isArray(city?.country) ? city.country[0] : city?.country; return country?.slug || countrySlug || ""; })()}
+            citySlug={(() => { const city = Array.isArray(place.city) ? place.city[0] : place.city; return city?.slug || citySlug || ""; })()}
           />
         ))}
       </div>

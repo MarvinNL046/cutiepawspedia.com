@@ -79,6 +79,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Extract business from Drizzle relation (can be object or array)
+    const business = Array.isArray(place.business) ? place.business[0] : place.business;
+
     // Insert the lead (include businessId for denormalization)
     const [newLead] = await db
       .insert(leads)
@@ -109,16 +112,16 @@ export async function POST(request: NextRequest) {
 
     // Auto-charge credits if business has auto-charge enabled
     let chargeResult: { success: boolean; error?: string } | null = null;
-    if (place.business && shouldAutoCharge(place.business)) {
+    if (business && shouldAutoCharge(business)) {
       // Calculate lead price using pricing engine
       const leadPriceCents = getLeadPriceForBusiness({
-        business: place.business,
+        business: business,
         place: { isPremium: place.isPremium, premiumLevel: place.premiumLevel },
       });
 
       // Attempt to charge credits
       chargeResult = await chargeForLead({
-        businessId: place.business.id,
+        businessId: business.id,
         leadId: newLead.id,
         priceCents: leadPriceCents,
       });
@@ -126,7 +129,7 @@ export async function POST(request: NextRequest) {
       if (chargeResult.success) {
         // Log LEAD_CHARGED audit event
         logAuditEvent({
-          actorBusinessId: place.business.id,
+          actorBusinessId: business.id,
           actorRole: "system",
           eventType: "LEAD_CHARGED",
           targetType: "lead",
@@ -157,7 +160,7 @@ export async function POST(request: NextRequest) {
           leadPhone: phone,
           leadMessage: message,
           placeName: place.name,
-          placeCity: place.city?.name || "",
+          placeCity: (() => { const city = Array.isArray(place.city) ? place.city[0] : place.city; return city?.name || ""; })(),
         });
       } catch (emailError) {
         // Log but don't fail the request if email fails

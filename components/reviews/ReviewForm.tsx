@@ -251,7 +251,7 @@ export function ReviewForm({
                   <FormControl>
                     <div className="flex items-center gap-3">
                       <RatingStars
-                        rating={field.value}
+                        rating={field.value ?? 0}
                         size="lg"
                         interactive
                         onChange={field.onChange}
@@ -302,7 +302,7 @@ export function ReviewForm({
                     />
                   </FormControl>
                   <FormDescription>
-                    {field.value.length}/5000 characters (minimum 10)
+                    {(field.value ?? "").length}/5000 characters (minimum 10)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

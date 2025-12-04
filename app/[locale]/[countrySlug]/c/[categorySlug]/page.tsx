@@ -83,7 +83,7 @@ export async function generateMetadata({ params }: CountryCategoryPageProps): Pr
   const categoryLabel = getLocalizedCategoryName(categorySlug, locale as ContentLocale);
 
   // Count unique cities
-  const uniqueCities = new Set(places.map((p) => p.city?.slug).filter(Boolean));
+  const uniqueCities = new Set(places.map((p) => { const city = Array.isArray(p.city) ? p.city[0] : p.city; return city?.slug; }).filter(Boolean));
 
   // Generate AI-driven content (cached or generated on demand)
   const { content } = await generateContent({
@@ -158,7 +158,7 @@ export default async function CountryCategoryPage({ params }: CountryCategoryPag
   const categoryIcon = getCategoryIcon(category.icon || categorySlug);
 
   // Count unique cities for content generation
-  const uniqueCities = new Set(places.map((p) => p.city?.slug).filter(Boolean));
+  const uniqueCities = new Set(places.map((p) => { const city = Array.isArray(p.city) ? p.city[0] : p.city; return city?.slug; }).filter(Boolean));
 
   // Generate AI-driven content for the page (cached or generated on demand)
   const { content } = await generateContent({
@@ -178,7 +178,7 @@ export default async function CountryCategoryPage({ params }: CountryCategoryPag
   const itemListJsonLd = itemListSchema(
     places.map((place, index) => ({
       name: place.name,
-      url: `/${locale}/${countrySlug}/${place.city?.slug}/${categorySlug}/${place.slug}`,
+      url: `/${locale}/${countrySlug}/${(() => { const city = Array.isArray(place.city) ? place.city[0] : place.city; return city?.slug || ""; })()}/${categorySlug}/${place.slug}`,
       position: index + 1,
       description: place.description || undefined,
     })),
@@ -247,7 +247,7 @@ export default async function CountryCategoryPage({ params }: CountryCategoryPag
                 place={place}
                 locale={locale}
                 countrySlug={countrySlug}
-                citySlug={place.city?.slug || ""}
+                citySlug={(() => { const city = Array.isArray(place.city) ? place.city[0] : place.city; return city?.slug || ""; })()}
                 categorySlug={categorySlug}
               />
             ))}

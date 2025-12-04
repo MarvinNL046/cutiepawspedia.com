@@ -46,7 +46,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // Only show published reviews to non-owners
-    const stackUser = await stackServerApp.getUser();
+    const stackUser = await stackServerApp?.getUser();
     const user = stackUser ? await getUserByStackAuthId(stackUser.id) : null;
 
     if (review.status !== "published" && review.userId !== user?.id) {
@@ -74,6 +74,12 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     // Check authentication
+    if (!stackServerApp) {
+      return NextResponse.json(
+        { error: "Authentication not configured" },
+        { status: 500 }
+      );
+    }
     const stackUser = await stackServerApp.getUser();
     if (!stackUser) {
       return NextResponse.json(
@@ -160,6 +166,12 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     // Check authentication
+    if (!stackServerApp) {
+      return NextResponse.json(
+        { error: "Authentication not configured" },
+        { status: 500 }
+      );
+    }
     const stackUser = await stackServerApp.getUser();
     if (!stackUser) {
       return NextResponse.json(

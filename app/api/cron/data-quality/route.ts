@@ -93,19 +93,21 @@ export async function GET(request: NextRequest) {
     const stats = await getQualityStats();
 
     // Log audit event
-    await db.insert(auditLogs).values({
-      actorRole: "system",
-      eventType: "DATA_QUALITY_SCAN",
-      targetType: "place",
-      targetId: null,
-      metadata: {
-        scanned,
-        enqueued,
-        errors,
-        stats,
-        duration: Date.now() - startTime,
-      },
-    });
+    if (db) {
+      await db.insert(auditLogs).values({
+        actorRole: "system",
+        eventType: "DATA_QUALITY_SCAN",
+        targetType: "place",
+        targetId: null,
+        metadata: {
+          scanned,
+          enqueued,
+          errors,
+          stats,
+          duration: Date.now() - startTime,
+        },
+      });
+    }
 
     return NextResponse.json({
       success: true,

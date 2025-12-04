@@ -57,7 +57,8 @@ export default async function CityPage({ params }: CityPageProps) {
   const topPlaces = city ? await getTopRatedPlacesByCity(city.id, 6) : [];
   const totalPlaces = city ? await getPlaceCountByCity(city.id) : 0;
   const cityName = city?.name || citySlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  const countryName = city?.country?.name || countrySlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const country = Array.isArray(city?.country) ? city.country[0] : city?.country;
+  const countryName = country?.name || countrySlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
   const displayCategories = categories.length > 0 ? categories : defaultCategories;
 

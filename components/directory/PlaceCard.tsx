@@ -3,6 +3,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, Phone, Crown, CheckCircle } from "lucide-react";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DrizzleRelation<T> = T | T[] | { [x: string]: any } | { [x: string]: any }[] | null | undefined;
+
 interface PlaceCardProps {
   place: {
     id: number;
@@ -15,7 +18,7 @@ interface PlaceCardProps {
     reviewCount: number;
     isVerified: boolean;
     isPremium: boolean;
-    placeCategories?: Array<{
+    placeCategories?: DrizzleRelation<{
       category: {
         slug: string;
         labelKey: string;
@@ -31,9 +34,18 @@ interface PlaceCardProps {
 }
 
 export function PlaceCard({ place, locale, countrySlug, citySlug, categorySlug, variant = "default" }: PlaceCardProps) {
+  // Extract categories array safely from Drizzle relation type
+  const categoriesArray = (() => {
+    const cats = place.placeCategories;
+    if (!cats) return [];
+    return Array.isArray(cats) ? cats : [cats];
+  })();
+
+  const firstCategorySlug = categoriesArray[0]?.category?.slug || "all";
+
   const href = categorySlug
     ? `/${locale}/${countrySlug}/${citySlug}/${categorySlug}/${place.slug}`
-    : `/${locale}/${countrySlug}/${citySlug}/${place.placeCategories?.[0]?.category.slug || "all"}/${place.slug}`;
+    : `/${locale}/${countrySlug}/${citySlug}/${firstCategorySlug}/${place.slug}`;
 
   // Premium card styling
   const premiumStyles = place.isPremium
@@ -103,11 +115,11 @@ export function PlaceCard({ place, locale, countrySlug, citySlug, categorySlug, 
           </div>
 
           {/* Categories */}
-          {place.placeCategories && place.placeCategories.length > 0 && (
+          {categoriesArray.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-3">
-              {place.placeCategories.slice(0, 3).map((pc) => (
-                <Badge key={pc.category.slug} variant="outline" className="text-xs">
-                  {pc.category.labelKey}
+              {categoriesArray.slice(0, 3).map((pc) => (
+                <Badge key={pc.category?.slug || 'unknown'} variant="outline" className="text-xs">
+                  {pc.category?.labelKey || ''}
                 </Badge>
               ))}
             </div>

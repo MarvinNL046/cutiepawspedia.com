@@ -31,6 +31,10 @@ export async function GET(
       return NextResponse.json({ error: "Invalid place ID" }, { status: 400 });
     }
 
+    if (!db) {
+      return NextResponse.json({ error: "Database not available" }, { status: 500 });
+    }
+
     // Get current quality data
     const [place] = await db
       .select({

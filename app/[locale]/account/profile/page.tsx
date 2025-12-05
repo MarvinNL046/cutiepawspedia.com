@@ -9,7 +9,7 @@
 
 import { redirect } from "next/navigation";
 import { stackServerApp } from "@/lib/auth/stack";
-import { getUserByStackAuthId } from "@/db/queries/users";
+import { getUserByStackAuthId, upsertUserFromStackAuth } from "@/db/queries/users";
 import { getUserProfile } from "@/db/queries/userProfiles";
 import { getBadgesForUser, getAllBadgeDefinitions } from "@/db/queries/badges";
 import { ProfileSettingsForm } from "./ProfileSettingsForm";
@@ -61,15 +61,37 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     redirect(`/handler/sign-in?after_auth_return_to=/${locale}/account/profile`);
   }
 
-  const user = await getUserByStackAuthId(stackUser.id);
+  // Get user from database, auto-sync if needed
+  let user = await getUserByStackAuthId(stackUser.id);
   if (!user) {
-    redirect(`/handler/sign-in?after_auth_return_to=/${locale}/account/profile`);
+    user = await upsertUserFromStackAuth({
+      stackauthId: stackUser.id,
+      email: stackUser.primaryEmail || "",
+      name: stackUser.displayName,
+    });
   }
 
-  // Get user profile and badges
-  const profile = await getUserProfile(user.id);
-  const userBadges = await getBadgesForUser(user.id);
-  const allBadges = await getAllBadgeDefinitions();
+  if (!user) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-slate-600">Unable to load user data.</p>
+      </div>
+    );
+  }
+
+  // Get user profile and badges (with error handling for missing tables)
+  let profile = null;
+  let userBadges: Awaited<ReturnType<typeof getBadgesForUser>> = [];
+  let allBadges: Awaited<ReturnType<typeof getAllBadgeDefinitions>> = [];
+
+  try {
+    profile = await getUserProfile(user.id);
+    userBadges = await getBadgesForUser(user.id);
+    allBadges = await getAllBadgeDefinitions();
+  } catch (error) {
+    console.error("Error loading profile/badges:", error);
+    // Continue with defaults - tables may not exist yet
+  }
 
   // Separate earned and unearned badges
   const earnedBadgeKeys = new Set(userBadges.map((b) => b.badgeKey));

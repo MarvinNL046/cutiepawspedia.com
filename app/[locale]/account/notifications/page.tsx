@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { stackServerApp } from "@/lib/auth/stack";
-import { getUserByStackAuthId } from "@/db/queries/users";
-import { getOrCreateNotificationSettings } from "@/db/queries/notifications";
+import { getUserByStackAuthId, upsertUserFromStackAuth } from "@/db/queries/users";
+import { getOrCreateNotificationSettings, DEFAULT_NOTIFICATION_SETTINGS } from "@/db/queries/notifications";
 import { NotificationSettingsForm } from "./NotificationSettingsForm";
 import { Bell } from "lucide-react";
 
@@ -26,13 +26,33 @@ export default async function NotificationsPage({ params }: NotificationsPagePro
     redirect(`/handler/sign-in?after_auth_return_to=/${locale}/account/notifications`);
   }
 
-  const user = await getUserByStackAuthId(stackUser.id);
+  // Get user from database, auto-sync if needed
+  let user = await getUserByStackAuthId(stackUser.id);
   if (!user) {
-    redirect(`/handler/sign-in?after_auth_return_to=/${locale}/account/notifications`);
+    user = await upsertUserFromStackAuth({
+      stackauthId: stackUser.id,
+      email: stackUser.primaryEmail || "",
+      name: stackUser.displayName,
+    });
   }
 
-  // Get or create notification settings
-  const settings = await getOrCreateNotificationSettings(user.id);
+  if (!user) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-slate-600">Unable to load user data.</p>
+      </div>
+    );
+  }
+
+  // Get or create notification settings (with fallback for missing table)
+  let settings;
+  try {
+    settings = await getOrCreateNotificationSettings(user.id);
+  } catch (error) {
+    console.error("Error loading notification settings:", error);
+    // Use defaults if table doesn't exist yet
+    settings = { ...DEFAULT_NOTIFICATION_SETTINGS, id: 0, userId: user.id, createdAt: new Date(), updatedAt: new Date() };
+  }
 
   return (
     <div className="max-w-2xl">

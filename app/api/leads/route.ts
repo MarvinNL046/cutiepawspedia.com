@@ -218,6 +218,11 @@ export async function POST(request: NextRequest) {
     if (place.email) {
       const baseUrl = process.env.APP_BASE_URL || "https://cutiepawspedia.com";
 
+      // Determine if lead is paid (for blurring contact details)
+      // isPaid = true if: no auto-charge, or charge succeeded
+      // isPaid = false if: auto-charge enabled but failed (insufficient credits)
+      const isPaid = !business || !shouldAutoCharge(business) || (chargeResult?.success ?? false);
+
       // Send email and track result (don't block response, but track success/failure)
       sendNotification({
         type: "LEAD_NEW",
@@ -231,6 +236,8 @@ export async function POST(request: NextRequest) {
         leadPhone: phone,
         leadMessage: message,
         dashboardUrl: place.businessId ? `${baseUrl}/dashboard/business/${place.businessId}` : undefined,
+        isPaid, // If false, contact details are blurred in email
+        creditsUrl: place.businessId ? `${baseUrl}/dashboard/business/${place.businessId}/credits` : undefined,
       }).then(async (emailResult) => {
         // Update lead status based on email result
         if (emailResult.success) {

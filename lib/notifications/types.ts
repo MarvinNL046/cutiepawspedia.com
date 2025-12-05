@@ -119,6 +119,8 @@ export interface LeadNewPayload extends BaseNotificationPayload {
   leadPhone?: string;
   leadMessage?: string;
   dashboardUrl?: string;
+  isPaid?: boolean; // If false, contact details are blurred in email
+  creditsUrl?: string; // URL to buy credits (shown when isPaid=false)
 }
 
 /**

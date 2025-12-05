@@ -248,6 +248,8 @@ export async function sendNotification(
           leadPhone: payload.leadPhone,
           leadMessage: payload.leadMessage,
           dashboardUrl: payload.dashboardUrl,
+          isPaid: payload.isPaid,
+          creditsUrl: payload.creditsUrl,
         });
         break;
 

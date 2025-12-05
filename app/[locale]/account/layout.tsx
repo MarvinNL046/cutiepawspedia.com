@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { stackServerApp } from "@/lib/auth/stack";
-import { getUserByStackAuthId, upsertUserFromStackAuth } from "@/db/queries";
+import { getUserByStackAuthId, upsertUserFromStackAuth, getBusinessesForUser } from "@/db/queries";
 import Link from "next/link";
-import { Heart, Clock, User, Settings, Bell } from "lucide-react";
+import { Heart, Clock, User, Settings, Bell, Building2, ChevronRight, Plus } from "lucide-react";
 
 interface AccountLayoutProps {
   children: React.ReactNode;
@@ -65,6 +65,9 @@ export default async function AccountLayout({
     );
   }
 
+  // Fetch user's businesses
+  const userBusinesses = await getBusinessesForUser(dbUser.id);
+
   const navItems = [
     {
       href: `/${locale}/account/favorites`,
@@ -108,13 +111,42 @@ export default async function AccountLayout({
                 CutiePawsPedia
               </Link>
               <span className="text-slate-300">|</span>
-              <span className="text-slate-600">My Account</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <User className="h-5 w-5 text-slate-400" />
-              <span className="text-sm text-slate-600">
-                {dbUser.name || dbUser.email}
+              <span className="text-slate-600">
+                {locale === "nl" ? "Mijn Account" : "My Account"}
               </span>
+            </div>
+            <div className="flex items-center gap-4">
+              {/* Business Switch */}
+              {userBusinesses.length > 0 ? (
+                <Link
+                  href={`/${locale}/dashboard/business/${userBusinesses[0].id}`}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-cpPink/10 text-cpPink rounded-full text-sm font-medium hover:bg-cpPink/20 transition-colors"
+                >
+                  <Building2 className="h-4 w-4" />
+                  <span className="hidden sm:inline">
+                    {locale === "nl" ? "Zakelijk Dashboard" : "Business Dashboard"}
+                  </span>
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+              ) : (
+                <Link
+                  href={`/${locale}/for-businesses`}
+                  className="flex items-center gap-2 px-3 py-1.5 border border-cpPink text-cpPink rounded-full text-sm font-medium hover:bg-cpPink/10 transition-colors"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span className="hidden sm:inline">
+                    {locale === "nl" ? "Claim je bedrijf" : "Claim Business"}
+                  </span>
+                </Link>
+              )}
+
+              {/* User info */}
+              <div className="flex items-center gap-2">
+                <User className="h-5 w-5 text-slate-400" />
+                <span className="text-sm text-slate-600 hidden sm:inline">
+                  {dbUser.name || dbUser.email}
+                </span>
+              </div>
             </div>
           </div>
         </div>

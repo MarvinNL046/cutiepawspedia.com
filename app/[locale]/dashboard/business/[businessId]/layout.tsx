@@ -25,6 +25,7 @@ import {
   PawPrint,
   Star,
   Inbox,
+  User,
 } from "lucide-react";
 
 interface BusinessLayoutProps {
@@ -94,7 +95,7 @@ export default async function BusinessLayout({
       inbox: "Inbox",
       leads: "Leads",
       credits: "Credits",
-      backToDashboard: "Back to Dashboard",
+      myAccount: "My Account",
       signOut: "Sign Out",
     },
     nl: {
@@ -104,7 +105,7 @@ export default async function BusinessLayout({
       inbox: "Inbox",
       leads: "Leads",
       credits: "Credits",
-      backToDashboard: "Terug naar Dashboard",
+      myAccount: "Mijn Account",
       signOut: "Uitloggen",
     },
     de: {
@@ -114,7 +115,7 @@ export default async function BusinessLayout({
       inbox: "Posteingang",
       leads: "Leads",
       credits: "Guthaben",
-      backToDashboard: "Zurück zum Dashboard",
+      myAccount: "Mein Konto",
       signOut: "Abmelden",
     },
   };
@@ -188,10 +189,10 @@ export default async function BusinessLayout({
 
         {/* Footer */}
         <div className="p-4 border-t space-y-2">
-          <Link href={`/${locale}/dashboard`}>
-            <Button variant="ghost" className="w-full justify-start gap-3 text-slate-500">
-              <ChevronLeft className="h-4 w-4" />
-              {t.backToDashboard}
+          <Link href={`/${locale}/account/favorites`}>
+            <Button variant="ghost" className="w-full justify-start gap-3 text-slate-500 hover:text-cpPink">
+              <User className="h-4 w-4" />
+              {t.myAccount}
             </Button>
           </Link>
           <Link href="/handler/sign-out">

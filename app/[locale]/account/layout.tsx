@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { stackServerApp } from "@/lib/auth/stack";
 import { getUserByStackAuthId, upsertUserFromStackAuth, getBusinessesForUser } from "@/db/queries";
 import Link from "next/link";
-import { Heart, Clock, User, Settings, Bell, Building2, ChevronRight, Plus } from "lucide-react";
+import { Heart, Clock, User, Settings, Bell, Building2, ChevronRight, Plus, Shield } from "lucide-react";
 
 interface AccountLayoutProps {
   children: React.ReactNode;
@@ -116,6 +116,17 @@ export default async function AccountLayout({
               </span>
             </div>
             <div className="flex items-center gap-4">
+              {/* Admin Link - only for admins */}
+              {dbUser.role === "admin" && (
+                <Link
+                  href={`/${locale}/admin`}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 text-red-600 rounded-full text-sm font-medium hover:bg-red-500/20 transition-colors"
+                >
+                  <Shield className="h-4 w-4" />
+                  <span className="hidden sm:inline">Admin</span>
+                </Link>
+              )}
+
               {/* Business Switch */}
               {userBusinesses.length > 0 ? (
                 <Link

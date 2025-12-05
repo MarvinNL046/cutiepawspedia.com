@@ -1,19 +1,18 @@
+/**
+ * Dashboard Index - Redirects to appropriate dashboard
+ *
+ * - If user has businesses: redirect to first business dashboard
+ * - If admin with no businesses: show business selector
+ * - Otherwise: show "no businesses" message
+ */
+
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { stackServerApp } from "@/lib/auth/stack";
-import { getUserByStackAuthId, getDashboardStats } from "@/db/queries";
-import { DashboardHeader } from "@/components/dashboard";
+import { getUserByStackAuthId, getBusinessesForUser } from "@/db/queries";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Building2, MessageSquare, TrendingUp, ArrowRight, Mail, Phone, Calendar } from "lucide-react";
+import { Building2, Plus, Shield, ArrowRight } from "lucide-react";
 
 interface DashboardPageProps {
   params: Promise<{ locale: string }>;
@@ -24,198 +23,124 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
 
   // Get current user
   const stackUser = await stackServerApp?.getUser();
-  if (!stackUser) return null;
+  if (!stackUser) {
+    redirect(`/handler/sign-in?after_auth_return_to=/${locale}/dashboard`);
+  }
 
   const dbUser = await getUserByStackAuthId(stackUser.id);
-  if (!dbUser) return null;
+  if (!dbUser) {
+    redirect(`/handler/sign-in?after_auth_return_to=/${locale}/dashboard`);
+  }
 
-  // Get dashboard stats
-  const stats = await getDashboardStats(dbUser.id);
+  // Get user's businesses
+  const businesses = await getBusinessesForUser(dbUser.id);
 
-  return (
-    <>
-      <DashboardHeader
-        title="Dashboard"
-        description="Overview of your business performance"
-      />
+  // If user has exactly one business, redirect directly
+  if (businesses.length === 1) {
+    redirect(`/${locale}/dashboard/business/${businesses[0].id}`);
+  }
 
-      <div className="p-6 space-y-6">
-        {/* Stats Cards */}
-        <div className="grid md:grid-cols-3 gap-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">
-                Total Listings
-              </CardTitle>
-              <Building2 className="h-4 w-4 text-cpAqua" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-cpDark">{stats.listingCount}</div>
-              <p className="text-xs text-slate-500 mt-1">
-                Active business listings
-              </p>
-            </CardContent>
-          </Card>
+  // If user has multiple businesses, show selector
+  if (businesses.length > 1) {
+    return (
+      <div className="min-h-screen bg-slate-50 p-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-cpDark">
+              {locale === "nl" ? "Kies een bedrijf" : "Select a Business"}
+            </h1>
+            <p className="text-slate-600 mt-2">
+              {locale === "nl"
+                ? "Je hebt meerdere bedrijven. Kies welke je wilt beheren."
+                : "You have multiple businesses. Choose which one to manage."}
+            </p>
+          </div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">
-                Total Leads
-              </CardTitle>
-              <MessageSquare className="h-4 w-4 text-cpPink" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-cpDark">{stats.leadCount}</div>
-              <p className="text-xs text-slate-500 mt-1">
-                Customer inquiries received
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">
-                Conversion Rate
-              </CardTitle>
-              <TrendingUp className="h-4 w-4 text-cpYellow" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-cpDark">
-                {stats.listingCount > 0
-                  ? Math.round((stats.leadCount / stats.listingCount) * 100) / 100
-                  : 0}
-              </div>
-              <p className="text-xs text-slate-500 mt-1">
-                Leads per listing
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Recent Leads Table */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle>Recent Leads</CardTitle>
-              <CardDescription>
-                Latest inquiries from potential customers
-              </CardDescription>
-            </div>
-            <Link href={`/${locale}/dashboard/leads`}>
-              <Button variant="outline" size="sm" className="gap-2">
-                View All
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </CardHeader>
-          <CardContent>
-            {stats.recentLeads.length === 0 ? (
-              <div className="text-center py-8">
-                <MessageSquare className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-                <p className="text-slate-500">No leads yet</p>
-                <p className="text-sm text-slate-400">
-                  Leads will appear here when customers contact you
-                </p>
-              </div>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Listing</TableHead>
-                    <TableHead>Contact</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {stats.recentLeads.map((lead) => (
-                    <TableRow key={lead.id}>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium text-cpDark">{lead.name}</p>
-                          {lead.message && (
-                            <p className="text-sm text-slate-500 truncate max-w-[200px]">
-                              {lead.message}
-                            </p>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">
-                          {lead.place?.name || "Unknown"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col gap-1">
-                          <span className="flex items-center gap-1 text-sm">
-                            <Mail className="h-3 w-3 text-slate-400" />
-                            {lead.email}
-                          </span>
-                          {lead.phone && (
-                            <span className="flex items-center gap-1 text-sm">
-                              <Phone className="h-3 w-3 text-slate-400" />
-                              {lead.phone}
-                            </span>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className="flex items-center gap-1 text-sm text-slate-500">
-                          <Calendar className="h-3 w-3" />
-                          {new Date(lead.createdAt).toLocaleDateString()}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button size="sm" variant="ghost" asChild>
-                          <a href={`mailto:${lead.email}`}>Reply</a>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions */}
-        <div className="grid md:grid-cols-2 gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Manage Listings</CardTitle>
-              <CardDescription>
-                View and update your business listings
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Link href={`/${locale}/dashboard/listings`}>
-                <Button className="bg-cpPink hover:bg-cpPink/90 gap-2">
-                  <Building2 className="h-4 w-4" />
-                  View Listings
-                </Button>
+          <div className="grid md:grid-cols-2 gap-4">
+            {businesses.map((business) => (
+              <Link key={business.id} href={`/${locale}/dashboard/business/${business.id}`}>
+                <Card className="hover:border-cpPink hover:shadow-md transition-all cursor-pointer">
+                  <CardHeader className="flex flex-row items-center gap-4">
+                    {business.logo ? (
+                      <img
+                        src={business.logo}
+                        alt={business.name}
+                        className="w-12 h-12 rounded-lg object-cover"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-lg bg-cpPink/10 flex items-center justify-center">
+                        <Building2 className="h-6 w-6 text-cpPink" />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">{business.name}</CardTitle>
+                      <CardDescription className="capitalize">{business.plan} plan</CardDescription>
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-slate-400" />
+                  </CardHeader>
+                </Card>
               </Link>
-            </CardContent>
-          </Card>
+            ))}
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">View All Leads</CardTitle>
-              <CardDescription>
-                See all customer inquiries and respond
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Link href={`/${locale}/dashboard/leads`}>
+          {/* Admin link */}
+          {dbUser.role === "admin" && (
+            <div className="mt-8 pt-8 border-t">
+              <Link href={`/${locale}/admin`}>
                 <Button variant="outline" className="gap-2">
-                  <MessageSquare className="h-4 w-4" />
-                  View Leads
+                  <Shield className="h-4 w-4" />
+                  {locale === "nl" ? "Ga naar Admin Panel" : "Go to Admin Panel"}
                 </Button>
               </Link>
-            </CardContent>
-          </Card>
+            </div>
+          )}
         </div>
       </div>
-    </>
+    );
+  }
+
+  // No businesses - show CTA
+  return (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-8">
+      <Card className="max-w-md w-full">
+        <CardHeader className="text-center">
+          <div className="w-16 h-16 rounded-full bg-cpPink/10 flex items-center justify-center mx-auto mb-4">
+            <Building2 className="h-8 w-8 text-cpPink" />
+          </div>
+          <CardTitle className="text-2xl">
+            {locale === "nl" ? "Geen bedrijven" : "No Businesses"}
+          </CardTitle>
+          <CardDescription>
+            {locale === "nl"
+              ? "Je hebt nog geen bedrijven gekoppeld aan je account."
+              : "You don't have any businesses linked to your account yet."}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Link href={`/${locale}/for-businesses`} className="block">
+            <Button className="w-full bg-cpPink hover:bg-cpPink/90 gap-2">
+              <Plus className="h-4 w-4" />
+              {locale === "nl" ? "Claim je bedrijf" : "Claim Your Business"}
+            </Button>
+          </Link>
+
+          <Link href={`/${locale}/account/favorites`} className="block">
+            <Button variant="outline" className="w-full">
+              {locale === "nl" ? "Terug naar Mijn Account" : "Back to My Account"}
+            </Button>
+          </Link>
+
+          {/* Admin link */}
+          {dbUser.role === "admin" && (
+            <Link href={`/${locale}/admin`} className="block">
+              <Button variant="ghost" className="w-full gap-2 text-slate-500">
+                <Shield className="h-4 w-4" />
+                {locale === "nl" ? "Admin Panel" : "Admin Panel"}
+              </Button>
+            </Link>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

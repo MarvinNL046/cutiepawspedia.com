@@ -191,9 +191,9 @@ export function BusinessesTable({
         </div>
 
         <Select
-          value={filters.status}
+          value={filters.status || "all"}
           onValueChange={(value) => {
-            setFilters((prev) => ({ ...prev, status: value }));
+            setFilters((prev) => ({ ...prev, status: value === "all" ? "" : value }));
             setPage(0);
           }}
         >
@@ -201,7 +201,7 @@ export function BusinessesTable({
             <SelectValue placeholder="All Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Status</SelectItem>
+            <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="active">Active</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
             <SelectItem value="suspended">Suspended</SelectItem>
@@ -209,9 +209,9 @@ export function BusinessesTable({
         </Select>
 
         <Select
-          value={filters.plan}
+          value={filters.plan || "all"}
           onValueChange={(value) => {
-            setFilters((prev) => ({ ...prev, plan: value }));
+            setFilters((prev) => ({ ...prev, plan: value === "all" ? "" : value }));
             setPage(0);
           }}
         >
@@ -219,7 +219,7 @@ export function BusinessesTable({
             <SelectValue placeholder="All Plans" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Plans</SelectItem>
+            <SelectItem value="all">All Plans</SelectItem>
             <SelectItem value="free">Free</SelectItem>
             <SelectItem value="starter">Starter</SelectItem>
             <SelectItem value="pro">Pro</SelectItem>
@@ -228,9 +228,9 @@ export function BusinessesTable({
         </Select>
 
         <Select
-          value={filters.billingStatus}
+          value={filters.billingStatus || "all"}
           onValueChange={(value) => {
-            setFilters((prev) => ({ ...prev, billingStatus: value }));
+            setFilters((prev) => ({ ...prev, billingStatus: value === "all" ? "" : value }));
             setPage(0);
           }}
         >
@@ -238,7 +238,7 @@ export function BusinessesTable({
             <SelectValue placeholder="Billing Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Billing</SelectItem>
+            <SelectItem value="all">All Billing</SelectItem>
             <SelectItem value="trial">Trial</SelectItem>
             <SelectItem value="paid">Paid</SelectItem>
             <SelectItem value="overdue">Overdue</SelectItem>

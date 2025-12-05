@@ -15,6 +15,7 @@ import {
   rateLimitExceededResponse,
 } from "@/lib/rateLimit";
 import { logAuditEvent } from "@/db/queries/auditLogs";
+import { verifyRecaptcha, isRecaptchaConfigured } from "@/lib/recaptcha";
 
 // Lead submission schema
 const leadSchema = z.object({
@@ -24,6 +25,7 @@ const leadSchema = z.object({
   phone: z.string().max(50).optional(),
   message: z.string().max(2000).optional(),
   source: z.string().max(100).optional(),
+  recaptchaToken: z.string().optional(), // Optional reCAPTCHA token
 });
 
 export async function POST(request: NextRequest) {
@@ -49,7 +51,51 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { placeId, name, email, phone, message, source } = result.data;
+    const { placeId, name, email, phone, message, source, recaptchaToken } = result.data;
+
+    // Verify reCAPTCHA if configured
+    if (isRecaptchaConfigured()) {
+      if (!recaptchaToken) {
+        console.warn(`Lead submission without reCAPTCHA token from IP: ${clientIP}`);
+        return NextResponse.json(
+          { error: "Security verification failed. Please try again." },
+          { status: 400 }
+        );
+      }
+
+      const recaptchaResult = await verifyRecaptcha(recaptchaToken, "lead_form");
+
+      if (!recaptchaResult.success) {
+        console.warn(`reCAPTCHA failed for lead submission from IP: ${clientIP}`, {
+          score: recaptchaResult.score,
+          error: recaptchaResult.error,
+        });
+
+        // Log the suspicious attempt
+        logAuditEvent({
+          actorRole: "public",
+          eventType: "LEAD_CREATED",
+          targetType: "lead",
+          targetId: "blocked",
+          metadata: {
+            placeId,
+            blocked: true,
+            reason: "recaptcha_failed",
+            score: recaptchaResult.score,
+            error: recaptchaResult.error,
+          },
+          ipAddress: clientIP,
+        });
+
+        return NextResponse.json(
+          { error: "Security verification failed. Please try again." },
+          { status: 403 }
+        );
+      }
+
+      // Log the reCAPTCHA score for monitoring
+      console.log(`Lead submission reCAPTCHA score: ${recaptchaResult.score} from IP: ${clientIP}`);
+    }
 
     // Check if database is available
     if (!db) {
@@ -111,8 +157,9 @@ export async function POST(request: NextRequest) {
     });
 
     // Auto-charge credits if business has auto-charge enabled
+    // CRITICAL: Only charge if place has an email address (otherwise lead can't be delivered)
     let chargeResult: { success: boolean; error?: string } | null = null;
-    if (business && shouldAutoCharge(business)) {
+    if (business && shouldAutoCharge(business) && place.email) {
       // Calculate lead price using pricing engine
       const leadPriceCents = getLeadPriceForBusiness({
         business: business,
@@ -147,11 +194,31 @@ export async function POST(request: NextRequest) {
           chargeResult.error
         );
       }
+    } else if (business && shouldAutoCharge(business) && !place.email) {
+      // Log when we skip charging due to missing email
+      console.warn(
+        `Skipping credit charge for lead ${newLead.id}: place ${placeId} has no email configured`
+      );
+      logAuditEvent({
+        actorBusinessId: business.id,
+        actorRole: "system",
+        eventType: "LEAD_CHARGED",
+        targetType: "lead",
+        targetId: newLead.id,
+        metadata: {
+          placeId,
+          skipped: true,
+          reason: "no_email_configured",
+        },
+        ipAddress: clientIP,
+      });
     }
 
-    // Send email notification to the business
+    // Send email notification to the business and update lead status
     if (place.email) {
       const baseUrl = process.env.APP_BASE_URL || "https://cutiepawspedia.com";
+
+      // Send email and track result (don't block response, but track success/failure)
       sendNotification({
         type: "LEAD_NEW",
         leadId: newLead.id,
@@ -164,6 +231,31 @@ export async function POST(request: NextRequest) {
         leadPhone: phone,
         leadMessage: message,
         dashboardUrl: place.businessId ? `${baseUrl}/dashboard/business/${place.businessId}` : undefined,
+      }).then(async (emailResult) => {
+        // Update lead status based on email result
+        if (emailResult.success) {
+          await db.update(leads)
+            .set({ status: "sent" })
+            .where(eq(leads.id, newLead.id));
+
+          console.log(`Lead ${newLead.id}: Email sent successfully, status updated to 'sent'`);
+        } else {
+          console.error(`Lead ${newLead.id}: Email failed -`, emailResult.error);
+
+          // Log email failure to audit
+          logAuditEvent({
+            actorRole: "system",
+            eventType: "LEAD_CREATED",
+            targetType: "lead",
+            targetId: newLead.id,
+            metadata: {
+              placeId,
+              emailFailed: true,
+              emailError: emailResult.error,
+            },
+            ipAddress: clientIP,
+          });
+        }
       }).catch((emailError) => {
         // Log but don't fail the request if email fails
         console.error("Failed to send lead notification email:", emailError);

@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { trackLeadSubmitted } from "@/lib/analytics";
-import { Send, Loader2, CheckCircle, AlertCircle, MessageSquare } from "lucide-react";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
+import { Send, Loader2, CheckCircle, AlertCircle, MessageSquare, ShieldCheck } from "lucide-react";
 
 interface LeadFormProps {
   placeId: number;
@@ -42,6 +43,9 @@ export function LeadForm({
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
+  // reCAPTCHA hook for spam protection
+  const { executeRecaptcha, isConfigured: recaptchaConfigured } = useRecaptcha();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -49,6 +53,15 @@ export function LeadForm({
     setErrorMessage("");
 
     try {
+      // Get reCAPTCHA token before submitting
+      let recaptchaToken: string | null = null;
+      if (recaptchaConfigured) {
+        recaptchaToken = await executeRecaptcha("lead_form");
+        if (!recaptchaToken) {
+          console.warn("Failed to get reCAPTCHA token, proceeding anyway");
+        }
+      }
+
       const response = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -59,6 +72,7 @@ export function LeadForm({
           phone: formData.phone || undefined,
           message: formData.message || undefined,
           source: "place_page",
+          recaptchaToken, // Include token for server-side verification
         }),
       });
 
@@ -215,12 +229,40 @@ export function LeadForm({
         )}
       </Button>
 
-      {/* Privacy note */}
+      {/* Privacy note with reCAPTCHA disclosure */}
       <p className="text-xs text-slate-500 text-center">
+        {recaptchaConfigured && (
+          <span className="flex items-center justify-center gap-1 mb-1">
+            <ShieldCheck className="h-3 w-3 text-green-500" />
+            Protected by reCAPTCHA
+          </span>
+        )}
         By submitting, you agree to our{" "}
         <a href="/privacy" className="text-cpPink hover:underline">
           Privacy Policy
         </a>
+        {recaptchaConfigured && (
+          <>
+            {" "}and Google&apos;s{" "}
+            <a
+              href="https://policies.google.com/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cpPink hover:underline"
+            >
+              Privacy Policy
+            </a>{" "}
+            &{" "}
+            <a
+              href="https://policies.google.com/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cpPink hover:underline"
+            >
+              Terms
+            </a>
+          </>
+        )}
       </p>
     </form>
   );

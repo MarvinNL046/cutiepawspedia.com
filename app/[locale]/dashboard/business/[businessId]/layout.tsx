@@ -24,6 +24,7 @@ import {
   LogOut,
   PawPrint,
   Star,
+  Inbox,
 } from "lucide-react";
 
 interface BusinessLayoutProps {
@@ -90,6 +91,7 @@ export default async function BusinessLayout({
       overview: "Overview",
       places: "My Places",
       reviews: "Reviews",
+      inbox: "Inbox",
       leads: "Leads",
       credits: "Credits",
       backToDashboard: "Back to Dashboard",
@@ -99,6 +101,7 @@ export default async function BusinessLayout({
       overview: "Overzicht",
       places: "Mijn Locaties",
       reviews: "Beoordelingen",
+      inbox: "Inbox",
       leads: "Leads",
       credits: "Credits",
       backToDashboard: "Terug naar Dashboard",
@@ -108,6 +111,7 @@ export default async function BusinessLayout({
       overview: "Übersicht",
       places: "Meine Standorte",
       reviews: "Bewertungen",
+      inbox: "Posteingang",
       leads: "Leads",
       credits: "Guthaben",
       backToDashboard: "Zurück zum Dashboard",
@@ -121,6 +125,7 @@ export default async function BusinessLayout({
     { href: "", label: t.overview, icon: LayoutDashboard },
     { href: "/places", label: t.places, icon: Building2 },
     { href: "/reviews", label: t.reviews, icon: Star },
+    { href: "/inbox", label: t.inbox, icon: Inbox },
     { href: "/leads", label: t.leads, icon: MessageSquare },
     { href: "/credits", label: t.credits, icon: CreditCard },
   ];

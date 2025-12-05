@@ -181,6 +181,19 @@ export const users = pgTable("users", {
   email: varchar("email", { length: 255 }).unique().notNull(),
   name: varchar("name", { length: 255 }),
   role: varchar("role", { length: 50 }).default("user").notNull(), // user, business, admin
+  // P3: User Profile fields
+  username: varchar("username", { length: 50 }).unique(), // Unique username for /u/[username]
+  avatarUrl: text("avatar_url"), // URL to avatar image
+  bio: text("bio"), // User biography/description
+  location: varchar("location", { length: 255 }), // City, country
+  websiteUrl: varchar("website_url", { length: 500 }), // Personal website
+  socialLinks: jsonb("social_links").$type<Record<string, string>>().default({}), // { instagram, facebook, etc. }
+  preferredLocale: varchar("preferred_locale", { length: 10 }).default("en"), // Language preference
+  isPublic: boolean("is_public").default(true), // Profile visibility
+  // P4: Karma & Trust Levels
+  karmaPoints: integer("karma_points").default(0).notNull(),
+  trustLevel: integer("trust_level").default(0).notNull(),
+  karmaUpdatedAt: timestamp("karma_updated_at").defaultNow(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -514,6 +527,8 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   recentViews: many(userRecentViews),
   notificationSettings: one(notificationSettings),
   notificationLogs: many(notificationLogs),
+  badges: many(userBadges), // P3: User badges
+  karmaEvents: many(karmaEvents), // P4: Karma events
 }));
 
 // User favorites relations (P1)
@@ -832,5 +847,250 @@ export const notificationLogsRelations = relations(notificationLogs, ({ one }) =
   business: one(businesses, {
     fields: [notificationLogs.businessId],
     references: [businesses.id],
+  }),
+}));
+
+// ============================================================================
+// BADGES (P3 - User Profiles + Badges)
+// ============================================================================
+
+// Badge category enum
+export const badgeCategoryEnum = pgEnum("badge_category", [
+  "general",
+  "reviewer",
+  "contributor",
+  "business",
+  "special",
+]);
+
+// Badge definitions table - available badge types
+export const badgeDefinitions = pgTable("badge_definitions", {
+  key: varchar("key", { length: 50 }).primaryKey(), // e.g., 'verified_user', 'top_reviewer'
+  label: varchar("label", { length: 100 }).notNull(), // English label
+  labelNl: varchar("label_nl", { length: 100 }), // Dutch label
+  description: text("description").notNull(), // English description
+  descriptionNl: text("description_nl"), // Dutch description
+  icon: varchar("icon", { length: 50 }).notNull(), // Emoji or icon name
+  category: varchar("category", { length: 50 }).default("general").notNull(), // general, reviewer, contributor, business, special
+  sortOrder: integer("sort_order").default(0).notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// User badges table - badges awarded to users
+export const userBadges = pgTable(
+  "user_badges",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    badgeKey: varchar("badge_key", { length: 50 })
+      .notNull()
+      .references(() => badgeDefinitions.key, { onDelete: "cascade" }),
+    awardedAt: timestamp("awarded_at").defaultNow().notNull(),
+    awardedBy: varchar("awarded_by", { length: 50 }), // 'system', 'admin', or admin user id
+    notes: text("notes"),
+  },
+  (table) => [
+    index("user_badges_user_id_idx").on(table.userId),
+    index("user_badges_badge_key_idx").on(table.badgeKey),
+    index("user_badges_awarded_at_idx").on(table.awardedAt),
+  ]
+);
+
+// Badge definitions relations
+export const badgeDefinitionsRelations = relations(badgeDefinitions, ({ many }) => ({
+  userBadges: many(userBadges),
+}));
+
+// User badges relations
+export const userBadgesRelations = relations(userBadges, ({ one }) => ({
+  user: one(users, {
+    fields: [userBadges.userId],
+    references: [users.id],
+  }),
+  badge: one(badgeDefinitions, {
+    fields: [userBadges.badgeKey],
+    references: [badgeDefinitions.key],
+  }),
+}));
+
+// ============================================================================
+// KARMA & TRUST LEVELS (P4)
+// ============================================================================
+
+// Karma events table - tracks all karma point changes
+export const karmaEvents = pgTable(
+  "karma_events",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    eventType: varchar("event_type", { length: 50 }).notNull(), // REVIEW_CREATED, REVIEW_HELPFUL, etc.
+    points: integer("points").notNull(), // Positive or negative
+    description: varchar("description", { length: 255 }),
+    // Related entities
+    reviewId: integer("review_id").references(() => reviews.id, { onDelete: "set null" }),
+    placeId: integer("place_id").references(() => places.id, { onDelete: "set null" }),
+    badgeKey: varchar("badge_key", { length: 50 }).references(() => badgeDefinitions.key, { onDelete: "set null" }),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("karma_events_user_id_idx").on(table.userId),
+    index("karma_events_event_type_idx").on(table.eventType),
+    index("karma_events_created_at_idx").on(table.createdAt),
+  ]
+);
+
+// Trust level definitions table
+export const trustLevelDefinitions = pgTable("trust_level_definitions", {
+  level: integer("level").primaryKey(), // 0-5
+  name: varchar("name", { length: 50 }).notNull(),
+  nameNl: varchar("name_nl", { length: 50 }),
+  description: text("description").notNull(),
+  descriptionNl: text("description_nl"),
+  minKarma: integer("min_karma").default(0).notNull(),
+  icon: varchar("icon", { length: 50 }),
+  color: varchar("color", { length: 20 }),
+  // Permissions
+  canReview: boolean("can_review").default(true).notNull(),
+  canUploadPhotos: boolean("can_upload_photos").default(true).notNull(),
+  maxPhotosPerReview: integer("max_photos_per_review").default(3),
+  reviewsAutoApproved: boolean("reviews_auto_approved").default(false).notNull(),
+  canFlagReviews: boolean("can_flag_reviews").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Karma events relations
+export const karmaEventsRelations = relations(karmaEvents, ({ one }) => ({
+  user: one(users, {
+    fields: [karmaEvents.userId],
+    references: [users.id],
+  }),
+  review: one(reviews, {
+    fields: [karmaEvents.reviewId],
+    references: [reviews.id],
+  }),
+  place: one(places, {
+    fields: [karmaEvents.placeId],
+    references: [places.id],
+  }),
+  badge: one(badgeDefinitions, {
+    fields: [karmaEvents.badgeKey],
+    references: [badgeDefinitions.key],
+  }),
+}));
+
+// ============================================================================
+// MESSAGING (B7)
+// ============================================================================
+
+// Message threads table - conversations between users and businesses
+export const messageThreads = pgTable(
+  "message_threads",
+  {
+    id: serial("id").primaryKey(),
+    businessId: integer("business_id")
+      .notNull()
+      .references(() => businesses.id, { onDelete: "cascade" }),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    placeId: integer("place_id").references(() => places.id, { onDelete: "set null" }),
+    subject: varchar("subject", { length: 255 }),
+    status: varchar("status", { length: 20 }).default("open").notNull(), // open, archived, spam
+    lastMessageAt: timestamp("last_message_at").defaultNow().notNull(),
+    lastMessagePreview: varchar("last_message_preview", { length: 255 }),
+    unreadCountBusiness: integer("unread_count_business").default(0).notNull(),
+    unreadCountUser: integer("unread_count_user").default(0).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("message_threads_business_id_idx").on(table.businessId),
+    index("message_threads_user_id_idx").on(table.userId),
+    index("message_threads_last_message_at_idx").on(table.lastMessageAt),
+  ]
+);
+
+// Messages table - individual messages in threads
+export const messages = pgTable(
+  "messages",
+  {
+    id: serial("id").primaryKey(),
+    threadId: integer("thread_id")
+      .notNull()
+      .references(() => messageThreads.id, { onDelete: "cascade" }),
+    senderType: varchar("sender_type", { length: 20 }).notNull(), // 'user' or 'business'
+    senderUserId: integer("sender_user_id").references(() => users.id, { onDelete: "set null" }),
+    body: text("body").notNull(),
+    isRead: boolean("is_read").default(false).notNull(),
+    readAt: timestamp("read_at"),
+    deletedBySender: boolean("deleted_by_sender").default(false).notNull(),
+    deletedByRecipient: boolean("deleted_by_recipient").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("messages_thread_id_idx").on(table.threadId),
+    index("messages_created_at_idx").on(table.createdAt),
+  ]
+);
+
+// Message attachments table
+export const messageAttachments = pgTable(
+  "message_attachments",
+  {
+    id: serial("id").primaryKey(),
+    messageId: integer("message_id")
+      .notNull()
+      .references(() => messages.id, { onDelete: "cascade" }),
+    filename: varchar("filename", { length: 255 }).notNull(),
+    mimeType: varchar("mime_type", { length: 100 }).notNull(),
+    fileSizeBytes: integer("file_size_bytes"),
+    storageKey: varchar("storage_key", { length: 500 }).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("message_attachments_message_id_idx").on(table.messageId)]
+);
+
+// Message threads relations
+export const messageThreadsRelations = relations(messageThreads, ({ one, many }) => ({
+  business: one(businesses, {
+    fields: [messageThreads.businessId],
+    references: [businesses.id],
+  }),
+  user: one(users, {
+    fields: [messageThreads.userId],
+    references: [users.id],
+  }),
+  place: one(places, {
+    fields: [messageThreads.placeId],
+    references: [places.id],
+  }),
+  messages: many(messages),
+}));
+
+// Messages relations
+export const messagesRelations = relations(messages, ({ one, many }) => ({
+  thread: one(messageThreads, {
+    fields: [messages.threadId],
+    references: [messageThreads.id],
+  }),
+  sender: one(users, {
+    fields: [messages.senderUserId],
+    references: [users.id],
+  }),
+  attachments: many(messageAttachments),
+}));
+
+// Message attachments relations
+export const messageAttachmentsRelations = relations(messageAttachments, ({ one }) => ({
+  message: one(messages, {
+    fields: [messageAttachments.messageId],
+    references: [messages.id],
   }),
 }));

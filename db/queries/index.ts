@@ -14,6 +14,10 @@ export * from "./dataQuality";
 export * from "./refreshJobs";
 export * from "./favorites";
 export * from "./recentViews";
+export * from "./userProfiles";
+export * from "./badges";
+export * from "./karma";
+export * from "./messaging";
 
 // Admin queries are exported separately from "@/db/queries/admin"
 // to avoid naming conflicts with getCityById, getCountryById, etc.

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { stackServerApp } from "@/lib/auth/stack";
-import { getUserByStackAuthId } from "@/db/queries";
+import { getUserByStackAuthId, upsertUserFromStackAuth } from "@/db/queries";
 import Link from "next/link";
 import { Heart, Clock, User, Settings, Bell } from "lucide-react";
 
@@ -41,11 +41,28 @@ export default async function AccountLayout({
     redirect(`/handler/sign-in?after_auth_return_to=/${locale}/account/favorites`);
   }
 
-  // Get user from database
-  const dbUser = await getUserByStackAuthId(stackUser.id);
+  // Get user from database, or create if not exists
+  let dbUser = await getUserByStackAuthId(stackUser.id);
 
+  // Auto-sync user to database if authenticated but not in DB
   if (!dbUser) {
-    redirect(`/handler/sign-in?after_auth_return_to=/${locale}/account/favorites`);
+    dbUser = await upsertUserFromStackAuth({
+      stackauthId: stackUser.id,
+      email: stackUser.primaryEmail || "",
+      name: stackUser.displayName,
+    });
+  }
+
+  // If still no user after sync attempt, show error
+  if (!dbUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="text-center p-8">
+          <h1 className="text-2xl font-bold text-cpDark mb-2">Account Error</h1>
+          <p className="text-slate-600">Unable to sync your account. Please try again.</p>
+        </div>
+      </div>
+    );
   }
 
   const navItems = [
@@ -60,14 +77,19 @@ export default async function AccountLayout({
       icon: Clock,
     },
     {
+      href: `/${locale}/account/profile`,
+      label: locale === "nl" ? "Profiel" : "Profile",
+      icon: User,
+    },
+    {
       href: `/${locale}/account/notifications`,
-      label: locale === "nl" ? "Instellingen" : "Settings",
-      icon: Settings,
+      label: locale === "nl" ? "Meldingen" : "Notifications",
+      icon: Bell,
     },
     {
       href: "/handler/account-settings",
       label: locale === "nl" ? "Beveiliging" : "Security",
-      icon: User,
+      icon: Settings,
       external: true, // StackAuth for password/2FA management
     },
   ];

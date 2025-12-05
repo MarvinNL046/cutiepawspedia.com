@@ -21,6 +21,7 @@ import { CategoryAffiliateBlockLazy as CategoryAffiliateBlock } from "@/componen
 import { PageHeader, SectionHeader } from "@/components/layout";
 import { PageIntro, FaqStatic, InternalLinksSection } from "@/components/seo";
 import { Filter, SlidersHorizontal } from "lucide-react";
+import { InFeedAd } from "@/components/ads";
 
 interface CategoryPageProps {
   params: Promise<{ locale: string; countrySlug: string; citySlug: string; categorySlug: string }>;
@@ -168,6 +169,11 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       {/* Affiliate Recommendations */}
       <section className="container mx-auto max-w-6xl px-4 py-6">
         <CategoryAffiliateBlock categorySlug={categorySlug} variant="banner" />
+      </section>
+
+      {/* Ad: In-feed (anonymous users only) */}
+      <section className="container mx-auto max-w-6xl px-4 py-4">
+        <InFeedAd />
       </section>
 
       {/* FAQ Section */}

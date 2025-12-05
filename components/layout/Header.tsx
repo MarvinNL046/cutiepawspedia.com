@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Globe, Menu, User, LogOut, Settings } from "lucide-react";
+import { Globe, Menu, User, LogOut, Settings, Heart } from "lucide-react";
 import { useAuth, isAuthConfigured } from "@/lib/auth/use-auth";
 import { ThemeToggle } from "@/components/theme";
 
@@ -121,9 +121,15 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
-                  <Link href="/handler/account-settings" className="gap-2">
+                  <Link href={`/${locale}/account/favorites`} className="gap-2">
+                    <Heart className="h-4 w-4" />
+                    My Account
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href={`/${locale}/account/notifications`} className="gap-2">
                     <Settings className="h-4 w-4" />
-                    Account Settings
+                    Settings
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />

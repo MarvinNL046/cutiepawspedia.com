@@ -38,6 +38,7 @@ import {
   generateEnrichmentFlags,
   type EnrichmentFlag,
 } from "@/lib/enrichment";
+import { notifyFavoritePlaceUpdate, filterRelevantFields } from "@/lib/notifications";
 
 const REVALIDATION_SECRET = process.env.REVALIDATION_SECRET;
 const BRIGHT_DATA_API_TOKEN = process.env.BRIGHT_DATA_API_TOKEN;
@@ -341,6 +342,7 @@ async function processRefreshJob(job: RefreshJobWithPlace): Promise<RefreshResul
       .select({
         id: places.id,
         name: places.name,
+        slug: places.slug,
         website: places.website,
         phone: places.phone,
         email: places.email,
@@ -453,6 +455,19 @@ async function processRefreshJob(job: RefreshJobWithPlace): Promise<RefreshResul
       await updateBadgesForPlace(job.placeId);
     } catch (badgeError) {
       console.error(`Failed to update badges for place ${job.placeId}:`, badgeError);
+    }
+
+    // Notify users who favorited this place about the update (async, don't wait)
+    const relevantUpdates = filterRelevantFields(updatedFields);
+    if (relevantUpdates.length > 0) {
+      notifyFavoritePlaceUpdate({
+        placeId: job.placeId,
+        placeName: place.name,
+        placeSlug: place.slug,
+        updatedFields: relevantUpdates,
+      }).catch((err) => {
+        console.error(`Failed to notify favorite place update for ${job.placeId}:`, err);
+      });
     }
 
     return {

@@ -20,6 +20,7 @@ import {
 import { getPlaceById } from "@/db/queries";
 import { getClientIP, reviewsRateLimiter, rateLimitExceededResponse } from "@/lib/rateLimit";
 import { hashIP } from "@/lib/utils/hash";
+import { sendNotification } from "@/lib/notifications";
 
 // Review submission schema
 const createReviewSchema = z.object({
@@ -169,6 +170,26 @@ export async function POST(request: NextRequest) {
     updatePlaceReviewStats(placeId).catch((err) => {
       console.error("Failed to update place review stats:", err);
     });
+
+    // Send notification to business owner (async, don't wait)
+    if (place.email && place.businessId) {
+      const baseUrl = process.env.APP_BASE_URL || "https://cutiepawspedia.com";
+      sendNotification({
+        type: "REVIEW_NEW",
+        reviewId: review.id,
+        placeId: place.id,
+        placeName: place.name,
+        reviewerName: user.name || "A customer",
+        rating,
+        reviewSnippet: reviewBody.substring(0, 150) + (reviewBody.length > 150 ? "..." : ""),
+        businessEmail: place.email,
+        businessId: place.businessId,
+        dashboardUrl: `${baseUrl}/dashboard/business/${place.businessId}`,
+        locale,
+      }).catch((err) => {
+        console.error("Failed to send new review notification:", err);
+      });
+    }
 
     return NextResponse.json(
       {

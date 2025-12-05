@@ -1,9 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, DM_Serif_Display } from "next/font/google";
+import Script from "next/script";
 import { StackProvider, StackTheme } from "@stackframe/stack";
 import { stackServerApp } from "@/lib/auth/stack";
 import { ThemeProvider } from "@/components/theme";
 import "./globals.css";
+
+// AdSense configuration
+const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
+const ADS_ENABLED = process.env.NEXT_PUBLIC_ADS_ENABLED === "true";
 
 /**
  * PERFORMANCE: Viewport configuration for mobile optimization
@@ -60,7 +65,27 @@ export default function RootLayout({
       {/* Mapbox tiles */}
       <link rel="preconnect" href="https://tiles.mapbox.com" />
       <link rel="dns-prefetch" href="https://tiles.mapbox.com" />
+      {/* Google AdSense - preconnect for ad loading performance */}
+      {ADS_ENABLED && ADSENSE_CLIENT && (
+        <>
+          <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
+          <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+        </>
+      )}
     </head>
+  );
+
+  /**
+   * Google AdSense script - only loaded if ads are enabled
+   * Uses afterInteractive strategy for non-blocking load
+   */
+  const adsenseScript = ADS_ENABLED && ADSENSE_CLIENT && (
+    <Script
+      id="google-adsense"
+      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+      crossOrigin="anonymous"
+      strategy="afterInteractive"
+    />
   );
 
   // Only wrap with StackProvider if configured
@@ -69,6 +94,7 @@ export default function RootLayout({
       <html lang="en" suppressHydrationWarning>
         {preconnectLinks}
         <body className={bodyClasses}>
+          {adsenseScript}
           <ThemeProvider>
             <StackProvider app={stackServerApp}>
               <StackTheme>
@@ -85,6 +111,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       {preconnectLinks}
       <body className={bodyClasses}>
+        {adsenseScript}
         <ThemeProvider>
           {children}
         </ThemeProvider>

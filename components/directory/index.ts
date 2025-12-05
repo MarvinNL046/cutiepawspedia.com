@@ -1,5 +1,6 @@
 export { SearchBar } from "./SearchBar";
 export { PlaceCard } from "./PlaceCard";
+export { SearchResultsClient } from "./SearchResultsClient";
 export { CategoryCard, getCategoryIcon } from "./CategoryCard";
 export { CountryCard, getCountryFlag } from "./CountryCard";
 export { CityCard } from "./CityCard";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,17 +26,19 @@ export function SearchBar({
   const router = useRouter();
   const [query, setQuery] = useState(initialQuery);
   const [location, setLocation] = useState(initialLocation);
-  const [isSearching, setIsSearching] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim() && !location.trim()) return;
 
-    setIsSearching(true);
     const params = new URLSearchParams();
     if (query.trim()) params.set("q", query.trim());
     if (location.trim()) params.set("city", location.trim().toLowerCase().replace(/\s+/g, "-"));
-    router.push(`/${locale}/search?${params.toString()}`);
+
+    startTransition(() => {
+      router.push(`/${locale}/search?${params.toString()}`);
+    });
   };
 
   if (compact) {
@@ -53,8 +55,8 @@ export function SearchBar({
             aria-label="Search query"
           />
         </div>
-        <Button type="submit" size="icon" className="bg-cpPink hover:bg-cpPink/90" disabled={isSearching} aria-label="Submit search">
-          {isSearching ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Search className="h-4 w-4" aria-hidden="true" />}
+        <Button type="submit" size="icon" className="bg-cpPink hover:bg-cpPink/90" disabled={isPending} aria-label="Submit search">
+          {isPending ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Search className="h-4 w-4" aria-hidden="true" />}
         </Button>
       </form>
     );
@@ -84,8 +86,8 @@ export function SearchBar({
           aria-label="City or region"
         />
       </div>
-      <Button type="submit" className="bg-cpPink hover:bg-cpPink/90" disabled={isSearching}>
-        {isSearching ? (
+      <Button type="submit" className="bg-cpPink hover:bg-cpPink/90" disabled={isPending}>
+        {isPending ? (
           <>
             <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
             Searching...

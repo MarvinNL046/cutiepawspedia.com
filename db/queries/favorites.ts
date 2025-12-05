@@ -179,6 +179,61 @@ export async function getFavoriteCount(user: DbUser): Promise<number> {
 }
 
 // ============================================================================
+// NOTIFICATION SUPPORT
+// ============================================================================
+
+/**
+ * Get all user IDs who have favorited a specific place
+ * Used for sending FAVORITE_PLACE_UPDATE notifications
+ */
+export async function getFavoriteUserIdsForPlace(placeId: number): Promise<number[]> {
+  if (!db) return [];
+
+  try {
+    const result = await db
+      .select({ userId: userFavorites.userId })
+      .from(userFavorites)
+      .where(eq(userFavorites.placeId, placeId));
+
+    return result.map(r => r.userId);
+  } catch (error) {
+    console.error("Failed to get favorite user IDs for place:", error);
+    return [];
+  }
+}
+
+/**
+ * Get all users who have favorited a specific place with their details
+ * Used for sending FAVORITE_PLACE_UPDATE notifications with proper user info
+ */
+export async function getFavoriteUsersForPlace(placeId: number): Promise<Array<{
+  userId: number;
+  userEmail: string;
+  userName: string | null;
+}>> {
+  if (!db) return [];
+
+  try {
+    const { users } = await import("../schema");
+
+    const result = await db
+      .select({
+        userId: users.id,
+        userEmail: users.email,
+        userName: users.name,
+      })
+      .from(userFavorites)
+      .innerJoin(users, eq(userFavorites.userId, users.id))
+      .where(eq(userFavorites.placeId, placeId));
+
+    return result;
+  } catch (error) {
+    console.error("Failed to get favorite users for place:", error);
+    return [];
+  }
+}
+
+// ============================================================================
 // TYPES
 // ============================================================================
 

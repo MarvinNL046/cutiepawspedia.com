@@ -503,7 +503,7 @@ export const placeCategoriesRelations = relations(placeCategories, ({ one }) => 
   }),
 }));
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ one, many }) => ({
   places: many(places),
   reviews: many(reviews),
   reviewReplies: many(reviewReplies),
@@ -512,6 +512,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   reviewedClaims: many(placeClaims, { relationName: "reviewedClaims" }),
   favorites: many(userFavorites),
   recentViews: many(userRecentViews),
+  notificationSettings: one(notificationSettings),
+  notificationLogs: many(notificationLogs),
 }));
 
 // User favorites relations (P1)
@@ -547,6 +549,7 @@ export const businessesRelations = relations(businesses, ({ one, many }) => ({
   reviews: many(reviews), // Reviews linked to this business
   leads: many(leads),
   creditTransactions: many(creditTransactions),
+  notificationLogs: many(notificationLogs),
 }));
 
 export const reviewsRelations = relations(reviews, ({ one, many }) => ({
@@ -742,5 +745,92 @@ export const placeRefreshJobsRelations = relations(placeRefreshJobs, ({ one }) =
   place: one(places, {
     fields: [placeRefreshJobs.placeId],
     references: [places.id],
+  }),
+}));
+
+// ============================================================================
+// NOTIFICATION SETTINGS (P2 - Email Notifications & Digests)
+// ============================================================================
+
+// Notification settings table - per-user email preferences
+export const notificationSettings = pgTable("notification_settings", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" })
+    .unique(), // One settings record per user
+  // Email preferences
+  emailGeneral: boolean("email_general").default(true).notNull(), // General platform emails
+  emailReviews: boolean("email_reviews").default(true).notNull(), // Review notifications (new reviews, replies)
+  emailFavorites: boolean("email_favorites").default(true).notNull(), // Updates about favorited places
+  emailLeads: boolean("email_leads").default(true).notNull(), // Lead notifications (for business owners)
+  emailBusiness: boolean("email_business").default(true).notNull(), // Business-related emails (claims, etc.)
+  emailDigest: boolean("email_digest").default(true).notNull(), // Weekly digest emails
+  // Locale preference for emails
+  locale: varchar("locale", { length: 10 }), // e.g., 'nl', 'en', 'de' - null means use user's default
+  // Quiet hours (N2 - Smart notification logic)
+  quietHoursEnabled: boolean("quiet_hours_enabled").default(false).notNull(), // Enable quiet hours
+  quietHoursStart: integer("quiet_hours_start").default(22), // Start hour (0-23), default 10 PM
+  quietHoursEnd: integer("quiet_hours_end").default(8), // End hour (0-23), default 8 AM
+  timezone: varchar("timezone", { length: 50 }), // e.g., 'Europe/Amsterdam' - null means server timezone
+  // Max per week (N2 - Advanced throttling)
+  maxEmailsPerWeek: integer("max_emails_per_week").default(50), // Max emails per week (null = no limit)
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Notification settings relations
+export const notificationSettingsRelations = relations(notificationSettings, ({ one }) => ({
+  user: one(users, {
+    fields: [notificationSettings.userId],
+    references: [users.id],
+  }),
+}));
+
+// ============================================================================
+// NOTIFICATION LOGS (P2 - Email Notifications & Digests)
+// ============================================================================
+
+// Notification log status enum
+export const notificationLogStatusEnum = pgEnum("notification_log_status", [
+  "sent",
+  "failed",
+]);
+
+// Notification logs table - audit trail for sent emails
+export const notificationLogs = pgTable(
+  "notification_logs",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").references(() => users.id, { onDelete: "set null" }), // Recipient user (null for system emails)
+    businessId: integer("business_id").references(() => businesses.id, { onDelete: "set null" }), // Related business
+    // Notification details
+    type: varchar("type", { length: 50 }).notNull(), // REVIEW_NEW, REVIEW_REPLY, LEAD_NEW, CLAIM_APPROVED, etc.
+    email: varchar("email", { length: 255 }).notNull(), // Actual email address sent to
+    status: notificationLogStatusEnum("status").notNull(), // sent, failed
+    error: text("error"), // Error message if failed
+    // Context metadata
+    metadata: jsonb("metadata"), // { reviewId, placeId, leadId, etc. }
+    // Timestamp
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("notification_logs_user_id_idx").on(table.userId),
+    index("notification_logs_business_id_idx").on(table.businessId),
+    index("notification_logs_type_idx").on(table.type),
+    index("notification_logs_created_at_idx").on(table.createdAt),
+  ]
+);
+
+// Notification logs relations
+export const notificationLogsRelations = relations(notificationLogs, ({ one }) => ({
+  user: one(users, {
+    fields: [notificationLogs.userId],
+    references: [users.id],
+  }),
+  business: one(businesses, {
+    fields: [notificationLogs.businessId],
+    references: [businesses.id],
   }),
 }));

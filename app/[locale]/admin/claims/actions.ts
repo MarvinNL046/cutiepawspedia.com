@@ -2,8 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { getAdminUser } from "@/lib/auth/admin";
-import { approveClaim, rejectClaim } from "@/db/queries/claims";
+import { approveClaim, rejectClaim, getClaimById } from "@/db/queries/claims";
 import { logAuditEvent } from "@/db/queries/auditLogs";
+import { sendNotification } from "@/lib/notifications";
 
 export type ClaimActionResult = {
   success: boolean;
@@ -23,6 +24,9 @@ export async function approveClaimAction(
       return { success: false, error: "Unauthorized" };
     }
 
+    // Get claim details before approving (for notification)
+    const claimBefore = await getClaimById(claimId);
+
     await approveClaim(claimId, adminResult.user.id, adminNotes);
 
     // Log CLAIM_APPROVED audit event
@@ -36,6 +40,23 @@ export async function approveClaimAction(
         adminNotes: adminNotes || null,
       },
     });
+
+    // Send notification to claimer
+    if (claimBefore?.userEmail) {
+      const baseUrl = process.env.APP_BASE_URL || "https://cutiepawspedia.com";
+      sendNotification({
+        type: "CLAIM_APPROVED",
+        claimId,
+        placeId: claimBefore.placeId,
+        placeName: claimBefore.placeName || "your place",
+        userId: claimBefore.userId,
+        userEmail: claimBefore.userEmail,
+        userName: claimBefore.userName || undefined,
+        dashboardUrl: `${baseUrl}/dashboard`,
+      }).catch((err) => {
+        console.error("Failed to send claim approved notification:", err);
+      });
+    }
 
     revalidatePath("/admin/claims");
     revalidatePath("/admin/businesses");
@@ -64,6 +85,9 @@ export async function rejectClaimAction(
       return { success: false, error: "Unauthorized" };
     }
 
+    // Get claim details before rejecting (for notification)
+    const claimBefore = await getClaimById(claimId);
+
     await rejectClaim(claimId, adminResult.user.id, adminNotes);
 
     // Log CLAIM_REJECTED audit event
@@ -77,6 +101,22 @@ export async function rejectClaimAction(
         adminNotes: adminNotes || null,
       },
     });
+
+    // Send notification to claimer
+    if (claimBefore?.userEmail) {
+      sendNotification({
+        type: "CLAIM_REJECTED",
+        claimId,
+        placeId: claimBefore.placeId,
+        placeName: claimBefore.placeName || "your place",
+        userId: claimBefore.userId,
+        userEmail: claimBefore.userEmail,
+        userName: claimBefore.userName || undefined,
+        reason: adminNotes,
+      }).catch((err) => {
+        console.error("Failed to send claim rejected notification:", err);
+      });
+    }
 
     revalidatePath("/admin/claims");
     revalidatePath("/admin");

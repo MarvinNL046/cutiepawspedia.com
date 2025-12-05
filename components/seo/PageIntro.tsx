@@ -39,13 +39,13 @@ interface PageIntroProps {
 }
 
 const variantStyles: Record<PageIntroVariant, string> = {
-  default: "bg-slate-50 border-b border-slate-200",
-  pink: "bg-cpPink/10 border-b border-cpPink/20",
-  yellow: "bg-cpYellow/10 border-b border-cpYellow/20",
-  aqua: "bg-cpAqua/10 border-b border-cpAqua/20",
-  gradient: "bg-gradient-to-b from-cpPink/10 via-cpYellow/5 to-white border-b",
-  white: "bg-white border-b border-slate-200",
-  muted: "bg-muted/50 border-b border-border",
+  default: "bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700",
+  pink: "bg-cpPink/10 dark:bg-cpPink/5 border-b border-cpPink/20 dark:border-cpPink/10",
+  yellow: "bg-cpYellow/10 dark:bg-cpYellow/5 border-b border-cpYellow/20 dark:border-cpYellow/10",
+  aqua: "bg-cpAqua/10 dark:bg-cpAqua/5 border-b border-cpAqua/20 dark:border-cpAqua/10",
+  gradient: "bg-gradient-to-b from-cpPink/10 via-cpYellow/5 to-transparent dark:from-cpPink/5 dark:via-transparent dark:to-transparent border-b border-slate-200/50 dark:border-slate-700/50",
+  white: "bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700",
+  muted: "bg-muted/50 dark:bg-slate-800/50 border-b border-border",
 };
 
 const defaultIcons: Record<PageIntroVariant, React.ReactNode> = {

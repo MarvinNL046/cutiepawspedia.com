@@ -42,6 +42,7 @@ import { isFavorite } from "@/db/queries/favorites";
 import { MapPin, Phone, Globe, Mail, Star, CheckCircle, MessageSquare } from "lucide-react";
 import { getCityName, getCountryName } from "@/lib/utils/place-helpers";
 import { AboutSection, ServicesSection, HighlightsSection, BusinessSnapshot } from "@/components/place";
+import { BetweenContentAd, SidebarAd } from "@/components/ads";
 
 interface PlacePageProps {
   params: Promise<{ locale: string; countrySlug: string; citySlug: string; categorySlug: string; placeSlug: string }>;
@@ -331,6 +332,9 @@ export default async function PlacePage({ params }: PlacePageProps) {
               locale={locale}
             />
 
+            {/* Ad: Between content (anonymous users only) */}
+            <BetweenContentAd />
+
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>{locale === "nl" ? "Beoordelingen" : "Reviews"}</CardTitle>
@@ -494,6 +498,9 @@ export default async function PlacePage({ params }: PlacePageProps) {
 
             {/* Affiliate Recommendations */}
             <CategoryAffiliateBlock categorySlug={categorySlug} variant="card" />
+
+            {/* Ad: Sidebar (anonymous users only) */}
+            <SidebarAd className="hidden lg:block" />
 
             {/* Claim this place CTA */}
             <ClaimPlaceCTA

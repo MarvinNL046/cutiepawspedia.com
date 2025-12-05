@@ -3,7 +3,7 @@ import { z } from "zod";
 import { db } from "@/db";
 import { leads, places } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { sendLeadNotification } from "@/lib/email/resend";
+import { sendNotification } from "@/lib/notifications";
 import { chargeForLead } from "@/db/queries/credits";
 import {
   getLeadPriceForBusiness,
@@ -151,21 +151,23 @@ export async function POST(request: NextRequest) {
 
     // Send email notification to the business
     if (place.email) {
-      try {
-        await sendLeadNotification({
-          businessEmail: place.email,
-          businessName: place.name,
-          leadName: name,
-          leadEmail: email,
-          leadPhone: phone,
-          leadMessage: message,
-          placeName: place.name,
-          placeCity: (() => { const city = Array.isArray(place.city) ? place.city[0] : place.city; return city?.name || ""; })(),
-        });
-      } catch (emailError) {
+      const baseUrl = process.env.APP_BASE_URL || "https://cutiepawspedia.com";
+      sendNotification({
+        type: "LEAD_NEW",
+        leadId: newLead.id,
+        placeId: place.id,
+        placeName: place.name,
+        businessEmail: place.email,
+        businessId: place.businessId ?? undefined,
+        leadName: name,
+        leadEmail: email,
+        leadPhone: phone,
+        leadMessage: message,
+        dashboardUrl: place.businessId ? `${baseUrl}/dashboard/business/${place.businessId}` : undefined,
+      }).catch((emailError) => {
         // Log but don't fail the request if email fails
         console.error("Failed to send lead notification email:", emailError);
-      }
+      });
     }
 
     return NextResponse.json(

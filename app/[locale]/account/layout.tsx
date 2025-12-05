@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { stackServerApp } from "@/lib/auth/stack";
 import { getUserByStackAuthId } from "@/db/queries";
 import Link from "next/link";
-import { Heart, Clock, User, Settings } from "lucide-react";
+import { Heart, Clock, User, Settings, Bell } from "lucide-react";
 
 interface AccountLayoutProps {
   children: React.ReactNode;
@@ -51,18 +51,24 @@ export default async function AccountLayout({
   const navItems = [
     {
       href: `/${locale}/account/favorites`,
-      label: "Saved Places",
+      label: locale === "nl" ? "Opgeslagen" : "Saved Places",
       icon: Heart,
     },
     {
       href: `/${locale}/account/recent`,
-      label: "Recently Viewed",
+      label: locale === "nl" ? "Recent Bekeken" : "Recently Viewed",
       icon: Clock,
     },
     {
-      href: "/handler/account-settings",
-      label: "Account Settings",
+      href: `/${locale}/account/notifications`,
+      label: locale === "nl" ? "Instellingen" : "Settings",
       icon: Settings,
+    },
+    {
+      href: "/handler/account-settings",
+      label: locale === "nl" ? "Beveiliging" : "Security",
+      icon: User,
+      external: true, // StackAuth for password/2FA management
     },
   ];
 

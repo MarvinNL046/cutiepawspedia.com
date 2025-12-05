@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { searchPlaces, getCategories, getCountries } from "@/db/queries";
 import { getSearchMetadata, getLocalizedCategoryName, type ContentLocale } from "@/lib/seo";
-import { PlaceCard, MapWidgetLazy as MapWidget, type MapMarker } from "@/components/directory";
+import { PlaceCard, MapWidgetLazy as MapWidget, type MapMarker, SearchResultsClient } from "@/components/directory";
 import { SearchBar } from "@/components/directory";
 import { SearchTracker } from "@/components/analytics";
 import { ChevronRight, Search, MapPin, Map, LayoutGrid } from "lucide-react";
@@ -68,18 +68,20 @@ function SearchSkeleton() {
 // No results component
 function NoResults({ query }: { query?: string }) {
   return (
-    <div className="text-center py-16 bg-white rounded-lg border">
-      <Search className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-      <h2 className="text-xl font-semibold text-cpDark mb-2">
+    <div className="text-center py-16 bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+      <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-cpPink/10 to-cpAqua/10 mb-6">
+        <Search className="h-10 w-10 text-cpPink" />
+      </div>
+      <h2 className="text-xl font-semibold text-cpDark dark:text-white mb-2">
         {query ? `No results for "${query}"` : "No results found"}
       </h2>
-      <p className="text-slate-500 mb-6 max-w-md mx-auto">
+      <p className="text-slate-500 dark:text-slate-400 mb-6 max-w-md mx-auto">
         {query
           ? "Try adjusting your search terms or filters to find what you're looking for."
           : "Try searching for pet services, locations, or categories."}
       </p>
       <div className="flex justify-center gap-3">
-        <Button variant="outline" asChild>
+        <Button variant="outline" className="hover:border-cpPink hover:text-cpPink" asChild>
           <Link href="/">Browse All</Link>
         </Button>
       </div>
@@ -229,50 +231,19 @@ async function SearchResults({
         viewMode="grid"
         page={page}
       />
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {results.places.map((place) => (
-          <PlaceCard
-            key={place.id}
-            place={{
-              id: place.id,
-              slug: place.slug,
-              name: place.name,
-              description: place.description,
-              address: place.address,
-              avgRating: place.avgRating,
-              reviewCount: place.reviewCount,
-              isPremium: place.isPremium,
-              isVerified: place.isVerified,
-              placeCategories: place.categories.map((c) => ({
-                category: { slug: c.slug, labelKey: c.labelKey, icon: c.icon },
-              })),
-            }}
-            locale={locale}
-            countrySlug={(() => { const city = Array.isArray(place.city) ? place.city[0] : place.city; const country = Array.isArray(city?.country) ? city.country[0] : city?.country; return country?.slug || countrySlug || ""; })()}
-            citySlug={(() => { const city = Array.isArray(place.city) ? place.city[0] : place.city; return city?.slug || citySlug || ""; })()}
-          />
-        ))}
-      </div>
-
-      {/* Pagination */}
-      {results.hasMore && (
-        <div className="flex justify-center mt-8">
-          <Button variant="outline" asChild>
-            <Link
-              href={`/${locale}/search?${new URLSearchParams({
-                ...(query && { q: query }),
-                ...(citySlug && { city: citySlug }),
-                ...(countrySlug && { country: countrySlug }),
-                ...(categorySlug && { category: categorySlug }),
-                ...(sortBy && { sort: sortBy }),
-                page: String(page + 1),
-              }).toString()}`}
-            >
-              Load More Results
-            </Link>
-          </Button>
-        </div>
-      )}
+      {/* Client-side Load More component */}
+      <SearchResultsClient
+        initialPlaces={results.places}
+        initialHasMore={results.hasMore}
+        locale={locale}
+        searchParams={{
+          query,
+          citySlug,
+          countrySlug,
+          categorySlug,
+          sortBy,
+        }}
+      />
     </>
   );
 }
@@ -306,39 +277,52 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
 
   return (
     <>
-      {/* Search Header */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-cpAqua/10 via-white to-cpPink/10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(41,160,177,0.1),transparent_50%)]" />
+      {/* Search Header - Modern Design */}
+      <section className="relative overflow-hidden min-h-[280px]">
+        {/* Gradient mesh background */}
+        <div className="absolute inset-0 gradient-mesh-bg" />
+
+        {/* Animated gradient blobs */}
+        <div className="gradient-blob gradient-blob-animated w-[400px] h-[400px] bg-cpAqua/25 -top-32 -left-32" />
+        <div className="gradient-blob gradient-blob-animated w-[300px] h-[300px] bg-cpPink/20 top-0 -right-20" style={{ animationDelay: '-5s' }} />
+
+        {/* Decorative elements */}
+        <div className="absolute top-12 right-24 w-32 h-32 border-2 border-cpAqua/10 rounded-full hidden lg:block" />
+
         <div className="relative container mx-auto max-w-6xl px-4 py-12 md:py-16">
-          <div className="flex items-center gap-2 text-sm text-slate-500 mb-4 flex-wrap">
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-6 flex-wrap">
             <Link href={`/${locale}`} className="hover:text-cpPink transition-colors">
               Directory
             </Link>
             <ChevronRight className="h-4 w-4" />
-            <span className="text-cpDark font-medium">Search</span>
+            <span className="text-cpDark dark:text-white font-medium">Search</span>
           </div>
 
           <div className="flex items-start gap-4 mb-8">
-            <div className="p-3 bg-white rounded-xl shadow-sm">
-              <Search className="h-8 w-8 text-cpAqua" />
+            {/* Icon with gradient background */}
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-cpAqua/20 to-cpAqua/5 shadow-sm">
+              <Search className="h-7 w-7 text-cpAqua" />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-cpDark tracking-tight">
+              <h1 className="text-3xl md:text-4xl font-bold text-cpDark dark:text-white tracking-tight">
                 {searchSummary.length > 0 ? `Search: ${searchSummary.join(" in ")}` : "Search Pet Services"}
               </h1>
-              <p className="text-slate-600 mt-1">Find the best pet services near you</p>
+              <p className="text-slate-600 dark:text-slate-400 mt-1">Find the best pet services near you</p>
             </div>
           </div>
 
-          {/* Search Form */}
+          {/* Search Form with glassmorphism */}
           <div className="max-w-2xl">
-            <SearchBar locale={locale} initialQuery={query} />
+            <div className="glass-card-strong rounded-2xl p-3 shadow-lg">
+              <SearchBar locale={locale} initialQuery={query} initialLocation={citySlug} />
+            </div>
           </div>
         </div>
       </section>
 
       {/* Filters Bar */}
-      <section className="sticky top-16 z-40 bg-white border-b shadow-sm">
+      <section className="sticky top-16 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-700/50 shadow-sm">
         <div className="container mx-auto max-w-6xl px-4 py-3">
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-2 flex-wrap">
@@ -386,7 +370,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
             {/* Sort Options & View Toggle */}
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <span className="text-sm text-slate-500">Sort:</span>
+                <span className="text-sm text-slate-500 dark:text-slate-400">Sort:</span>
                 {[
                   { value: "relevance", label: "Relevance" },
                   { value: "rating", label: "Rating" },
@@ -418,7 +402,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
                   </Badge>
                 ))}
               </div>
-              <div className="flex items-center border-l pl-4 gap-1">
+              <div className="flex items-center border-l border-slate-200 dark:border-slate-700 pl-4 gap-1">
                 <Button
                   variant={showMap ? "ghost" : "secondary"}
                   size="icon"
@@ -480,16 +464,21 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
 
       {/* Popular Countries */}
       {countries.length > 0 && (
-        <section className="container mx-auto max-w-6xl px-4 py-8 pb-16">
-          <h2 className="text-xl font-bold text-cpDark mb-4 tracking-tight">Browse by Country</h2>
-          <div className="flex flex-wrap gap-2">
+        <section className="container mx-auto max-w-6xl px-4 py-12 pb-16">
+          <div className="text-center mb-8">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-cpAqua/10 text-cpAqua text-sm font-medium mb-4">
+              Explore
+            </span>
+            <h2 className="text-2xl md:text-3xl font-bold text-cpDark dark:text-white tracking-tight">Browse by Country</h2>
+          </div>
+          <div className="flex flex-wrap justify-center gap-3">
             {countries.map((country) => (
               <Link key={country.slug} href={`/${locale}/${country.slug}`}>
                 <Badge
                   variant="outline"
-                  className="hover:bg-cpPink/10 hover:border-cpPink transition-colors cursor-pointer py-2 px-3"
+                  className="hover:bg-cpPink/10 hover:border-cpPink dark:hover:bg-cpPink/20 transition-all duration-300 cursor-pointer py-2.5 px-4 text-sm hover:-translate-y-0.5"
                 >
-                  <MapPin className="h-3 w-3 mr-1" />
+                  <MapPin className="h-3.5 w-3.5 mr-1.5 text-cpPink" />
                   {country.name}
                 </Badge>
               </Link>

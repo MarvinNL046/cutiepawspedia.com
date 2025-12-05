@@ -1,12 +1,14 @@
 import { stackServerApp } from "@/lib/auth/stack";
 import { getUserByStackAuthId } from "@/db/queries";
-import { DashboardHeader } from "@/components/dashboard";
+import { getOrCreateNotificationSettings } from "@/db/queries/notifications";
+import { DashboardHeader, NotificationSettings, type NotificationSettingsData } from "@/components/dashboard";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User, Mail, Building2, Shield, Bell, CreditCard } from "lucide-react";
+import { User, Mail, Building2, Shield, CreditCard } from "lucide-react";
+import { updateNotificationSettingsAction } from "./actions";
 
 interface SettingsPageProps {
   params: Promise<{ locale: string }>;
@@ -21,6 +23,23 @@ export default async function SettingsPage({ params }: SettingsPageProps) {
 
   const dbUser = await getUserByStackAuthId(stackUser.id);
   if (!dbUser) return null;
+
+  // Get notification settings
+  const notificationSettings = await getOrCreateNotificationSettings(dbUser.id);
+  const initialSettings: NotificationSettingsData = {
+    emailGeneral: notificationSettings.emailGeneral,
+    emailReviews: notificationSettings.emailReviews,
+    emailFavorites: notificationSettings.emailFavorites,
+    emailLeads: notificationSettings.emailLeads,
+    emailBusiness: notificationSettings.emailBusiness,
+    emailDigest: notificationSettings.emailDigest,
+    locale: notificationSettings.locale,
+    quietHoursEnabled: notificationSettings.quietHoursEnabled,
+    quietHoursStart: notificationSettings.quietHoursStart,
+    quietHoursEnd: notificationSettings.quietHoursEnd,
+    timezone: notificationSettings.timezone,
+    maxEmailsPerWeek: notificationSettings.maxEmailsPerWeek,
+  };
 
   return (
     <>
@@ -74,44 +93,12 @@ export default async function SettingsPage({ params }: SettingsPageProps) {
           </CardContent>
         </Card>
 
-        {/* Notification Settings (Placeholder) */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bell className="h-5 w-5 text-cpAqua" />
-              Notifications
-            </CardTitle>
-            <CardDescription>
-              Configure how you receive updates
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Email Notifications</p>
-                  <p className="text-sm text-slate-500">
-                    Receive emails when you get new leads
-                  </p>
-                </div>
-                <Button variant="outline" size="sm" disabled>
-                  Enabled
-                </Button>
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Weekly Reports</p>
-                  <p className="text-sm text-slate-500">
-                    Get a weekly summary of your performance
-                  </p>
-                </div>
-                <Button variant="outline" size="sm" disabled>
-                  Coming Soon
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Notification Settings */}
+        <NotificationSettings
+          initialSettings={initialSettings}
+          onUpdate={updateNotificationSettingsAction}
+          locale={locale}
+        />
 
         {/* Billing (Placeholder) */}
         <Card>

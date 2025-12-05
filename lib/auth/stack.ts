@@ -20,11 +20,11 @@ function createStackServerApp() {
       home: "/",
       signIn: "/handler/sign-in",
       signUp: "/handler/sign-up",
-      afterSignIn: "/en",
-      afterSignUp: "/en",
+      afterSignIn: "/en/account/favorites", // Redirect to account after login
+      afterSignUp: "/en/account/favorites", // Redirect to account after signup
       signOut: "/handler/sign-out",
       afterSignOut: "/",
-      accountSettings: "/handler/account-settings",
+      accountSettings: "/en/account/notifications", // Our settings page
     },
   });
 }

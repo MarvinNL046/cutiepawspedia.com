@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
 
 interface CategoryCardProps {
   href: string;
@@ -9,14 +8,14 @@ interface CategoryCardProps {
 }
 
 /**
- * Consistent category card used across home, city, and listing pages.
- * Uses standardized styling: rounded-xl, shadow-sm hover:shadow-md, cpPink accent.
+ * Modern category card with glassmorphism and gradient effects.
+ * Inspired by postforge.ai and seogrove.ai design patterns.
  */
 export function CategoryCard({ href, icon, label, variant = "default" }: CategoryCardProps) {
   if (variant === "compact") {
     return (
       <Link href={href} className="group">
-        <div className="flex items-center gap-2 px-3 py-2 rounded-lg border bg-white hover:border-cpPink/50 hover:shadow-sm transition-all">
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl glass-card hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
           <span className="text-lg">{icon}</span>
           <span className="text-sm font-medium text-cpDark group-hover:text-cpPink transition-colors">
             {label}
@@ -28,16 +27,22 @@ export function CategoryCard({ href, icon, label, variant = "default" }: Categor
 
   return (
     <Link href={href} className="group block">
-      <Card className="h-full hover-lift hover:shadow-md hover:border-cpPink/50">
-        <CardContent className="p-4 text-center">
-          <div className="text-3xl mb-2 group-hover:scale-110 transition-transform duration-200">
-            {icon}
+      <div className="relative h-full rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50 p-5 transition-all duration-300 hover:shadow-lg hover:shadow-cpPink/10 hover:-translate-y-1 hover:border-cpPink/30 overflow-hidden">
+        {/* Gradient overlay on hover */}
+        <div className="absolute inset-0 bg-gradient-to-br from-cpPink/5 to-cpAqua/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+        {/* Content */}
+        <div className="relative text-center">
+          {/* Icon with gradient background */}
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-cpPink/10 to-cpPink/5 mb-3 group-hover:scale-110 transition-transform duration-300">
+            <span className="text-3xl">{icon}</span>
           </div>
-          <h3 className="font-medium text-foreground group-hover:text-cpPink transition-colors text-sm">
+
+          <h3 className="font-semibold text-foreground group-hover:text-cpPink transition-colors text-sm">
             {label}
           </h3>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </Link>
   );
 }

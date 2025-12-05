@@ -15,6 +15,10 @@ import {
   getRepliesForReview,
   createReviewReply,
 } from "@/db/queries/reviews";
+import { sendNotification } from "@/lib/notifications";
+import { db } from "@/db";
+import { users, places, businesses } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 // Create reply schema
 const createReplySchema = z.object({
@@ -137,6 +141,51 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       authorUserId: user.id,
       body: result.data.body,
     });
+
+    // Send notification to the original reviewer (async, don't wait)
+    // Only if business replied (not admin), and we can find the reviewer's email
+    if (authorType === "business" && db) {
+      (async () => {
+        try {
+          // Get the reviewer's info
+          const [reviewer] = await db
+            .select({ id: users.id, email: users.email, name: users.name })
+            .from(users)
+            .where(eq(users.id, review.userId))
+            .limit(1);
+
+          if (!reviewer?.email) return;
+
+          // Get place and business info for the notification
+          const [place] = await db
+            .select({ id: places.id, name: places.name, slug: places.slug })
+            .from(places)
+            .where(eq(places.id, review.placeId))
+            .limit(1);
+
+          // Get business name (the replier's business)
+          const business = await getBusinessByUserId(user.id);
+          const businessName = business?.name || place?.name || "A business";
+
+          const baseUrl = process.env.APP_BASE_URL || "https://cutiepawspedia.com";
+
+          await sendNotification({
+            type: "REVIEW_REPLY",
+            reviewId,
+            replyId: reply.id,
+            placeId: review.placeId,
+            placeName: place?.name || "a place",
+            businessName,
+            replySnippet: result.data.body.substring(0, 150) + (result.data.body.length > 150 ? "..." : ""),
+            userId: reviewer.id,
+            userEmail: reviewer.email,
+            reviewUrl: place?.slug ? `${baseUrl}/places/${place.slug}#review-${reviewId}` : undefined,
+          });
+        } catch (err) {
+          console.error("Failed to send review reply notification:", err);
+        }
+      })();
+    }
 
     return NextResponse.json(
       {

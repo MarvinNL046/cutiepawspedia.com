@@ -245,6 +245,211 @@
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
   }
+
+  /* ========================================
+     MODERN DESIGN UTILITIES
+     Inspired by postforge.ai & seogrove.ai
+     ======================================== */
+
+  /* Gradient Text Effect - Pink to Aqua */
+  .gradient-text {
+    background: linear-gradient(135deg, #FF7FA1 0%, #FF6B8A 50%, #29A0B1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Gradient Text - Pink emphasis */
+  .gradient-text-pink {
+    background: linear-gradient(135deg, #FF7FA1 0%, #FF5C85 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Animated Gradient Text */
+  .gradient-text-animated {
+    background: linear-gradient(90deg, #FF7FA1, #FFD166, #29A0B1, #FF7FA1);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 8s ease infinite;
+  }
+
+  /* Glassmorphism Card */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  .dark .glass-card {
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Glassmorphism Card - Stronger */
+  .glass-card-strong {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  }
+  .dark .glass-card-strong {
+    background: rgba(30, 41, 59, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Floating Gradient Blob */
+  .gradient-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  /* Animated floating blob */
+  .gradient-blob-animated {
+    animation: blobFloat 20s ease-in-out infinite;
+  }
+
+  /* Gradient Border Effect */
+  .gradient-border {
+    position: relative;
+    background: white;
+    border-radius: 1rem;
+  }
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: calc(1rem + 2px);
+    background: linear-gradient(135deg, #FF7FA1, #FFD166, #29A0B1);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .gradient-border:hover::before {
+    opacity: 1;
+  }
+  .dark .gradient-border {
+    background: #1e293b;
+  }
+
+  /* Stat Card with colored background */
+  .stat-card {
+    @apply rounded-2xl p-6 text-center transition-all duration-300;
+    background: linear-gradient(135deg, rgba(255, 127, 161, 0.1), rgba(255, 127, 161, 0.05));
+  }
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(255, 127, 161, 0.15);
+  }
+
+  /* Pink stat card */
+  .stat-card-pink {
+    background: linear-gradient(135deg, rgba(255, 127, 161, 0.15), rgba(255, 127, 161, 0.05));
+  }
+  .dark .stat-card-pink {
+    background: linear-gradient(135deg, rgba(255, 127, 161, 0.2), rgba(255, 127, 161, 0.08));
+  }
+
+  /* Yellow stat card */
+  .stat-card-yellow {
+    background: linear-gradient(135deg, rgba(255, 209, 102, 0.15), rgba(255, 209, 102, 0.05));
+  }
+  .dark .stat-card-yellow {
+    background: linear-gradient(135deg, rgba(255, 209, 102, 0.2), rgba(255, 209, 102, 0.08));
+  }
+
+  /* Aqua stat card */
+  .stat-card-aqua {
+    background: linear-gradient(135deg, rgba(41, 160, 177, 0.15), rgba(41, 160, 177, 0.05));
+  }
+  .dark .stat-card-aqua {
+    background: linear-gradient(135deg, rgba(41, 160, 177, 0.2), rgba(41, 160, 177, 0.08));
+  }
+
+  /* Modern Button with gradient */
+  .btn-gradient {
+    background: linear-gradient(135deg, #FF7FA1 0%, #FF5C85 100%);
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 127, 161, 0.3);
+  }
+  .btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 127, 161, 0.4);
+  }
+
+  /* Icon Badge with gradient background */
+  .icon-badge {
+    @apply inline-flex items-center justify-center rounded-xl p-3;
+    background: linear-gradient(135deg, rgba(255, 127, 161, 0.15), rgba(255, 127, 161, 0.05));
+  }
+  .icon-badge-pink {
+    background: linear-gradient(135deg, rgba(255, 127, 161, 0.15), rgba(255, 127, 161, 0.05));
+  }
+  .icon-badge-aqua {
+    background: linear-gradient(135deg, rgba(41, 160, 177, 0.15), rgba(41, 160, 177, 0.05));
+  }
+  .icon-badge-yellow {
+    background: linear-gradient(135deg, rgba(255, 209, 102, 0.15), rgba(255, 209, 102, 0.05));
+  }
+
+  /* Section with gradient mesh background */
+  .gradient-mesh-bg {
+    background-color: #f8fafc;
+    background-image:
+      radial-gradient(at 0% 0%, rgba(255, 127, 161, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(255, 209, 102, 0.1) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(41, 160, 177, 0.15) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(255, 127, 161, 0.1) 0px, transparent 50%);
+  }
+  .dark .gradient-mesh-bg {
+    background-color: #0f172a;
+    background-image:
+      radial-gradient(at 0% 0%, rgba(255, 127, 161, 0.1) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(255, 209, 102, 0.08) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(41, 160, 177, 0.1) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(255, 127, 161, 0.08) 0px, transparent 50%);
+  }
+
+  /* Feature card hover glow */
+  .feature-card {
+    @apply relative rounded-2xl bg-white p-6 transition-all duration-300 border border-slate-100;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  }
+  .feature-card:hover {
+    box-shadow: 0 8px 40px rgba(255, 127, 161, 0.15);
+    transform: translateY(-4px);
+  }
+  .dark .feature-card {
+    @apply bg-slate-800/80 border-slate-700/50;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+  .dark .feature-card:hover {
+    box-shadow: 0 8px 40px rgba(255, 127, 161, 0.25);
+    @apply border-cpPink/30;
+  }
+
+  /* Decorative ring */
+  .decorative-ring {
+    @apply absolute rounded-full border-2 border-dashed opacity-20;
+    animation: spin 30s linear infinite;
+  }
+
+  /* Number badge like PostForge */
+  .number-badge {
+    @apply inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold;
+    background: linear-gradient(135deg, #FF7FA1, #FF5C85);
+    color: white;
+  }
 }
 
 /* Keyframe definitions */
@@ -300,6 +505,30 @@
   }
   100% {
     background-position: 200% 0;
+  }
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes blobFloat {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(20px, -30px) scale(1.05);
+  }
+  50% {
+    transform: translate(-20px, 20px) scale(0.95);
+  }
+  75% {
+    transform: translate(30px, 10px) scale(1.02);
   }
 }
 

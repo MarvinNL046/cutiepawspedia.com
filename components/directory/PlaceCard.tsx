@@ -49,12 +49,12 @@ export function PlaceCard({ place, locale, countrySlug, citySlug, categorySlug, 
 
   // Premium card styling
   const premiumStyles = place.isPremium
-    ? "border-cpYellow border-2 bg-gradient-to-br from-cpYellow/5 to-white shadow-md ring-1 ring-cpYellow/20"
-    : "";
+    ? "border-cpYellow border-2 bg-gradient-to-br from-cpYellow/5 to-white dark:from-cpYellow/10 dark:to-slate-800 shadow-md ring-1 ring-cpYellow/20"
+    : "bg-white dark:bg-slate-800/80 border-slate-100 dark:border-slate-700/50";
 
   return (
     <Link href={href} className="block">
-      <Card className={`group hover-lift hover:shadow-lg relative overflow-hidden ${premiumStyles}`}>
+      <Card className={`group hover-lift hover:shadow-xl hover:shadow-cpPink/10 dark:hover:shadow-cpPink/20 relative overflow-hidden transition-all duration-300 hover:-translate-y-1 ${premiumStyles}`}>
         {/* Premium Ribbon */}
         {place.isPremium && (
           <div className="absolute top-0 right-0 z-10">
@@ -70,7 +70,7 @@ export function PlaceCard({ place, locale, countrySlug, citySlug, categorySlug, 
           <div className="flex items-start justify-between gap-2 mb-2">
             <div className="flex-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <h3 className={`font-semibold line-clamp-1 group-hover:text-cpPink transition-colors ${place.isPremium ? "text-amber-900" : "text-cpDark"}`}>
+                <h3 className={`font-semibold line-clamp-1 group-hover:text-cpPink transition-colors ${place.isPremium ? "text-amber-900 dark:text-amber-200" : "text-cpDark dark:text-white"}`}>
                   {place.name}
                 </h3>
                 {place.isVerified && (
@@ -85,21 +85,21 @@ export function PlaceCard({ place, locale, countrySlug, citySlug, categorySlug, 
             {place.avgRating && Number(place.avgRating) > 0 && (
               <div className="flex items-center gap-1 text-sm shrink-0">
                 <Star className="h-4 w-4 fill-cpYellow text-cpYellow" />
-                <span className="font-medium">{Number(place.avgRating).toFixed(1)}</span>
-                <span className="text-slate-400">({place.reviewCount})</span>
+                <span className="font-medium text-cpDark dark:text-white">{Number(place.avgRating).toFixed(1)}</span>
+                <span className="text-slate-400 dark:text-slate-500">({place.reviewCount})</span>
               </div>
             )}
           </div>
 
           {/* Description */}
           {place.description && (
-            <p className="text-sm text-slate-600 line-clamp-2 mb-3">
+            <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-3">
               {place.description}
             </p>
           )}
 
           {/* Info */}
-          <div className="flex flex-col gap-1 text-sm text-slate-500">
+          <div className="flex flex-col gap-1 text-sm text-slate-500 dark:text-slate-400">
             {place.address && (
               <div className="flex items-center gap-2">
                 <MapPin className="h-3.5 w-3.5" />

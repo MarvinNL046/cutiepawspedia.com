@@ -1,4 +1,4 @@
-import { sql, eq, and, or, ilike, desc, asc } from "drizzle-orm";
+import { eq, and, or, ilike, desc, asc } from "drizzle-orm";
 import { db } from "../index";
 import { places, cities, categories, placeCategories, countries } from "../schema";
 
@@ -94,13 +94,30 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
 
   // Filter by city if provided
   let resolvedCityId = cityId;
-  if (citySlug && countrySlug && !resolvedCityId) {
-    const city = await db.query.cities.findFirst({
+  if (citySlug && !resolvedCityId) {
+    // Try to find city by slug first
+    let city = await db.query.cities.findFirst({
       where: eq(cities.slug, citySlug),
       with: { country: true },
     });
-    const countryRel = getRelation(city?.country);
-    if (city && countryRel?.slug === countrySlug) {
+
+    // If countrySlug is provided, verify it matches
+    if (city && countrySlug) {
+      const countryRel = getRelation(city?.country);
+      if (countryRel?.slug !== countrySlug) {
+        city = undefined; // City doesn't match the country filter
+      }
+    }
+
+    // If no city found by slug, try searching by name (case-insensitive)
+    if (!city) {
+      city = await db.query.cities.findFirst({
+        where: ilike(cities.name, citySlug.replace(/-/g, " ")),
+        with: { country: true },
+      });
+    }
+
+    if (city) {
       resolvedCityId = city.id;
     }
   }
@@ -138,60 +155,47 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
   let results;
 
   if (query && query.trim()) {
-    // Full-text search with ranking
-    const searchQuery = query.trim().split(/\s+/).join(" & ");
+    // Simple ILIKE search (no pg_trgm or full-text search extensions required)
+    const searchTerm = `%${query.trim()}%`;
 
-    // Use raw SQL for full-text search
-    const searchResults = await db.execute(sql`
-      SELECT
-        p.id,
-        p.slug,
-        p.name,
-        p.description,
-        p.address,
-        p.phone,
-        p.website,
-        p.lat,
-        p.lng,
-        p.avg_rating,
-        p.review_count,
-        p.is_premium,
-        p.is_verified,
-        p.city_id,
-        ts_rank(
-          COALESCE(p.search_vector, to_tsvector('english', COALESCE(p.name, '') || ' ' || COALESCE(p.description, ''))),
-          plainto_tsquery('english', ${query})
-        ) as rank,
-        similarity(p.name, ${query}) as name_sim
-      FROM places p
-      WHERE (
-        p.search_vector @@ plainto_tsquery('english', ${query})
-        OR p.name ILIKE ${'%' + query + '%'}
-        OR p.description ILIKE ${'%' + query + '%'}
-        OR p.address ILIKE ${'%' + query + '%'}
-      )
-      ${resolvedCityId ? sql`AND p.city_id = ${resolvedCityId}` : sql``}
-      ${categoryPlaceIds ? sql`AND p.id = ANY(${categoryPlaceIds})` : sql``}
-      ORDER BY
-        ${premiumFirst ? sql`p.is_premium DESC,` : sql``}
-        ${sortBy === "relevance" ? sql`rank DESC, name_sim DESC,` : sql``}
-        ${sortBy === "rating" ? sql`p.avg_rating DESC NULLS LAST,` : sql``}
-        ${sortBy === "name" ? sql`p.name ASC,` : sql``}
-        ${sortBy === "newest" ? sql`p.created_at DESC,` : sql``}
-        p.review_count DESC
-      LIMIT ${limit + 1}
-      OFFSET ${offset}
-    `);
-
-    const placeIds = (searchResults.rows as Array<{ id: number }>).map((r) => r.id);
-
-    if (placeIds.length === 0) {
-      return { places: [], total: 0, hasMore: false };
-    }
-
-    // Fetch full place data with relations
+    // Use Drizzle ORM for search - simple and reliable
     results = await db.query.places.findMany({
-      where: (places, { inArray }) => inArray(places.id, placeIds.slice(0, limit)),
+      where: (places, { and, or, ilike, eq, inArray }) => {
+        const searchConditions = or(
+          ilike(places.name, searchTerm),
+          ilike(places.description, searchTerm),
+          ilike(places.address, searchTerm)
+        );
+
+        const allConditions = [];
+        allConditions.push(searchConditions);
+
+        if (resolvedCityId) {
+          allConditions.push(eq(places.cityId, resolvedCityId));
+        }
+        if (categoryPlaceIds) {
+          allConditions.push(inArray(places.id, categoryPlaceIds));
+        }
+
+        return and(...allConditions);
+      },
+      orderBy: (places, { desc, asc }) => {
+        const orders = [];
+        if (premiumFirst) {
+          orders.push(desc(places.isPremium));
+        }
+        if (sortBy === "rating" || sortBy === "relevance") {
+          orders.push(desc(places.avgRating));
+        } else if (sortBy === "name") {
+          orders.push(asc(places.name));
+        } else if (sortBy === "newest") {
+          orders.push(desc(places.createdAt));
+        }
+        orders.push(desc(places.reviewCount));
+        return orders;
+      },
+      limit: limit + 1,
+      offset,
       with: {
         city: {
           with: {
@@ -205,9 +209,6 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
         },
       },
     });
-
-    // Sort results to match the search ranking
-    results.sort((a, b) => placeIds.indexOf(a.id) - placeIds.indexOf(b.id));
   } else {
     // No search query - just apply filters
     results = await db.query.places.findMany({

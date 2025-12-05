@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyAdminAccess, logAdminAction } from "@/lib/auth/admin-api";
 import { getPlaceByIdForAdmin, updatePlaceAdmin, togglePlaceVerified, togglePlacePremium } from "@/db/queries/admin";
 import { placeAdminUpdateSchema } from "@/lib/validations/admin";
+import { notifyFavoritePlaceUpdate, filterRelevantFields } from "@/lib/notifications";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -66,6 +67,21 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     }
 
     await logAdminAction("UPDATE", "place", placeId, auth.user.id, validated);
+
+    // Notify users who favorited this place about the update (async, don't wait)
+    const updatedFields = Object.keys(validated).filter((key) => validated[key as keyof typeof validated] !== undefined);
+    const relevantFields = filterRelevantFields(updatedFields);
+
+    if (relevantFields.length > 0 && place.slug) {
+      notifyFavoritePlaceUpdate({
+        placeId,
+        placeName: place.name,
+        placeSlug: place.slug,
+        updatedFields: relevantFields,
+      }).catch((err) => {
+        console.error("Failed to notify favorite place update:", err);
+      });
+    }
 
     return NextResponse.json({ place });
   } catch (error) {

@@ -24,6 +24,7 @@ import { PlaceCard, CategoryCard, getCategoryIcon } from "@/components/directory
 import { PageHeader, SectionHeader } from "@/components/layout";
 import { PageIntro, JsonLd, FaqStatic, InternalLinksSection } from "@/components/seo";
 import { MapPin, Star } from "lucide-react";
+import { BetweenContentAd } from "@/components/ads";
 
 interface CityPageProps {
   params: Promise<{ locale: string; countrySlug: string; citySlug: string }>;
@@ -127,6 +128,11 @@ export default async function CityPage({ params }: CityPageProps) {
             />
           ))}
         </div>
+      </section>
+
+      {/* Ad: Between content (anonymous users only) */}
+      <section className="container mx-auto max-w-6xl px-4">
+        <BetweenContentAd />
       </section>
 
       {topPlaces.length > 0 && (

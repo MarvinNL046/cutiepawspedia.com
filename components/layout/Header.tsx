@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Globe, Menu, User, LogOut, Settings, Heart } from "lucide-react";
+import { Globe, Menu, X, User, LogOut, Settings, Heart } from "lucide-react";
 import { useAuth, isAuthConfigured } from "@/lib/auth/use-auth";
 import { ThemeToggle } from "@/components/theme";
 
@@ -27,6 +28,7 @@ const locales = [
 
 export function Header({ locale, variant = "marketing" }: HeaderProps) {
   const user = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -159,13 +161,136 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
             </Button>
           )}
 
-          {/* Mobile Menu */}
-          <Button variant="ghost" size="sm" className="md:hidden" aria-label="Open menu">
-            <Menu className="h-5 w-5" aria-hidden="true" />
+          {/* Mobile Menu Toggle */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="md:hidden"
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? (
+              <X className="h-5 w-5" aria-hidden="true" />
+            ) : (
+              <Menu className="h-5 w-5" aria-hidden="true" />
+            )}
             <span className="sr-only">Menu</span>
           </Button>
         </div>
       </div>
+
+      {/* Mobile Menu Panel */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-border bg-background">
+          <nav className="container mx-auto px-4 py-4 flex flex-col gap-4">
+            {variant === "marketing" ? (
+              <>
+                <Link
+                  href={`/${locale}`}
+                  className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors py-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Home
+                </Link>
+                <Link
+                  href={`/${locale}/about`}
+                  className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors py-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  About
+                </Link>
+                <Link
+                  href={`/${locale}/for-businesses`}
+                  className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors py-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  For Businesses
+                </Link>
+                <Link
+                  href={`/${locale}/contact`}
+                  className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors py-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Contact
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  href={`/${locale}`}
+                  className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors py-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Directory
+                </Link>
+                <Link
+                  href={`/${locale}/search`}
+                  className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors py-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Search
+                </Link>
+              </>
+            )}
+
+            {/* Mobile Auth Links */}
+            {isAuthConfigured && user ? (
+              <>
+                <div className="border-t border-border pt-4 mt-2">
+                  <Link
+                    href={`/${locale}/account/favorites`}
+                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors py-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Heart className="h-4 w-4" />
+                    My Account
+                  </Link>
+                  <Link
+                    href={`/${locale}/account/notifications`}
+                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors py-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Settings className="h-4 w-4" />
+                    Settings
+                  </Link>
+                  <Link
+                    href="/handler/sign-out"
+                    className="flex items-center gap-2 text-sm font-medium text-red-600 hover:text-red-700 transition-colors py-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Sign Out
+                  </Link>
+                </div>
+              </>
+            ) : isAuthConfigured ? (
+              <div className="border-t border-border pt-4 mt-2 flex flex-col gap-2">
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/handler/sign-in" onClick={() => setMobileMenuOpen(false)}>
+                    Sign In
+                  </Link>
+                </Button>
+                <Button size="sm" className="bg-cpPink hover:bg-cpPink/90" asChild>
+                  <Link href="/handler/sign-up" onClick={() => setMobileMenuOpen(false)}>
+                    Sign Up
+                  </Link>
+                </Button>
+              </div>
+            ) : null}
+
+            {/* Mobile CTA */}
+            {!user && (
+              <div className="border-t border-border pt-4 mt-2">
+                <Button size="sm" className="bg-cpPink hover:bg-cpPink/90 w-full" asChild>
+                  <Link href={`/${locale}/for-businesses`} onClick={() => setMobileMenuOpen(false)}>
+                    List Your Business
+                  </Link>
+                </Button>
+              </div>
+            )}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

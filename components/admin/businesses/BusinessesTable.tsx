@@ -33,6 +33,7 @@ import {
   Building2,
   UserCheck,
   Search,
+  LayoutDashboard,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -367,6 +368,12 @@ export function BusinessesTable({
                           <Link href={`/en/admin/businesses/${business.id}`}>
                             <Eye className="h-4 w-4 mr-2" />
                             View Details
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href={`/en/dashboard/business/${business.id}`}>
+                            <LayoutDashboard className="h-4 w-4 mr-2" />
+                            Open Dashboard
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>

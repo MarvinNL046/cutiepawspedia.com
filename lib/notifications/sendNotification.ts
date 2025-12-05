@@ -20,6 +20,7 @@ import {
   logNotification,
 } from "@/db/queries/notifications";
 import {
+  buildWelcomeEmail,
   buildReviewNewEmail,
   buildReviewReplyEmail,
   buildLeadNewEmail,
@@ -39,6 +40,7 @@ import type {
 
 // Default sender addresses
 const FROM_ADDRESSES = {
+  welcome: "CutiePawsPedia <welcome@cutiepawspedia.com>",
   reviews: "CutiePawsPedia Reviews <reviews@cutiepawspedia.com>",
   leads: "CutiePawsPedia <leads@cutiepawspedia.com>",
   claims: "CutiePawsPedia <claims@cutiepawspedia.com>",
@@ -51,6 +53,7 @@ const FROM_ADDRESSES = {
  * Get the appropriate "from" address for a notification type
  */
 function getFromAddress(type: string): string {
+  if (type === "USER_WELCOME") return FROM_ADDRESSES.welcome;
   if (type.startsWith("REVIEW_")) return FROM_ADDRESSES.reviews;
   if (type.startsWith("LEAD_")) return FROM_ADDRESSES.leads;
   if (type.startsWith("CLAIM_")) return FROM_ADDRESSES.claims;
@@ -65,6 +68,7 @@ function getFromAddress(type: string): string {
 function getSettingCategory(
   type: string
 ): "reviews" | "leads" | "business" | "digest" | "favorites" | "general" {
+  if (type === "USER_WELCOME") return "general"; // Welcome emails always sent
   if (type === "REVIEW_NEW" || type === "REVIEW_REPLY") return "reviews";
   if (type === "LEAD_NEW") return "leads";
   if (type === "CLAIM_APPROVED" || type === "CLAIM_REJECTED") return "business";
@@ -129,6 +133,12 @@ export async function sendNotification(
     let settingCategory: "reviews" | "leads" | "business" | "digest" | "favorites" | "general";
 
     switch (type) {
+      case "USER_WELCOME":
+        recipientEmail = payload.userEmail;
+        recipientUserId = payload.userId;
+        settingCategory = "general";
+        break;
+
       case "REVIEW_NEW":
         recipientEmail = payload.businessEmail;
         recipientBusinessId = payload.businessId;
@@ -201,6 +211,13 @@ export async function sendNotification(
     let email: { subject: string; text: string; html: string };
 
     switch (type) {
+      case "USER_WELCOME":
+        email = buildWelcomeEmail({
+          locale,
+          userName: payload.userName,
+        });
+        break;
+
       case "REVIEW_NEW":
         email = buildReviewNewEmail({
           locale,
@@ -350,6 +367,12 @@ function buildMetadata(payload: AnyNotificationPayload): Record<string, unknown>
   const base: Record<string, unknown> = { type: payload.type };
 
   switch (payload.type) {
+    case "USER_WELCOME":
+      return {
+        ...base,
+        userId: payload.userId,
+      };
+
     case "REVIEW_NEW":
       return {
         ...base,

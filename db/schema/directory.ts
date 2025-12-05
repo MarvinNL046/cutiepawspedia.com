@@ -179,6 +179,7 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   stackauthId: varchar("stackauth_id", { length: 255 }).unique().notNull(),
   email: varchar("email", { length: 255 }).unique().notNull(),
+  emailVerified: boolean("email_verified").default(false).notNull(), // Synced from StackAuth
   name: varchar("name", { length: 255 }),
   role: varchar("role", { length: 50 }).default("user").notNull(), // user, business, admin
   // P3: User Profile fields

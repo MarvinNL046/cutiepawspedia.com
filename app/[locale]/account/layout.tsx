@@ -50,6 +50,7 @@ export default async function AccountLayout({
       stackauthId: stackUser.id,
       email: stackUser.primaryEmail || "",
       name: stackUser.displayName,
+      emailVerified: stackUser.primaryEmailVerified,
     });
   }
 

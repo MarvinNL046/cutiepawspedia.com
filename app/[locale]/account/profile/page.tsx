@@ -68,6 +68,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
       stackauthId: stackUser.id,
       email: stackUser.primaryEmail || "",
       name: stackUser.displayName,
+      emailVerified: stackUser.primaryEmailVerified,
     });
   }
 

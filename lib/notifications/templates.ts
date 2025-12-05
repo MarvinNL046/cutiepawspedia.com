@@ -28,6 +28,19 @@ import {
 
 const translations: Record<Locale, Record<string, string>> = {
   en: {
+    // ─── User Welcome ───
+    welcome_subject: "Welcome to CutiePawsPedia! Let's find pet-friendly places together",
+    welcome_preview: "Your account is ready - start exploring pet-friendly places near you",
+    welcome_heading: "Welcome aboard! 🎉",
+    welcome_intro: "Hi{userName}! Thanks for joining CutiePawsPedia - your guide to pet-friendly places.",
+    welcome_body: "With your new account, you can now:",
+    welcome_feature1: "Save your favorite pet-friendly places",
+    welcome_feature2: "Write and share reviews",
+    welcome_feature3: "Get updates when your saved places change",
+    welcome_feature4: "Discover new places based on your preferences",
+    welcome_cta: "Start Exploring",
+    welcome_footer: "Questions? Just reply to this email - we're happy to help!",
+
     // ─── Review New ───
     reviewNew_subject: "Great news! {placeName} just got a new review",
     reviewNew_preview: "Someone left a {rating}-star review for your business",
@@ -106,6 +119,19 @@ const translations: Record<Locale, Record<string, string>> = {
     favUpdate_footer: "You're receiving this because you saved this place to your favorites.",
   },
   nl: {
+    // ─── User Welcome ───
+    welcome_subject: "Welkom bij CutiePawsPedia! Laten we samen diervriendelijke plekken ontdekken",
+    welcome_preview: "Je account is klaar - ontdek diervriendelijke plekken bij jou in de buurt",
+    welcome_heading: "Welkom aan boord! 🎉",
+    welcome_intro: "Hoi{userName}! Bedankt voor je aanmelding bij CutiePawsPedia - je gids voor diervriendelijke plekken.",
+    welcome_body: "Met je nieuwe account kun je nu:",
+    welcome_feature1: "Je favoriete diervriendelijke plekken opslaan",
+    welcome_feature2: "Reviews schrijven en delen",
+    welcome_feature3: "Updates ontvangen wanneer je opgeslagen plekken veranderen",
+    welcome_feature4: "Nieuwe plekken ontdekken op basis van je voorkeuren",
+    welcome_cta: "Begin met Ontdekken",
+    welcome_footer: "Vragen? Reageer gewoon op deze e-mail - we helpen je graag!",
+
     // ─── Review New ───
     reviewNew_subject: "Goed nieuws! {placeName} heeft een nieuwe review",
     reviewNew_preview: "Iemand gaf jouw bedrijf {rating} sterren",
@@ -184,6 +210,19 @@ const translations: Record<Locale, Record<string, string>> = {
     favUpdate_footer: "Je ontvangt dit omdat je deze plek hebt opgeslagen bij je favorieten.",
   },
   de: {
+    // ─── User Welcome ───
+    welcome_subject: "Willkommen bei CutiePawsPedia! Lassen Sie uns gemeinsam tierfreundliche Orte finden",
+    welcome_preview: "Ihr Konto ist bereit - entdecken Sie tierfreundliche Orte in Ihrer Nähe",
+    welcome_heading: "Willkommen an Bord! 🎉",
+    welcome_intro: "Hallo{userName}! Danke, dass Sie sich bei CutiePawsPedia angemeldet haben - Ihrem Guide für tierfreundliche Orte.",
+    welcome_body: "Mit Ihrem neuen Konto können Sie jetzt:",
+    welcome_feature1: "Ihre Lieblings-tierfreundlichen Orte speichern",
+    welcome_feature2: "Bewertungen schreiben und teilen",
+    welcome_feature3: "Updates erhalten, wenn sich Ihre gespeicherten Orte ändern",
+    welcome_feature4: "Neue Orte basierend auf Ihren Vorlieben entdecken",
+    welcome_cta: "Jetzt Entdecken",
+    welcome_footer: "Fragen? Antworten Sie einfach auf diese E-Mail - wir helfen Ihnen gerne!",
+
     // ─── Review New ───
     reviewNew_subject: "Tolle Neuigkeiten! {placeName} hat eine neue Bewertung",
     reviewNew_preview: "Jemand hat {rating} Sterne für Ihr Unternehmen vergeben",
@@ -329,6 +368,78 @@ const fieldLabels: Record<Locale, Record<string, string>> = {
 // ============================================================================
 // TEMPLATE BUILDERS
 // ============================================================================
+
+/**
+ * Build email for welcome notification (to new user)
+ */
+export function buildWelcomeEmail(params: {
+  locale: string;
+  userName?: string;
+}): EmailBuildResult {
+  const { userName } = params;
+  const locale = getLocale(params.locale);
+  const baseUrl = process.env.APP_BASE_URL || "https://cutiepawspedia.com";
+
+  // Format name for greeting (add space before if name exists)
+  const nameDisplay = userName ? ` ${userName}` : "";
+
+  const subject = t(locale, "welcome_subject");
+  const preview = t(locale, "welcome_preview");
+
+  const features = [
+    t(locale, "welcome_feature1"),
+    t(locale, "welcome_feature2"),
+    t(locale, "welcome_feature3"),
+    t(locale, "welcome_feature4"),
+  ];
+
+  const bodyHtml = `
+    ${buildHeading(t(locale, "welcome_heading"))}
+    ${buildParagraph(t(locale, "welcome_intro", { userName: nameDisplay }))}
+
+    ${buildCard(`
+      <p style="margin: 0 0 ${STYLES.spacing.md} 0; font-weight: ${STYLES.fontWeight.semibold}; color: ${BRAND.colors.text};">
+        ${t(locale, "welcome_body")}
+      </p>
+      ${buildList(features)}
+    `, { accentColor: BRAND.colors.success })}
+
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: ${STYLES.spacing.xl} 0;">
+      <tr>
+        <td align="center">
+          ${buildButton(t(locale, "welcome_cta"), `${baseUrl}/${locale}`)}
+        </td>
+      </tr>
+    </table>
+
+    ${buildParagraph(t(locale, "welcome_footer"), { muted: true, align: "center" })}
+  `;
+
+  const html = buildBaseLayout({
+    subject,
+    previewText: preview,
+    bodyHtml,
+    locale,
+  });
+
+  const text = buildPlainTextLayout({
+    bodyText: `
+${t(locale, "welcome_heading")}
+
+${t(locale, "welcome_intro", { userName: nameDisplay }).replace(/<[^>]*>/g, "")}
+
+${t(locale, "welcome_body")}
+${features.map((f) => `• ${f}`).join("\n")}
+
+${t(locale, "welcome_cta")}: ${baseUrl}/${locale}
+
+${t(locale, "welcome_footer")}
+    `.trim(),
+    locale,
+  });
+
+  return { subject, html, text };
+}
 
 /**
  * Build email for new review notification (to business owner)

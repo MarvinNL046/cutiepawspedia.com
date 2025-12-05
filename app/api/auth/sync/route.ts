@@ -31,6 +31,7 @@ export async function POST() {
       stackauthId: user.id,
       email: user.primaryEmail || "",
       name: user.displayName,
+      emailVerified: user.primaryEmailVerified,
     });
 
     return NextResponse.json({

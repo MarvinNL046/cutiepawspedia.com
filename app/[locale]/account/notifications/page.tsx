@@ -33,6 +33,7 @@ export default async function NotificationsPage({ params }: NotificationsPagePro
       stackauthId: stackUser.id,
       email: stackUser.primaryEmail || "",
       name: stackUser.displayName,
+      emailVerified: stackUser.primaryEmailVerified,
     });
   }
 

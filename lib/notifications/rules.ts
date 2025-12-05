@@ -28,6 +28,9 @@ export interface ThrottleConfig {
 }
 
 export const THROTTLE_RULES: Record<NotificationType, ThrottleConfig> = {
+  // Welcome email - once per user (no throttling needed)
+  USER_WELCOME: { maxPerHour: 100, minIntervalMinutes: 0 },
+
   // Business notifications - allow more frequent
   REVIEW_NEW: { maxPerHour: 10, minIntervalMinutes: 5 },
   LEAD_NEW: { maxPerHour: 15, minIntervalMinutes: 2, maxPerDay: 50 },

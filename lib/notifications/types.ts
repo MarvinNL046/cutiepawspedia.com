@@ -21,6 +21,7 @@ export const DEFAULT_LOCALE: Locale = "en";
 // ============================================================================
 
 export type NotificationType =
+  | "USER_WELCOME" // Welcome email for new user registration
   | "REVIEW_NEW" // New review on a business's place
   | "REVIEW_REPLY" // Business replied to user's review
   | "LEAD_NEW" // New lead for a business
@@ -36,6 +37,7 @@ export const NOTIFICATION_TYPE_TO_SETTING: Record<
   NotificationType,
   "reviews" | "leads" | "business" | "digest" | "favorites" | "general"
 > = {
+  USER_WELCOME: "general", // Welcome emails always sent
   REVIEW_NEW: "reviews",
   REVIEW_REPLY: "reviews",
   LEAD_NEW: "leads",
@@ -54,6 +56,17 @@ export const NOTIFICATION_TYPE_TO_SETTING: Record<
 export interface BaseNotificationPayload {
   type: NotificationType;
   locale?: string;
+}
+
+/**
+ * Welcome notification payload
+ * Sent to new users after registration
+ */
+export interface UserWelcomePayload extends BaseNotificationPayload {
+  type: "USER_WELCOME";
+  userId: number;
+  userEmail: string;
+  userName?: string;
 }
 
 /**
@@ -254,6 +267,7 @@ export interface DigestAdminPayload extends BaseNotificationPayload {
 
 // Union type of all payloads
 export type AnyNotificationPayload =
+  | UserWelcomePayload
   | ReviewNewPayload
   | ReviewReplyPayload
   | LeadNewPayload

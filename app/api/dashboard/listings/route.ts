@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { stackServerApp } from "@/lib/auth/stack";
 import { getUserByStackAuthId, canUserEditListing, updateListing } from "@/db/queries";
+import { db } from "@/db";
+import { places, cities, countries, placeCategories, categories } from "@/db/schema/directory";
+import { eq } from "drizzle-orm";
 
 // Zod schema for listing update validation
 const updateListingSchema = z.object({
@@ -108,6 +112,48 @@ export async function PUT(request: Request) {
         { error: "Failed to update listing" },
         { status: 500 }
       );
+    }
+
+    // Revalidate the public place page
+    try {
+      if (db) {
+        // Get place details for path construction
+        const placeDetails = await db
+          .select({
+            slug: places.slug,
+            citySlug: cities.slug,
+            countrySlug: countries.slug,
+          })
+          .from(places)
+          .leftJoin(cities, eq(places.cityId, cities.id))
+          .leftJoin(countries, eq(cities.countryId, countries.id))
+          .where(eq(places.id, listingId))
+          .limit(1);
+
+        if (placeDetails[0]) {
+          const { slug, citySlug, countrySlug } = placeDetails[0];
+
+          // Get first category for this place
+          const placeCategory = await db
+            .select({ categorySlug: categories.slug })
+            .from(placeCategories)
+            .leftJoin(categories, eq(placeCategories.categoryId, categories.id))
+            .where(eq(placeCategories.placeId, listingId))
+            .limit(1);
+
+          const categorySlug = placeCategory[0]?.categorySlug || "business";
+
+          // Revalidate all locale versions of this page
+          const locales = ["en", "nl", "de"];
+          for (const locale of locales) {
+            const path = `/${locale}/${countrySlug}/${citySlug}/${categorySlug}/${slug}`;
+            revalidatePath(path);
+          }
+        }
+      }
+    } catch (revalidateError) {
+      // Log but don't fail the request if revalidation fails
+      console.error("Revalidation error:", revalidateError);
     }
 
     return NextResponse.json({

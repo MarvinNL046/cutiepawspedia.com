@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { stackServerApp } from "@/lib/auth/stack";
 import { upsertUserFromStackAuth } from "@/db/queries/users";
+import { checkAndAwardBadges } from "@/db/queries/badges";
 
 /**
  * POST /api/auth/sync
@@ -33,6 +34,13 @@ export async function POST() {
       name: user.displayName,
       emailVerified: user.primaryEmailVerified,
     });
+
+    // Check and award any badges the user qualifies for
+    if (dbUser) {
+      checkAndAwardBadges(dbUser.id).catch((error) => {
+        console.error("Failed to check/award badges during sync:", error);
+      });
+    }
 
     return NextResponse.json({
       success: true,

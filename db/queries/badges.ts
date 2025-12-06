@@ -267,6 +267,12 @@ export async function checkAndAwardBadges(userId: number): Promise<string[]> {
 
   if (!user) return [];
 
+  // Verified User badge: email is verified
+  if (user.emailVerified) {
+    const badge = await awardBadge(userId, "verified_user", "system", "Email verified");
+    if (badge) awarded.push("verified_user");
+  }
+
   // Count published reviews
   const publishedReviews = user.reviews?.filter((r) => r.status === "published") || [];
   const reviewCount = publishedReviews.length;
@@ -280,6 +286,28 @@ export async function checkAndAwardBadges(userId: number): Promise<string[]> {
   // Helpful Reviewer badge would require tracking "helpful" votes (future feature)
 
   // More badge checks can be added here based on business logic
+
+  return awarded;
+}
+
+/**
+ * Award verified_user badge to all users who have verified emails but no badge
+ * Run this once to retroactively award badges to existing users
+ */
+export async function awardVerifiedBadgesToExistingUsers(): Promise<number> {
+  if (!db) return 0;
+
+  // Get all users with verified email who don't have the badge yet
+  const verifiedUsers = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.emailVerified, true));
+
+  let awarded = 0;
+  for (const user of verifiedUsers) {
+    const badge = await awardBadge(user.id, "verified_user", "system", "Email verified (retroactive)");
+    if (badge) awarded++;
+  }
 
   return awarded;
 }

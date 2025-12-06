@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { headers } from "next/headers";
+import { db } from "@/db";
+import { businesses } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { addCredits } from "@/db/queries/credits";
 import { logAuditEvent } from "@/db/queries/auditLogs";
+import { type PlanKey, type PlanStatus } from "@/lib/plans/config";
 
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -13,7 +17,7 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 /**
  * POST /api/stripe/webhook
- * Handles Stripe webhook events
+ * Handles Stripe webhook events for both credits (legacy) and subscriptions
  */
 export async function POST(request: NextRequest) {
   try {
@@ -41,22 +45,56 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log(`Processing Stripe event: ${event.type}`);
+
     // Handle the event
     switch (event.type) {
+      // ========== CHECKOUT EVENTS ==========
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         await handleCheckoutCompleted(session);
         break;
       }
 
+      // ========== SUBSCRIPTION EVENTS ==========
+      case "customer.subscription.created": {
+        const subscription = event.data.object as Stripe.Subscription;
+        await handleSubscriptionCreated(subscription);
+        break;
+      }
+
+      case "customer.subscription.updated": {
+        const subscription = event.data.object as Stripe.Subscription;
+        await handleSubscriptionUpdated(subscription);
+        break;
+      }
+
+      case "customer.subscription.deleted": {
+        const subscription = event.data.object as Stripe.Subscription;
+        await handleSubscriptionDeleted(subscription);
+        break;
+      }
+
+      // ========== INVOICE EVENTS ==========
+      case "invoice.paid": {
+        const invoice = event.data.object as Stripe.Invoice;
+        await handleInvoicePaid(invoice);
+        break;
+      }
+
+      case "invoice.payment_failed": {
+        const invoice = event.data.object as Stripe.Invoice;
+        await handleInvoicePaymentFailed(invoice);
+        break;
+      }
+
+      // ========== LEGACY PAYMENT EVENTS (for credits) ==========
       case "payment_intent.succeeded": {
-        // Log successful payment (checkout.session.completed handles the actual credit addition)
         console.log("Payment succeeded:", event.data.object);
         break;
       }
 
       case "payment_intent.payment_failed": {
-        // Log failed payment
         console.error("Payment failed:", event.data.object);
         break;
       }
@@ -77,6 +115,7 @@ export async function POST(request: NextRequest) {
 
 /**
  * Handle successful checkout session
+ * Supports both subscription and one-time credit purchases
  */
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const metadata = session.metadata;
@@ -86,48 +125,342 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     return;
   }
 
-  const { type, businessId, amountCents } = metadata;
+  const { type, businessId } = metadata;
 
-  // Only handle credit purchases
-  if (type !== "credit_purchase") {
-    console.log(`Ignoring checkout session of type: ${type}`);
+  // Handle subscription checkout
+  if (type === "subscription") {
+    console.log(`Subscription checkout completed for business ${businessId}`);
+    // Subscription is handled by customer.subscription.created event
     return;
   }
 
-  if (!businessId || !amountCents) {
-    console.error("Missing required metadata:", metadata);
+  // Handle credit purchase (legacy)
+  if (type === "credit_purchase") {
+    const { amountCents } = metadata;
+    if (!businessId || !amountCents) {
+      console.error("Missing required metadata for credit purchase:", metadata);
+      return;
+    }
+
+    try {
+      const transaction = await addCredits({
+        businessId: parseInt(businessId, 10),
+        amountCents: parseInt(amountCents, 10),
+        type: "purchase",
+        description: `Credit purchase via Stripe`,
+        stripePaymentIntentId: session.payment_intent as string,
+      });
+
+      logAuditEvent({
+        actorBusinessId: parseInt(businessId, 10),
+        actorRole: "system",
+        eventType: "STRIPE_TOPUP_COMPLETED",
+        targetType: "payment",
+        targetId: transaction.id,
+        metadata: {
+          amountCents: parseInt(amountCents, 10),
+          stripePaymentIntentId: session.payment_intent,
+          stripeSessionId: session.id,
+        },
+      });
+
+      console.log(`Added ${amountCents} cents to business ${businessId}`);
+    } catch (error) {
+      console.error("Failed to add credits:", error);
+      throw error;
+    }
+  }
+}
+
+/**
+ * Handle subscription created
+ */
+async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
+  const businessId = subscription.metadata?.businessId;
+  const planKey = subscription.metadata?.planKey as PlanKey;
+
+  if (!businessId) {
+    console.error("No businessId in subscription metadata");
     return;
   }
 
   try {
-    // Add credits to the business account
-    const transaction = await addCredits({
-      businessId: parseInt(businessId, 10),
-      amountCents: parseInt(amountCents, 10),
-      type: "purchase",
-      description: `Credit purchase via Stripe`,
-      stripePaymentIntentId: session.payment_intent as string,
-    });
+    // Determine plan status based on subscription status
+    let planStatus: PlanStatus = "ACTIVE";
+    if (subscription.status === "trialing") {
+      planStatus = "TRIAL";
+    } else if (subscription.status === "past_due") {
+      planStatus = "PAST_DUE";
+    }
 
-    // Log STRIPE_TOPUP_COMPLETED audit event
+    // Update business with subscription details
+    await db
+      .update(businesses)
+      .set({
+        planKey: planKey || "STARTER",
+        planStatus,
+        stripeSubscriptionId: subscription.id,
+        planValidUntil: new Date(subscription.current_period_end * 1000),
+        trialEndsAt: subscription.trial_end
+          ? new Date(subscription.trial_end * 1000)
+          : null,
+      })
+      .where(eq(businesses.id, parseInt(businessId, 10)));
+
+    // Log audit event
     logAuditEvent({
       actorBusinessId: parseInt(businessId, 10),
       actorRole: "system",
-      eventType: "STRIPE_TOPUP_COMPLETED",
-      targetType: "payment",
-      targetId: transaction.id,
+      eventType: "SUBSCRIPTION_CREATED",
+      targetType: "business",
+      targetId: parseInt(businessId, 10),
       metadata: {
-        amountCents: parseInt(amountCents, 10),
-        stripePaymentIntentId: session.payment_intent,
-        stripeSessionId: session.id,
+        planKey,
+        subscriptionId: subscription.id,
+        status: subscription.status,
       },
     });
 
-    console.log(
-      `Successfully added ${amountCents} cents to business ${businessId}. Transaction ID: ${transaction.id}`
-    );
+    console.log(`Subscription created for business ${businessId}: ${planKey}`);
   } catch (error) {
-    console.error("Failed to add credits:", error);
-    throw error; // Re-throw to trigger webhook retry
+    console.error("Failed to handle subscription created:", error);
+    throw error;
   }
+}
+
+/**
+ * Handle subscription updated (plan changes, renewals, etc.)
+ */
+async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
+  const businessId = subscription.metadata?.businessId;
+
+  if (!businessId) {
+    // Try to find business by subscription ID
+    const business = await db.query.businesses.findFirst({
+      where: eq(businesses.stripeSubscriptionId, subscription.id),
+    });
+    if (!business) {
+      console.error("Could not find business for subscription:", subscription.id);
+      return;
+    }
+    await updateBusinessSubscription(business.id, subscription);
+    return;
+  }
+
+  await updateBusinessSubscription(parseInt(businessId, 10), subscription);
+}
+
+/**
+ * Update business subscription data
+ */
+async function updateBusinessSubscription(
+  businessId: number,
+  subscription: Stripe.Subscription
+) {
+  try {
+    // Get plan key from subscription item price metadata or default
+    let planKey: PlanKey = "FREE";
+    const item = subscription.items.data[0];
+    if (item?.price?.metadata?.planKey) {
+      planKey = item.price.metadata.planKey as PlanKey;
+    } else if (subscription.metadata?.planKey) {
+      planKey = subscription.metadata.planKey as PlanKey;
+    }
+
+    // Determine plan status
+    let planStatus: PlanStatus = "ACTIVE";
+    switch (subscription.status) {
+      case "active":
+        planStatus = "ACTIVE";
+        break;
+      case "trialing":
+        planStatus = "TRIAL";
+        break;
+      case "past_due":
+        planStatus = "PAST_DUE";
+        break;
+      case "canceled":
+      case "unpaid":
+        planStatus = "CANCELLED";
+        break;
+      default:
+        planStatus = "INACTIVE";
+    }
+
+    // If canceled but not yet ended, keep features until period end
+    if (subscription.cancel_at_period_end && subscription.status === "active") {
+      // Business can use features until period end, then downgrade
+      console.log(`Subscription ${subscription.id} will cancel at period end`);
+    }
+
+    // Update business
+    await db
+      .update(businesses)
+      .set({
+        planKey: subscription.status === "canceled" ? "FREE" : planKey,
+        planStatus,
+        planValidUntil: new Date(subscription.current_period_end * 1000),
+        trialEndsAt: subscription.trial_end
+          ? new Date(subscription.trial_end * 1000)
+          : null,
+      })
+      .where(eq(businesses.id, businessId));
+
+    // Log audit event
+    logAuditEvent({
+      actorBusinessId: businessId,
+      actorRole: "system",
+      eventType: "SUBSCRIPTION_UPDATED",
+      targetType: "business",
+      targetId: businessId,
+      metadata: {
+        planKey,
+        planStatus,
+        subscriptionStatus: subscription.status,
+        cancelAtPeriodEnd: subscription.cancel_at_period_end,
+      },
+    });
+
+    console.log(`Subscription updated for business ${businessId}: ${planKey} (${planStatus})`);
+  } catch (error) {
+    console.error("Failed to update business subscription:", error);
+    throw error;
+  }
+}
+
+/**
+ * Handle subscription deleted/canceled
+ */
+async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
+  const businessId = subscription.metadata?.businessId;
+
+  // Try to find business by subscription ID if not in metadata
+  let targetBusinessId: number | null = businessId ? parseInt(businessId, 10) : null;
+
+  if (!targetBusinessId) {
+    const business = await db.query.businesses.findFirst({
+      where: eq(businesses.stripeSubscriptionId, subscription.id),
+    });
+    if (business) {
+      targetBusinessId = business.id;
+    }
+  }
+
+  if (!targetBusinessId) {
+    console.error("Could not find business for deleted subscription:", subscription.id);
+    return;
+  }
+
+  try {
+    // Downgrade to free plan
+    await db
+      .update(businesses)
+      .set({
+        planKey: "FREE",
+        planStatus: "CANCELLED",
+        stripeSubscriptionId: null,
+        planValidUntil: null,
+        trialEndsAt: null,
+      })
+      .where(eq(businesses.id, targetBusinessId));
+
+    // Log audit event
+    logAuditEvent({
+      actorBusinessId: targetBusinessId,
+      actorRole: "system",
+      eventType: "SUBSCRIPTION_CANCELLED",
+      targetType: "business",
+      targetId: targetBusinessId,
+      metadata: {
+        previousSubscriptionId: subscription.id,
+        cancelReason: subscription.cancellation_details?.reason || "unknown",
+      },
+    });
+
+    console.log(`Subscription cancelled for business ${targetBusinessId}`);
+  } catch (error) {
+    console.error("Failed to handle subscription deleted:", error);
+    throw error;
+  }
+}
+
+/**
+ * Handle successful invoice payment (subscription renewal)
+ */
+async function handleInvoicePaid(invoice: Stripe.Invoice) {
+  if (!invoice.subscription) return;
+
+  const subscriptionId = typeof invoice.subscription === "string"
+    ? invoice.subscription
+    : invoice.subscription.id;
+
+  // Find business by subscription ID
+  const business = await db.query.businesses.findFirst({
+    where: eq(businesses.stripeSubscriptionId, subscriptionId),
+  });
+
+  if (!business) {
+    console.log("Invoice paid for unknown subscription:", subscriptionId);
+    return;
+  }
+
+  // Log successful payment
+  logAuditEvent({
+    actorBusinessId: business.id,
+    actorRole: "system",
+    eventType: "SUBSCRIPTION_PAYMENT_SUCCESS",
+    targetType: "business",
+    targetId: business.id,
+    metadata: {
+      invoiceId: invoice.id,
+      amountPaid: invoice.amount_paid,
+      currency: invoice.currency,
+    },
+  });
+
+  console.log(`Invoice paid for business ${business.id}: ${invoice.amount_paid} ${invoice.currency}`);
+}
+
+/**
+ * Handle failed invoice payment
+ */
+async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
+  if (!invoice.subscription) return;
+
+  const subscriptionId = typeof invoice.subscription === "string"
+    ? invoice.subscription
+    : invoice.subscription.id;
+
+  // Find business by subscription ID
+  const business = await db.query.businesses.findFirst({
+    where: eq(businesses.stripeSubscriptionId, subscriptionId),
+  });
+
+  if (!business) {
+    console.log("Invoice failed for unknown subscription:", subscriptionId);
+    return;
+  }
+
+  // Update plan status to PAST_DUE
+  await db
+    .update(businesses)
+    .set({ planStatus: "PAST_DUE" })
+    .where(eq(businesses.id, business.id));
+
+  // Log failed payment
+  logAuditEvent({
+    actorBusinessId: business.id,
+    actorRole: "system",
+    eventType: "SUBSCRIPTION_PAYMENT_FAILED",
+    targetType: "business",
+    targetId: business.id,
+    metadata: {
+      invoiceId: invoice.id,
+      amountDue: invoice.amount_due,
+      currency: invoice.currency,
+      attemptCount: invoice.attempt_count,
+    },
+  });
+
+  console.error(`Invoice payment failed for business ${business.id}`);
 }

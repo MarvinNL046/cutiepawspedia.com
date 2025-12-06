@@ -15,12 +15,14 @@ import {
   getReviewsForPlace,
   hasUserReviewedPlace,
   updatePlaceReviewStats,
+  getUserReviewCount,
   type ReviewFilterOptions,
 } from "@/db/queries/reviews";
 import { getPlaceById } from "@/db/queries";
 import { getClientIP, reviewsRateLimiter, rateLimitExceededResponse } from "@/lib/rateLimit";
 import { hashIP } from "@/lib/utils/hash";
 import { sendNotification } from "@/lib/notifications";
+import { awardKarma, KARMA_POINTS, getUserPrivileges } from "@/db/queries/karma";
 
 // Review submission schema
 const createReviewSchema = z.object({
@@ -153,6 +155,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check user's trust level privileges for auto-approval
+    const privileges = await getUserPrivileges(user.id);
+    const reviewStatus = privileges.reviewsAutoApproved ? "published" : "pending";
+
     // Create the review
     const review = await createReview({
       placeId,
@@ -164,12 +170,37 @@ export async function POST(request: NextRequest) {
       locale,
       visitDate: visitDate ? new Date(visitDate) : null,
       ipHash: hashIP(clientIP),
+      status: reviewStatus,
     });
 
     // Update place aggregation (async, don't wait)
     updatePlaceReviewStats(placeId).catch((err) => {
       console.error("Failed to update place review stats:", err);
     });
+
+    // Award karma points for review creation
+    (async () => {
+      try {
+        // Award base karma for creating a review
+        await awardKarma(user.id, "REVIEW_CREATED", undefined, {
+          description: `Review for ${place.name}`,
+          reviewId: review.id,
+          placeId: place.id,
+        });
+
+        // Check if this is user's first review for bonus karma
+        const reviewCount = await getUserReviewCount(user.id);
+        if (reviewCount === 1) {
+          await awardKarma(user.id, "FIRST_REVIEW_BONUS", undefined, {
+            description: "First review bonus!",
+            reviewId: review.id,
+            placeId: place.id,
+          });
+        }
+      } catch (err) {
+        console.error("Failed to award karma for review:", err);
+      }
+    })();
 
     // Send notification to business owner (async, don't wait)
     if (place.email && place.businessId) {
@@ -194,11 +225,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: true,
-        message: "Your review has been submitted and is pending moderation",
+        message: reviewStatus === "published"
+          ? "Your review has been published! Thank you for your trusted contribution."
+          : "Your review has been submitted and is pending moderation",
         review: {
           id: review.id,
           status: review.status,
         },
+        autoApproved: reviewStatus === "published",
       },
       { status: 201 }
     );

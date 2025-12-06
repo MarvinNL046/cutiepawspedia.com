@@ -584,29 +584,11 @@ ${t(locale, "reviewReply_cta")}: ${reviewUrl || baseUrl}
 }
 
 /**
- * Helper to blur/mask contact details for unpaid leads
- */
-function blurText(text: string, showChars: number = 2): string {
-  if (text.length <= showChars) return "••••••";
-  return text.substring(0, showChars) + "••••••";
-}
-
-function blurEmail(email: string): string {
-  const [local, domain] = email.split("@");
-  if (!domain) return "••••••@••••••";
-  return blurText(local, 2) + "@" + blurText(domain.split(".")[0], 2) + ".•••";
-}
-
-function blurPhone(phone: string): string {
-  // Show first 3 digits, blur rest
-  const digits = phone.replace(/\D/g, "");
-  if (digits.length <= 3) return "••• ••• ••••";
-  return digits.substring(0, 3) + " ••• ••••";
-}
-
-/**
  * Build email for new lead notification (to business owner)
- * When isPaid=false, contact details are blurred to encourage credit purchase
+ *
+ * NOTE: Pay-per-lead paywall has been disabled.
+ * All leads now show full contact details without payment.
+ * The isPaid parameter is kept for backwards compatibility but defaults to true.
  */
 export function buildLeadNewEmail(params: {
   locale: string;
@@ -616,94 +598,55 @@ export function buildLeadNewEmail(params: {
   leadPhone?: string;
   leadMessage?: string;
   dashboardUrl?: string;
-  isPaid?: boolean; // If false, contact details are blurred
-  creditsUrl?: string; // URL to buy credits
+  isPaid?: boolean; // Deprecated - kept for backwards compatibility, always treated as true
 }): EmailBuildResult {
-  const { placeName, leadName, leadEmail, leadPhone, leadMessage, dashboardUrl, isPaid = true, creditsUrl } = params;
+  const { placeName, leadName, leadEmail, leadPhone, leadMessage, dashboardUrl } = params;
   const locale = getLocale(params.locale);
   const baseUrl = process.env.APP_BASE_URL || "https://cutiepawspedia.com";
 
-  // Blur contact details if not paid
-  const displayName = isPaid ? leadName : blurText(leadName.split(" ")[0], 2) + " •••";
-  const displayEmail = isPaid ? leadEmail : blurEmail(leadEmail);
-  const displayPhone = isPaid && leadPhone ? leadPhone : (leadPhone ? blurPhone(leadPhone) : undefined);
-  const displayMessage = isPaid ? leadMessage : (leadMessage ? leadMessage.substring(0, 20) + "..." : undefined);
-
   const subject = t(locale, "leadNew_subject", { placeName });
-  const preview = t(locale, "leadNew_preview", { leadName: displayName });
-
-  // Warning banner for unpaid leads
-  const unpaidBanner = !isPaid ? `
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: ${STYLES.spacing.lg};">
-      <tr>
-        <td style="background-color: #FEF3C7; border: 1px solid #F59E0B; border-radius: 8px; padding: ${STYLES.spacing.md};">
-          <table width="100%" cellpadding="0" cellspacing="0" border="0">
-            <tr>
-              <td style="color: #92400E; font-size: 14px;">
-                <strong>🔒 Contact details hidden</strong><br/>
-                <span style="font-size: 13px;">You need credits to view this lead's contact information. Top up your credits to unlock.</span>
-              </td>
-              <td width="120" align="right">
-                <a href="${creditsUrl || `${baseUrl}/dashboard`}" style="display: inline-block; background-color: #F59E0B; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px;">Buy Credits</a>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  ` : "";
+  const preview = t(locale, "leadNew_preview", { leadName });
 
   const bodyHtml = `
     ${buildHeading(t(locale, "leadNew_heading"))}
     ${buildParagraph(t(locale, "leadNew_intro", { placeName }))}
 
-    ${unpaidBanner}
-
     ${buildCard(`
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td style="padding-bottom: ${STYLES.spacing.sm};">
-            <strong>${t(locale, "leadNew_from")}:</strong> ${displayName}
+            <strong>${t(locale, "leadNew_from")}:</strong> ${leadName}
           </td>
         </tr>
         <tr>
           <td style="padding-bottom: ${STYLES.spacing.sm};">
             <strong>${t(locale, "leadNew_email")}:</strong>
-            ${isPaid
-              ? `<a href="mailto:${leadEmail}" style="color: ${BRAND.colors.primary}; text-decoration: none;">${displayEmail}</a>`
-              : `<span style="color: #9CA3AF; font-family: monospace;">${displayEmail}</span>`
-            }
+            <a href="mailto:${leadEmail}" style="color: ${BRAND.colors.primary}; text-decoration: none;">${leadEmail}</a>
           </td>
         </tr>
-        ${displayPhone ? `
+        ${leadPhone ? `
         <tr>
           <td style="padding-bottom: ${STYLES.spacing.sm};">
             <strong>${t(locale, "leadNew_phone")}:</strong>
-            ${isPaid
-              ? `<a href="tel:${leadPhone}" style="color: ${BRAND.colors.primary}; text-decoration: none;">${displayPhone}</a>`
-              : `<span style="color: #9CA3AF; font-family: monospace;">${displayPhone}</span>`
-            }
+            <a href="tel:${leadPhone}" style="color: ${BRAND.colors.primary}; text-decoration: none;">${leadPhone}</a>
           </td>
         </tr>
         ` : ""}
-        ${displayMessage ? `
+        ${leadMessage ? `
         <tr>
           <td>
             <strong>${t(locale, "leadNew_message")}:</strong>
-            <p style="margin: ${STYLES.spacing.sm} 0 0 0; color: ${isPaid ? BRAND.colors.text : "#9CA3AF"};">${displayMessage}</p>
+            <p style="margin: ${STYLES.spacing.sm} 0 0 0; color: ${BRAND.colors.text};">${leadMessage}</p>
           </td>
         </tr>
         ` : ""}
       </table>
-    `, { accentColor: isPaid ? BRAND.colors.warning : "#9CA3AF" })}
+    `, { accentColor: BRAND.colors.warning })}
 
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: ${STYLES.spacing.xl} 0;">
       <tr>
         <td align="center">
-          ${isPaid
-            ? buildButton(t(locale, "leadNew_cta"), dashboardUrl || `${baseUrl}/dashboard`)
-            : buildButton("🔓 Unlock This Lead", creditsUrl || `${baseUrl}/dashboard`)
-          }
+          ${buildButton(t(locale, "leadNew_cta"), dashboardUrl || `${baseUrl}/dashboard`)}
         </td>
       </tr>
     </table>
@@ -724,14 +667,12 @@ ${t(locale, "leadNew_heading")}
 
 ${t(locale, "leadNew_intro", { placeName }).replace(/<[^>]*>/g, "")}
 
-${!isPaid ? "⚠️ CONTACT DETAILS HIDDEN - Buy credits to unlock: " + (creditsUrl || `${baseUrl}/dashboard`) + "\n" : ""}
+${t(locale, "leadNew_from")}: ${leadName}
+${t(locale, "leadNew_email")}: ${leadEmail}
+${leadPhone ? `${t(locale, "leadNew_phone")}: ${leadPhone}` : ""}
+${leadMessage ? `${t(locale, "leadNew_message")}: ${leadMessage}` : ""}
 
-${t(locale, "leadNew_from")}: ${displayName}
-${t(locale, "leadNew_email")}: ${displayEmail}
-${displayPhone ? `${t(locale, "leadNew_phone")}: ${displayPhone}` : ""}
-${displayMessage ? `${t(locale, "leadNew_message")}: ${displayMessage}` : ""}
-
-${isPaid ? t(locale, "leadNew_cta") : "Unlock This Lead"}: ${isPaid ? (dashboardUrl || `${baseUrl}/dashboard`) : (creditsUrl || `${baseUrl}/dashboard`)}
+${t(locale, "leadNew_cta")}: ${dashboardUrl || `${baseUrl}/dashboard`}
 
 ${t(locale, "leadNew_footer")}
     `.trim(),

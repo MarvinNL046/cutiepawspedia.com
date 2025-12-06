@@ -39,10 +39,13 @@ import { PlaceViewTracker } from "@/components/analytics";
 import { Breadcrumbs } from "@/components/layout";
 import { FavoriteButton } from "@/components/favorites/FavoriteButton";
 import { isFavorite } from "@/db/queries/favorites";
-import { MapPin, Phone, Globe, Mail, Star, CheckCircle, MessageSquare } from "lucide-react";
+import { MapPin, Phone, Globe, Mail, Star, CheckCircle, MessageSquare, Lock, Shield, Crown } from "lucide-react";
 import { getCityName, getCountryName } from "@/lib/utils/place-helpers";
-import { AboutSection, ServicesSection, HighlightsSection, BusinessSnapshot } from "@/components/place";
+import { AboutSection, ServicesSection, HighlightsSection, BusinessSnapshot, BusinessPhotoGallery } from "@/components/place";
+import { getActivePhotosByPlaceId } from "@/db/queries/businessPhotos";
+import { getBusinessPhotoUrl } from "@/lib/storage/businessPhotos";
 import { BetweenContentAd, SidebarAd } from "@/components/ads";
+import { getPlaceFeatures, getUpgradeCTA } from "@/lib/plans/getPlaceFeatures";
 
 interface PlacePageProps {
   params: Promise<{ locale: string; countrySlug: string; citySlug: string; categorySlug: string; placeSlug: string }>;
@@ -73,6 +76,10 @@ export default async function PlacePage({ params }: PlacePageProps) {
   const cityName = getCityName(place, citySlug);
   const countryName = getCountryName(place, countrySlug);
   const primaryCategory = place.placeCategories?.[0]?.category;
+
+  // Get plan-based feature gating
+  const placeFeatures = getPlaceFeatures(place);
+  const upgradeCTA = getUpgradeCTA(place, locale);
 
   // Check if current user has a pending claim for this place and if they favorited it
   let hasPendingClaim = false;
@@ -158,12 +165,26 @@ export default async function PlacePage({ params }: PlacePageProps) {
     placeName: place.name,
   });
 
-  // Fetch published reviews for this place
-  const publishedReviews = await getReviewsForPlace(place.id, {
-    status: "published",
-    limit: 10,
-    orderBy: "newest",
-  });
+  // Fetch published reviews and business photos for this place
+  const [publishedReviews, businessPhotos] = await Promise.all([
+    getReviewsForPlace(place.id, {
+      status: "published",
+      limit: 10,
+      orderBy: "newest",
+    }),
+    getActivePhotosByPlaceId(place.id),
+  ]);
+
+  // Transform photos for the gallery component
+  const photosWithUrls = businessPhotos.map((photo) => ({
+    id: photo.id,
+    url: getBusinessPhotoUrl(photo.storageKey),
+    isPrimary: photo.isPrimary,
+    altText: photo.altText,
+    caption: photo.caption,
+    width: photo.width,
+    height: photo.height,
+  }));
 
   // Generate JSON-LD structured data
   const BASE_URL = process.env.APP_BASE_URL || "https://cutiepawspedia.com";
@@ -213,9 +234,21 @@ export default async function PlacePage({ params }: PlacePageProps) {
         ...(faqs.length >= 2 ? [buildFaqJsonLd(faqs)] : []),
       ].filter(Boolean)} />
 
-      {/* Hero Header */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-cpPink/10 via-white to-cpAqua/10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,127,161,0.15),transparent_50%)]" />
+      {/* Hero Header - Enhanced styling for PRO/ELITE */}
+      <section className={`relative overflow-hidden ${
+        placeFeatures.hasEnhancedStyling
+          ? "bg-gradient-to-br from-purple-100 via-white to-purple-50 border-b-4 border-purple-400"
+          : placeFeatures.hasFeaturedStyling
+            ? "bg-gradient-to-br from-amber-50 via-white to-cpYellow/10 border-b-4 border-cpYellow"
+            : "bg-gradient-to-br from-cpPink/10 via-white to-cpAqua/10"
+      }`}>
+        <div className={`absolute inset-0 ${
+          placeFeatures.hasEnhancedStyling
+            ? "bg-[radial-gradient(circle_at_80%_20%,rgba(147,51,234,0.15),transparent_50%)]"
+            : placeFeatures.hasFeaturedStyling
+              ? "bg-[radial-gradient(circle_at_80%_20%,rgba(251,191,36,0.2),transparent_50%)]"
+              : "bg-[radial-gradient(circle_at_80%_20%,rgba(255,127,161,0.15),transparent_50%)]"
+        }`} />
         <div className="relative container mx-auto max-w-6xl px-4 py-8 md:py-12">
           {/* Breadcrumbs */}
           <Breadcrumbs
@@ -235,13 +268,35 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 <h1 className="text-3xl md:text-4xl font-bold text-cpDark tracking-tight">
                   {place.name}
                 </h1>
-                {place.isVerified && (
+                {/* Plan badge - show based on subscription */}
+                {placeFeatures.planBadge && (
+                  <Badge className={`gap-1 ${
+                    placeFeatures.planBadge.color === "purple"
+                      ? "bg-purple-100 text-purple-700 border-purple-300"
+                      : placeFeatures.planBadge.color === "amber"
+                        ? "bg-amber-100 text-amber-700 border-amber-300"
+                        : "bg-blue-100 text-blue-700 border-blue-300"
+                  }`}>
+                    {placeFeatures.planBadge.color === "purple" ? (
+                      <Crown className="h-3 w-3" />
+                    ) : (
+                      <Star className="h-3 w-3" />
+                    )}
+                    {placeFeatures.planBadge.text}
+                  </Badge>
+                )}
+                {/* Verified business badge - ELITE exclusive */}
+                {placeFeatures.hasVerifiedBadge && (
+                  <Badge className="bg-purple-100 text-purple-700 border-purple-300 gap-1">
+                    <Shield className="h-3 w-3" />
+                    {locale === "nl" ? "Geverifieerd" : "Verified"}
+                  </Badge>
+                )}
+                {/* Legacy verified badge (admin-set) */}
+                {place.isVerified && !placeFeatures.hasVerifiedBadge && (
                   <Badge className="bg-cpAqua/20 text-cpAqua border-cpAqua gap-1">
                     <CheckCircle className="h-3 w-3" />Verified
                   </Badge>
-                )}
-                {place.isPremium && (
-                  <Badge className="bg-cpYellow/20 text-cpYellow border-cpYellow">Premium</Badge>
                 )}
               </div>
               <div className="flex flex-wrap gap-2 mb-4">
@@ -273,14 +328,26 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 initialIsFavorite={isPlaceFavorited}
                 variant="default"
               />
-              {place.phone && (
+              {/* Call button - only show if plan allows phone display */}
+              {place.phone && placeFeatures.canShowPhone ? (
                 <Button asChild className="bg-cpPink hover:bg-cpPink/90 gap-2">
-                  <a href={`tel:${place.phone}`}><Phone className="h-4 w-4" />Call Now</a>
+                  <a href={`tel:${place.phone}`}><Phone className="h-4 w-4" />{locale === "nl" ? "Bel Nu" : "Call Now"}</a>
                 </Button>
-              )}
+              ) : place.phone && !placeFeatures.canShowPhone ? (
+                <Button variant="outline" className="gap-2 text-slate-400" disabled>
+                  <Lock className="h-4 w-4" />{locale === "nl" ? "Telefoon verborgen" : "Phone hidden"}
+                </Button>
+              ) : null}
               <Button asChild variant="outline" className="gap-2">
-                <a href="#inquiry-form"><MessageSquare className="h-4 w-4" />Send Inquiry</a>
+                <a href="#inquiry-form"><MessageSquare className="h-4 w-4" />{locale === "nl" ? "Stuur Bericht" : "Send Inquiry"}</a>
               </Button>
+              {/* Plan badge for ELITE */}
+              {placeFeatures.hasVerifiedBadge && (
+                <Badge className="justify-center bg-purple-100 text-purple-700 border-purple-300 gap-1">
+                  <Shield className="h-3 w-3" />
+                  {locale === "nl" ? "Geverifieerd Bedrijf" : "Verified Business"}
+                </Badge>
+              )}
             </div>
           </div>
         </div>
@@ -307,6 +374,15 @@ export default async function PlacePage({ params }: PlacePageProps) {
               }}
               locale={locale}
             />
+
+            {/* Business Photos - only show if business has uploaded photos */}
+            {photosWithUrls.length > 0 && (
+              <BusinessPhotoGallery
+                photos={photosWithUrls}
+                placeName={place.name}
+                locale={locale}
+              />
+            )}
 
             {/* Services Section */}
             <ServicesSection
@@ -405,6 +481,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 <CardTitle>{locale === "nl" ? "Contactgegevens" : "Contact Information"}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Address - always shown */}
                 {place.address && (
                   <div className="flex items-start gap-3">
                     <MapPin className="h-5 w-5 text-cpPink shrink-0 mt-0.5" />
@@ -414,28 +491,71 @@ export default async function PlacePage({ params }: PlacePageProps) {
                     </div>
                   </div>
                 )}
-                {place.phone && (
+
+                {/* Phone - gated by plan */}
+                {place.phone && placeFeatures.canShowPhone ? (
                   <div className="flex items-center gap-3">
                     <Phone className="h-5 w-5 text-cpPink" />
                     <a href={`tel:${place.phone}`} className="text-cpDark hover:text-cpPink transition-colors">
                       {place.phone}
                     </a>
                   </div>
-                )}
-                {place.email && (
+                ) : place.phone && !placeFeatures.canShowPhone ? (
+                  <div className="flex items-center gap-3 text-slate-400">
+                    <Phone className="h-5 w-5" />
+                    <span className="flex items-center gap-1">
+                      <Lock className="h-3 w-3" />
+                      {locale === "nl" ? "Upgrade voor telefoonnummer" : "Upgrade to see phone"}
+                    </span>
+                  </div>
+                ) : null}
+
+                {/* Email - gated by plan */}
+                {place.email && placeFeatures.canShowEmail ? (
                   <div className="flex items-center gap-3">
                     <Mail className="h-5 w-5 text-cpPink" />
                     <a href={`mailto:${place.email}`} className="text-cpDark hover:text-cpPink transition-colors truncate">
                       {place.email}
                     </a>
                   </div>
-                )}
-                {place.website && (
+                ) : place.email && !placeFeatures.canShowEmail ? (
+                  <div className="flex items-center gap-3 text-slate-400">
+                    <Mail className="h-5 w-5" />
+                    <span className="flex items-center gap-1">
+                      <Lock className="h-3 w-3" />
+                      {locale === "nl" ? "Upgrade voor e-mail" : "Upgrade to see email"}
+                    </span>
+                  </div>
+                ) : null}
+
+                {/* Website - gated by plan */}
+                {place.website && placeFeatures.canShowWebsite ? (
                   <div className="flex items-center gap-3">
                     <Globe className="h-5 w-5 text-cpPink" />
                     <a href={place.website} target="_blank" rel="noopener noreferrer" className="text-cpDark hover:text-cpPink transition-colors">
                       {locale === "nl" ? "Bezoek Website" : "Visit Website"}
                     </a>
+                  </div>
+                ) : place.website && !placeFeatures.canShowWebsite ? (
+                  <div className="flex items-center gap-3 text-slate-400">
+                    <Globe className="h-5 w-5" />
+                    <span className="flex items-center gap-1">
+                      <Lock className="h-3 w-3" />
+                      {locale === "nl" ? "Upgrade voor website" : "Upgrade to see website"}
+                    </span>
+                  </div>
+                ) : null}
+
+                {/* Upgrade CTA for FREE tier */}
+                {upgradeCTA && (
+                  <div className="pt-3 border-t border-slate-100">
+                    <p className="text-xs text-slate-500 mb-2">{upgradeCTA.message}</p>
+                    <Button asChild size="sm" variant="outline" className="w-full gap-1 text-cpPink border-cpPink/30 hover:bg-cpPink/5">
+                      <a href={`/${locale}/for-businesses`}>
+                        <Crown className="h-3 w-3" />
+                        {locale === "nl" ? "Bekijk Abonnementen" : "View Plans"}
+                      </a>
+                    </Button>
                   </div>
                 )}
               </CardContent>

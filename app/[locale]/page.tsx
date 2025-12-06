@@ -16,7 +16,8 @@ import { Button } from "@/components/ui/button";
 import { SearchBar, CategoryCard, CountryCard, getCategoryIcon } from "@/components/directory";
 import { SectionHeader } from "@/components/layout";
 import { PageIntro } from "@/components/seo";
-import { getCountries, getCategories, getPlaceCount, getCityCount, getCountryCount } from "@/db/queries";
+import { getCountries, getCategories, getPlaceCount, getCityCount, getCountryCount, getSpotlightPlaces, getCountryByCode } from "@/db/queries";
+import { getCountryCodeForLocale } from "@/lib/geo/localeCountryMap";
 import {
   generateSeoData,
   DEFAULT_SEO_CONFIG,
@@ -26,7 +27,7 @@ import {
   getLocalizedCategoryName,
   type ContentLocale,
 } from "@/lib/seo";
-import { Search, Shield, Clock, Star, MapPin, CheckCircle, ChevronRight, Sparkles, Heart, Users, Award } from "lucide-react";
+import { Search, Shield, Clock, Star, MapPin, CheckCircle, ChevronRight, Sparkles, Heart, Users, Award, Crown } from "lucide-react";
 
 interface HomePageProps {
   params: Promise<{ locale: string }>;
@@ -66,12 +67,26 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
 export default async function HomePage({ params }: HomePageProps) {
   const { locale } = await params;
 
-  const [countries, categories, totalPlaces, totalCities] = await Promise.all([
+  // Get the default country for this locale (for geo-targeted spotlight)
+  const countryCode = getCountryCodeForLocale(locale);
+  const localeCountry = await getCountryByCode(countryCode);
+
+  const [countries, categories, totalPlaces, totalCities, localSpotlightPlaces] = await Promise.all([
     getCountries(),
     getCategories(),
     getPlaceCount(),
     getCityCount(),
+    // Show ELITE businesses from the user's locale country first
+    getSpotlightPlaces({
+      limit: 6,
+      countryId: localeCountry?.id,
+    }),
   ]);
+
+  // Fallback: if no ELITE businesses in locale country, show all ELITE businesses
+  const spotlightPlaces = localSpotlightPlaces.length > 0
+    ? localSpotlightPlaces
+    : await getSpotlightPlaces({ limit: 6 });
 
   const displayCategories = categories.length > 0 ? categories : defaultCategories;
   const displayCountries = countries.length > 0 ? countries : defaultCountries;
@@ -263,6 +278,88 @@ export default async function HomePage({ params }: HomePageProps) {
           </div>
         </div>
       </section>
+
+      {/* ELITE Spotlight - Premium Visibility */}
+      {spotlightPlaces.length > 0 && (
+        <section className="py-20 bg-gradient-to-b from-white to-purple-50/30 dark:from-slate-900 dark:to-purple-900/10">
+          <div className="container mx-auto max-w-6xl px-4">
+            <div className="text-center mb-12">
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/10 text-purple-600 dark:text-purple-400 text-sm font-medium mb-4">
+                <Crown className="w-4 h-4" />
+                {locale === "nl" ? "Premium Partners" : "Premium Partners"}
+              </span>
+              <h2 className="text-3xl md:text-4xl font-bold text-cpDark dark:text-white mb-4">
+                {locale === "nl" ? "Uitgelichte Elite Bedrijven" : "Featured Elite Businesses"}
+              </h2>
+              <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+                {locale === "nl"
+                  ? "Ontdek onze best beoordeelde premium partners met geverifieerde kwaliteitsservice"
+                  : "Discover our top-rated premium partners with verified quality service"}
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {spotlightPlaces.map((place) => (
+                <Link
+                  key={place.id}
+                  href={`/${locale}/${place.countrySlug}/${place.citySlug}/${place.categorySlug}/${place.slug}`}
+                  className="group block"
+                >
+                  <div className="relative rounded-2xl overflow-hidden bg-white dark:bg-slate-800/80 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 border-purple-200/50 dark:border-purple-700/30">
+                    {/* Premium gradient header */}
+                    <div className="relative h-32 bg-gradient-to-br from-purple-500 via-purple-600 to-purple-700">
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.2),transparent_50%)]" />
+                      {/* ELITE Badge */}
+                      <div className="absolute top-3 left-3">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 text-purple-600 text-xs font-bold shadow-sm">
+                          <Crown className="w-3 h-3" />
+                          ELITE
+                        </span>
+                      </div>
+                      {/* Verified Badge */}
+                      <div className="absolute top-3 right-3">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/90 text-white text-xs font-medium">
+                          <Shield className="w-3 h-3" />
+                          {locale === "nl" ? "Geverifieerd" : "Verified"}
+                        </span>
+                      </div>
+                      {/* Rating */}
+                      {place.avgRating && (
+                        <div className="absolute bottom-3 right-3">
+                          <span className="px-2.5 py-1 rounded-full bg-cpYellow text-xs font-bold text-cpDark flex items-center gap-1 shadow-sm">
+                            <Star className="w-3 h-3 fill-current" />
+                            {parseFloat(place.avgRating).toFixed(1)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-5">
+                      <h3 className="font-bold text-cpDark dark:text-white group-hover:text-purple-600 transition-colors mb-2">
+                        {place.name}
+                      </h3>
+                      {place.description && (
+                        <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-3">
+                          {place.description}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                        <MapPin className="w-3.5 h-3.5" />
+                        {place.cityName}
+                        {place.reviewCount > 0 && (
+                          <>
+                            <span className="text-slate-300 dark:text-slate-600">•</span>
+                            <span>{place.reviewCount} {locale === "nl" ? "reviews" : "reviews"}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Why CutiePawsPedia - Features */}
       <section className="py-20 bg-slate-50/50 dark:bg-slate-900/50">

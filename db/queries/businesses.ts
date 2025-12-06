@@ -40,6 +40,15 @@ export type BusinessDetails = BusinessWithStats & {
   description: string | null;
   website: string | null;
   logo: string | null;
+  // Subscription plan fields
+  planKey: string;
+  planStatus: string;
+  planStartedAt: Date | null;
+  planValidUntil: Date | null;
+  trialEndsAt: Date | null;
+  stripeCustomerId: string | null;
+  stripeSubscriptionId: string | null;
+  creditBalanceCents: number | null;
 };
 
 // ============================================================================
@@ -182,11 +191,20 @@ export async function getBusinessById(id: number): Promise<BusinessDetails | nul
       plan: businesses.plan,
       billingStatus: businesses.billingStatus,
       leadPriceCents: businesses.leadPriceCents,
+      creditBalanceCents: businesses.creditBalanceCents,
       notes: businesses.notes,
       createdAt: businesses.createdAt,
       updatedAt: businesses.updatedAt,
       ownerEmail: users.email,
       ownerName: users.name,
+      // Subscription plan fields
+      planKey: businesses.planKey,
+      planStatus: businesses.planStatus,
+      planStartedAt: businesses.planStartedAt,
+      planValidUntil: businesses.planValidUntil,
+      trialEndsAt: businesses.trialEndsAt,
+      stripeCustomerId: businesses.stripeCustomerId,
+      stripeSubscriptionId: businesses.stripeSubscriptionId,
     })
     .from(businesses)
     .leftJoin(users, eq(businesses.userId, users.id))
@@ -314,6 +332,14 @@ export async function getBusinessByIdForUser(options: {
       updatedAt: businesses.updatedAt,
       ownerEmail: users.email,
       ownerName: users.name,
+      // Subscription plan fields
+      planKey: businesses.planKey,
+      planStatus: businesses.planStatus,
+      planStartedAt: businesses.planStartedAt,
+      planValidUntil: businesses.planValidUntil,
+      trialEndsAt: businesses.trialEndsAt,
+      stripeCustomerId: businesses.stripeCustomerId,
+      stripeSubscriptionId: businesses.stripeSubscriptionId,
     })
     .from(businesses)
     .leftJoin(users, eq(businesses.userId, users.id))
@@ -616,6 +642,7 @@ export type BusinessStats = {
   leadsLast30Days: number;
   avgRating: number;
   totalReviews: number;
+  conversionRate: number; // Leads per listing percentage
 };
 
 /**
@@ -632,6 +659,7 @@ export async function getBusinessStats(businessId: number): Promise<BusinessStat
       leadsLast30Days: 0,
       avgRating: 0,
       totalReviews: 0,
+      conversionRate: 0,
     };
   }
 
@@ -687,15 +715,20 @@ export async function getBusinessStats(businessId: number): Promise<BusinessStat
       .where(eq(places.businessId, businessId)),
   ]);
 
+  const totalListings = totalListingsResult[0]?.value ?? 0;
+  const totalLeads = totalLeadsResult[0]?.value ?? 0;
+  const conversionRate = totalListings > 0 ? (totalLeads / totalListings) * 100 : 0;
+
   return {
-    totalListings: totalListingsResult[0]?.value ?? 0,
+    totalListings,
     verifiedListings: verifiedListingsResult[0]?.value ?? 0,
     premiumListings: premiumListingsResult[0]?.value ?? 0,
-    totalLeads: totalLeadsResult[0]?.value ?? 0,
+    totalLeads,
     leadsLast7Days: leadsLast7DaysResult[0]?.value ?? 0,
     leadsLast30Days: leadsLast30DaysResult[0]?.value ?? 0,
     avgRating: Math.round((ratingsResult[0]?.avgRating ?? 0) * 10) / 10,
     totalReviews: ratingsResult[0]?.totalReviews ?? 0,
+    conversionRate: Math.round(conversionRate * 10) / 10,
   };
 }
 
@@ -719,6 +752,85 @@ export async function linkPlaceToBusiness(placeId: number, businessId: number | 
     .returning();
 
   return result;
+}
+
+/**
+ * Get ELITE spotlight places for homepage/city pages
+ * Returns places with ELITE plan that have hasHomepageSpotlight enabled
+ */
+export async function getSpotlightPlaces(options: {
+  limit?: number;
+  cityId?: number;
+  countryId?: number;
+} = {}): Promise<{
+  id: number;
+  name: string;
+  slug: string;
+  description: string | null;
+  avgRating: string | null;
+  reviewCount: number;
+  cityName: string | null;
+  citySlug: string | null;
+  countrySlug: string | null;
+  categorySlug: string | null;
+}[]> {
+  if (!db) return [];
+
+  const { limit = 6, cityId, countryId } = options;
+
+  // Build conditions for ELITE businesses with spotlight enabled
+  const conditions = [
+    eq(businesses.planKey, "ELITE"),
+    eq(businesses.planStatus, "ACTIVE"),
+  ];
+
+  if (cityId) {
+    conditions.push(eq(places.cityId, cityId));
+  }
+
+  if (countryId) {
+    conditions.push(eq(cities.countryId, countryId));
+  }
+
+  // Query places with ELITE businesses
+  const result = await db
+    .select({
+      id: places.id,
+      name: places.name,
+      slug: places.slug,
+      description: places.description,
+      avgRating: places.avgRating,
+      reviewCount: places.reviewCount,
+      cityName: cities.name,
+      citySlug: cities.slug,
+      countrySlug: countries.slug,
+    })
+    .from(places)
+    .innerJoin(businesses, eq(places.businessId, businesses.id))
+    .leftJoin(cities, eq(places.cityId, cities.id))
+    .leftJoin(countries, eq(cities.countryId, countries.id))
+    .where(and(...conditions))
+    .orderBy(desc(places.avgRating), desc(places.reviewCount))
+    .limit(limit);
+
+  // Get first category for each place
+  const withCategory = await Promise.all(
+    result.map(async (place) => {
+      const categoryResult = await db!
+        .select({ slug: categories.slug })
+        .from(placeCategories)
+        .innerJoin(categories, eq(placeCategories.categoryId, categories.id))
+        .where(eq(placeCategories.placeId, place.id))
+        .limit(1);
+
+      return {
+        ...place,
+        categorySlug: categoryResult[0]?.slug ?? null,
+      };
+    })
+  );
+
+  return withCategory;
 }
 
 /**

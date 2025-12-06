@@ -28,6 +28,8 @@ export interface ReviewData {
   user?: {
     name: string | null;
     image?: string | null;
+    trustLevel?: number;
+    karmaPoints?: number;
   } | null;
   replies?: ReviewReply[];
 }
@@ -79,6 +81,10 @@ export function ReviewCard({
           <div>
             <div className="flex items-center gap-2">
               <span className="font-medium text-sm">{userName}</span>
+              {/* Trust Level Badge */}
+              {review.user?.trustLevel !== undefined && review.user.trustLevel >= 2 && (
+                <TrustLevelIcon level={review.user.trustLevel} />
+              )}
               {review.isFeatured && (
                 <Badge variant="secondary" className="text-xs bg-yellow-100 text-yellow-800">
                   <Award className="h-3 w-3 mr-1" />
@@ -192,6 +198,28 @@ function ReplyCard({ reply }: { reply: ReviewReply }) {
       </div>
       <p className="text-sm text-muted-foreground">{reply.body}</p>
     </div>
+  );
+}
+
+// Trust level icon with tooltip
+function TrustLevelIcon({ level }: { level: number }) {
+  const levelData: Record<number, { icon: string; label: string; color: string }> = {
+    2: { icon: "⭐", label: "Contributor", color: "text-blue-600" },
+    3: { icon: "🏆", label: "Trusted Reviewer", color: "text-amber-600" },
+    4: { icon: "💎", label: "Expert", color: "text-purple-600" },
+    5: { icon: "👑", label: "Legend", color: "text-orange-600" },
+  };
+
+  const data = levelData[level];
+  if (!data) return null;
+
+  return (
+    <span
+      className={cn("text-sm cursor-help", data.color)}
+      title={data.label}
+    >
+      {data.icon}
+    </span>
   );
 }
 

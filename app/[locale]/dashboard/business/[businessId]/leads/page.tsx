@@ -1,5 +1,9 @@
 /**
  * My Leads Page - Lists all leads with status filter and actions
+ *
+ * NOTE: Pay-per-lead paywall has been disabled.
+ * All leads now show full contact details without payment.
+ * Lead tracking remains for informational purposes.
  */
 
 import Link from "next/link";
@@ -26,30 +30,8 @@ import {
   Phone,
   Calendar,
   Building2,
-  Lock,
-  CreditCard,
-  AlertTriangle,
 } from "lucide-react";
 import { LeadStatusDropdown } from "./LeadStatusDropdown";
-import { getCreditBalance } from "@/db/queries/credits";
-
-// Helper to blur contact details
-function blurText(text: string, showChars: number = 2): string {
-  if (text.length <= showChars) return "••••••";
-  return text.substring(0, showChars) + "••••••";
-}
-
-function blurEmail(email: string): string {
-  const [local, domain] = email.split("@");
-  if (!domain) return "••••••@••••••";
-  return blurText(local, 2) + "@" + blurText(domain.split(".")[0], 2) + ".•••";
-}
-
-function blurPhone(phone: string): string {
-  const digits = phone.replace(/\D/g, "");
-  if (digits.length <= 3) return "••• ••• ••••";
-  return digits.substring(0, 3) + " ••• ••••";
-}
 
 interface LeadsPageProps {
   params: Promise<{ locale: string; businessId: string }>;
@@ -84,15 +66,12 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
     ? (statusParam as LeadStatus)
     : undefined;
 
-  // Get leads, status counts, and credit balance
-  const [{ leads, total }, statusCounts, creditBalance] = await Promise.all([
+  // Get leads and status counts
+  // NOTE: Credit balance no longer needed - pay-per-lead disabled
+  const [{ leads, total }, statusCounts] = await Promise.all([
     getLeadsForBusiness({ businessId: businessIdNum, status: statusFilter, limit: 100 }),
     getLeadStatusCounts(businessIdNum),
-    getCreditBalance(businessIdNum),
   ]);
-
-  // Count unpaid leads (leads where chargedAt is null but should have been charged)
-  const unpaidLeadsCount = leads.filter(lead => !lead.chargedAt && lead.status !== "spam").length;
 
   const labels = {
     en: {
@@ -114,12 +93,6 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
       viewed: "Viewed",
       converted: "Converted",
       spam: "Spam",
-      locked: "Locked",
-      lockedDesc: "Buy credits to unlock contact details",
-      buyCredits: "Buy Credits",
-      unlockLead: "Unlock",
-      creditsBalance: "Credit Balance",
-      lockedLeadsWarning: "You have {count} locked leads. Top up your credits to unlock them.",
     },
     nl: {
       title: "Leads",
@@ -140,12 +113,6 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
       viewed: "Bekeken",
       converted: "Geconverteerd",
       spam: "Spam",
-      locked: "Vergrendeld",
-      lockedDesc: "Koop credits om contactgegevens te ontgrendelen",
-      buyCredits: "Credits Kopen",
-      unlockLead: "Ontgrendelen",
-      creditsBalance: "Credit Saldo",
-      lockedLeadsWarning: "Je hebt {count} vergrendelde leads. Koop credits om ze te ontgrendelen.",
     },
     de: {
       title: "Leads",
@@ -166,12 +133,6 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
       viewed: "Angesehen",
       converted: "Konvertiert",
       spam: "Spam",
-      locked: "Gesperrt",
-      lockedDesc: "Kaufen Sie Credits, um Kontaktdaten freizuschalten",
-      buyCredits: "Credits Kaufen",
-      unlockLead: "Freischalten",
-      creditsBalance: "Guthaben",
-      lockedLeadsWarning: "Sie haben {count} gesperrte Leads. Laden Sie Credits auf, um sie freizuschalten.",
     },
   };
 
@@ -218,35 +179,6 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
           })}
         </div>
 
-        {/* Locked leads warning banner */}
-        {unpaidLeadsCount > 0 && (
-          <Card className="border-amber-300 bg-amber-50">
-            <CardContent className="py-4">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-amber-100">
-                    <Lock className="h-5 w-5 text-amber-600" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-amber-800">
-                      {t.lockedLeadsWarning.replace("{count}", String(unpaidLeadsCount))}
-                    </p>
-                    <p className="text-sm text-amber-600">
-                      {t.creditsBalance}: €{(creditBalance.balanceCents / 100).toFixed(2)}
-                    </p>
-                  </div>
-                </div>
-                <Link href={`/${locale}/dashboard/business/${businessId}/credits`}>
-                  <Button className="bg-amber-500 hover:bg-amber-600 text-white gap-2">
-                    <CreditCard className="h-4 w-4" />
-                    {t.buyCredits}
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
         {leads.length === 0 ? (
           // Empty state
           <Card className="max-w-md mx-auto mt-8">
@@ -274,16 +206,8 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {leads.map((lead) => {
-                    // Check if lead is paid (has chargedAt) - if not, blur contact details
-                    const isPaid = !!lead.chargedAt || lead.status === "spam";
-                    const displayName = isPaid ? lead.name : blurText(lead.name.split(" ")[0], 2) + " •••";
-                    const displayEmail = isPaid ? lead.email : blurEmail(lead.email);
-                    const displayPhone = isPaid && lead.phone ? lead.phone : (lead.phone ? blurPhone(lead.phone) : null);
-                    const displayMessage = isPaid ? lead.message : (lead.message ? lead.message.substring(0, 20) + "..." : null);
-
-                    return (
-                    <TableRow key={lead.id} className={!isPaid ? "bg-amber-50/50" : ""}>
+                  {leads.map((lead) => (
+                    <TableRow key={lead.id}>
                       <TableCell>
                         <div className="flex items-center gap-1 text-sm text-slate-600">
                           <Calendar className="h-3 w-3" />
@@ -298,12 +222,6 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
                             Viewed: {new Date(lead.viewedAt).toLocaleDateString()}
                           </div>
                         )}
-                        {!isPaid && (
-                          <Badge variant="outline" className="mt-1 text-amber-600 border-amber-300 bg-amber-100 text-xs">
-                            <Lock className="h-2 w-2 mr-1" />
-                            {t.locked}
-                          </Badge>
-                        )}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
@@ -316,45 +234,31 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
                       </TableCell>
                       <TableCell>
                         <div className="space-y-1">
-                          <div className={`font-medium ${isPaid ? "text-cpDark" : "text-slate-400 font-mono"}`}>
-                            {displayName}
+                          <div className="font-medium text-cpDark">
+                            {lead.name}
                           </div>
-                          {isPaid ? (
+                          <a
+                            href={`mailto:${lead.email}`}
+                            className="flex items-center gap-1 text-sm text-cpPink hover:underline"
+                          >
+                            <Mail className="h-3 w-3" />
+                            {lead.email}
+                          </a>
+                          {lead.phone && (
                             <a
-                              href={`mailto:${lead.email}`}
-                              className="flex items-center gap-1 text-sm text-cpPink hover:underline"
+                              href={`tel:${lead.phone}`}
+                              className="flex items-center gap-1 text-sm text-slate-600 hover:text-cpPink"
                             >
-                              <Mail className="h-3 w-3" />
-                              {displayEmail}
+                              <Phone className="h-3 w-3" />
+                              {lead.phone}
                             </a>
-                          ) : (
-                            <span className="flex items-center gap-1 text-sm text-slate-400 font-mono">
-                              <Mail className="h-3 w-3" />
-                              {displayEmail}
-                            </span>
-                          )}
-                          {displayPhone && (
-                            isPaid ? (
-                              <a
-                                href={`tel:${lead.phone}`}
-                                className="flex items-center gap-1 text-sm text-slate-600 hover:text-cpPink"
-                              >
-                                <Phone className="h-3 w-3" />
-                                {displayPhone}
-                              </a>
-                            ) : (
-                              <span className="flex items-center gap-1 text-sm text-slate-400 font-mono">
-                                <Phone className="h-3 w-3" />
-                                {displayPhone}
-                              </span>
-                            )
                           )}
                         </div>
                       </TableCell>
                       <TableCell>
-                        {displayMessage ? (
-                          <p className={`text-sm truncate max-w-[200px] ${isPaid ? "text-slate-600" : "text-slate-400 italic"}`} title={isPaid ? lead.message || "" : t.lockedDesc}>
-                            {displayMessage}
+                        {lead.message ? (
+                          <p className="text-sm truncate max-w-[200px] text-slate-600" title={lead.message}>
+                            {lead.message}
                           </p>
                         ) : (
                           <span className="text-slate-400 text-sm italic">No message</span>
@@ -369,7 +273,6 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
                         />
                       </TableCell>
                       <TableCell className="text-right">
-                        {isPaid ? (
                         <div className="flex items-center justify-end gap-2">
                           <Button size="sm" className="bg-cpPink hover:bg-cpPink/90" asChild>
                             <a href={`mailto:${lead.email}`}>
@@ -386,18 +289,9 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
                             </Button>
                           )}
                         </div>
-                        ) : (
-                          <Link href={`/${locale}/dashboard/business/${businessId}/credits`}>
-                            <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white gap-1">
-                              <Lock className="h-3 w-3" />
-                              {t.unlockLead}
-                            </Button>
-                          </Link>
-                        )}
                       </TableCell>
                     </TableRow>
-                    );
-                  })}
+                  ))}
                 </TableBody>
               </Table>
             </CardContent>

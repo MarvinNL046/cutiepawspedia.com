@@ -26,7 +26,10 @@ import {
   Star,
   Inbox,
   User,
+  Crown,
+  BarChart3,
 } from "lucide-react";
+import { getPlan, type PlanKey } from "@/lib/plans/config";
 
 interface BusinessLayoutProps {
   children: React.ReactNode;
@@ -94,6 +97,8 @@ export default async function BusinessLayout({
       reviews: "Reviews",
       inbox: "Inbox",
       leads: "Leads",
+      analytics: "Analytics",
+      plan: "Plan",
       credits: "Credits",
       myAccount: "My Account",
       signOut: "Sign Out",
@@ -104,6 +109,8 @@ export default async function BusinessLayout({
       reviews: "Beoordelingen",
       inbox: "Inbox",
       leads: "Leads",
+      analytics: "Statistieken",
+      plan: "Abonnement",
       credits: "Credits",
       myAccount: "Mijn Account",
       signOut: "Uitloggen",
@@ -114,6 +121,8 @@ export default async function BusinessLayout({
       reviews: "Bewertungen",
       inbox: "Posteingang",
       leads: "Leads",
+      analytics: "Statistiken",
+      plan: "Abonnement",
       credits: "Guthaben",
       myAccount: "Mein Konto",
       signOut: "Abmelden",
@@ -128,6 +137,8 @@ export default async function BusinessLayout({
     { href: "/reviews", label: t.reviews, icon: Star },
     { href: "/inbox", label: t.inbox, icon: Inbox },
     { href: "/leads", label: t.leads, icon: MessageSquare },
+    { href: "/analytics", label: t.analytics, icon: BarChart3 },
+    { href: "/plan", label: t.plan, icon: Crown },
     { href: "/credits", label: t.credits, icon: CreditCard },
   ];
 
@@ -173,7 +184,9 @@ export default async function BusinessLayout({
             )}
             <div className="truncate">
               <p className="font-medium text-cpDark truncate">{business.name}</p>
-              <p className="text-xs text-slate-500">{business.plan} plan</p>
+              <p className="text-xs text-slate-500">
+                {getPlan((business.planKey as PlanKey) || "FREE").name} plan
+              </p>
             </div>
           </div>
         </div>

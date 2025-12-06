@@ -4,11 +4,10 @@ import { db } from "@/db";
 import { leads, places } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { sendNotification } from "@/lib/notifications";
-import { chargeForLead } from "@/db/queries/credits";
-import {
-  getLeadPriceForBusiness,
-  shouldAutoCharge,
-} from "@/lib/pricing/getLeadPriceForBusiness";
+// NOTE: Pay-per-lead paywall disabled - leads are now free to view
+// Keeping imports for potential future use or reference
+// import { chargeForLead } from "@/db/queries/credits";
+// import { getLeadPriceForBusiness, shouldAutoCharge } from "@/lib/pricing/getLeadPriceForBusiness";
 import {
   getClientIP,
   leadsRateLimiter,
@@ -156,74 +155,16 @@ export async function POST(request: NextRequest) {
       ipAddress: clientIP,
     });
 
-    // Auto-charge credits if business has auto-charge enabled
-    // CRITICAL: Only charge if place has an email address (otherwise lead can't be delivered)
-    let chargeResult: { success: boolean; error?: string } | null = null;
-    if (business && shouldAutoCharge(business) && place.email) {
-      // Calculate lead price using pricing engine
-      const leadPriceCents = getLeadPriceForBusiness({
-        business: business,
-        place: { isPremium: place.isPremium, premiumLevel: place.premiumLevel },
-      });
-
-      // Attempt to charge credits
-      chargeResult = await chargeForLead({
-        businessId: business.id,
-        leadId: newLead.id,
-        priceCents: leadPriceCents,
-      });
-
-      if (chargeResult.success) {
-        // Log LEAD_CHARGED audit event
-        logAuditEvent({
-          actorBusinessId: business.id,
-          actorRole: "system",
-          eventType: "LEAD_CHARGED",
-          targetType: "lead",
-          targetId: newLead.id,
-          metadata: {
-            placeId,
-            priceCents: leadPriceCents,
-          },
-          ipAddress: clientIP,
-        });
-      } else {
-        // Log the failure but don't block lead creation
-        console.warn(
-          `Failed to charge credits for lead ${newLead.id}:`,
-          chargeResult.error
-        );
-      }
-    } else if (business && shouldAutoCharge(business) && !place.email) {
-      // Log when we skip charging due to missing email
-      console.warn(
-        `Skipping credit charge for lead ${newLead.id}: place ${placeId} has no email configured`
-      );
-      logAuditEvent({
-        actorBusinessId: business.id,
-        actorRole: "system",
-        eventType: "LEAD_CHARGED",
-        targetType: "lead",
-        targetId: newLead.id,
-        metadata: {
-          placeId,
-          skipped: true,
-          reason: "no_email_configured",
-        },
-        ipAddress: clientIP,
-      });
-    }
+    // NOTE: Pay-per-lead paywall has been disabled
+    // Leads are now free to view - no credit charging
+    // The chargeResult and isPaid logic has been simplified
 
     // Send email notification to the business and update lead status
     if (place.email) {
       const baseUrl = process.env.APP_BASE_URL || "https://cutiepawspedia.com";
 
-      // Determine if lead is paid (for blurring contact details)
-      // isPaid = true if: no auto-charge, or charge succeeded
-      // isPaid = false if: auto-charge enabled but failed (insufficient credits)
-      const isPaid = !business || !shouldAutoCharge(business) || (chargeResult?.success ?? false);
-
       // Send email and track result (don't block response, but track success/failure)
+      // All leads are now accessible without payment - contact details always visible
       sendNotification({
         type: "LEAD_NEW",
         leadId: newLead.id,
@@ -236,8 +177,8 @@ export async function POST(request: NextRequest) {
         leadPhone: phone,
         leadMessage: message,
         dashboardUrl: place.businessId ? `${baseUrl}/dashboard/business/${place.businessId}` : undefined,
-        isPaid, // If false, contact details are blurred in email
-        creditsUrl: place.businessId ? `${baseUrl}/dashboard/business/${place.businessId}/credits` : undefined,
+        // Pay-per-lead disabled: all leads show full contact details
+        isPaid: true,
       }).then(async (emailResult) => {
         // Update lead status based on email result
         if (emailResult.success) {

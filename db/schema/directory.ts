@@ -42,6 +42,12 @@ export const reviewPhotoStatusEnum = pgEnum("review_photo_status", [
   "flagged",
 ]);
 
+// Business photo status enum
+export const businessPhotoStatusEnum = pgEnum("business_photo_status", [
+  "active",
+  "deleted",
+]);
+
 // Place status enum (for closed/moved detection)
 export const placeStatusEnum = pgEnum("place_status", [
   "active",
@@ -57,6 +63,51 @@ export const refreshJobStatusEnum = pgEnum("refresh_job_status", [
   "done",
   "failed",
 ]);
+
+// Plan status enum (for business subscriptions)
+export const planStatusEnum = pgEnum("plan_status", [
+  "ACTIVE",
+  "CANCELLED",
+  "TRIAL",
+  "PAST_DUE",
+  "INACTIVE",
+]);
+
+// ============================================================================
+// SUBSCRIPTION PLANS
+// ============================================================================
+
+// Subscription plans table - plan definitions (single source of truth in DB)
+export const subscriptionPlans = pgTable("subscription_plans", {
+  key: varchar("key", { length: 20 }).primaryKey(), // FREE, STARTER, PRO, ELITE
+  name: varchar("name", { length: 100 }).notNull(),
+  nameNl: varchar("name_nl", { length: 100 }),
+  description: text("description"),
+  descriptionNl: text("description_nl"),
+  monthlyPriceCents: integer("monthly_price_cents").default(0).notNull(),
+  yearlyPriceCents: integer("yearly_price_cents"), // null = not available
+  // Features (denormalized for quick access)
+  maxPhotos: integer("max_photos").default(0).notNull(),
+  maxCategories: integer("max_categories").default(1).notNull(),
+  canShowWebsite: boolean("can_show_website").default(false).notNull(),
+  canShowEmail: boolean("can_show_email").default(false).notNull(),
+  canShowPhone: boolean("can_show_phone").default(false).notNull(),
+  canShowSocialLinks: boolean("can_show_social_links").default(false).notNull(),
+  canShowDescription: boolean("can_show_description").default(false).notNull(),
+  priorityRank: integer("priority_rank").default(1).notNull(), // Higher = shown first in search
+  hasFeaturedStyling: boolean("has_featured_styling").default(false).notNull(),
+  hasBasicAnalytics: boolean("has_basic_analytics").default(false).notNull(),
+  hasAdvancedAnalytics: boolean("has_advanced_analytics").default(false).notNull(),
+  showPlanBadge: boolean("show_plan_badge").default(false).notNull(),
+  badgeText: varchar("badge_text", { length: 50 }),
+  badgeColor: varchar("badge_color", { length: 20 }),
+  // Meta
+  isPopular: boolean("is_popular").default(false).notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  sortOrder: integer("sort_order").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
 
 // ============================================================================
 // LOCATIONS
@@ -264,14 +315,25 @@ export const businesses = pgTable("businesses", {
   contactEmail: varchar("contact_email", { length: 255 }),
   contactPhone: varchar("contact_phone", { length: 50 }),
   status: varchar("status", { length: 20 }).default("active").notNull(), // active, pending, suspended
-  plan: varchar("plan", { length: 20 }).default("free").notNull(), // free, starter, pro, enterprise
-  billingStatus: varchar("billing_status", { length: 20 }).default("trial").notNull(), // trial, paid, overdue, cancelled
+  // Legacy plan fields (deprecated - use planKey/planStatus instead)
+  plan: varchar("plan", { length: 20 }).default("free").notNull(), // @deprecated: use planKey
+  billingStatus: varchar("billing_status", { length: 20 }).default("trial").notNull(), // @deprecated: use planStatus
+  // Subscription plan fields (new)
+  planKey: varchar("plan_key", { length: 20 })
+    .default("FREE")
+    .notNull()
+    .references(() => subscriptionPlans.key), // FK to subscription_plans
+  planStatus: planStatusEnum("plan_status").default("ACTIVE").notNull(),
+  planStartedAt: timestamp("plan_started_at"), // When current plan started
+  planValidUntil: timestamp("plan_valid_until"), // When plan expires (null = no expiry for free)
+  trialEndsAt: timestamp("trial_ends_at"), // When trial period ends
   // Stripe integration
   stripeCustomerId: varchar("stripe_customer_id", { length: 255 }), // Stripe customer ID
-  // Credits system (prepaid balance for leads)
-  creditBalanceCents: integer("credit_balance_cents").default(0).notNull(), // Current credit balance
-  leadPriceCents: integer("lead_price_cents"), // Custom lead price in cents (optional override)
-  autoChargeEnabled: boolean("auto_charge_enabled").default(true).notNull(), // Auto-charge credits for new leads
+  stripeSubscriptionId: varchar("stripe_subscription_id", { length: 255 }), // Active subscription ID
+  // Credits system (prepaid balance for leads) - deprecated: pay-per-lead disabled
+  creditBalanceCents: integer("credit_balance_cents").default(0).notNull(), // @deprecated: pay-per-lead disabled
+  leadPriceCents: integer("lead_price_cents"), // @deprecated: pay-per-lead disabled
+  autoChargeEnabled: boolean("auto_charge_enabled").default(true).notNull(), // @deprecated: pay-per-lead disabled
   notes: text("notes"), // Internal admin notes
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -372,6 +434,82 @@ export const reviewPhotos = pgTable(
     index("review_photos_review_id_idx").on(table.reviewId),
     index("review_photos_place_id_idx").on(table.placeId),
     index("review_photos_status_idx").on(table.status),
+  ]
+);
+
+// ============================================================================
+// BUSINESS PHOTOS (uploaded by business owners)
+// ============================================================================
+
+// Business photos table - photos uploaded by businesses to their listings
+export const businessPhotos = pgTable(
+  "business_photos",
+  {
+    id: serial("id").primaryKey(),
+    placeId: integer("place_id")
+      .notNull()
+      .references(() => places.id, { onDelete: "cascade" }),
+    businessId: integer("business_id")
+      .notNull()
+      .references(() => businesses.id, { onDelete: "cascade" }),
+    uploadedBy: integer("uploaded_by")
+      .references(() => users.id, { onDelete: "set null" }),
+    // Storage info
+    storageKey: varchar("storage_key", { length: 500 }).notNull(), // e.g., business_photos/{placeId}/{uuid}.jpg
+    // Image metadata
+    width: integer("width"),
+    height: integer("height"),
+    sizeBytes: integer("size_bytes"),
+    mimeType: varchar("mime_type", { length: 50 }),
+    // Display info
+    altText: varchar("alt_text", { length: 255 }),
+    caption: varchar("caption", { length: 500 }),
+    isPrimary: boolean("is_primary").default(false).notNull(), // Primary/cover photo
+    sortOrder: integer("sort_order").default(0).notNull(), // Display order
+    // Status
+    status: businessPhotoStatusEnum("status").default("active").notNull(),
+    // Timestamps
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("business_photos_place_id_idx").on(table.placeId),
+    index("business_photos_business_id_idx").on(table.businessId),
+    index("business_photos_status_idx").on(table.status),
+  ]
+);
+
+// ============================================================================
+// PAGE VIEWS (for analytics)
+// ============================================================================
+
+// Page views table - tracks views for analytics
+export const pageViews = pgTable(
+  "page_views",
+  {
+    id: serial("id").primaryKey(),
+    placeId: integer("place_id")
+      .notNull()
+      .references(() => places.id, { onDelete: "cascade" }),
+    businessId: integer("business_id")
+      .references(() => businesses.id, { onDelete: "set null" }), // Denormalized for quick lookups
+    // Visitor info (privacy-safe)
+    sessionId: varchar("session_id", { length: 64 }), // Hashed session identifier
+    // Source tracking
+    source: varchar("source", { length: 100 }), // search, direct, category, spotlight, etc.
+    referrer: varchar("referrer", { length: 500 }),
+    // Device/context
+    deviceType: varchar("device_type", { length: 20 }), // mobile, tablet, desktop
+    locale: varchar("locale", { length: 10 }),
+    // Timestamps
+    viewedAt: timestamp("viewed_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("page_views_place_id_idx").on(table.placeId),
+    index("page_views_business_id_idx").on(table.businessId),
+    index("page_views_viewed_at_idx").on(table.viewedAt),
+    // Composite index for time-based analytics queries
+    index("page_views_place_date_idx").on(table.placeId, table.viewedAt),
   ]
 );
 
@@ -499,6 +637,8 @@ export const placesRelations = relations(places, ({ one, many }) => ({
   placeCategories: many(placeCategories),
   reviews: many(reviews),
   reviewPhotos: many(reviewPhotos),
+  businessPhotos: many(businessPhotos),
+  pageViews: many(pageViews),
   leads: many(leads),
   claims: many(placeClaims),
   refreshJobs: many(placeRefreshJobs),
@@ -561,11 +701,50 @@ export const businessesRelations = relations(businesses, ({ one, many }) => ({
     fields: [businesses.userId],
     references: [users.id],
   }),
+  subscriptionPlan: one(subscriptionPlans, {
+    fields: [businesses.planKey],
+    references: [subscriptionPlans.key],
+  }),
   places: many(places),
   reviews: many(reviews), // Reviews linked to this business
+  businessPhotos: many(businessPhotos),
+  pageViews: many(pageViews),
   leads: many(leads),
   creditTransactions: many(creditTransactions),
   notificationLogs: many(notificationLogs),
+}));
+
+// Business photos relations
+export const businessPhotosRelations = relations(businessPhotos, ({ one }) => ({
+  place: one(places, {
+    fields: [businessPhotos.placeId],
+    references: [places.id],
+  }),
+  business: one(businesses, {
+    fields: [businessPhotos.businessId],
+    references: [businesses.id],
+  }),
+  uploader: one(users, {
+    fields: [businessPhotos.uploadedBy],
+    references: [users.id],
+  }),
+}));
+
+// Page views relations
+export const pageViewsRelations = relations(pageViews, ({ one }) => ({
+  place: one(places, {
+    fields: [pageViews.placeId],
+    references: [places.id],
+  }),
+  business: one(businesses, {
+    fields: [pageViews.businessId],
+    references: [businesses.id],
+  }),
+}));
+
+// Subscription plans relations
+export const subscriptionPlansRelations = relations(subscriptionPlans, ({ many }) => ({
+  businesses: many(businesses),
 }));
 
 export const reviewsRelations = relations(reviews, ({ one, many }) => ({

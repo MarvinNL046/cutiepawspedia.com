@@ -56,6 +56,7 @@ export interface TrustLevel {
   maxPhotosPerReview: number | null;
   reviewsAutoApproved: boolean;
   canFlagReviews: boolean;
+  createdAt: Date;
 }
 
 // ============================================================================
@@ -239,9 +240,11 @@ export async function getAllTrustLevels(): Promise<TrustLevel[]> {
 export async function getTrustLevel(level: number): Promise<TrustLevel | null> {
   if (!db) return null;
 
-  return db.query.trustLevelDefinitions.findFirst({
+  const result = await db.query.trustLevelDefinitions.findFirst({
     where: eq(trustLevelDefinitions.level, level),
   });
+
+  return result ?? null;
 }
 
 /**
@@ -328,8 +331,3 @@ export async function getKarmaLeaderboard(limit = 10): Promise<Array<{
   }));
 }
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
-export type { KarmaEvent, TrustLevel };

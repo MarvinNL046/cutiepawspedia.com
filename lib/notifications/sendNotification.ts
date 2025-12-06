@@ -240,6 +240,7 @@ export async function sendNotification(
         break;
 
       case "LEAD_NEW":
+        // NOTE: Pay-per-lead paywall disabled - all leads show full contact details
         email = buildLeadNewEmail({
           locale,
           placeName: payload.placeName,
@@ -248,8 +249,6 @@ export async function sendNotification(
           leadPhone: payload.leadPhone,
           leadMessage: payload.leadMessage,
           dashboardUrl: payload.dashboardUrl,
-          isPaid: payload.isPaid,
-          creditsUrl: payload.creditsUrl,
         });
         break;
 

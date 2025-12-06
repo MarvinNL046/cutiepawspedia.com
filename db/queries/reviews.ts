@@ -27,6 +27,7 @@ export interface CreateReviewInput {
   locale?: string;
   visitDate?: Date | null;
   ipHash?: string | null;
+  status?: ReviewStatus; // For trusted users: auto-approve
 }
 
 export interface UpdateReviewInput {
@@ -78,7 +79,7 @@ export async function createReview(input: CreateReviewInput) {
       locale: input.locale ?? "en",
       visitDate: input.visitDate?.toISOString().split("T")[0] ?? null,
       ipHash: input.ipHash ?? null,
-      status: "pending", // New reviews start as pending
+      status: input.status ?? "pending", // Trusted users get auto-approved
       isFeatured: false,
     })
     .returning();
@@ -554,6 +555,18 @@ export async function hasUserReviewedPlace(
     columns: { id: true },
   });
   return !!existing;
+}
+
+/**
+ * Get total review count for a user (for karma first review bonus)
+ */
+export async function getUserReviewCount(userId: number): Promise<number> {
+  if (!db) return 0;
+  const result = await db
+    .select({ count: count() })
+    .from(reviews)
+    .where(eq(reviews.userId, userId));
+  return result[0]?.count ?? 0;
 }
 
 /**

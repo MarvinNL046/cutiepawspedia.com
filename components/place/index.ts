@@ -8,3 +8,4 @@ export { AboutSection } from "./AboutSection";
 export { ServicesSection } from "./ServicesSection";
 export { HighlightsSection } from "./HighlightsSection";
 export { BusinessSnapshot } from "./BusinessSnapshot";
+export { BusinessPhotoGallery } from "./BusinessPhotoGallery";

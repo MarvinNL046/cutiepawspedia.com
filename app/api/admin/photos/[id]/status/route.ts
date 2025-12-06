@@ -11,6 +11,7 @@ import { db } from "@/db";
 import { eq } from "drizzle-orm";
 import { reviewPhotos, places } from "@/db/schema/directory";
 import { updateBadgesForPlace } from "@/lib/trustBadges";
+import { awardKarma } from "@/db/queries/karma";
 
 const VALID_STATUSES = ["pending", "approved", "rejected", "flagged"] as const;
 type PhotoStatus = (typeof VALID_STATUSES)[number];
@@ -47,9 +48,13 @@ export async function PATCH(
       return NextResponse.json({ error: "Database not available" }, { status: 500 });
     }
 
-    // Get photo to find the place ID
+    // Get photo to find the place ID and user ID
     const [photo] = await db
-      .select({ placeId: reviewPhotos.placeId })
+      .select({
+        placeId: reviewPhotos.placeId,
+        userId: reviewPhotos.userId,
+        currentStatus: reviewPhotos.status,
+      })
       .from(reviewPhotos)
       .where(eq(reviewPhotos.id, photoId))
       .limit(1);
@@ -66,6 +71,26 @@ export async function PATCH(
         updatedAt: new Date(),
       })
       .where(eq(reviewPhotos.id, photoId));
+
+    // Award karma when photo is approved (only if transitioning to approved)
+    if (status === "approved" && photo.currentStatus !== "approved" && photo.userId) {
+      awardKarma(photo.userId, "PHOTO_APPROVED", undefined, {
+        description: "Photo approved by moderator",
+        placeId: photo.placeId ?? undefined,
+      }).catch((err) => {
+        console.error("Failed to award karma for photo approval:", err);
+      });
+    }
+
+    // Deduct karma when photo is rejected (only if transitioning to rejected)
+    if (status === "rejected" && photo.currentStatus !== "rejected" && photo.userId) {
+      awardKarma(photo.userId, "PHOTO_REJECTED", undefined, {
+        description: "Photo rejected by moderator",
+        placeId: photo.placeId ?? undefined,
+      }).catch((err) => {
+        console.error("Failed to deduct karma for photo rejection:", err);
+      });
+    }
 
     // Recompute badges for the place (photo approval affects hasPhotos badge)
     if (photo.placeId) {

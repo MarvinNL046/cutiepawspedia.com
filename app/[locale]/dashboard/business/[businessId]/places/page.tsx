@@ -73,6 +73,7 @@ export default async function PlacesPage({ params }: PlacesPageProps) {
       status: "Status",
       actions: "Actions",
       view: "View",
+      manage: "Manage",
       verified: "Verified",
       premium: "Premium",
       noRating: "No reviews",
@@ -91,6 +92,7 @@ export default async function PlacesPage({ params }: PlacesPageProps) {
       status: "Status",
       actions: "Acties",
       view: "Bekijk",
+      manage: "Beheer",
       verified: "Geverifieerd",
       premium: "Premium",
       noRating: "Geen reviews",
@@ -109,6 +111,7 @@ export default async function PlacesPage({ params }: PlacesPageProps) {
       status: "Status",
       actions: "Aktionen",
       view: "Ansehen",
+      manage: "Verwalten",
       verified: "Verifiziert",
       premium: "Premium",
       noRating: "Keine Bewertungen",
@@ -215,15 +218,22 @@ export default async function PlacesPage({ params }: PlacesPageProps) {
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button size="sm" variant="outline" asChild>
-                          <Link
-                            href={`/${locale}/${place.countryName?.toLowerCase().replace(/\s+/g, "-") || "unknown"}/${place.cityName?.toLowerCase().replace(/\s+/g, "-") || "unknown"}/${place.categoryName || "business"}/${place.slug}`}
-                            target="_blank"
-                          >
-                            {t.view}
-                            <ExternalLink className="h-3 w-3 ml-1" />
-                          </Link>
-                        </Button>
+                        <div className="flex items-center justify-end gap-2">
+                          <Button size="sm" variant="default" asChild className="bg-cpPink hover:bg-cpPink/90">
+                            <Link href={`/${locale}/dashboard/business/${businessId}/places/${place.id}`}>
+                              {t.manage}
+                            </Link>
+                          </Button>
+                          <Button size="sm" variant="outline" asChild>
+                            <Link
+                              href={`/${locale}/${place.countryName?.toLowerCase().replace(/\s+/g, "-") || "unknown"}/${place.cityName?.toLowerCase().replace(/\s+/g, "-") || "unknown"}/${place.categoryName || "business"}/${place.slug}`}
+                              target="_blank"
+                            >
+                              {t.view}
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </Link>
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

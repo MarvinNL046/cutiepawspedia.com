@@ -4,3 +4,6 @@ export { ListingEditForm } from "./ListingEditForm";
 export { LeadsFilters } from "./LeadsFilters";
 export { NotificationSettings } from "./NotificationSettings";
 export type { NotificationSettingsData } from "./NotificationSettings";
+export { PhotoManager } from "./PhotoManager";
+export { CategorySelector } from "./CategorySelector";
+export { AnalyticsDashboard } from "./AnalyticsDashboard";

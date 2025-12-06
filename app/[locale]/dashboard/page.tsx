@@ -117,10 +117,10 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Link href={`/${locale}/for-businesses`} className="block">
+          <Link href={`/${locale}/onboarding/business`} className="block">
             <Button className="w-full bg-cpPink hover:bg-cpPink/90 gap-2">
               <Plus className="h-4 w-4" />
-              {locale === "nl" ? "Claim je bedrijf" : "Claim Your Business"}
+              {locale === "nl" ? "Registreer je bedrijf" : "Register Your Business"}
             </Button>
           </Link>
 

@@ -93,6 +93,7 @@ export async function getPlacesByCitySlugAndCategorySlug(
 
 /**
  * Get a place by its slug within a specific city
+ * Includes business and plan info for feature gating
  */
 export async function getPlaceBySlugAndCity(placeSlug: string, cityId: number) {
   if (!db) return null;
@@ -114,6 +115,12 @@ export async function getPlaceBySlugAndCity(placeSlug: string, cityId: number) {
         limit: 10,
         with: {
           user: true,
+        },
+      },
+      // Include business with plan for feature gating
+      business: {
+        with: {
+          subscriptionPlan: true,
         },
       },
     },

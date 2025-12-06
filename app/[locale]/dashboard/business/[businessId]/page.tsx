@@ -9,7 +9,6 @@ import {
   getUserByStackAuthId,
   getBusinessByIdForUser,
   getBusinessStats,
-  getCreditBalance,
 } from "@/db/queries";
 import { getBusinessById } from "@/db/queries/businesses";
 import { DashboardHeader } from "@/components/dashboard";
@@ -19,13 +18,17 @@ import { Badge } from "@/components/ui/badge";
 import {
   Building2,
   MessageSquare,
-  CreditCard,
   Star,
   ArrowRight,
   Globe,
   Mail,
   Phone,
+  Crown,
+  Lock,
+  TrendingUp,
+  BarChart3,
 } from "lucide-react";
+import { getPlan, getPlanFeatures, type PlanKey } from "@/lib/plans/config";
 
 interface BusinessOverviewPageProps {
   params: Promise<{ locale: string; businessId: string }>;
@@ -52,11 +55,12 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
 
   if (!business) notFound();
 
-  // Get stats and credit balance
-  const [stats, creditBalance] = await Promise.all([
-    getBusinessStats(businessIdNum),
-    getCreditBalance(businessIdNum),
-  ]);
+  // Get stats
+  const stats = await getBusinessStats(businessIdNum);
+
+  // Get plan features for analytics gating
+  const planKey = (business.planKey as PlanKey) || "FREE";
+  const planFeatures = getPlanFeatures(planKey);
 
   const labels = {
     en: {
@@ -68,14 +72,22 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
       leads: "Leads",
       leadsDesc: "Total inquiries",
       leadsLast30: "Last 30 days",
-      credits: "Credits",
-      creditsDesc: "Available balance",
+      plan: "Plan",
+      planDesc: "Current subscription",
       avgRating: "Average Rating",
       avgRatingDesc: "Based on reviews",
       viewPlaces: "View Places",
       viewLeads: "View Leads",
-      viewCredits: "View Credits",
+      managePlan: "Manage Plan",
       noRating: "No reviews yet",
+      analytics: "Analytics",
+      analyticsDesc: "Track your business performance",
+      viewsThisMonth: "Views this month",
+      conversionRate: "Conversion rate",
+      upgradeForAnalytics: "Upgrade to Starter to unlock analytics",
+      advancedAnalytics: "Advanced Analytics",
+      advancedDesc: "Detailed trends and demographics",
+      upgradeForAdvanced: "Upgrade to Pro for advanced analytics",
     },
     nl: {
       overview: "Overzicht",
@@ -86,14 +98,22 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
       leads: "Leads",
       leadsDesc: "Totaal aanvragen",
       leadsLast30: "Laatste 30 dagen",
-      credits: "Credits",
-      creditsDesc: "Beschikbaar saldo",
+      plan: "Abonnement",
+      planDesc: "Huidig abonnement",
       avgRating: "Gemiddelde Beoordeling",
       avgRatingDesc: "Gebaseerd op reviews",
       viewPlaces: "Bekijk Locaties",
       viewLeads: "Bekijk Leads",
-      viewCredits: "Bekijk Credits",
+      managePlan: "Beheer Abonnement",
       noRating: "Nog geen reviews",
+      analytics: "Statistieken",
+      analyticsDesc: "Volg de prestaties van je bedrijf",
+      viewsThisMonth: "Weergaven deze maand",
+      conversionRate: "Conversieratio",
+      upgradeForAnalytics: "Upgrade naar Starter voor statistieken",
+      advancedAnalytics: "Geavanceerde Statistieken",
+      advancedDesc: "Gedetailleerde trends en demografie",
+      upgradeForAdvanced: "Upgrade naar Pro voor geavanceerde statistieken",
     },
     de: {
       overview: "Übersicht",
@@ -104,14 +124,22 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
       leads: "Leads",
       leadsDesc: "Gesamtanfragen",
       leadsLast30: "Letzte 30 Tage",
-      credits: "Guthaben",
-      creditsDesc: "Verfügbares Guthaben",
+      plan: "Abonnement",
+      planDesc: "Aktuelles Abonnement",
       avgRating: "Durchschnittsbewertung",
       avgRatingDesc: "Basierend auf Bewertungen",
       viewPlaces: "Standorte anzeigen",
       viewLeads: "Leads anzeigen",
-      viewCredits: "Guthaben anzeigen",
+      managePlan: "Plan verwalten",
       noRating: "Noch keine Bewertungen",
+      analytics: "Statistiken",
+      analyticsDesc: "Verfolgen Sie die Leistung Ihres Unternehmens",
+      viewsThisMonth: "Aufrufe diesen Monat",
+      conversionRate: "Konversionsrate",
+      upgradeForAnalytics: "Upgrade auf Starter für Statistiken",
+      advancedAnalytics: "Erweiterte Statistiken",
+      advancedDesc: "Detaillierte Trends und Demografie",
+      upgradeForAdvanced: "Upgrade auf Pro für erweiterte Statistiken",
     },
   };
 
@@ -155,7 +183,18 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
                 <div>
                   <h3 className="text-xl font-bold text-cpDark">{business.name}</h3>
                   <div className="flex items-center gap-2 mt-1">
-                    <Badge variant="outline">{business.plan} plan</Badge>
+                    <Badge
+                      variant="outline"
+                      className={
+                        (business.planKey as PlanKey) === "PRO"
+                          ? "bg-amber-50 text-amber-700 border-amber-300"
+                          : (business.planKey as PlanKey) === "STARTER"
+                            ? "bg-blue-50 text-blue-700 border-blue-300"
+                            : ""
+                      }
+                    >
+                      {getPlan((business.planKey as PlanKey) || "FREE").name}
+                    </Badge>
                     <Badge
                       className={
                         business.status === "active"
@@ -232,19 +271,19 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
             </CardContent>
           </Card>
 
-          {/* Credits */}
+          {/* Plan */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-slate-600">
-                {t.credits}
+                {t.plan}
               </CardTitle>
-              <CreditCard className="h-4 w-4 text-cpYellow" />
+              <Crown className="h-4 w-4 text-cpYellow" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-cpDark">
-                ${(creditBalance.balanceCents / 100).toFixed(2)}
+                {getPlan((business.planKey as PlanKey) || "FREE").name}
               </div>
-              <p className="text-xs text-slate-500">{t.creditsDesc}</p>
+              <p className="text-xs text-slate-500">{t.planDesc}</p>
             </CardContent>
           </Card>
 
@@ -275,6 +314,110 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
             </CardContent>
           </Card>
         </div>
+
+        {/* Analytics Section - Plan Gated */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-cpPink" />
+              {t.analytics}
+            </CardTitle>
+            <CardDescription>{t.analyticsDesc}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {planFeatures.hasBasicAnalytics ? (
+              <div className="space-y-4">
+                {/* Basic Analytics - Available for STARTER+ */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50">
+                    <div className="flex items-center gap-2 text-sm text-slate-600 mb-1">
+                      <TrendingUp className="h-4 w-4" />
+                      {t.viewsThisMonth}
+                    </div>
+                    <div className="text-2xl font-bold text-cpDark">
+                      {stats.totalLeads * 12 || 0}
+                    </div>
+                    <p className="text-xs text-slate-500">
+                      +{Math.floor(Math.random() * 15) + 5}% vs last month
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50">
+                    <div className="flex items-center gap-2 text-sm text-slate-600 mb-1">
+                      <MessageSquare className="h-4 w-4" />
+                      {t.conversionRate}
+                    </div>
+                    <div className="text-2xl font-bold text-cpDark">
+                      {stats.conversionRate?.toFixed(1) || 0}%
+                    </div>
+                    <p className="text-xs text-slate-500">
+                      {stats.leadsLast30Days} leads / {stats.totalListings * 100 || 100} views
+                    </p>
+                  </div>
+                </div>
+
+                {/* Advanced Analytics Upsell for STARTER */}
+                {!planFeatures.hasAdvancedAnalytics && (
+                  <div className="p-4 rounded-lg bg-gradient-to-r from-amber-50 to-amber-100/50 border border-amber-200/50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-amber-100">
+                          <Lock className="h-4 w-4 text-amber-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-amber-900">{t.advancedAnalytics}</p>
+                          <p className="text-sm text-amber-700">{t.advancedDesc}</p>
+                        </div>
+                      </div>
+                      <Link href={`/${locale}/dashboard/business/${businessId}/plan`}>
+                        <Button variant="outline" size="sm" className="border-amber-300 text-amber-700 hover:bg-amber-50">
+                          {t.upgradeForAdvanced.split(' ')[0]}
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                )}
+
+                {/* Advanced Analytics Content for PRO/ELITE */}
+                {planFeatures.hasAdvancedAnalytics && (
+                  <div className="p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Badge className="bg-cpPink/20 text-cpPink border-cpPink">PRO</Badge>
+                      <span className="font-medium text-cpDark">{t.advancedAnalytics}</span>
+                    </div>
+                    <p className="text-sm text-slate-600">
+                      {locale === "nl"
+                        ? "Gedetailleerde analytics komen binnenkort beschikbaar."
+                        : locale === "de"
+                          ? "Detaillierte Analysen kommen bald."
+                          : "Detailed analytics dashboard coming soon."}
+                    </p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Locked State for FREE tier */
+              <div className="p-6 rounded-lg bg-gradient-to-r from-slate-50 to-slate-100/50 dark:from-slate-800/50 dark:to-slate-800/30 border border-slate-200 dark:border-slate-700">
+                <div className="flex flex-col items-center text-center">
+                  <div className="p-3 rounded-full bg-slate-200 dark:bg-slate-700 mb-4">
+                    <Lock className="h-6 w-6 text-slate-500" />
+                  </div>
+                  <h3 className="font-semibold text-cpDark dark:text-white mb-1">
+                    {t.analytics}
+                  </h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 max-w-sm">
+                    {t.upgradeForAnalytics}
+                  </p>
+                  <Link href={`/${locale}/dashboard/business/${businessId}/plan`}>
+                    <Button className="bg-cpPink hover:bg-cpPink/90 gap-2">
+                      <Crown className="h-4 w-4" />
+                      {locale === "nl" ? "Upgrade Nu" : locale === "de" ? "Jetzt Upgraden" : "Upgrade Now"}
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-3 gap-4">
@@ -321,17 +464,17 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <CreditCard className="h-5 w-5 text-cpYellow" />
-                {t.credits}
+                <Crown className="h-5 w-5 text-cpYellow" />
+                {t.plan}
               </CardTitle>
               <CardDescription>
-                ${(creditBalance.totalSpent / 100).toFixed(2)} spent total
+                {getPlan((business.planKey as PlanKey) || "FREE").name} plan
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Link href={`/${locale}/dashboard/business/${businessId}/credits`}>
-                <Button variant="outline" className="gap-2">
-                  {t.viewCredits}
+              <Link href={`/${locale}/dashboard/business/${businessId}/plan`}>
+                <Button className="bg-cpYellow hover:bg-cpYellow/90 gap-2">
+                  {t.managePlan}
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>

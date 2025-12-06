@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, User, ArrowLeft } from "lucide-react";
+import { ExternalLink, User, ArrowLeft, Building2 } from "lucide-react";
 import type { AdminUser } from "@/lib/auth/admin";
 import type { ImpersonationData } from "@/lib/auth/impersonation";
 import { ImpersonationBanner } from "./ImpersonationBanner";
@@ -50,13 +50,27 @@ export function AdminHeader({
 
           {/* Right side */}
           <div className="flex items-center gap-4">
-            {/* View Site link */}
-            <Link href={`/${locale}`} target="_blank">
-              <Button variant="outline" size="sm" className="gap-2">
-                <ExternalLink className="h-4 w-4" aria-hidden="true" />
-                View Site
-              </Button>
-            </Link>
+            {/* Dashboard Navigation */}
+            <div className="flex items-center gap-2">
+              <Link href={`/${locale}`} target="_blank">
+                <Button variant="outline" size="sm" className="gap-2">
+                  <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                  View Site
+                </Button>
+              </Link>
+              <Link href={`/${locale}/account/favorites`}>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <User className="h-4 w-4" aria-hidden="true" />
+                  User Dashboard
+                </Button>
+              </Link>
+              <Link href={`/${locale}/dashboard`}>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Building2 className="h-4 w-4" aria-hidden="true" />
+                  Business Dashboard
+                </Button>
+              </Link>
+            </div>
 
             {/* User info */}
             <div className="flex items-center gap-3 pl-4 border-l">

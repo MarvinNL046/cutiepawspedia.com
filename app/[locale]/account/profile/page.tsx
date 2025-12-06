@@ -12,9 +12,11 @@ import { stackServerApp } from "@/lib/auth/stack";
 import { getUserByStackAuthId, upsertUserFromStackAuth } from "@/db/queries/users";
 import { getUserProfile } from "@/db/queries/userProfiles";
 import { getBadgesForUser, getAllBadgeDefinitions } from "@/db/queries/badges";
+import { getUserKarmaSummary } from "@/db/queries/karma";
 import { ProfileSettingsForm } from "./ProfileSettingsForm";
 import { BadgeDisplay } from "./BadgeDisplay";
-import { User, Award } from "lucide-react";
+import { TrustLevelBadge } from "@/components/profile/TrustLevelBadge";
+import { User, Award, Star } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 interface ProfilePageProps {
@@ -31,6 +33,9 @@ const t = {
     noBadges: "You haven't earned any badges yet. Start reviewing places to earn your first badge!",
     earnedBadges: "Earned",
     availableBadges: "Available to earn",
+    trustLevelTitle: "Trust Level & Karma",
+    trustLevelSubtitle: "Your reputation in the community",
+    karmaPoints: "karma points",
   },
   nl: {
     title: "Profiel Instellingen",
@@ -40,6 +45,9 @@ const t = {
     noBadges: "Je hebt nog geen badges verdiend. Begin met het reviewen van plekken om je eerste badge te verdienen!",
     earnedBadges: "Verdiend",
     availableBadges: "Beschikbaar om te verdienen",
+    trustLevelTitle: "Trust Level & Karma",
+    trustLevelSubtitle: "Jouw reputatie in de community",
+    karmaPoints: "karma punten",
   },
 };
 
@@ -80,17 +88,19 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     );
   }
 
-  // Get user profile and badges (with error handling for missing tables)
+  // Get user profile, badges, and karma (with error handling for missing tables)
   let profile = null;
   let userBadges: Awaited<ReturnType<typeof getBadgesForUser>> = [];
   let allBadges: Awaited<ReturnType<typeof getAllBadgeDefinitions>> = [];
+  let karmaSummary: Awaited<ReturnType<typeof getUserKarmaSummary>> = null;
 
   try {
     profile = await getUserProfile(user.id);
     userBadges = await getBadgesForUser(user.id);
     allBadges = await getAllBadgeDefinitions();
+    karmaSummary = await getUserKarmaSummary(user.id);
   } catch (error) {
-    console.error("Error loading profile/badges:", error);
+    console.error("Error loading profile/badges/karma:", error);
     // Continue with defaults - tables may not exist yet
   }
 
@@ -127,6 +137,33 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           locale={locale}
         />
       </div>
+
+      {/* Trust Level & Karma Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Star className="h-5 w-5 text-cpPink" />
+            {text.trustLevelTitle}
+          </CardTitle>
+          <CardDescription>{text.trustLevelSubtitle}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-4">
+            <TrustLevelBadge
+              trustLevel={karmaSummary?.trustLevel ?? 0}
+              trustLevelInfo={karmaSummary?.trustLevelInfo ?? null}
+              karmaPoints={karmaSummary?.totalKarma ?? 0}
+              nextLevel={karmaSummary?.nextLevel}
+              locale={locale}
+              showProgress
+              size="lg"
+            />
+            <div className="text-sm text-slate-500">
+              {karmaSummary?.totalKarma ?? 0} {text.karmaPoints}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Badges Section */}
       <Card>

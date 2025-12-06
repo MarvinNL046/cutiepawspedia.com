@@ -1,6 +1,7 @@
-import { eq, and, or, ilike, desc, asc } from "drizzle-orm";
+import { eq, and, or, ilike, desc, asc, sql } from "drizzle-orm";
 import { db } from "../index";
-import { places, cities, categories, placeCategories, countries } from "../schema";
+import { places, cities, categories, placeCategories, countries, businesses, subscriptionPlans } from "../schema";
+import type { PlanKey } from "@/lib/plans/config";
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -27,7 +28,8 @@ export interface SearchOptions {
   limit?: number;
   offset?: number;
   sortBy?: "relevance" | "rating" | "name" | "newest";
-  premiumFirst?: boolean;
+  premiumFirst?: boolean; // @deprecated - use planPriorityFirst instead
+  planPriorityFirst?: boolean; // Sort by plan priority rank (PRO > STARTER > FREE)
 }
 
 export interface SearchResult {
@@ -45,6 +47,11 @@ export interface SearchResult {
     reviewCount: number;
     isPremium: boolean;
     isVerified: boolean;
+    // Plan info (from linked business, if any)
+    planKey: PlanKey | null;
+    planPriorityRank: number; // 1=FREE, 2=STARTER, 3=PRO, 4=ELITE
+    hasFeaturedStyling: boolean;
+    planBadge: { text: string; color: string } | null;
     city: {
       id: number;
       slug: string;
@@ -70,6 +77,7 @@ export interface SearchResult {
 
 /**
  * Search places with full-text search and filters
+ * Sorts by plan priority (PRO > STARTER > FREE) when planPriorityFirst is true
  */
 export async function searchPlaces(options: SearchOptions): Promise<SearchResult> {
   if (!db) {
@@ -86,7 +94,8 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
     limit = 20,
     offset = 0,
     sortBy = "relevance",
-    premiumFirst = true,
+    premiumFirst = true, // @deprecated
+    planPriorityFirst = true, // Default to sorting by plan priority
   } = options;
 
   // Build conditions array
@@ -154,6 +163,25 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
   // Build the search query
   let results;
 
+  // Common query config with business and plan relations
+  const withRelations = {
+    city: {
+      with: {
+        country: true,
+      },
+    },
+    placeCategories: {
+      with: {
+        category: true,
+      },
+    },
+    business: {
+      with: {
+        subscriptionPlan: true,
+      },
+    },
+  } as const;
+
   if (query && query.trim()) {
     // Simple ILIKE search (no pg_trgm or full-text search extensions required)
     const searchTerm = `%${query.trim()}%`;
@@ -181,7 +209,7 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
       },
       orderBy: (places, { desc, asc }) => {
         const orders = [];
-        if (premiumFirst) {
+        if (premiumFirst || planPriorityFirst) {
           orders.push(desc(places.isPremium));
         }
         if (sortBy === "rating" || sortBy === "relevance") {
@@ -190,24 +218,15 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
           orders.push(asc(places.name));
         } else if (sortBy === "newest") {
           orders.push(desc(places.createdAt));
+        } else {
+          orders.push(desc(places.avgRating));
         }
         orders.push(desc(places.reviewCount));
         return orders;
       },
       limit: limit + 1,
       offset,
-      with: {
-        city: {
-          with: {
-            country: true,
-          },
-        },
-        placeCategories: {
-          with: {
-            category: true,
-          },
-        },
-      },
+      with: withRelations,
     });
   } else {
     // No search query - just apply filters
@@ -224,7 +243,7 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
       },
       orderBy: (places, { desc, asc }) => {
         const orders = [];
-        if (premiumFirst) {
+        if (premiumFirst || planPriorityFirst) {
           orders.push(desc(places.isPremium));
         }
         if (sortBy === "rating") {
@@ -236,22 +255,25 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
         } else {
           orders.push(desc(places.avgRating));
         }
+        orders.push(desc(places.reviewCount));
         return orders;
       },
       limit: limit + 1,
       offset,
-      with: {
-        city: {
-          with: {
-            country: true,
-          },
-        },
-        placeCategories: {
-          with: {
-            category: true,
-          },
-        },
-      },
+      with: withRelations,
+    });
+  }
+
+  // Re-sort by plan priority if enabled (since DB ordering doesn't join plan table efficiently)
+  if (planPriorityFirst && results.length > 0) {
+    results.sort((a, b) => {
+      const aBusiness = getRelation(a.business);
+      const bBusiness = getRelation(b.business);
+      const aPlan = aBusiness ? getRelation(aBusiness.subscriptionPlan) : null;
+      const bPlan = bBusiness ? getRelation(bBusiness.subscriptionPlan) : null;
+      const aPriority = aPlan?.priorityRank ?? 1; // Default to FREE (1) if no plan
+      const bPriority = bPlan?.priorityRank ?? 1;
+      return bPriority - aPriority; // Higher priority first
     });
   }
 
@@ -263,6 +285,17 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
   const transformedResults = finalResults.map((place) => {
     const cityRel = getRelation(place.city);
     const countryRel = cityRel ? getRelation(cityRel.country) : null;
+    const businessRel = getRelation(place.business);
+    const planRel = businessRel ? getRelation(businessRel.subscriptionPlan) : null;
+
+    // Get plan info with defaults for unclaimed places (FREE tier)
+    const planKey = (businessRel?.planKey as PlanKey) ?? null;
+    const planPriorityRank = planRel?.priorityRank ?? 1; // FREE = 1
+    const hasFeaturedStyling = planRel?.hasFeaturedStyling ?? false;
+    const planBadge = planRel?.showPlanBadge && planRel?.badgeText
+      ? { text: planRel.badgeText, color: planRel.badgeColor ?? "gray" }
+      : null;
+
     return {
       id: place.id,
       slug: place.slug,
@@ -277,6 +310,11 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
       reviewCount: place.reviewCount,
       isPremium: place.isPremium,
       isVerified: place.isVerified,
+      // Plan info
+      planKey,
+      planPriorityRank,
+      hasFeaturedStyling,
+      planBadge,
       city: cityRel
         ? {
             id: cityRel.id,

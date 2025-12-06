@@ -46,8 +46,8 @@ export default async function BusinessIndexPage({ params }: BusinessIndexPagePro
       title: "My Businesses",
       description: "Select a business to manage",
       noBusiness: "No businesses yet",
-      noBusinessDesc: "You don't have any businesses registered. Claim a listing to get started!",
-      claimListing: "Claim a Listing",
+      noBusinessDesc: "You don't have any businesses registered. Start the onboarding to get listed!",
+      claimListing: "Register Your Business",
       selectBusiness: "Select",
       credits: "credits",
     },
@@ -55,8 +55,8 @@ export default async function BusinessIndexPage({ params }: BusinessIndexPagePro
       title: "Mijn Bedrijven",
       description: "Selecteer een bedrijf om te beheren",
       noBusiness: "Nog geen bedrijven",
-      noBusinessDesc: "Je hebt nog geen bedrijven geregistreerd. Claim een vermelding om te beginnen!",
-      claimListing: "Claim een Vermelding",
+      noBusinessDesc: "Je hebt nog geen bedrijven geregistreerd. Start de onboarding om vermeld te worden!",
+      claimListing: "Registreer Je Bedrijf",
       selectBusiness: "Selecteer",
       credits: "credits",
     },
@@ -64,8 +64,8 @@ export default async function BusinessIndexPage({ params }: BusinessIndexPagePro
       title: "Meine Unternehmen",
       description: "Wählen Sie ein Unternehmen zur Verwaltung",
       noBusiness: "Noch keine Unternehmen",
-      noBusinessDesc: "Sie haben noch keine Unternehmen registriert. Beanspruchen Sie einen Eintrag, um zu beginnen!",
-      claimListing: "Eintrag beanspruchen",
+      noBusinessDesc: "Sie haben noch keine Unternehmen registriert. Starten Sie das Onboarding, um gelistet zu werden!",
+      claimListing: "Unternehmen Registrieren",
       selectBusiness: "Auswählen",
       credits: "Credits",
     },
@@ -91,7 +91,7 @@ export default async function BusinessIndexPage({ params }: BusinessIndexPagePro
               <h3 className="text-xl font-semibold text-cpDark mb-2">{t.noBusiness}</h3>
               <p className="text-slate-600 mb-6">{t.noBusinessDesc}</p>
               <Button asChild className="bg-cpPink hover:bg-cpPink/90">
-                <Link href={`/${locale}`}>
+                <Link href={`/${locale}/onboarding/business`}>
                   <Plus className="h-4 w-4 mr-2" />
                   {t.claimListing}
                 </Link>

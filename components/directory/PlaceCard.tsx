@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, MapPin, Phone, Crown, CheckCircle } from "lucide-react";
+import { Star, MapPin, Phone, Crown, CheckCircle, Sparkles } from "lucide-react";
+import type { PlanKey } from "@/lib/plans/config";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type DrizzleRelation<T> = T | T[] | { [x: string]: any } | { [x: string]: any }[] | null | undefined;
@@ -18,6 +19,10 @@ interface PlaceCardProps {
     reviewCount: number;
     isVerified: boolean;
     isPremium: boolean;
+    // Plan-based features (from search results)
+    planKey?: PlanKey | null;
+    hasFeaturedStyling?: boolean;
+    planBadge?: { text: string; color: string } | null;
     placeCategories?: DrizzleRelation<{
       category: {
         slug: string;
@@ -47,18 +52,48 @@ export function PlaceCard({ place, locale, countrySlug, citySlug, categorySlug, 
     ? `/${locale}/${countrySlug}/${citySlug}/${categorySlug}/${place.slug}`
     : `/${locale}/${countrySlug}/${citySlug}/${firstCategorySlug}/${place.slug}`;
 
-  // Premium card styling
-  const premiumStyles = place.isPremium
+  // Use plan-based featured styling (falls back to isPremium for backwards compatibility)
+  const isFeatured = place.hasFeaturedStyling ?? place.isPremium;
+
+  // Get plan badge color class
+  const getBadgeColorClasses = (color: string) => {
+    switch (color) {
+      case "amber":
+        return "bg-gradient-to-r from-amber-500 to-amber-400 text-white";
+      case "blue":
+        return "bg-gradient-to-r from-blue-500 to-blue-400 text-white";
+      case "purple":
+        return "bg-gradient-to-r from-purple-500 to-purple-400 text-white";
+      default:
+        return "bg-gradient-to-r from-slate-500 to-slate-400 text-white";
+    }
+  };
+
+  // Featured card styling (PRO and above)
+  const featuredStyles = isFeatured
     ? "border-cpYellow border-2 bg-gradient-to-br from-cpYellow/5 to-white dark:from-cpYellow/10 dark:to-slate-800 shadow-md ring-1 ring-cpYellow/20"
     : "bg-white dark:bg-slate-800/80 border-slate-100 dark:border-slate-700/50";
 
   return (
     <Link href={href} className="block">
-      <Card className={`group hover-lift hover:shadow-xl hover:shadow-cpPink/10 dark:hover:shadow-cpPink/20 relative overflow-hidden transition-all duration-300 hover:-translate-y-1 ${premiumStyles}`}>
-        {/* Premium Ribbon */}
-        {place.isPremium && (
+      <Card className={`group hover-lift hover:shadow-xl hover:shadow-cpPink/10 dark:hover:shadow-cpPink/20 relative overflow-hidden transition-all duration-300 hover:-translate-y-1 ${featuredStyles}`}>
+        {/* Plan Badge Ribbon */}
+        {place.planBadge && (
           <div className="absolute top-0 right-0 z-10">
-            <div className="bg-gradient-to-r from-cpYellow to-amber-400 text-white text-xs font-bold px-3 py-1 transform rotate-0 flex items-center gap-1 rounded-bl-lg shadow-sm">
+            <div className={`text-xs font-bold px-3 py-1 flex items-center gap-1 rounded-bl-lg shadow-sm ${getBadgeColorClasses(place.planBadge.color)}`}>
+              {place.planBadge.color === "amber" ? (
+                <Crown className="h-3 w-3" />
+              ) : (
+                <Sparkles className="h-3 w-3" />
+              )}
+              {place.planBadge.text}
+            </div>
+          </div>
+        )}
+        {/* Fallback: Legacy Premium Ribbon (when no planBadge but isPremium) */}
+        {!place.planBadge && place.isPremium && (
+          <div className="absolute top-0 right-0 z-10">
+            <div className="bg-gradient-to-r from-cpYellow to-amber-400 text-white text-xs font-bold px-3 py-1 flex items-center gap-1 rounded-bl-lg shadow-sm">
               <Crown className="h-3 w-3" />
               Featured
             </div>
@@ -70,7 +105,7 @@ export function PlaceCard({ place, locale, countrySlug, citySlug, categorySlug, 
           <div className="flex items-start justify-between gap-2 mb-2">
             <div className="flex-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <h3 className={`font-semibold line-clamp-1 group-hover:text-cpPink transition-colors ${place.isPremium ? "text-amber-900 dark:text-amber-200" : "text-cpDark dark:text-white"}`}>
+                <h3 className={`font-semibold line-clamp-1 group-hover:text-cpPink transition-colors ${isFeatured ? "text-amber-900 dark:text-amber-200" : "text-cpDark dark:text-white"}`}>
                   {place.name}
                 </h3>
                 {place.isVerified && (

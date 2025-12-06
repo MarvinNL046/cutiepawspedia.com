@@ -29,6 +29,8 @@ import {
 } from "lucide-react";
 import { type PlanKey, getPlanFeatures } from "@/lib/plans/config";
 import { getBusinessPhotoUrl } from "@/lib/storage/businessPhotos";
+import { generateContent, type ContentLocale } from "@/lib/ai/generateContent";
+import { getBestAboutText } from "@/lib/enrichment/ui";
 
 interface PlaceDetailPageProps {
   params: Promise<{ locale: string; businessId: string; placeId: string }>;
@@ -94,6 +96,30 @@ export default async function PlaceDetailPage({ params }: PlaceDetailPageProps) 
     url: getBusinessPhotoUrl(photo.storageKey),
     createdAt: photo.createdAt.toISOString(),
   }));
+
+  // Generate AI content to use as fallback description (same as public page)
+  // This ensures the form shows what's actually displayed on the public page
+  const { content: aiContent } = await generateContent({
+    type: "place",
+    locale: locale as ContentLocale,
+    data: {
+      placeName: place.name,
+      placeSlug: place.slug,
+      cityName: place.cityName || "",
+      citySlug: place.citySlug || "",
+      countryName: place.countryName || "",
+      countrySlug: place.countrySlug || "",
+      categories: [],
+      description: place.description || undefined,
+      address: place.address || undefined,
+    },
+  });
+
+  // Get the best about text (same logic as public page)
+  const { text: displayedAboutText } = getBestAboutText(
+    { name: place.name, description: place.description },
+    { intro: aiContent.intro, secondary: aiContent.secondary, bullets: aiContent.bullets }
+  );
 
   // Get plan features
   const planKey = (business.planKey || "FREE") as PlanKey;
@@ -275,7 +301,7 @@ export default async function PlaceDetailPage({ params }: PlaceDetailPageProps) 
                 address: place.address || "",
                 website: place.website || "",
                 phone: place.phone || "",
-                description: place.description || "",
+                description: displayedAboutText,
               }}
               locale={locale}
             />

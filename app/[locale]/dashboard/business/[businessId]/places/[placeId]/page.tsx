@@ -12,7 +12,7 @@ import { getActivePhotosByPlaceId } from "@/db/queries/businessPhotos";
 import { db } from "@/db";
 import { eq, and } from "drizzle-orm";
 import { places, cities, countries, businesses } from "@/db/schema/directory";
-import { DashboardHeader, PhotoManager, CategorySelector } from "@/components/dashboard";
+import { DashboardHeader, PhotoManager, CategorySelector, ListingEditForm } from "@/components/dashboard";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +25,7 @@ import {
   Building2,
   CheckCircle,
   Crown,
+  FileText,
 } from "lucide-react";
 import { type PlanKey, getPlanFeatures } from "@/lib/plans/config";
 import { getBusinessPhotoUrl } from "@/lib/storage/businessPhotos";
@@ -66,6 +67,9 @@ export default async function PlaceDetailPage({ params }: PlaceDetailPageProps) 
       name: places.name,
       slug: places.slug,
       description: places.description,
+      address: places.address,
+      phone: places.phone,
+      website: places.website,
       avgRating: places.avgRating,
       reviewCount: places.reviewCount,
       isVerified: places.isVerified,
@@ -110,6 +114,8 @@ export default async function PlaceDetailPage({ params }: PlaceDetailPageProps) 
       premium: "Premium",
       viewListing: "View Public Listing",
       plan: "Current Plan",
+      businessDetails: "Business Details",
+      businessDetailsDesc: "Edit your business name, address, contact info and description",
     },
     nl: {
       title: "Locatie Beheren",
@@ -125,6 +131,8 @@ export default async function PlaceDetailPage({ params }: PlaceDetailPageProps) 
       premium: "Premium",
       viewListing: "Bekijk Publieke Vermelding",
       plan: "Huidige Abonnement",
+      businessDetails: "Bedrijfsgegevens",
+      businessDetailsDesc: "Bewerk je bedrijfsnaam, adres, contactgegevens en beschrijving",
     },
     de: {
       title: "Standort Verwalten",
@@ -140,6 +148,8 @@ export default async function PlaceDetailPage({ params }: PlaceDetailPageProps) 
       premium: "Premium",
       viewListing: "Öffentlichen Eintrag Ansehen",
       plan: "Aktueller Plan",
+      businessDetails: "Geschäftsdetails",
+      businessDetailsDesc: "Bearbeiten Sie Ihren Firmennamen, Adresse, Kontaktdaten und Beschreibung",
     },
   };
 
@@ -245,6 +255,30 @@ export default async function PlaceDetailPage({ params }: PlaceDetailPageProps) 
                 </Badge>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Business Details Editor */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-cpAqua" />
+              {t.businessDetails}
+            </CardTitle>
+            <CardDescription>{t.businessDetailsDesc}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ListingEditForm
+              listingId={placeIdNum}
+              initialData={{
+                name: place.name,
+                address: place.address || "",
+                website: place.website || "",
+                phone: place.phone || "",
+                description: place.description || "",
+              }}
+              locale={locale}
+            />
           </CardContent>
         </Card>
 

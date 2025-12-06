@@ -29,6 +29,7 @@ interface OnboardingWizardProps {
   isLoggedIn: boolean;
   userId?: number;
   userEmail?: string;
+  initialPlan?: "FREE" | "STARTER" | "PRO" | "ELITE";
 }
 
 export interface OnboardingData {
@@ -73,6 +74,7 @@ export function OnboardingWizard({
   isLoggedIn,
   userId,
   userEmail,
+  initialPlan,
 }: OnboardingWizardProps) {
   const router = useRouter();
 
@@ -89,7 +91,7 @@ export function OnboardingWizard({
     businessPhone: "",
     businessEmail: userEmail || "",
     businessWebsite: "",
-    planKey: "FREE",
+    planKey: initialPlan || "FREE",
     placeName: "",
     placeDescription: "",
     placeAddress: "",
@@ -115,6 +117,12 @@ export function OnboardingWizard({
   };
 
   const goToPrevStep = () => {
+    // Skip plan step if plan was pre-selected
+    if (currentStep === "place" && initialPlan) {
+      setCurrentStep("business");
+      return;
+    }
+
     const prevIndex = currentStepIndex - 1;
     // Don't go back to account if logged in
     if (prevIndex >= 0 && !(isLoggedIn && STEPS[prevIndex] === "account")) {
@@ -128,7 +136,12 @@ export function OnboardingWizard({
   };
 
   const handleBusinessComplete = () => {
-    goToNextStep();
+    // Skip plan step if plan was pre-selected from URL
+    if (initialPlan) {
+      setCurrentStep("place");
+    } else {
+      goToNextStep();
+    }
   };
 
   const handlePlanComplete = () => {

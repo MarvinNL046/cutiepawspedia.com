@@ -16,6 +16,7 @@ import { OnboardingWizard } from "@/components/onboarding/OnboardingWizard";
 
 interface OnboardingPageProps {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ plan?: string; cancelled?: string }>;
 }
 
 export async function generateMetadata({ params }: OnboardingPageProps): Promise<Metadata> {
@@ -39,8 +40,9 @@ export async function generateMetadata({ params }: OnboardingPageProps): Promise
   };
 }
 
-export default async function OnboardingPage({ params }: OnboardingPageProps) {
+export default async function OnboardingPage({ params, searchParams }: OnboardingPageProps) {
   const { locale } = await params;
+  const { plan: initialPlan, cancelled } = await searchParams;
 
   // Check if user is logged in
   const stackUser = stackServerApp ? await stackServerApp.getUser() : null;
@@ -107,6 +109,17 @@ export default async function OnboardingPage({ params }: OnboardingPageProps) {
           </p>
         </div>
 
+        {/* Cancelled payment notice */}
+        {cancelled && (
+          <div className="mb-6 p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 text-sm">
+            {locale === "nl"
+              ? "Betaling geannuleerd. Je kunt het opnieuw proberen of een ander plan kiezen."
+              : locale === "de"
+                ? "Zahlung abgebrochen. Du kannst es erneut versuchen oder einen anderen Plan wählen."
+                : "Payment cancelled. You can try again or choose a different plan."}
+          </div>
+        )}
+
         {/* Wizard */}
         <OnboardingWizard
           locale={locale}
@@ -114,6 +127,7 @@ export default async function OnboardingPage({ params }: OnboardingPageProps) {
           isLoggedIn={!!stackUser}
           userId={dbUser?.id}
           userEmail={stackUser?.primaryEmail || undefined}
+          initialPlan={initialPlan as "FREE" | "STARTER" | "PRO" | "ELITE" | undefined}
         />
       </div>
     </div>

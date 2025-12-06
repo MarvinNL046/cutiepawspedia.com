@@ -505,7 +505,7 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
                       }`}
                       variant={plan.isPopular ? "default" : "outline"}
                     >
-                      <Link href={`/${locale}/onboarding/business`}>
+                      <Link href={`/${locale}/onboarding/business?plan=${plan.key}`}>
                         {t.getStarted}
                         <ArrowRight className="h-4 w-4 ml-2" />
                       </Link>

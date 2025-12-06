@@ -28,6 +28,7 @@ import {
   type ContentLocale,
 } from "@/lib/seo";
 import { Search, Shield, Clock, Star, MapPin, CheckCircle, ChevronRight, Sparkles, Heart, Users, Award, Crown } from "lucide-react";
+import { BetweenContentAd, InFeedAd } from "@/components/ads";
 
 interface HomePageProps {
   params: Promise<{ locale: string }>;
@@ -361,6 +362,11 @@ export default async function HomePage({ params }: HomePageProps) {
         </section>
       )}
 
+      {/* Ad: Between Content (for non-logged-in users) */}
+      <div className="container mx-auto max-w-6xl px-4">
+        <BetweenContentAd className="my-8" />
+      </div>
+
       {/* Why CutiePawsPedia - Features */}
       <section className="py-20 bg-slate-50/50 dark:bg-slate-900/50">
         <div className="container mx-auto max-w-6xl px-4">
@@ -619,6 +625,11 @@ export default async function HomePage({ params }: HomePageProps) {
           </div>
         </div>
       </section>
+
+      {/* Ad: Between Content (for non-logged-in users) */}
+      <div className="container mx-auto max-w-6xl px-4">
+        <BetweenContentAd className="my-8" />
+      </div>
 
       {/* Stats - Modern Card Design */}
       <section className="relative py-20 overflow-hidden">

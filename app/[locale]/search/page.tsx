@@ -20,6 +20,7 @@ import { PlaceCard, MapWidgetLazy as MapWidget, type MapMarker, SearchResultsCli
 import { SearchBar } from "@/components/directory";
 import { SearchTracker } from "@/components/analytics";
 import { ChevronRight, Search, MapPin, Map, LayoutGrid } from "lucide-react";
+import { BetweenContentAd, SidebarAd } from "@/components/ads";
 
 interface SearchPageProps {
   params: Promise<{ locale: string }>;
@@ -460,6 +461,9 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
             showMap={showMap}
           />
         </Suspense>
+
+        {/* Ad: Between search results and countries (for non-logged-in users) */}
+        <BetweenContentAd className="mt-8" />
       </section>
 
       {/* Popular Countries */}

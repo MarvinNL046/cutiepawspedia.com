@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import { addCredits } from "@/db/queries/credits";
 import { logAuditEvent } from "@/db/queries/auditLogs";
 import { type PlanKey, type PlanStatus } from "@/lib/plans/config";
+import { createBusiness } from "@/app/api/onboarding/business/route";
 
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -131,6 +132,81 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   if (type === "subscription") {
     console.log(`Subscription checkout completed for business ${businessId}`);
     // Subscription is handled by customer.subscription.created event
+    return;
+  }
+
+  // Handle onboarding checkout (new business creation after payment)
+  if (type === "onboarding") {
+    const { userId, businessName, businessDescription, businessPhone, businessEmail,
+            businessWebsite, countryId, planKey, placeName, placeDescription,
+            placeAddress, cityId, categoryIds, claimPlaceId } = metadata;
+
+    if (!userId || !businessName) {
+      console.error("Missing required onboarding metadata:", metadata);
+      return;
+    }
+
+    try {
+      // Check if business already exists (from success page)
+      const existingBusiness = await db.query.businesses.findFirst({
+        where: eq(businesses.stripeSubscriptionId, session.subscription as string),
+      });
+
+      if (existingBusiness) {
+        console.log(`Business already exists for session ${session.id}, skipping creation`);
+        return;
+      }
+
+      // Create the business
+      const result = await createBusiness(parseInt(userId, 10), {
+        businessName,
+        businessDescription: businessDescription || "",
+        businessPhone: businessPhone || "",
+        businessEmail,
+        businessWebsite: businessWebsite || "",
+        countryId: parseInt(countryId, 10),
+        planKey: planKey as "STARTER" | "PRO" | "ELITE",
+        placeName: placeName || undefined,
+        placeDescription: placeDescription || undefined,
+        placeAddress: placeAddress || undefined,
+        cityId: cityId ? parseInt(cityId, 10) : undefined,
+        categoryIds: categoryIds ? JSON.parse(categoryIds) : [],
+        claimPlaceId: claimPlaceId ? parseInt(claimPlaceId, 10) : undefined,
+      });
+
+      if (result.success && result.businessId) {
+        // Update business with Stripe subscription ID
+        if (session.subscription) {
+          await db
+            .update(businesses)
+            .set({
+              stripeCustomerId: session.customer as string,
+              stripeSubscriptionId: session.subscription as string,
+            })
+            .where(eq(businesses.id, result.businessId));
+        }
+
+        console.log(`Onboarding completed via webhook: business ${result.businessId} created`);
+
+        logAuditEvent({
+          actorBusinessId: result.businessId,
+          actorRole: "system",
+          eventType: "BUSINESS_CREATED_VIA_WEBHOOK",
+          targetType: "business",
+          targetId: result.businessId,
+          metadata: {
+            planKey,
+            stripeSessionId: session.id,
+            createdVia: "webhook",
+          },
+        });
+      } else {
+        console.error("Failed to create business via webhook:", result.error);
+      }
+    } catch (error) {
+      console.error("Error creating business via webhook:", error);
+      throw error;
+    }
     return;
   }
 

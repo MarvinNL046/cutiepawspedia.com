@@ -474,24 +474,45 @@ export const TRIAL_DURATION_DAYS = 14;
 
 /**
  * Get Stripe Price ID for a plan
+ *
+ * NOTE: This function reads env vars at runtime to avoid build-time baking.
+ * The PLAN_CONFIG values are fallbacks that get evaluated at build time.
  */
 export function getStripePriceId(
   planKey: PlanKey,
   interval: "monthly" | "yearly"
 ): string | null {
-  const plan = PLAN_CONFIG[planKey];
-  return interval === "monthly"
-    ? plan.stripePriceIdMonthly
-    : plan.stripePriceIdYearly;
+  // Read env vars at runtime (not build time)
+  const envVarMap: Record<PlanKey, { monthly: string; yearly: string }> = {
+    FREE: { monthly: "", yearly: "" },
+    STARTER: {
+      monthly: "STRIPE_PRICE_STARTER_MONTHLY",
+      yearly: "STRIPE_PRICE_STARTER_YEARLY",
+    },
+    PRO: {
+      monthly: "STRIPE_PRICE_PRO_MONTHLY",
+      yearly: "STRIPE_PRICE_PRO_YEARLY",
+    },
+    ELITE: {
+      monthly: "STRIPE_PRICE_ELITE_MONTHLY",
+      yearly: "STRIPE_PRICE_ELITE_YEARLY",
+    },
+  };
+
+  const envVar = envVarMap[planKey][interval];
+  if (!envVar) return null;
+
+  // Read from process.env at runtime
+  const priceId = process.env[envVar];
+  return priceId || null;
 }
 
 /**
  * Check if Stripe is properly configured for a plan
  */
 export function isStripeConfigured(planKey: PlanKey): boolean {
-  const plan = PLAN_CONFIG[planKey];
   // Free plan doesn't need Stripe
   if (planKey === "FREE") return true;
-  // Check if at least monthly price ID is set
-  return !!plan.stripePriceIdMonthly;
+  // Check if at least monthly price ID is set (read at runtime)
+  return !!getStripePriceId(planKey, "monthly");
 }

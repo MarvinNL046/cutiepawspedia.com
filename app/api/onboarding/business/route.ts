@@ -160,6 +160,9 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      // Get base URL for redirects
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_BASE_URL || "https://www.cutiepawspedia.com";
+
       // Create Stripe checkout session
       const session = await stripe.checkout.sessions.create({
         mode: "subscription",
@@ -170,8 +173,8 @@ export async function POST(request: NextRequest) {
             quantity: 1,
           },
         ],
-        success_url: `${process.env.NEXT_PUBLIC_APP_URL}/onboarding/business/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/onboarding/business?cancelled=true`,
+        success_url: `${baseUrl}/onboarding/business/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${baseUrl}/onboarding/business?cancelled=true`,
         metadata: {
           type: "onboarding",
           userId: dbUser.id.toString(),
@@ -223,8 +226,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error in business onboarding:", error);
+    // Return more specific error message for debugging
+    const errorMessage = error instanceof Error ? error.message : "Failed to create business";
     return NextResponse.json(
-      { error: "Failed to create business" },
+      { error: errorMessage },
       { status: 500 }
     );
   }

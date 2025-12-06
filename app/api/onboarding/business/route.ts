@@ -160,8 +160,11 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Get base URL for redirects
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_BASE_URL || "https://www.cutiepawspedia.com";
+      // Get base URL for redirects - use request origin or fallback to production
+      const requestOrigin = request.headers.get("origin") || request.headers.get("referer")?.split("/").slice(0, 3).join("/");
+      const baseUrl = requestOrigin?.includes("localhost")
+        ? "https://www.cutiepawspedia.com"  // Never redirect to localhost
+        : (requestOrigin || "https://www.cutiepawspedia.com");
 
       // Create Stripe checkout session
       const session = await stripe.checkout.sessions.create({

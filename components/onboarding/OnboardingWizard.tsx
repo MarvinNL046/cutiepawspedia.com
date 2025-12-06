@@ -56,6 +56,11 @@ export interface OnboardingData {
   cityId?: number;
   cityName?: string;
   categoryIds: number[];
+
+  // Claim mode (when claiming existing place)
+  claimPlaceId?: number;
+  claimPlaceName?: string;
+  claimCityName?: string;
 }
 
 const STEPS = ["account", "business", "plan", "place"] as const;
@@ -141,6 +146,22 @@ export function OnboardingWizard({
       setCurrentStep("place");
     } else {
       goToNextStep();
+    }
+  };
+
+  // Handle claiming an existing place from BusinessStep
+  const handleClaimPlace = (placeId: number, placeName: string, cityName: string) => {
+    updateData({
+      claimPlaceId: placeId,
+      claimPlaceName: placeName,
+      claimCityName: cityName,
+      placeName: placeName,
+    });
+    // Skip plan step if plan was pre-selected, go to place step in claim mode
+    if (initialPlan) {
+      setCurrentStep("place");
+    } else {
+      goToNextStep(); // Go to plan step
     }
   };
 
@@ -279,6 +300,7 @@ export function OnboardingWizard({
               updateData={updateData}
               onNext={handleBusinessComplete}
               onBack={isLoggedIn ? undefined : goToPrevStep}
+              onClaimPlace={handleClaimPlace}
               labels={{ back: t.back, next: t.next }}
             />
           )}

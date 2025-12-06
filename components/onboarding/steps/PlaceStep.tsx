@@ -57,7 +57,7 @@ interface SearchResult {
   hasOwner: boolean;
 }
 
-type Mode = "choose" | "claim" | "create";
+type Mode = "choose" | "claim" | "create" | "confirm-claim";
 
 export function PlaceStep({
   locale,
@@ -68,7 +68,8 @@ export function PlaceStep({
   isSubmitting,
   labels,
 }: PlaceStepProps) {
-  const [mode, setMode] = useState<Mode>("choose");
+  // If claimPlaceId is already set (from BusinessStep), start in confirm mode
+  const [mode, setMode] = useState<Mode>(data.claimPlaceId ? "confirm-claim" : "choose");
   const [cities, setCities] = useState<City[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoadingCities, setIsLoadingCities] = useState(false);
@@ -146,6 +147,12 @@ export function PlaceStep({
         selected: "Selected",
         back: "Back to options",
       },
+      confirmClaim: {
+        title: "Claim Your Listing",
+        description: "You're about to claim this existing listing:",
+        confirmButton: "Claim & Complete",
+        changeChoice: "Choose a different listing",
+      },
       create: {
         title: "Create New Listing",
         placeName: "Location Name",
@@ -184,6 +191,12 @@ export function PlaceStep({
         selected: "Geselecteerd",
         back: "Terug naar opties",
       },
+      confirmClaim: {
+        title: "Claim Je Vermelding",
+        description: "Je staat op het punt deze bestaande vermelding te claimen:",
+        confirmButton: "Claim & Voltooien",
+        changeChoice: "Kies een andere vermelding",
+      },
       create: {
         title: "Nieuwe Vermelding Aanmaken",
         placeName: "Locatienaam",
@@ -221,6 +234,12 @@ export function PlaceStep({
         select: "Auswählen",
         selected: "Ausgewählt",
         back: "Zurück zu den Optionen",
+      },
+      confirmClaim: {
+        title: "Beanspruche Deinen Eintrag",
+        description: "Du bist dabei, diesen bestehenden Eintrag zu beanspruchen:",
+        confirmButton: "Beanspruchen & Abschließen",
+        changeChoice: "Anderen Eintrag wählen",
       },
       create: {
         title: "Neuen Eintrag Erstellen",
@@ -297,6 +316,65 @@ export function PlaceStep({
       updateData({ categoryIds: [...currentIds, categoryId] });
     }
   };
+
+  // Confirm claim mode UI (when place was selected from BusinessStep)
+  if (mode === "confirm-claim" && data.claimPlaceId) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-4">
+            <Check className="w-6 h-6 text-green-500" />
+          </div>
+          <h2 className="text-xl font-semibold text-cpDark dark:text-white mb-2">
+            {t.confirmClaim.title}
+          </h2>
+          <p className="text-slate-600 dark:text-slate-400">
+            {t.confirmClaim.description}
+          </p>
+        </div>
+
+        {/* Selected place card */}
+        <div className="p-6 rounded-xl border-2 border-green-500/50 bg-green-50 dark:bg-green-900/20">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-lg bg-white dark:bg-slate-800 flex items-center justify-center">
+              <Building2 className="w-6 h-6 text-cpPink" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-cpDark dark:text-white text-lg">
+                {data.claimPlaceName || data.placeName}
+              </h3>
+              <div className="flex items-center gap-1 text-slate-500">
+                <MapPin className="h-4 w-4" />
+                {data.claimCityName}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div className="flex justify-between pt-4">
+          <Button
+            variant="outline"
+            onClick={() => {
+              // Clear claim data and go back to choose
+              updateData({ claimPlaceId: undefined, claimPlaceName: undefined, claimCityName: undefined });
+              setMode("choose");
+            }}
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            {t.confirmClaim.changeChoice}
+          </Button>
+          <Button
+            onClick={onSubmit}
+            disabled={isSubmitting}
+            className="bg-cpPink hover:bg-cpPink/90"
+          >
+            {isSubmitting ? labels.submitting : t.confirmClaim.confirmButton}
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   // Choose mode UI
   if (mode === "choose") {

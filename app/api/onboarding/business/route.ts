@@ -11,7 +11,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stackServerApp } from "@/lib/auth/stack";
 import { db } from "@/db";
-import { businesses, places, placeCategories, users, userRoleEnum } from "@/db/schema/directory";
+import { businesses, places, placeCategories, users } from "@/db/schema/directory";
 import { eq, and } from "drizzle-orm";
 import { getStripePriceId, type PlanKey } from "@/lib/plans/config";
 import Stripe from "stripe";

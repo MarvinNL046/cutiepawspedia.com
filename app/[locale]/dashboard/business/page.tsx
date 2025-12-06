@@ -10,7 +10,7 @@ import { DashboardHeader } from "@/components/dashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Plus, ChevronRight, CreditCard } from "lucide-react";
+import { Building2, Plus, ChevronRight } from "lucide-react";
 
 interface BusinessIndexPageProps {
   params: Promise<{ locale: string }>;
@@ -137,10 +137,12 @@ export default async function BusinessIndexPage({ params }: BusinessIndexPagePro
                   <CardContent>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-slate-500">Plan: {business.plan}</span>
+                      {/* Credits feature disabled for now
                       <span className="flex items-center gap-1 text-cpDark font-medium">
                         <CreditCard className="h-4 w-4" />
                         {(business.creditBalanceCents / 100).toFixed(2)} {t.credits}
                       </span>
+                      */}
                     </div>
                   </CardContent>
                 </Card>

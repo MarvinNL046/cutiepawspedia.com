@@ -139,7 +139,8 @@ export default async function BusinessLayout({
     { href: "/leads", label: t.leads, icon: MessageSquare },
     { href: "/analytics", label: t.analytics, icon: BarChart3 },
     { href: "/plan", label: t.plan, icon: Crown },
-    { href: "/credits", label: t.credits, icon: CreditCard },
+    // Credits feature disabled for now
+    // { href: "/credits", label: t.credits, icon: CreditCard },
   ];
 
   return (

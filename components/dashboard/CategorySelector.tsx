@@ -120,11 +120,11 @@ export function CategorySelector({
         `/api/dashboard/business/${businessId}/places/${placeId}/categories`
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to load categories");
-      }
-
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to load categories");
+      }
       setAllCategories(data.allCategories || []);
 
       const selectedSet = new Set<number>(

@@ -11,7 +11,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { stackServerApp } from "@/lib/auth/stack";
 import { getUserByStackAuthId } from "@/db/queries/users";
 import { getBusinessById, getBusinessByIdForUser } from "@/db/queries/businesses";
-import { db } from "@/db";
+import { db, isDatabaseAvailable } from "@/db";
 import { eq, and } from "drizzle-orm";
 import { places } from "@/db/schema/directory";
 import {
@@ -33,6 +33,14 @@ interface RouteParams {
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
+    // Check database availability
+    if (!isDatabaseAvailable()) {
+      return NextResponse.json(
+        { error: "Database not available" },
+        { status: 503 }
+      );
+    }
+
     const { businessId, placeId } = await params;
     const businessIdNum = parseInt(businessId, 10);
     const placeIdNum = parseInt(placeId, 10);
@@ -109,6 +117,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  */
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
+    // Check database availability
+    if (!isDatabaseAvailable()) {
+      return NextResponse.json(
+        { error: "Database not available" },
+        { status: 503 }
+      );
+    }
+
     const { businessId, placeId } = await params;
     const businessIdNum = parseInt(businessId, 10);
     const placeIdNum = parseInt(placeId, 10);

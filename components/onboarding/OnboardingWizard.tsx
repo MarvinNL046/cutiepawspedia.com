@@ -290,6 +290,7 @@ export function OnboardingWizard({
             <AccountStep
               locale={locale}
               onComplete={handleAccountComplete}
+              initialPlan={initialPlan}
             />
           )}
 

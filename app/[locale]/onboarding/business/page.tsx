@@ -11,7 +11,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { stackServerApp } from "@/lib/auth/stack";
-import { getUserByStackAuthId, getBusinessesForUser } from "@/db/queries";
+import { getUserByStackAuthId, getBusinessesForUser, upsertUserFromStackAuth } from "@/db/queries";
 import { OnboardingWizard } from "@/components/onboarding/OnboardingWizard";
 
 interface OnboardingPageProps {
@@ -50,7 +50,18 @@ export default async function OnboardingPage({ params, searchParams }: Onboardin
   let existingBusinesses: { id: number; name: string }[] = [];
 
   if (stackUser) {
+    // First try to get existing user
     dbUser = await getUserByStackAuthId(stackUser.id);
+
+    // If Stack Auth user exists but not in our DB, sync them now
+    if (!dbUser) {
+      dbUser = await upsertUserFromStackAuth({
+        stackauthId: stackUser.id,
+        email: stackUser.primaryEmail || "",
+        name: stackUser.displayName,
+        emailVerified: stackUser.primaryEmailVerified,
+      });
+    }
 
     // If user already has businesses, redirect to dashboard
     if (dbUser) {

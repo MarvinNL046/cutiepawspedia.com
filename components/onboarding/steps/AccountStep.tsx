@@ -10,9 +10,10 @@ import { LogIn, UserPlus } from "lucide-react";
 interface AccountStepProps {
   locale: string;
   onComplete: (userId: number, email: string) => void;
+  initialPlan?: string;
 }
 
-export function AccountStep({ locale }: AccountStepProps) {
+export function AccountStep({ locale, initialPlan }: AccountStepProps) {
   const translations = {
     en: {
       title: "Create or Sign In to Your Account",
@@ -42,8 +43,9 @@ export function AccountStep({ locale }: AccountStepProps) {
 
   const t = translations[locale as keyof typeof translations] || translations.en;
 
-  // Redirect to auth with return URL
-  const returnUrl = `/${locale}/onboarding/business`;
+  // Redirect to auth with return URL, preserving the plan parameter
+  const planParam = initialPlan ? `?plan=${initialPlan}` : "";
+  const returnUrl = `/${locale}/onboarding/business${planParam}`;
 
   return (
     <div className="space-y-6">

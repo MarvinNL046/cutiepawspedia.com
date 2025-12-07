@@ -301,15 +301,24 @@ export function faqSchema(
  * Individual Review schema for JSON-LD
  * Used for featured reviews on place pages
  */
+// E-E-A-T Enhanced Author Schema
+interface AuthorSchemaData {
+  name?: string | null;
+  // E-E-A-T Expert fields
+  isExpert?: boolean;
+  professionalTitle?: string | null;
+  credentials?: string[];
+  expertiseAreas?: string[];
+  yearsExperience?: number | null;
+}
+
 interface ReviewSchemaData {
   id: number;
   rating: number;
   title?: string | null;
   body: string;
   createdAt: Date | string;
-  author?: {
-    name?: string | null;
-  } | null;
+  author?: AuthorSchemaData | null;
   itemReviewed: {
     name: string;
     url: string;
@@ -317,7 +326,51 @@ interface ReviewSchemaData {
 }
 
 /**
+ * Build enhanced Person schema for review authors (E-E-A-T)
+ * Includes expert credentials when available
+ */
+function buildAuthorSchema(author?: AuthorSchemaData | null): object {
+  // Use real name or "Community Reviewer" (not "Anonymous" for E-E-A-T)
+  const authorName = author?.name || "Community Reviewer";
+
+  const personSchema: Record<string, unknown> = {
+    "@type": "Person",
+    name: authorName,
+  };
+
+  // Add expert credentials for E-E-A-T signals
+  if (author?.isExpert) {
+    // Add job title
+    if (author.professionalTitle) {
+      personSchema.jobTitle = author.professionalTitle;
+    }
+
+    // Add credentials as hasCredential
+    if (author.credentials && author.credentials.length > 0) {
+      personSchema.hasCredential = author.credentials.map((cred) => ({
+        "@type": "EducationalOccupationalCredential",
+        credentialCategory: "professional certification",
+        name: cred,
+      }));
+    }
+
+    // Add expertise areas as knowsAbout
+    if (author.expertiseAreas && author.expertiseAreas.length > 0) {
+      personSchema.knowsAbout = author.expertiseAreas;
+    }
+
+    // Add description with years of experience
+    if (author.yearsExperience && author.yearsExperience > 0) {
+      personSchema.description = `${author.professionalTitle || "Pet care professional"} with ${author.yearsExperience}+ years of experience`;
+    }
+  }
+
+  return personSchema;
+}
+
+/**
  * Build Review JSON-LD schema for a single review
+ * Enhanced with E-E-A-T Person schema for expert authors
  */
 export function reviewSchema(review: ReviewSchemaData): object {
   const dateCreated = typeof review.createdAt === "string"
@@ -336,10 +389,7 @@ export function reviewSchema(review: ReviewSchemaData): object {
       worstRating: "1",
     },
     datePublished: dateCreated.split("T")[0],
-    author: {
-      "@type": "Person",
-      name: review.author?.name || "Anonymous",
-    },
+    author: buildAuthorSchema(review.author),
     itemReviewed: {
       "@type": "LocalBusiness",
       name: review.itemReviewed.name,
@@ -367,6 +417,7 @@ export function reviewsSchema(
 /**
  * Enhanced LocalBusiness schema with embedded reviews
  * Includes both aggregateRating and individual review snippets
+ * Updated with E-E-A-T Person schema for expert authors
  */
 export function localBusinessWithReviewsSchema(
   place: PlaceSchemaData,
@@ -378,7 +429,7 @@ export function localBusinessWithReviewsSchema(
     title?: string | null;
     body: string;
     createdAt: Date | string;
-    author?: { name?: string | null } | null;
+    author?: AuthorSchemaData | null;
   }>
 ): object {
   // Get base LocalBusiness schema
@@ -402,10 +453,8 @@ export function localBusinessWithReviewsSchema(
           worstRating: "1",
         },
         datePublished: dateCreated.split("T")[0],
-        author: {
-          "@type": "Person",
-          name: review.author?.name || "Anonymous",
-        },
+        // Use enhanced Person schema with E-E-A-T credentials
+        author: buildAuthorSchema(review.author),
       };
     });
 

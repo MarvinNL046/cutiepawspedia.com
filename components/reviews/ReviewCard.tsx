@@ -2,12 +2,18 @@
 
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { Award, MessageSquare, ChevronDown, ChevronUp, User } from "lucide-react";
+import { Award, MessageSquare, ChevronDown, ChevronUp, User, GraduationCap, BadgeCheck } from "lucide-react";
 import { RatingStars } from "./RatingStars";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export interface ReviewReply {
   id: number;
@@ -30,6 +36,12 @@ export interface ReviewData {
     image?: string | null;
     trustLevel?: number;
     karmaPoints?: number;
+    // E-E-A-T Expert fields
+    isExpert?: boolean;
+    professionalTitle?: string | null;
+    credentials?: string[];
+    expertiseAreas?: string[];
+    yearsExperience?: number | null;
   } | null;
   replies?: ReviewReply[];
 }
@@ -79,10 +91,18 @@ export function ReviewCard({
             </AvatarFallback>
           </Avatar>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="font-medium text-sm">{userName}</span>
+              {/* Expert Badge - E-E-A-T Signal */}
+              {review.user?.isExpert && (
+                <ExpertBadge
+                  professionalTitle={review.user.professionalTitle}
+                  credentials={review.user.credentials}
+                  yearsExperience={review.user.yearsExperience}
+                />
+              )}
               {/* Trust Level Badge */}
-              {review.user?.trustLevel !== undefined && review.user.trustLevel >= 2 && (
+              {review.user?.trustLevel !== undefined && review.user.trustLevel >= 2 && !review.user.isExpert && (
                 <TrustLevelIcon level={review.user.trustLevel} />
               )}
               {review.isFeatured && (
@@ -220,6 +240,70 @@ function TrustLevelIcon({ level }: { level: number }) {
     >
       {data.icon}
     </span>
+  );
+}
+
+// Expert badge with credentials tooltip (E-E-A-T)
+interface ExpertBadgeProps {
+  professionalTitle?: string | null;
+  credentials?: string[];
+  yearsExperience?: number | null;
+}
+
+function ExpertBadge({ professionalTitle, credentials, yearsExperience }: ExpertBadgeProps) {
+  const hasCredentials = credentials && credentials.length > 0;
+  const displayTitle = professionalTitle || "Pet Care Expert";
+
+  // Build tooltip content
+  const tooltipLines: string[] = [];
+  if (professionalTitle) {
+    tooltipLines.push(professionalTitle);
+  }
+  if (yearsExperience && yearsExperience > 0) {
+    tooltipLines.push(`${yearsExperience}+ years experience`);
+  }
+  if (hasCredentials) {
+    tooltipLines.push("Credentials: " + credentials.slice(0, 3).join(", "));
+  }
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Badge
+            variant="secondary"
+            className="text-xs bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 cursor-help gap-1"
+          >
+            <GraduationCap className="h-3 w-3" />
+            <span className="hidden sm:inline">{displayTitle}</span>
+            <span className="sm:hidden">Expert</span>
+            <BadgeCheck className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
+          </Badge>
+        </TooltipTrigger>
+        <TooltipContent
+          side="bottom"
+          className="max-w-xs bg-white dark:bg-cpSurface border shadow-lg p-3"
+        >
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2 font-medium text-emerald-700 dark:text-emerald-300">
+              <GraduationCap className="h-4 w-4" />
+              <span>Verified Expert</span>
+            </div>
+            {tooltipLines.length > 0 ? (
+              <ul className="text-sm text-muted-foreground space-y-0.5">
+                {tooltipLines.map((line, i) => (
+                  <li key={i}>{line}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Verified pet care professional
+              </p>
+            )}
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
 

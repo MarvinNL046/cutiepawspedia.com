@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BadgeCheck, GraduationCap, Users, Lock, Shield } from "lucide-react";
 import { NewsletterForm } from "@/components/forms";
 
 interface FooterProps {
@@ -43,6 +44,72 @@ export function Footer({ locale }: FooterProps) {
             </div>
             <div className="md:w-96">
               <NewsletterForm variant="inline" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Trust & Security Section - E-E-A-T */}
+      <div className="border-b border-border">
+        <div className="container mx-auto max-w-6xl px-4 py-8">
+          <div className="text-center mb-6">
+            <h3 className="text-lg font-semibold text-foreground mb-2">
+              {isNl ? "Vertrouwen & Veiligheid" : "Trust & Security"}
+            </h3>
+            <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
+              {isNl
+                ? "Wij zetten ons in voor kwaliteit, veiligheid en transparantie voor alle huisdiereigenaren."
+                : "We're committed to quality, security, and transparency for all pet owners."}
+            </p>
+          </div>
+
+          {/* Trust Features */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="text-center p-3">
+              <BadgeCheck className="w-6 h-6 mx-auto mb-2 text-blue-500" />
+              <p className="text-xs font-medium text-foreground">
+                {isNl ? "Geverifieerde Bedrijven" : "Verified Businesses"}
+              </p>
+            </div>
+            <div className="text-center p-3">
+              <GraduationCap className="w-6 h-6 mx-auto mb-2 text-emerald-500" />
+              <p className="text-xs font-medium text-foreground">
+                {isNl ? "Expert Reviews" : "Expert Reviews"}
+              </p>
+            </div>
+            <div className="text-center p-3">
+              <Users className="w-6 h-6 mx-auto mb-2 text-cpCoral" />
+              <p className="text-xs font-medium text-foreground">
+                {isNl ? "Community Gedreven" : "Community Driven"}
+              </p>
+            </div>
+            <div className="text-center p-3">
+              <Lock className="w-6 h-6 mx-auto mb-2 text-cpAmber" />
+              <p className="text-xs font-medium text-foreground">
+                {isNl ? "Privacy & Veiligheid" : "Privacy & Security"}
+              </p>
+            </div>
+          </div>
+
+          {/* Trust Badges */}
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 dark:bg-green-900/20 rounded-full border border-green-200 dark:border-green-800">
+              <Shield className="w-4 h-4 text-green-600 dark:text-green-400" />
+              <span className="text-xs font-medium text-green-700 dark:text-green-300">
+                {isNl ? "SSL Beveiligd" : "SSL Secured"}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/20 rounded-full border border-blue-200 dark:border-blue-800">
+              <Lock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
+                {isNl ? "GDPR Conform" : "GDPR Compliant"}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 dark:bg-purple-900/20 rounded-full border border-purple-200 dark:border-purple-800">
+              <BadgeCheck className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              <span className="text-xs font-medium text-purple-700 dark:text-purple-300">
+                {isNl ? "Actief Gemodereerd" : "Actively Moderated"}
+              </span>
             </div>
           </div>
         </div>
@@ -197,8 +264,12 @@ export function Footer({ locale }: FooterProps) {
           <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-muted-foreground">
             <p>© {currentYear} CutiePawsPedia</p>
             <span className="hidden sm:inline">•</span>
-            <Link href={`/${locale}/privacy`} className="hover:text-cpCoral transition-colors">
-              {isNl ? "Privacy" : "Privacy Policy"}
+            <Link href={`/${locale}/privacy-policy`} className="hover:text-cpCoral transition-colors">
+              {isNl ? "Privacybeleid" : "Privacy Policy"}
+            </Link>
+            <span className="hidden sm:inline">•</span>
+            <Link href={`/${locale}/cookie-policy`} className="hover:text-cpCoral transition-colors">
+              {isNl ? "Cookiebeleid" : "Cookie Policy"}
             </Link>
             <span className="hidden sm:inline">•</span>
             <Link href={`/${locale}/terms`} className="hover:text-cpCoral transition-colors">

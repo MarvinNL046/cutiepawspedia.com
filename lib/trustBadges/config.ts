@@ -32,7 +32,8 @@ export type TrustBadgeType =
   | "top_rated"
   | "community_favorite"
   | "photo_verified"
-  | "premium";
+  | "premium"
+  | "expert";
 
 export interface TrustBadge {
   type: TrustBadgeType;
@@ -77,5 +78,12 @@ export const TRUST_BADGES: Record<TrustBadgeType, TrustBadge> = {
     description: "Premium business listing",
     icon: "Crown",
     color: "text-purple-500",
+  },
+  expert: {
+    type: "expert",
+    label: "Verified Expert",
+    description: "Verified pet care professional with credentials",
+    icon: "GraduationCap",
+    color: "text-emerald-600",
   },
 };

@@ -279,6 +279,14 @@ export const users = pgTable("users", {
   karmaPoints: integer("karma_points").default(0).notNull(),
   trustLevel: integer("trust_level").default(0).notNull(),
   karmaUpdatedAt: timestamp("karma_updated_at").defaultNow(),
+  // E-E-A-T Expert fields
+  isExpert: boolean("is_expert").default(false).notNull(), // Whether user is a verified expert
+  professionalTitle: varchar("professional_title", { length: 100 }), // e.g., "Veterinarian", "Dog Trainer"
+  credentials: jsonb("credentials").$type<string[]>().default([]), // Array of credentials/certifications
+  expertiseAreas: jsonb("expertise_areas").$type<string[]>().default([]), // e.g., ["dogs", "cats", "training"]
+  yearsExperience: integer("years_experience"), // Years of professional experience
+  expertVerifiedAt: timestamp("expert_verified_at"), // When expert status was verified
+  expertVerifiedBy: integer("expert_verified_by"), // Admin who verified
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

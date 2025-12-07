@@ -78,7 +78,7 @@ export function NewsletterForm({ variant = "inline", className = "" }: Newslette
         <Button
           type="submit"
           disabled={status === "loading"}
-          className={`bg-cpPink hover:bg-cpPink/90 ${variant === "stacked" ? "w-full" : ""}`}
+          className={`bg-cpCoral hover:bg-cpCoral/90 ${variant === "stacked" ? "w-full" : ""}`}
         >
           {status === "loading" ? (
             <>

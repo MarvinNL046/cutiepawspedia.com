@@ -258,7 +258,7 @@ export default async function BestInCityPage({ params }: BestInCityPageProps) {
               <article
                 key={place.id}
                 className={`relative bg-white rounded-xl border-2 ${
-                  index === 0 ? "border-cpYellow shadow-lg" : index < 3 ? "border-cpPink/30" : "border-slate-200"
+                  index === 0 ? "border-cpYellow shadow-lg" : index < 3 ? "border-cpCoral/30" : "border-slate-200"
                 } overflow-hidden`}
               >
                 {/* Rank Badge */}
@@ -281,7 +281,7 @@ export default async function BestInCityPage({ params }: BestInCityPageProps) {
                     <div className="flex-1 min-w-0">
                       <Link
                         href={`/${locale}/${countrySlug}/${citySlug}/${categorySlug}/${place.slug}`}
-                        className="text-lg font-bold text-slate-900 hover:text-cpPink transition-colors"
+                        className="text-lg font-bold text-slate-900 hover:text-cpCoral transition-colors"
                       >
                         {place.name}
                       </Link>
@@ -318,7 +318,7 @@ export default async function BestInCityPage({ params }: BestInCityPageProps) {
                       </span>
                       <Link
                         href={`/${locale}/${countrySlug}/${citySlug}/${categorySlug}/${place.slug}`}
-                        className="mt-2 inline-flex items-center gap-1 px-3 py-1.5 bg-cpPink text-white rounded-lg hover:bg-cpPink/90 transition-colors text-sm font-medium"
+                        className="mt-2 inline-flex items-center gap-1 px-3 py-1.5 bg-cpCoral text-white rounded-lg hover:bg-cpCoral/90 transition-colors text-sm font-medium"
                       >
                         {locale === "nl" ? "Bekijk" : "View"}
                         <ExternalLink className="h-3 w-3" />
@@ -349,17 +349,17 @@ export default async function BestInCityPage({ params }: BestInCityPageProps) {
         <div className="container mx-auto max-w-6xl px-4">
           <SectionHeader title={locale === "nl" ? "Bekijk ook" : "See also"} />
           <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className="cursor-pointer hover:bg-cpPink/10">
+            <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10">
               <a href={`/${locale}/${countrySlug}/${citySlug}/${categorySlug}`}>
                 {locale === "nl" ? `Alle ${categoryLabel} in ${cityName}` : `All ${categoryLabel} in ${cityName}`}
               </a>
             </Badge>
-            <Badge variant="outline" className="cursor-pointer hover:bg-cpPink/10">
+            <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10">
               <a href={`/${locale}/${countrySlug}/best/${categorySlug}`}>
                 {locale === "nl" ? `Beste ${categoryLabel} in ${countryName}` : `Best ${categoryLabel} in ${countryName}`}
               </a>
             </Badge>
-            <Badge variant="outline" className="cursor-pointer hover:bg-cpPink/10">
+            <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10">
               <a href={`/${locale}/${countrySlug}/${citySlug}`}>
                 {locale === "nl" ? `Alle services in ${cityName}` : `All services in ${cityName}`}
               </a>

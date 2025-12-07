@@ -338,7 +338,7 @@ export default async function AdminDataQualityPage({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Activity className="h-5 w-5 text-cpPink" />
+                <Activity className="h-5 w-5 text-cpCoral" />
                 Recent Activity (24h)
               </CardTitle>
               <CardDescription>Latest refresh job activity</CardDescription>

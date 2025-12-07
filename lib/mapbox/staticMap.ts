@@ -76,7 +76,7 @@ export function getStaticMapUrl(options: StaticMapOptions): string | null {
     height = 300,
     style = DEFAULT_STYLE,
     marker = true,
-    markerColor = "FF7FA1", // cpPink without #
+    markerColor = "FF7FA1", // cpCoral without #
     markerSize = "l",
     retina = true,
   } = options;

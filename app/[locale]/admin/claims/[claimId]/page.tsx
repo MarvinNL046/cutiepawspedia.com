@@ -110,7 +110,7 @@ export default async function ClaimDetailPage({
                 <div className="flex items-start justify-between">
                   <div>
                     <CardTitle className="flex items-center gap-2">
-                      <MapPin className="h-5 w-5 text-cpPink" />
+                      <MapPin className="h-5 w-5 text-cpCoral" />
                       Place Being Claimed
                     </CardTitle>
                     <CardDescription>Details of the place</CardDescription>
@@ -257,7 +257,7 @@ export default async function ClaimDetailPage({
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex gap-3">
-                    <div className="w-2 h-2 rounded-full bg-cpPink mt-2" />
+                    <div className="w-2 h-2 rounded-full bg-cpCoral mt-2" />
                     <div>
                       <p className="text-sm font-medium">Claim Submitted</p>
                       <p className="text-xs text-slate-500">

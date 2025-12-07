@@ -120,7 +120,7 @@ export default async function CountryPage({ params }: CountryPageProps) {
       <section className="container mx-auto max-w-6xl px-4 py-12">
         <SectionHeader
           title={locale === "nl" ? `Steden in ${countryName}` : `Cities in ${countryName}`}
-          icon={<MapPin className="h-5 w-5 text-cpPink" />}
+          icon={<MapPin className="h-5 w-5 text-cpCoral" />}
         />
 
         {cities.length > 0 ? (

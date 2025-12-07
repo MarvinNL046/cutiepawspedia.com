@@ -97,7 +97,7 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-cpPink">{thisMonth}</div>
+              <div className="text-2xl font-bold text-cpCoral">{thisMonth}</div>
             </CardContent>
           </Card>
 
@@ -177,7 +177,7 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
                       <TableCell>
                         <a
                           href={`mailto:${lead.email}`}
-                          className="flex items-center gap-1 text-sm text-cpPink hover:underline"
+                          className="flex items-center gap-1 text-sm text-cpCoral hover:underline"
                         >
                           <Mail className="h-3 w-3" />
                           {lead.email}
@@ -206,7 +206,7 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
                         <div className="flex items-center justify-end gap-2">
                           <Button
                             size="sm"
-                            className="bg-cpPink hover:bg-cpPink/90"
+                            className="bg-cpCoral hover:bg-cpCoral/90"
                             asChild
                           >
                             <a href={`mailto:${lead.email}`}>

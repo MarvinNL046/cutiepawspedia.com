@@ -251,7 +251,7 @@ export function SponsorAd({ ad, variant = "sidebar", className = "" }: SponsorAd
     return (
       <Link
         href={`/${ad.locale}/${ad.businessSlug}`}
-        className={`block bg-gradient-to-br from-cpPink/5 to-cpCoral/5 dark:from-cpPink/10 dark:to-cpCoral/10 rounded-xl border border-cpPink/20 overflow-hidden hover:border-cpPink/40 transition-all group ${className}`}
+        className={`block bg-gradient-to-br from-cpCoral/5 to-cpCoral/5 dark:from-cpCoral/10 dark:to-cpCoral/10 rounded-xl border border-cpCoral/20 overflow-hidden hover:border-cpCoral/40 transition-all group ${className}`}
       >
         <div className="relative aspect-[4/3] w-full">
           <Image
@@ -260,12 +260,12 @@ export function SponsorAd({ ad, variant = "sidebar", className = "" }: SponsorAd
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
-          <div className="absolute top-2 right-2 bg-cpPink/90 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+          <div className="absolute top-2 right-2 bg-cpCoral/90 text-white text-xs px-2 py-0.5 rounded-full font-medium">
             Sponsor
           </div>
         </div>
         <div className="p-4">
-          <h4 className="font-semibold text-foreground dark:text-cpCream group-hover:text-cpPink transition-colors">
+          <h4 className="font-semibold text-foreground dark:text-cpCream group-hover:text-cpCoral transition-colors">
             {ad.headline}
           </h4>
           {ad.description && (
@@ -273,7 +273,7 @@ export function SponsorAd({ ad, variant = "sidebar", className = "" }: SponsorAd
               {ad.description}
             </p>
           )}
-          <span className="inline-flex items-center gap-1 text-cpPink text-sm font-medium mt-3">
+          <span className="inline-flex items-center gap-1 text-cpCoral text-sm font-medium mt-3">
             {ad.ctaText || "Learn more"} →
           </span>
         </div>
@@ -285,7 +285,7 @@ export function SponsorAd({ ad, variant = "sidebar", className = "" }: SponsorAd
     return (
       <Link
         href={`/${ad.locale}/${ad.businessSlug}`}
-        className={`flex gap-4 bg-gradient-to-r from-cpPink/5 to-cpCoral/5 dark:from-cpPink/10 dark:to-cpCoral/10 rounded-xl border border-cpPink/20 p-4 my-6 hover:border-cpPink/40 transition-all group ${className}`}
+        className={`flex gap-4 bg-gradient-to-r from-cpCoral/5 to-cpCoral/5 dark:from-cpCoral/10 dark:to-cpCoral/10 rounded-xl border border-cpCoral/20 p-4 my-6 hover:border-cpCoral/40 transition-all group ${className}`}
       >
         <div className="relative w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden">
           <Image
@@ -297,11 +297,11 @@ export function SponsorAd({ ad, variant = "sidebar", className = "" }: SponsorAd
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="bg-cpPink/90 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+            <span className="bg-cpCoral/90 text-white text-xs px-2 py-0.5 rounded-full font-medium">
               Sponsor
             </span>
           </div>
-          <h4 className="font-semibold text-foreground dark:text-cpCream group-hover:text-cpPink transition-colors">
+          <h4 className="font-semibold text-foreground dark:text-cpCream group-hover:text-cpCoral transition-colors">
             {ad.headline}
           </h4>
           {ad.description && (
@@ -318,7 +318,7 @@ export function SponsorAd({ ad, variant = "sidebar", className = "" }: SponsorAd
   return (
     <Link
       href={`/${ad.locale}/${ad.businessSlug}`}
-      className={`flex items-center gap-3 bg-gradient-to-r from-cpPink/5 to-cpCoral/5 dark:from-cpPink/10 dark:to-cpCoral/10 rounded-lg border border-cpPink/20 p-3 hover:border-cpPink/40 transition-all group ${className}`}
+      className={`flex items-center gap-3 bg-gradient-to-r from-cpCoral/5 to-cpCoral/5 dark:from-cpCoral/10 dark:to-cpCoral/10 rounded-lg border border-cpCoral/20 p-3 hover:border-cpCoral/40 transition-all group ${className}`}
     >
       <div className="relative w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden">
         <Image
@@ -329,10 +329,10 @@ export function SponsorAd({ ad, variant = "sidebar", className = "" }: SponsorAd
         />
       </div>
       <div className="flex-1 min-w-0">
-        <span className="text-[10px] bg-cpPink/90 text-white px-1.5 py-0.5 rounded-full font-medium">
+        <span className="text-[10px] bg-cpCoral/90 text-white px-1.5 py-0.5 rounded-full font-medium">
           Sponsor
         </span>
-        <h5 className="font-medium text-sm text-foreground dark:text-cpCream group-hover:text-cpPink transition-colors truncate">
+        <h5 className="font-medium text-sm text-foreground dark:text-cpCream group-hover:text-cpCoral transition-colors truncate">
           {ad.headline}
         </h5>
       </div>

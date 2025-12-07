@@ -126,7 +126,7 @@ export function AvatarImage({
     return (
       <div
         className={cn(
-          "flex items-center justify-center rounded-full bg-cpPink/20 text-cpPink font-semibold",
+          "flex items-center justify-center rounded-full bg-cpCoral/20 text-cpCoral font-semibold",
           className
         )}
         style={{ width: size, height: size, fontSize: size * 0.4 }}
@@ -169,7 +169,7 @@ export function PlaceImage({
     return (
       <div
         className={cn(
-          "flex items-center justify-center bg-gradient-to-br from-cpPink/20 to-cpAqua/20",
+          "flex items-center justify-center bg-gradient-to-br from-cpCoral/20 to-cpAqua/20",
           className
         )}
       >

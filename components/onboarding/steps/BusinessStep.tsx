@@ -241,8 +241,8 @@ export function BusinessStep({
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <div className="w-12 h-12 rounded-full bg-cpPink/10 flex items-center justify-center mx-auto mb-4">
-          <Building2 className="w-6 h-6 text-cpPink" />
+        <div className="w-12 h-12 rounded-full bg-cpCoral/10 flex items-center justify-center mx-auto mb-4">
+          <Building2 className="w-6 h-6 text-cpCoral" />
         </div>
         <h2 className="text-xl font-semibold text-cpDark dark:text-white mb-2">
           {t.title}
@@ -291,7 +291,7 @@ export function BusinessStep({
                     "w-full p-3 text-left flex items-center justify-between gap-2 transition-colors",
                     place.hasOwner
                       ? "opacity-50 cursor-not-allowed bg-slate-50 dark:bg-slate-900"
-                      : "hover:bg-cpPink/5 cursor-pointer"
+                      : "hover:bg-cpCoral/5 cursor-pointer"
                   )}
                 >
                   <div className="flex-1 min-w-0">
@@ -308,7 +308,7 @@ export function BusinessStep({
                       {t.alreadyClaimed}
                     </span>
                   ) : (
-                    <span className="text-xs text-cpPink font-medium px-2 py-1 bg-cpPink/10 rounded shrink-0">
+                    <span className="text-xs text-cpCoral font-medium px-2 py-1 bg-cpCoral/10 rounded shrink-0">
                       {t.claimThis}
                     </span>
                   )}
@@ -409,7 +409,7 @@ export function BusinessStep({
         ) : (
           <div />
         )}
-        <Button onClick={handleNext} className="bg-cpPink hover:bg-cpPink/90">
+        <Button onClick={handleNext} className="bg-cpCoral hover:bg-cpCoral/90">
           {labels.next}
           <ArrowRight className="w-4 h-4 ml-2" />
         </Button>

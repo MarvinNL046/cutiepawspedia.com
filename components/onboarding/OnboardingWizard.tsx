@@ -247,7 +247,7 @@ export function OnboardingWizard({
                   isComplete
                     ? "bg-green-500 text-white"
                     : isActive
-                      ? "bg-cpPink text-white"
+                      ? "bg-cpCoral text-white"
                       : "bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400"
                 )}
               >
@@ -261,7 +261,7 @@ export function OnboardingWizard({
                 className={cn(
                   "text-xs font-medium text-center",
                   isActive
-                    ? "text-cpPink"
+                    ? "text-cpCoral"
                     : isComplete
                       ? "text-green-600 dark:text-green-400"
                       : "text-slate-500 dark:text-slate-400"

@@ -160,7 +160,7 @@ export function BusinessBillingTab({ business }: BusinessBillingTabProps) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5 text-cpPink" />
+              <CreditCard className="h-5 w-5 text-cpCoral" />
               Billing Status
             </CardTitle>
             <CardDescription>Current billing and payment status</CardDescription>

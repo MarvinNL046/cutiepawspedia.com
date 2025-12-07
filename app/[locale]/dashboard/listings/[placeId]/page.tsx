@@ -52,7 +52,7 @@ export default async function EditListingPage({ params }: EditListingPageProps) 
                 You can only edit listings that belong to your account.
               </p>
               <Link href={`/${locale}/dashboard/listings`}>
-                <Button className="bg-cpPink hover:bg-cpPink/90">
+                <Button className="bg-cpCoral hover:bg-cpCoral/90">
                   Back to Listings
                 </Button>
               </Link>
@@ -80,7 +80,7 @@ export default async function EditListingPage({ params }: EditListingPageProps) 
         {/* Back link */}
         <Link
           href={`/${locale}/dashboard/listings`}
-          className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-cpPink transition-colors"
+          className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-cpCoral transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Listings
@@ -91,8 +91,8 @@ export default async function EditListingPage({ params }: EditListingPageProps) 
           <CardHeader>
             <div className="flex items-start justify-between">
               <div className="flex items-start gap-4">
-                <div className="p-3 rounded-lg bg-cpPink/10">
-                  <Building2 className="h-6 w-6 text-cpPink" />
+                <div className="p-3 rounded-lg bg-cpCoral/10">
+                  <Building2 className="h-6 w-6 text-cpCoral" />
                 </div>
                 <div>
                   <CardTitle className="flex items-center gap-2">

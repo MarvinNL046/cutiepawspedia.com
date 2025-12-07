@@ -62,7 +62,7 @@ export default async function ListingsPage({ params }: ListingsPageProps) {
                   If you own a business listed on CutiePawsPedia, contact us to claim it.
                 </p>
                 <Link href={`/${locale}/for-businesses`}>
-                  <Button className="bg-cpPink hover:bg-cpPink/90">
+                  <Button className="bg-cpCoral hover:bg-cpCoral/90">
                     Add Your Business
                   </Button>
                 </Link>
@@ -92,8 +92,8 @@ export default async function ListingsPage({ params }: ListingsPageProps) {
                       <TableRow key={listing.id}>
                         <TableCell>
                           <div className="flex items-start gap-3">
-                            <div className="p-2 rounded-lg bg-cpPink/10">
-                              <Building2 className="h-5 w-5 text-cpPink" />
+                            <div className="p-2 rounded-lg bg-cpCoral/10">
+                              <Building2 className="h-5 w-5 text-cpCoral" />
                             </div>
                             <div>
                               <div className="flex items-center gap-2">

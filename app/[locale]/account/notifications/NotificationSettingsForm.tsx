@@ -130,8 +130,8 @@ export function NotificationSettingsForm({
             className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors"
           >
             <div className="flex items-start gap-4">
-              <div className="p-2 bg-cpPink/10 rounded-lg">
-                <item.icon className="h-5 w-5 text-cpPink" />
+              <div className="p-2 bg-cpCoral/10 rounded-lg">
+                <item.icon className="h-5 w-5 text-cpCoral" />
               </div>
               <div>
                 <Label htmlFor={item.key} className="text-sm font-medium text-cpDark cursor-pointer">
@@ -169,7 +169,7 @@ export function NotificationSettingsForm({
         <Button
           type="submit"
           disabled={isSubmitting || !hasChanges}
-          className="bg-cpPink hover:bg-cpPink/90 text-white"
+          className="bg-cpCoral hover:bg-cpCoral/90 text-white"
         >
           {isSubmitting ? (
             <>

@@ -170,7 +170,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
               {/* Avatar */}
               <Avatar className="h-24 w-24 md:h-32 md:w-32">
                 <AvatarImage src={profile.avatarUrl || undefined} alt={profile.name || ""} />
-                <AvatarFallback className="text-2xl bg-cpPink/10 text-cpPink">
+                <AvatarFallback className="text-2xl bg-cpCoral/10 text-cpCoral">
                   {initials}
                 </AvatarFallback>
               </Avatar>
@@ -202,7 +202,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
                       href={profile.websiteUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-cpPink hover:underline"
+                      className="flex items-center gap-1 text-cpCoral hover:underline"
                     >
                       <Globe className="h-4 w-4" />
                       Website
@@ -314,7 +314,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
                       <div>
                         <Link
                           href={`/${locale}/${review.countrySlug}/${review.citySlug}/all/${review.placeSlug}`}
-                          className="font-medium text-cpDark hover:text-cpPink transition-colors"
+                          className="font-medium text-cpDark hover:text-cpCoral transition-colors"
                         >
                           {review.placeName}
                         </Link>

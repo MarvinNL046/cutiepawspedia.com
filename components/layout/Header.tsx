@@ -37,7 +37,7 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
         <Link href={`/${locale}`} className="flex items-center gap-2" aria-label="CutiePawsPedia - Go to homepage">
           <span className="text-2xl" role="img" aria-hidden="true">🐾</span>
           <span className="text-xl font-bold text-foreground">
-            Cutie<span className="text-cpPink">Paws</span>Pedia
+            Cutie<span className="text-cpCoral">Paws</span>Pedia
           </span>
         </Link>
 
@@ -47,31 +47,31 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
             <>
               <Link
                 href={`/${locale}`}
-                className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors"
+                className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors"
               >
                 Home
               </Link>
               <Link
                 href={`/${locale}/blog`}
-                className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors"
+                className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors"
               >
                 Blog
               </Link>
               <Link
                 href={`/${locale}/about`}
-                className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors"
+                className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors"
               >
                 About
               </Link>
               <Link
                 href={`/${locale}/for-businesses`}
-                className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors"
+                className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors"
               >
                 For Businesses
               </Link>
               <Link
                 href={`/${locale}/contact`}
-                className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors"
+                className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors"
               >
                 Contact
               </Link>
@@ -80,19 +80,19 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
             <>
               <Link
                 href={`/${locale}`}
-                className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors"
+                className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors"
               >
                 Directory
               </Link>
               <Link
                 href={`/${locale}/search`}
-                className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors"
+                className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors"
               >
                 Search
               </Link>
               <Link
                 href={`/${locale}/blog`}
-                className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors"
+                className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors"
               >
                 Blog
               </Link>
@@ -160,7 +160,7 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/handler/sign-in">Sign In</Link>
               </Button>
-              <Button size="sm" className="bg-cpPink hover:bg-cpPink/90" asChild>
+              <Button size="sm" className="bg-cpCoral hover:bg-cpCoral/90" asChild>
                 <Link href="/handler/sign-up">Sign Up</Link>
               </Button>
             </div>
@@ -168,7 +168,7 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
 
           {/* CTA Button - always show for non-logged in users */}
           {!user && (
-            <Button size="sm" className="bg-cpPink hover:bg-cpPink/90 hidden sm:flex" asChild>
+            <Button size="sm" className="bg-cpCoral hover:bg-cpCoral/90 hidden sm:flex" asChild>
               <Link href={`/${locale}/for-businesses`}>List Your Business</Link>
             </Button>
           )}
@@ -199,35 +199,35 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
               <>
                 <Link
                   href={`/${locale}`}
-                  className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors py-2"
+                  className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Home
                 </Link>
                 <Link
                   href={`/${locale}/blog`}
-                  className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors py-2"
+                  className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Blog
                 </Link>
                 <Link
                   href={`/${locale}/about`}
-                  className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors py-2"
+                  className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   About
                 </Link>
                 <Link
                   href={`/${locale}/for-businesses`}
-                  className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors py-2"
+                  className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   For Businesses
                 </Link>
                 <Link
                   href={`/${locale}/contact`}
-                  className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors py-2"
+                  className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Contact
@@ -237,21 +237,21 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
               <>
                 <Link
                   href={`/${locale}`}
-                  className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors py-2"
+                  className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Directory
                 </Link>
                 <Link
                   href={`/${locale}/search`}
-                  className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors py-2"
+                  className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Search
                 </Link>
                 <Link
                   href={`/${locale}/blog`}
-                  className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors py-2"
+                  className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Blog
@@ -265,7 +265,7 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
                 <div className="border-t border-border pt-4 mt-2">
                   <Link
                     href={`/${locale}/account/favorites`}
-                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors py-2"
+                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors py-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <Heart className="h-4 w-4" />
@@ -273,7 +273,7 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
                   </Link>
                   <Link
                     href={`/${locale}/account/notifications`}
-                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors py-2"
+                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors py-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <Settings className="h-4 w-4" />
@@ -296,7 +296,7 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
                     Sign In
                   </Link>
                 </Button>
-                <Button size="sm" className="bg-cpPink hover:bg-cpPink/90" asChild>
+                <Button size="sm" className="bg-cpCoral hover:bg-cpCoral/90" asChild>
                   <Link href="/handler/sign-up" onClick={() => setMobileMenuOpen(false)}>
                     Sign Up
                   </Link>
@@ -307,7 +307,7 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
             {/* Mobile CTA */}
             {!user && (
               <div className="border-t border-border pt-4 mt-2">
-                <Button size="sm" className="bg-cpPink hover:bg-cpPink/90 w-full" asChild>
+                <Button size="sm" className="bg-cpCoral hover:bg-cpCoral/90 w-full" asChild>
                   <Link href={`/${locale}/for-businesses`} onClick={() => setMobileMenuOpen(false)}>
                     List Your Business
                   </Link>

@@ -188,14 +188,14 @@ export function PlanStep({
               className={cn(
                 "relative p-5 rounded-xl border-2 text-left transition-all",
                 isSelected
-                  ? "border-cpPink bg-cpPink/5"
-                  : "border-slate-200 dark:border-slate-700 hover:border-cpPink/50",
-                plan.isPopular && !isSelected && "border-cpPink/30"
+                  ? "border-cpCoral bg-cpCoral/5"
+                  : "border-slate-200 dark:border-slate-700 hover:border-cpCoral/50",
+                plan.isPopular && !isSelected && "border-cpCoral/30"
               )}
             >
               {/* Popular Badge */}
               {plan.isPopular && (
-                <span className="absolute -top-3 left-4 px-2 py-0.5 text-xs font-medium bg-cpPink text-white rounded-full">
+                <span className="absolute -top-3 left-4 px-2 py-0.5 text-xs font-medium bg-cpCoral text-white rounded-full">
                   {t.popular}
                 </span>
               )}
@@ -211,13 +211,13 @@ export function PlanStep({
                 <div
                   className={cn(
                     "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
-                    isSelected ? "bg-cpPink/20" : "bg-slate-100 dark:bg-slate-700"
+                    isSelected ? "bg-cpCoral/20" : "bg-slate-100 dark:bg-slate-700"
                   )}
                 >
                   <Icon
                     className={cn(
                       "w-5 h-5",
-                      isSelected ? "text-cpPink" : "text-slate-500"
+                      isSelected ? "text-cpCoral" : "text-slate-500"
                     )}
                   />
                 </div>
@@ -263,7 +263,7 @@ export function PlanStep({
           <ArrowLeft className="w-4 h-4 mr-2" />
           {labels.back}
         </Button>
-        <Button onClick={onNext} className="bg-cpPink hover:bg-cpPink/90">
+        <Button onClick={onNext} className="bg-cpCoral hover:bg-cpCoral/90">
           {labels.next}
           <ArrowRight className="w-4 h-4 ml-2" />
         </Button>

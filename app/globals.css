@@ -6,7 +6,7 @@
 /* CutiePawsPedia Color Theme */
 @theme inline {
   /* Brand Colors - Light Mode */
-  --color-cpPink: #FF7FA1;
+  --color-cpPink: #FF8C73;
   --color-cpYellow: #FFD166;
   --color-cpAqua: #29A0B1;
   --color-cpDark: #1F2937;
@@ -267,7 +267,7 @@
 
   /* Gradient Text Effect - Pink to Aqua */
   .gradient-text {
-    background: linear-gradient(135deg, #FF7FA1 0%, #FF6B8A 50%, #29A0B1 100%);
+    background: linear-gradient(135deg, #FF8C73 0%, #FF6B8A 50%, #29A0B1 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -275,7 +275,7 @@
 
   /* Gradient Text - Pink emphasis */
   .gradient-text-pink {
-    background: linear-gradient(135deg, #FF7FA1 0%, #FF5C85 100%);
+    background: linear-gradient(135deg, #FF8C73 0%, #FF5C85 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -283,7 +283,7 @@
 
   /* Animated Gradient Text */
   .gradient-text-animated {
-    background: linear-gradient(90deg, #FF7FA1, #FFD166, #29A0B1, #FF7FA1);
+    background: linear-gradient(90deg, #FF8C73, #FFD166, #29A0B1, #FF8C73);
     background-size: 300% 100%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -342,7 +342,7 @@
     position: absolute;
     inset: -2px;
     border-radius: calc(1rem + 2px);
-    background: linear-gradient(135deg, #FF7FA1, #FFD166, #29A0B1);
+    background: linear-gradient(135deg, #FF8C73, #FFD166, #29A0B1);
     z-index: -1;
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -390,7 +390,7 @@
 
   /* Modern Button with gradient */
   .btn-gradient {
-    background: linear-gradient(135deg, #FF7FA1 0%, #FF5C85 100%);
+    background: linear-gradient(135deg, #FF8C73 0%, #FF5C85 100%);
     color: white;
     font-weight: 600;
     transition: all 0.3s ease;
@@ -461,7 +461,7 @@
   /* Number badge like PostForge */
   .number-badge {
     @apply inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold;
-    background: linear-gradient(135deg, #FF7FA1, #FF5C85);
+    background: linear-gradient(135deg, #FF8C73, #FF5C85);
     color: white;
   }
 }

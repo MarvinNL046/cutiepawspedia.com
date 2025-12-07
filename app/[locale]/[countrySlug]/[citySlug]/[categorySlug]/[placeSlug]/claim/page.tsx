@@ -136,8 +136,8 @@ export default async function ClaimPage({ params }: ClaimPageProps) {
         <div className="mt-6 space-y-6">
           {/* Header */}
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-cpPink/10 mb-4">
-              <Building2 className="h-8 w-8 text-cpPink" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-cpCoral/10 mb-4">
+              <Building2 className="h-8 w-8 text-cpCoral" />
             </div>
             <h1 className="text-2xl md:text-3xl font-bold text-cpDark">{t.title}</h1>
             <p className="mt-2 text-slate-600 max-w-md mx-auto">{t.description}</p>
@@ -150,8 +150,8 @@ export default async function ClaimPage({ params }: ClaimPageProps) {
             </CardHeader>
             <CardContent>
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-lg bg-cpPink/10 flex items-center justify-center shrink-0">
-                  <Building2 className="h-6 w-6 text-cpPink" />
+                <div className="w-12 h-12 rounded-lg bg-cpCoral/10 flex items-center justify-center shrink-0">
+                  <Building2 className="h-6 w-6 text-cpCoral" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-cpDark">{place.name}</h3>

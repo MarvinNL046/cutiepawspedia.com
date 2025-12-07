@@ -274,12 +274,12 @@ export default async function CountryCategoryPage({ params }: CountryCategoryPag
             title={locale === "nl" ? "Bekijk ook" : "See also"}
           />
           <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className="cursor-pointer hover:bg-cpPink/10">
+            <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10">
               <a href={`/${locale}/${countrySlug}/best/${categorySlug}`}>
                 {locale === "nl" ? `Beste ${categoryLabel} in ${countryName}` : `Best ${categoryLabel} in ${countryName}`}
               </a>
             </Badge>
-            <Badge variant="outline" className="cursor-pointer hover:bg-cpPink/10">
+            <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10">
               <a href={`/${locale}/${countrySlug}/top/${categorySlug}`}>
                 {locale === "nl" ? `Top 10 ${categoryLabel} in ${countryName}` : `Top 10 ${categoryLabel} in ${countryName}`}
               </a>

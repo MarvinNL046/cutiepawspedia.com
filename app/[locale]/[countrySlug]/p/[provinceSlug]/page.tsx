@@ -142,7 +142,7 @@ export default async function ProvincePage({ params }: ProvincePageProps) {
       <section className="container mx-auto max-w-6xl px-4 py-8">
         <div className="flex flex-wrap gap-4 justify-center">
           <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border">
-            <Building2 className="h-4 w-4 text-cpPink" />
+            <Building2 className="h-4 w-4 text-cpCoral" />
             <span className="text-sm font-medium">{t.totalCities}</span>
           </div>
           <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border">
@@ -161,7 +161,7 @@ export default async function ProvincePage({ params }: ProvincePageProps) {
       <section className="container mx-auto max-w-6xl px-4 py-8">
         <SectionHeader
           title={t.citiesTitle}
-          icon={<MapPin className="h-5 w-5 text-cpPink" />}
+          icon={<MapPin className="h-5 w-5 text-cpCoral" />}
         />
 
         {cities.length > 0 ? (

@@ -260,7 +260,7 @@ export function MapWidget({
       {!mapLoaded && (
         <div className="absolute inset-0 bg-slate-100 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cpPink mx-auto mb-2" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cpCoral mx-auto mb-2" />
             <p className="text-sm text-slate-500">Loading map...</p>
           </div>
         </div>
@@ -316,7 +316,7 @@ function calculateCenter(markers: MapMarker[]): { lat: number; lng: number } {
 
 // Helper function to create marker HTML
 function createMarkerHTML(marker: MapMarker, isSelected: boolean): string {
-  const color = marker.isPremium ? "#FFD166" : isSelected ? "#FF7FA1" : "#29A0B1";
+  const color = marker.isPremium ? "#FFD166" : isSelected ? "#FF8C73" : "#29A0B1";
 
   return `
     <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">

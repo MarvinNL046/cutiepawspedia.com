@@ -51,7 +51,7 @@ export default async function AnalyticsPage({ params }: AnalyticsPageProps) {
         {/* Key Metrics */}
         <div>
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-cpPink" aria-hidden="true" />
+            <BarChart3 className="h-5 w-5 text-cpCoral" aria-hidden="true" />
             Key Metrics
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -60,7 +60,7 @@ export default async function AnalyticsPage({ params }: AnalyticsPageProps) {
               value={`${conversionRate}%`}
               description="Leads per listing"
               icon={TrendingUp}
-              color="cpPink"
+              color="cpCoral"
             />
             <MetricCard
               title="Premium Adoption"
@@ -139,7 +139,7 @@ export default async function AnalyticsPage({ params }: AnalyticsPageProps) {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Pending Review</span>
-                    <span className="font-semibold text-cpPink">{stats.places.pendingReview}</span>
+                    <span className="font-semibold text-cpCoral">{stats.places.pendingReview}</span>
                   </div>
                 </div>
               </CardContent>
@@ -166,7 +166,7 @@ export default async function AnalyticsPage({ params }: AnalyticsPageProps) {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Total Leads</span>
-                    <span className="font-semibold text-cpPink">{stats.leads.total}</span>
+                    <span className="font-semibold text-cpCoral">{stats.leads.total}</span>
                   </div>
                 </div>
               </CardContent>
@@ -188,7 +188,7 @@ export default async function AnalyticsPage({ params }: AnalyticsPageProps) {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="text-center p-4 bg-slate-50 rounded-lg">
-                  <p className="text-3xl font-bold text-cpPink">{stats.leads.last7Days}</p>
+                  <p className="text-3xl font-bold text-cpCoral">{stats.leads.last7Days}</p>
                   <p className="text-sm text-muted-foreground">Last 7 Days</p>
                 </div>
                 <div className="text-center p-4 bg-slate-50 rounded-lg">
@@ -217,12 +217,12 @@ interface MetricCardProps {
   value: string;
   description: string;
   icon: React.ComponentType<{ className?: string }>;
-  color: "cpPink" | "cpAqua" | "cpYellow" | "slate";
+  color: "cpCoral" | "cpAqua" | "cpYellow" | "slate";
 }
 
 function MetricCard({ title, value, description, icon: Icon, color }: MetricCardProps) {
   const colorClasses = {
-    cpPink: "bg-cpPink/10 text-cpPink",
+    cpCoral: "bg-cpCoral/10 text-cpCoral",
     cpAqua: "bg-cpAqua/10 text-cpAqua",
     cpYellow: "bg-cpYellow/10 text-cpYellow",
     slate: "bg-slate-100 text-slate-600",

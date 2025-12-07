@@ -78,7 +78,7 @@ export function AdminHeader({
                 <p className="text-sm font-medium text-slate-900">
                   {user.name || user.email.split("@")[0]}
                 </p>
-                <Badge variant="secondary" className="text-xs bg-cpPink/10 text-cpPink">
+                <Badge variant="secondary" className="text-xs bg-cpCoral/10 text-cpCoral">
                   Admin
                 </Badge>
               </div>

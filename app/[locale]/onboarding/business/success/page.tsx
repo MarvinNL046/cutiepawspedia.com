@@ -154,14 +154,14 @@ export default async function SuccessPage({
             <h1 className="text-2xl font-bold text-cpDark dark:text-white mb-2">
               {t.title}
             </h1>
-            <p className="text-lg text-cpPink font-medium mb-4">
+            <p className="text-lg text-cpCoral font-medium mb-4">
               {t.subtitle}
             </p>
             <p className="text-slate-600 dark:text-slate-400 mb-8">
               {t.description}
             </p>
 
-            <Button asChild className="bg-cpPink hover:bg-cpPink/90">
+            <Button asChild className="bg-cpCoral hover:bg-cpCoral/90">
               <Link href={`/${locale}/dashboard/business/${result.businessId}`}>
                 {t.button}
                 <ArrowRight className="w-4 h-4 ml-2" />

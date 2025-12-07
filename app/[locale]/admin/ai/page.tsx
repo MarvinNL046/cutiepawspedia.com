@@ -43,7 +43,7 @@ function getContentTypeBadge(contentType: string) {
     city: "bg-green-100 text-green-700 border-green-200",
     category: "bg-amber-100 text-amber-700 border-amber-200",
     place: "bg-purple-100 text-purple-700 border-purple-200",
-    combo: "bg-pink-100 text-pink-700 border-pink-200",
+    combo: "bg-cpCoral/20 text-cpCoral border-cpCoral/30",
     best: "bg-cpAqua/20 text-cpAqua border-cpAqua/30",
     top: "bg-orange-100 text-orange-700 border-orange-200",
   };
@@ -83,8 +83,8 @@ export default async function AiToolsPage({ params, searchParams }: AiToolsPageP
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-cpPink/10">
-                  <Database className="h-5 w-5 text-cpPink" aria-hidden="true" />
+                <div className="p-2 rounded-lg bg-cpCoral/10">
+                  <Database className="h-5 w-5 text-cpCoral" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Cached Content</p>
@@ -165,7 +165,7 @@ export default async function AiToolsPage({ params, searchParams }: AiToolsPageP
         <Card className="mb-6">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-3">
-              <Brain className="h-5 w-5 text-cpPink" aria-hidden="true" />
+              <Brain className="h-5 w-5 text-cpCoral" aria-hidden="true" />
               <CardTitle className="text-lg">AI Configuration</CardTitle>
             </div>
           </CardHeader>
@@ -173,7 +173,7 @@ export default async function AiToolsPage({ params, searchParams }: AiToolsPageP
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
                 <p className="text-sm text-muted-foreground">Version</p>
-                <Badge className="bg-cpPink/10 text-cpPink border-cpPink/20 mt-1">
+                <Badge className="bg-cpCoral/10 text-cpCoral border-cpCoral/20 mt-1">
                   {stats.config.version}
                 </Badge>
               </div>
@@ -240,7 +240,7 @@ export default async function AiToolsPage({ params, searchParams }: AiToolsPageP
         {/* Tools Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Tool 1: Missing Content Scanner */}
-          <Card className={tab === "missing" ? "ring-2 ring-cpPink" : ""}>
+          <Card className={tab === "missing" ? "ring-2 ring-cpCoral" : ""}>
             <CardHeader>
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-blue-100">
@@ -258,7 +258,7 @@ export default async function AiToolsPage({ params, searchParams }: AiToolsPageP
           </Card>
 
           {/* Tool 2: Stale Content Scanner */}
-          <Card className={tab === "stale" ? "ring-2 ring-cpPink" : ""}>
+          <Card className={tab === "stale" ? "ring-2 ring-cpCoral" : ""}>
             <CardHeader>
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-amber-100">

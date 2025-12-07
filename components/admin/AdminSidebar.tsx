@@ -99,8 +99,8 @@ export function AdminSidebar({ locale }: AdminSidebarProps) {
     <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white flex flex-col">
       {/* Logo */}
       <div className="h-16 flex items-center gap-3 px-4 border-b border-slate-700">
-        <div className="p-2 rounded-lg bg-cpPink/20">
-          <Shield className="h-5 w-5 text-cpPink" aria-hidden="true" />
+        <div className="p-2 rounded-lg bg-cpCoral/20">
+          <Shield className="h-5 w-5 text-cpCoral" aria-hidden="true" />
         </div>
         <div>
           <span className="font-bold text-white">CutiePawsPedia</span>
@@ -120,7 +120,7 @@ export function AdminSidebar({ locale }: AdminSidebarProps) {
                 variant="ghost"
                 className={cn(
                   "w-full justify-start gap-3 text-slate-300 hover:text-white hover:bg-slate-800",
-                  active && "bg-cpPink/20 text-cpPink hover:bg-cpPink/30 hover:text-cpPink"
+                  active && "bg-cpCoral/20 text-cpCoral hover:bg-cpCoral/30 hover:text-cpCoral"
                 )}
               >
                 <Icon className="h-4 w-4" aria-hidden="true" />

@@ -169,7 +169,7 @@ export default async function CreditsPage({ params }: CreditsPageProps) {
             <CardHeader className="pb-2">
               <CardDescription>Businesses with Credits</CardDescription>
               <CardTitle className="text-2xl flex items-center gap-2">
-                <Building2 className="h-5 w-5 text-cpPink" />
+                <Building2 className="h-5 w-5 text-cpCoral" />
                 {data.totalBusinessesWithCredits}
               </CardTitle>
             </CardHeader>

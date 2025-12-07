@@ -223,7 +223,7 @@ export default async function TopInCountryPage({ params }: TopInCountryPageProps
       />
 
       {/* AI-Generated Intro Content */}
-      <section className="bg-gradient-to-b from-cpPink/10 to-white border-b">
+      <section className="bg-gradient-to-b from-cpCoral/10 to-white border-b">
         <div className="container mx-auto max-w-6xl px-4 py-6">
           <p className="text-slate-700 mb-2">{content.intro}</p>
           {content.secondary && (
@@ -240,7 +240,7 @@ export default async function TopInCountryPage({ params }: TopInCountryPageProps
               <article
                 key={place.id}
                 className={`relative bg-white rounded-xl border-2 ${
-                  index === 0 ? "border-cpYellow shadow-lg" : index < 3 ? "border-cpPink/30" : "border-slate-200"
+                  index === 0 ? "border-cpYellow shadow-lg" : index < 3 ? "border-cpCoral/30" : "border-slate-200"
                 } overflow-hidden`}
               >
                 {/* Rank Banner */}
@@ -263,7 +263,7 @@ export default async function TopInCountryPage({ params }: TopInCountryPageProps
                     <div className="flex-1">
                       <Link
                         href={`/${locale}/${countrySlug}/${getCitySlug(place)}/${categorySlug}/${place.slug}`}
-                        className="text-xl font-bold text-slate-900 hover:text-cpPink transition-colors"
+                        className="text-xl font-bold text-slate-900 hover:text-cpCoral transition-colors"
                       >
                         {place.name}
                       </Link>
@@ -296,7 +296,7 @@ export default async function TopInCountryPage({ params }: TopInCountryPageProps
                     {/* View Button */}
                     <Link
                       href={`/${locale}/${countrySlug}/${getCitySlug(place)}/${categorySlug}/${place.slug}`}
-                      className="flex-shrink-0 inline-flex items-center gap-1 px-4 py-2 bg-cpPink text-white rounded-lg hover:bg-cpPink/90 transition-colors text-sm font-medium"
+                      className="flex-shrink-0 inline-flex items-center gap-1 px-4 py-2 bg-cpCoral text-white rounded-lg hover:bg-cpCoral/90 transition-colors text-sm font-medium"
                     >
                       {locale === "nl" ? "Bekijk" : "View"}
                       <ExternalLink className="h-4 w-4" />
@@ -326,12 +326,12 @@ export default async function TopInCountryPage({ params }: TopInCountryPageProps
         <div className="container mx-auto max-w-6xl px-4">
           <SectionHeader title={locale === "nl" ? "Meer ontdekken" : "Explore more"} />
           <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className="cursor-pointer hover:bg-cpPink/10">
+            <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10">
               <a href={`/${locale}/${countrySlug}/c/${categorySlug}`}>
                 {locale === "nl" ? `Alle ${categoryLabel} in ${countryName}` : `All ${categoryLabel} in ${countryName}`}
               </a>
             </Badge>
-            <Badge variant="outline" className="cursor-pointer hover:bg-cpPink/10">
+            <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10">
               <a href={`/${locale}/${countrySlug}/best/${categorySlug}`}>
                 {locale === "nl" ? `Beste ${categoryLabel}` : `Best ${categoryLabel}`}
               </a>

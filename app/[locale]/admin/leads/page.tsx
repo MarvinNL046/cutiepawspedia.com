@@ -74,8 +74,8 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-cpPink/10">
-                  <MessageSquare className="h-5 w-5 text-cpPink" aria-hidden="true" />
+                <div className="p-2 rounded-lg bg-cpCoral/10">
+                  <MessageSquare className="h-5 w-5 text-cpCoral" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Total Leads</p>

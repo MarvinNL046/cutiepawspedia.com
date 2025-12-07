@@ -275,7 +275,7 @@ export function ClaimForm({
               name="confirmed"
               checked={formData.confirmed}
               onChange={handleChange}
-              className="mt-1 h-4 w-4 rounded border-slate-300 text-cpPink focus:ring-cpPink"
+              className="mt-1 h-4 w-4 rounded border-slate-300 text-cpCoral focus:ring-cpCoral"
             />
             <Label htmlFor="confirmed" className="text-sm text-slate-600 cursor-pointer">
               {t.confirm}
@@ -294,7 +294,7 @@ export function ClaimForm({
           <Button
             type="submit"
             disabled={status === "loading" || !formData.confirmed}
-            className="w-full bg-cpPink hover:bg-cpPink/90"
+            className="w-full bg-cpCoral hover:bg-cpCoral/90"
           >
             {status === "loading" ? (
               <>

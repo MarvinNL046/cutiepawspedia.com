@@ -337,7 +337,7 @@ export function PlaceStep({
         <div className="p-6 rounded-xl border-2 border-green-500/50 bg-green-50 dark:bg-green-900/20">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-lg bg-white dark:bg-slate-800 flex items-center justify-center">
-              <Building2 className="w-6 h-6 text-cpPink" />
+              <Building2 className="w-6 h-6 text-cpCoral" />
             </div>
             <div>
               <h3 className="font-semibold text-cpDark dark:text-white text-lg">
@@ -367,7 +367,7 @@ export function PlaceStep({
           <Button
             onClick={onSubmit}
             disabled={isSubmitting}
-            className="bg-cpPink hover:bg-cpPink/90"
+            className="bg-cpCoral hover:bg-cpCoral/90"
           >
             {isSubmitting ? labels.submitting : t.confirmClaim.confirmButton}
           </Button>
@@ -381,8 +381,8 @@ export function PlaceStep({
     return (
       <div className="space-y-6">
         <div className="text-center">
-          <div className="w-12 h-12 rounded-full bg-cpPink/10 flex items-center justify-center mx-auto mb-4">
-            <MapPin className="w-6 h-6 text-cpPink" />
+          <div className="w-12 h-12 rounded-full bg-cpCoral/10 flex items-center justify-center mx-auto mb-4">
+            <MapPin className="w-6 h-6 text-cpCoral" />
           </div>
           <h2 className="text-xl font-semibold text-cpDark dark:text-white mb-2">
             {t.title}
@@ -402,7 +402,7 @@ export function PlaceStep({
           {/* Claim existing */}
           <button
             onClick={() => setMode("claim")}
-            className="p-6 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-cpPink/50 transition-all text-left"
+            className="p-6 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-cpCoral/50 transition-all text-left"
           >
             <div className="w-10 h-10 rounded-lg bg-cpAqua/10 flex items-center justify-center mb-3">
               <Search className="w-5 h-5 text-cpAqua" />
@@ -418,10 +418,10 @@ export function PlaceStep({
           {/* Create new */}
           <button
             onClick={() => setMode("create")}
-            className="p-6 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-cpPink/50 transition-all text-left"
+            className="p-6 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-cpCoral/50 transition-all text-left"
           >
-            <div className="w-10 h-10 rounded-lg bg-cpPink/10 flex items-center justify-center mb-3">
-              <Plus className="w-5 h-5 text-cpPink" />
+            <div className="w-10 h-10 rounded-lg bg-cpCoral/10 flex items-center justify-center mb-3">
+              <Plus className="w-5 h-5 text-cpCoral" />
             </div>
             <h3 className="font-semibold text-cpDark dark:text-white mb-1">
               {t.chooseMode.create}
@@ -488,8 +488,8 @@ export function PlaceStep({
                 place.hasOwner
                   ? "border-slate-200 bg-slate-50 opacity-60 cursor-not-allowed"
                   : selectedClaimPlace?.id === place.id
-                    ? "border-cpPink bg-cpPink/5"
-                    : "border-slate-200 hover:border-cpPink/50"
+                    ? "border-cpCoral bg-cpCoral/5"
+                    : "border-slate-200 hover:border-cpCoral/50"
               )}
             >
               <div className="flex items-center justify-between">
@@ -504,9 +504,9 @@ export function PlaceStep({
                     {t.claim.alreadyClaimed}
                   </span>
                 ) : selectedClaimPlace?.id === place.id ? (
-                  <Check className="w-5 h-5 text-cpPink" />
+                  <Check className="w-5 h-5 text-cpCoral" />
                 ) : (
-                  <span className="text-sm text-cpPink">{t.claim.select}</span>
+                  <span className="text-sm text-cpCoral">{t.claim.select}</span>
                 )}
               </div>
             </button>
@@ -522,7 +522,7 @@ export function PlaceStep({
           <Button
             onClick={handleSubmit}
             disabled={!selectedClaimPlace || isSubmitting}
-            className="bg-cpPink hover:bg-cpPink/90"
+            className="bg-cpCoral hover:bg-cpCoral/90"
           >
             {isSubmitting ? labels.submitting : labels.submit}
           </Button>
@@ -603,8 +603,8 @@ export function PlaceStep({
                 className={cn(
                   "p-2 text-sm rounded-lg border transition-all",
                   data.categoryIds.includes(category.id)
-                    ? "border-cpPink bg-cpPink/10 text-cpPink"
-                    : "border-slate-200 hover:border-cpPink/50"
+                    ? "border-cpCoral bg-cpCoral/10 text-cpCoral"
+                    : "border-slate-200 hover:border-cpCoral/50"
                 )}
               >
                 {category.labelKey}
@@ -638,7 +638,7 @@ export function PlaceStep({
         <Button
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className="bg-cpPink hover:bg-cpPink/90"
+          className="bg-cpCoral hover:bg-cpCoral/90"
         >
           {isSubmitting ? labels.submitting : labels.submit}
         </Button>

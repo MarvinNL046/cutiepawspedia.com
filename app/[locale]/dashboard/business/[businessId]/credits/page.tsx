@@ -157,7 +157,7 @@ export default async function CreditsPage({ params }: CreditsPageProps) {
       case "refund":
         return <RefreshCw className="h-4 w-4 text-blue-500" />;
       case "bonus":
-        return <Gift className="h-4 w-4 text-cpPink" />;
+        return <Gift className="h-4 w-4 text-cpCoral" />;
       case "premium_subscription":
         return <Crown className="h-4 w-4 text-cpYellow" />;
       default:
@@ -175,7 +175,7 @@ export default async function CreditsPage({ params }: CreditsPageProps) {
       case "refund":
         return <Badge className="bg-blue-100 text-blue-600 border-blue-300">{label}</Badge>;
       case "bonus":
-        return <Badge className="bg-cpPink/20 text-cpPink border-cpPink">{label}</Badge>;
+        return <Badge className="bg-cpCoral/20 text-cpCoral border-cpCoral">{label}</Badge>;
       case "premium_subscription":
         return <Badge className="bg-cpYellow/20 text-cpYellow border-cpYellow">{label}</Badge>;
       default:
@@ -211,12 +211,12 @@ export default async function CreditsPage({ params }: CreditsPageProps) {
         {/* Balance and Stats Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Current Balance - Large */}
-          <Card className="lg:col-span-2 bg-gradient-to-br from-cpPink/10 to-cpAqua/10 border-cpPink/20">
+          <Card className="lg:col-span-2 bg-gradient-to-br from-cpCoral/10 to-cpAqua/10 border-cpCoral/20">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-slate-600">
                 {t.currentBalance}
               </CardTitle>
-              <CreditCard className="h-5 w-5 text-cpPink" />
+              <CreditCard className="h-5 w-5 text-cpCoral" />
             </CardHeader>
             <CardContent>
               <div className="text-4xl font-bold text-cpDark">
@@ -247,7 +247,7 @@ export default async function CreditsPage({ params }: CreditsPageProps) {
               <CardTitle className="text-sm font-medium text-slate-600">
                 {t.leadsCharged}
               </CardTitle>
-              <MessageSquare className="h-4 w-4 text-cpPink" />
+              <MessageSquare className="h-4 w-4 text-cpCoral" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-cpDark">{stats.leadsCharged}</div>

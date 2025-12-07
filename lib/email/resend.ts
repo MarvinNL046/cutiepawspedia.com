@@ -33,7 +33,7 @@ export const emailTemplates = {
         </head>
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1F2937; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #FF7FA1; margin-bottom: 10px;">🐾 CutiePawsPedia</h1>
+            <h1 style="color: #FF8C73; margin-bottom: 10px;">🐾 CutiePawsPedia</h1>
           </div>
 
           <h2 style="color: #1F2937;">Welcome to our newsletter!</h2>
@@ -48,7 +48,7 @@ export const emailTemplates = {
           </ul>
 
           <p style="margin-top: 30px;">
-            <a href="https://cutiepawspedia.com" style="display: inline-block; background-color: #FF7FA1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600;">
+            <a href="https://cutiepawspedia.com" style="display: inline-block; background-color: #FF8C73; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600;">
               Explore CutiePawsPedia
             </a>
           </p>
@@ -58,7 +58,7 @@ export const emailTemplates = {
           <p style="color: #6B7280; font-size: 12px;">
             You received this email because you subscribed to our newsletter.
             <br>
-            <a href="https://cutiepawspedia.com/unsubscribe" style="color: #FF7FA1;">Unsubscribe</a>
+            <a href="https://cutiepawspedia.com/unsubscribe" style="color: #FF8C73;">Unsubscribe</a>
           </p>
         </body>
       </html>
@@ -88,14 +88,14 @@ export const emailTemplates = {
         </head>
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1F2937; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #FF7FA1; margin-bottom: 10px;">🐾 CutiePawsPedia</h1>
+            <h1 style="color: #FF8C73; margin-bottom: 10px;">🐾 CutiePawsPedia</h1>
           </div>
 
           <h2 style="color: #1F2937;">You have a new inquiry!</h2>
 
           <div style="background-color: #F9FAFB; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <p><strong>From:</strong> ${data.leadName}</p>
-            <p><strong>Email:</strong> <a href="mailto:${data.leadEmail}" style="color: #FF7FA1;">${data.leadEmail}</a></p>
+            <p><strong>Email:</strong> <a href="mailto:${data.leadEmail}" style="color: #FF8C73;">${data.leadEmail}</a></p>
             ${data.leadPhone ? `<p><strong>Phone:</strong> ${data.leadPhone}</p>` : ""}
             ${data.message ? `<p><strong>Message:</strong><br>${data.message}</p>` : ""}
           </div>
@@ -192,7 +192,7 @@ export async function sendNewClaimNotification(data: {
         </head>
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1F2937; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #FF7FA1; margin-bottom: 10px;">🐾 CutiePawsPedia</h1>
+            <h1 style="color: #FF8C73; margin-bottom: 10px;">🐾 CutiePawsPedia</h1>
           </div>
 
           <h2 style="color: #1F2937;">New Place Claim Request</h2>
@@ -211,7 +211,7 @@ export async function sendNewClaimNotification(data: {
           <h3 style="color: #4B5563; margin-top: 25px;">Claimant Information</h3>
           <div style="background-color: #F9FAFB; padding: 20px; border-radius: 8px; margin: 10px 0;">
             <p style="margin: 0 0 8px 0;"><strong>Name:</strong> ${data.userName || "Not provided"}</p>
-            <p style="margin: 0 0 8px 0;"><strong>Email:</strong> <a href="mailto:${data.userEmail}" style="color: #FF7FA1;">${data.userEmail}</a></p>
+            <p style="margin: 0 0 8px 0;"><strong>Email:</strong> <a href="mailto:${data.userEmail}" style="color: #FF8C73;">${data.userEmail}</a></p>
             <p style="margin: 0 0 8px 0;"><strong>Business Name:</strong> ${data.businessName}</p>
             <p style="margin: 0;"><strong>Role:</strong> ${data.businessRole}</p>
           </div>
@@ -224,7 +224,7 @@ export async function sendNewClaimNotification(data: {
           ` : ""}
 
           <p style="margin-top: 30px;">
-            <a href="${adminUrl}/en/admin/claims" style="display: inline-block; background-color: #FF7FA1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600;">
+            <a href="${adminUrl}/en/admin/claims" style="display: inline-block; background-color: #FF8C73; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600;">
               Review Claim in Admin Panel
             </a>
           </p>

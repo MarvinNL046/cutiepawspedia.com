@@ -358,7 +358,7 @@ export function ProfileSettingsForm({ profile, locale }: ProfileSettingsFormProp
           <Button
             type="submit"
             disabled={isSubmitting || usernameStatus === "unavailable"}
-            className="bg-cpPink hover:bg-cpPink/90"
+            className="bg-cpCoral hover:bg-cpCoral/90"
           >
             {isSubmitting ? (
               <>

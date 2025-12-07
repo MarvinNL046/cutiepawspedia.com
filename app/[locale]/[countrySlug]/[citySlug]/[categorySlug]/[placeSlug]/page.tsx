@@ -247,7 +247,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
           ? "bg-gradient-to-br from-purple-100 via-white to-purple-50 border-b-4 border-purple-400"
           : placeFeatures.hasFeaturedStyling
             ? "bg-gradient-to-br from-amber-50 via-white to-cpYellow/10 border-b-4 border-cpYellow"
-            : "bg-gradient-to-br from-cpPink/10 via-white to-cpAqua/10"
+            : "bg-gradient-to-br from-cpCoral/10 via-white to-cpAqua/10"
       }`}>
         <div className={`absolute inset-0 ${
           placeFeatures.hasEnhancedStyling
@@ -337,7 +337,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
               />
               {/* Call button - only show if plan allows phone display */}
               {place.phone && placeFeatures.canShowPhone ? (
-                <Button asChild className="bg-cpPink hover:bg-cpPink/90 gap-2">
+                <Button asChild className="bg-cpCoral hover:bg-cpCoral/90 gap-2">
                   <a href={`tel:${place.phone}`}><Phone className="h-4 w-4" />{locale === "nl" ? "Bel Nu" : "Call Now"}</a>
                 </Button>
               ) : place.phone && !placeFeatures.canShowPhone ? (
@@ -455,10 +455,10 @@ export default async function PlacePage({ params }: PlacePageProps) {
                         {review.body && <p className="text-slate-600">{review.body}</p>}
                         {/* Show business replies */}
                         {review.replies && review.replies.length > 0 && (
-                          <div className="mt-3 pl-4 border-l-2 border-cpPink/30">
+                          <div className="mt-3 pl-4 border-l-2 border-cpCoral/30">
                             {review.replies.map((reply) => (
                               <div key={reply.id} className="bg-slate-50 rounded p-3 mt-2">
-                                <p className="text-xs text-cpPink font-medium mb-1">
+                                <p className="text-xs text-cpCoral font-medium mb-1">
                                   {reply.authorType === "business" ? (locale === "nl" ? "Reactie van bedrijf" : "Business Response") : (locale === "nl" ? "Reactie van beheerder" : "Admin Response")}
                                 </p>
                                 <p className="text-sm text-slate-600">{reply.body}</p>
@@ -491,7 +491,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 {/* Address - always shown */}
                 {place.address && (
                   <div className="flex items-start gap-3">
-                    <MapPin className="h-5 w-5 text-cpPink shrink-0 mt-0.5" />
+                    <MapPin className="h-5 w-5 text-cpCoral shrink-0 mt-0.5" />
                     <div>
                       <p className="text-slate-600">{place.address}</p>
                       <p className="text-slate-500 text-sm">
@@ -504,8 +504,8 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 {/* Phone - gated by plan */}
                 {place.phone && placeFeatures.canShowPhone ? (
                   <div className="flex items-center gap-3">
-                    <Phone className="h-5 w-5 text-cpPink" />
-                    <a href={`tel:${place.phone}`} className="text-cpDark hover:text-cpPink transition-colors">
+                    <Phone className="h-5 w-5 text-cpCoral" />
+                    <a href={`tel:${place.phone}`} className="text-cpDark hover:text-cpCoral transition-colors">
                       {place.phone}
                     </a>
                   </div>
@@ -522,8 +522,8 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 {/* Email - gated by plan */}
                 {place.email && placeFeatures.canShowEmail ? (
                   <div className="flex items-center gap-3">
-                    <Mail className="h-5 w-5 text-cpPink" />
-                    <a href={`mailto:${place.email}`} className="text-cpDark hover:text-cpPink transition-colors truncate">
+                    <Mail className="h-5 w-5 text-cpCoral" />
+                    <a href={`mailto:${place.email}`} className="text-cpDark hover:text-cpCoral transition-colors truncate">
                       {place.email}
                     </a>
                   </div>
@@ -540,8 +540,8 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 {/* Website - gated by plan */}
                 {place.website && placeFeatures.canShowWebsite ? (
                   <div className="flex items-center gap-3">
-                    <Globe className="h-5 w-5 text-cpPink" />
-                    <a href={place.website} target="_blank" rel="noopener noreferrer" className="text-cpDark hover:text-cpPink transition-colors">
+                    <Globe className="h-5 w-5 text-cpCoral" />
+                    <a href={place.website} target="_blank" rel="noopener noreferrer" className="text-cpDark hover:text-cpCoral transition-colors">
                       {locale === "nl" ? "Bezoek Website" : "Visit Website"}
                     </a>
                   </div>
@@ -559,7 +559,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 {upgradeCTA && (
                   <div className="pt-3 border-t border-slate-100">
                     <p className="text-xs text-slate-500 mb-2">{upgradeCTA.message}</p>
-                    <Button asChild size="sm" variant="outline" className="w-full gap-1 text-cpPink border-cpPink/30 hover:bg-cpPink/5">
+                    <Button asChild size="sm" variant="outline" className="w-full gap-1 text-cpCoral border-cpCoral/30 hover:bg-cpCoral/5">
                       <a href={`/${locale}/for-businesses`}>
                         <Crown className="h-3 w-3" />
                         {locale === "nl" ? "Bekijk Abonnementen" : "View Plans"}
@@ -603,7 +603,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                       href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.address)}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 mt-3 text-sm text-cpAqua hover:text-cpPink transition-colors"
+                      className="flex items-center justify-center gap-2 mt-3 text-sm text-cpAqua hover:text-cpCoral transition-colors"
                     >
                       <MapPin className="h-4 w-4" />
                       {locale === "nl" ? "Open in Google Maps" : "Open in Google Maps"}

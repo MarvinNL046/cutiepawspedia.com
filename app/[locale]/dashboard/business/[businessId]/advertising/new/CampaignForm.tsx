@@ -163,7 +163,7 @@ export function CampaignForm({
       {/* Package Selection */}
       <div className="bg-white rounded-xl border p-6 space-y-4">
         <div className="flex items-center gap-2 text-cpDark font-medium">
-          <Package className="w-5 h-5 text-cpPink" />
+          <Package className="w-5 h-5 text-cpCoral" />
           {isNl ? "Advertentiepakket" : "Ad Package"}
         </div>
 
@@ -175,7 +175,7 @@ export function CampaignForm({
             {packages.map((pkg) => (
               <SelectItem key={pkg.key} value={pkg.key}>
                 <div className="flex items-center gap-2">
-                  {pkg.isPopular && <Star className="w-3 h-3 text-cpPink" />}
+                  {pkg.isPopular && <Star className="w-3 h-3 text-cpCoral" />}
                   <span>{pkg.name}</span>
                   <span className="text-slate-500">
                     - {formatPrice(pkg.priceCents)} / {pkg.durationDays}{" "}
@@ -191,7 +191,7 @@ export function CampaignForm({
       {/* Campaign Details */}
       <div className="bg-white rounded-xl border p-6 space-y-4">
         <div className="flex items-center gap-2 text-cpDark font-medium">
-          <Type className="w-5 h-5 text-cpPink" />
+          <Type className="w-5 h-5 text-cpCoral" />
           {isNl ? "Campagne Details" : "Campaign Details"}
         </div>
 
@@ -255,7 +255,7 @@ export function CampaignForm({
       {/* Description */}
       <div className="bg-white rounded-xl border p-6 space-y-4">
         <div className="flex items-center gap-2 text-cpDark font-medium">
-          <FileText className="w-5 h-5 text-cpPink" />
+          <FileText className="w-5 h-5 text-cpCoral" />
           {isNl ? "Beschrijving" : "Description"}{" "}
           <span className="text-slate-400 text-xs">
             ({isNl ? "optioneel" : "optional"})
@@ -307,7 +307,7 @@ export function CampaignForm({
       {/* Image & Link */}
       <div className="bg-white rounded-xl border p-6 space-y-4">
         <div className="flex items-center gap-2 text-cpDark font-medium">
-          <ImageIcon className="w-5 h-5 text-cpPink" />
+          <ImageIcon className="w-5 h-5 text-cpCoral" />
           {isNl ? "Afbeelding & Link" : "Image & Link"}
         </div>
 
@@ -387,7 +387,7 @@ export function CampaignForm({
       </div>
 
       {/* Submit */}
-      <div className="bg-gradient-to-r from-cpPink/10 to-cpCoral/10 rounded-xl p-6">
+      <div className="bg-gradient-to-r from-cpCoral/10 to-cpCoral/10 rounded-xl p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <p className="font-medium text-cpDark">
@@ -403,7 +403,7 @@ export function CampaignForm({
           <Button
             type="submit"
             size="lg"
-            className="bg-cpPink hover:bg-cpPink/90 gap-2"
+            className="bg-cpCoral hover:bg-cpCoral/90 gap-2"
             disabled={isLoading || !headline}
           >
             {isLoading ? (

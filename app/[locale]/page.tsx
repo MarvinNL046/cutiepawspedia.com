@@ -207,20 +207,35 @@ export default async function HomePage({ params }: HomePageProps) {
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { icon: "🩺", title: locale === "nl" ? "Dierenarts" : "Vet", desc: locale === "nl" ? "Dierenartsen klaarstaan voor je vrienden." : "Veterinarians ready for your friends." },
-              { icon: "✂️", title: locale === "nl" ? "Trimmer" : "Groomer", desc: locale === "nl" ? "Trimsalons aanstaand aan in trimmercentrees." : "Grooming salons in grooming centers." },
-              { icon: "🏠", title: locale === "nl" ? "Oppas" : "Sitter", desc: locale === "nl" ? "Oppas op dierenwinter met eerst eertoilvloren." : "Pet sitters with first priority." },
+              {
+                icon: "🩺",
+                title: locale === "nl" ? "Dierenartsen" : "Veterinarians",
+                desc: locale === "nl" ? "Vind betrouwbare dierenartsen bij jou in de buurt voor de beste zorg." : "Find trusted veterinarians near you for the best care.",
+                href: `/${locale}/search?category=veterinary`
+              },
+              {
+                icon: "✂️",
+                title: locale === "nl" ? "Trimsalons" : "Groomers",
+                desc: locale === "nl" ? "Professionele trimsalons voor een stralende vacht en gezonde huid." : "Professional grooming salons for a shiny coat and healthy skin.",
+                href: `/${locale}/search?category=grooming`
+              },
+              {
+                icon: "🏠",
+                title: locale === "nl" ? "Dierenpensions" : "Pet Hotels",
+                desc: locale === "nl" ? "Liefdevolle opvang voor je huisdier wanneer je op reis bent." : "Loving care for your pet while you're away.",
+                href: `/${locale}/search?category=boarding`
+              },
             ].map((service) => (
-              <div key={service.title} className="bg-card dark:bg-cpSurface/50 rounded-3xl p-6 text-center border border-border dark:border-cpAmber/20 shadow-sm hover:shadow-lg transition-all">
+              <Link key={service.title} href={service.href} className="bg-card dark:bg-cpSurface/50 rounded-3xl p-6 text-center border border-border dark:border-cpAmber/20 shadow-sm hover:shadow-lg hover:border-cpCoral/40 transition-all group">
                 <div className="category-circle mx-auto mb-4">
                   <span className="text-3xl">{service.icon}</span>
                 </div>
-                <h3 className="text-lg font-bold text-foreground dark:text-cpCream mb-2">{service.title}</h3>
+                <h3 className="text-lg font-bold text-foreground dark:text-cpCream mb-2 group-hover:text-cpCoral transition-colors">{service.title}</h3>
                 <p className="text-sm text-muted-foreground dark:text-slate-400 mb-4">{service.desc}</p>
-                <button className="btn-coral w-full py-2.5 rounded-xl text-sm font-medium">
-                  {locale === "nl" ? "Lees meer" : "Learn more"}
-                </button>
-              </div>
+                <span className="btn-coral w-full py-2.5 rounded-xl text-sm font-medium inline-block">
+                  {locale === "nl" ? "Bekijk alle" : "View all"} →
+                </span>
+              </Link>
             ))}
           </div>
         </section>

@@ -157,8 +157,8 @@ export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps)
         {/* Header */}
         <div className="px-6 pt-6 pb-4 border-b border-slate-100">
           <div className="flex items-start gap-4">
-            <div className="p-2 bg-cpPink/10 rounded-lg">
-              <Cookie className="h-6 w-6 text-cpPink" />
+            <div className="p-2 bg-cpCoral/10 rounded-lg">
+              <Cookie className="h-6 w-6 text-cpCoral" />
             </div>
             <div className="flex-1">
               <h2 id="consent-title" className="text-lg font-semibold text-cpDark">
@@ -224,7 +224,7 @@ export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps)
                 {t.decline}
               </Button>
               <Button
-                className="flex-1 bg-cpPink hover:bg-cpPink/90"
+                className="flex-1 bg-cpCoral hover:bg-cpCoral/90"
                 onClick={handleSavePreferences}
               >
                 <Check className="h-4 w-4 mr-2" />
@@ -252,7 +252,7 @@ export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps)
               </Button>
               <Button
                 size="sm"
-                className="flex-1 sm:order-3 bg-cpPink hover:bg-cpPink/90"
+                className="flex-1 sm:order-3 bg-cpCoral hover:bg-cpCoral/90"
                 onClick={handleAcceptAll}
               >
                 <Check className="h-4 w-4 mr-2" />
@@ -266,7 +266,7 @@ export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps)
         <div className="px-6 pb-4 text-center">
           <p className="text-xs text-slate-400">
             {t.learnMore}{" "}
-            <Link href={`/${locale}/privacy`} className="text-cpPink hover:underline">
+            <Link href={`/${locale}/privacy`} className="text-cpCoral hover:underline">
               {t.privacyPolicy}
             </Link>
           </p>

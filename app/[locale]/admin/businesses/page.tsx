@@ -45,7 +45,7 @@ export default async function BusinessesPage({ params }: BusinessesPageProps) {
             value={totalListings}
             subtitle="Across all businesses"
             icon={Users}
-            color="cpPink"
+            color="cpCoral"
           />
           <StatCard
             title="Total Leads"
@@ -89,12 +89,12 @@ interface StatCardProps {
   value: number;
   subtitle?: string;
   icon: React.ComponentType<{ className?: string }>;
-  color: "cpPink" | "cpAqua" | "cpYellow" | "slate";
+  color: "cpCoral" | "cpAqua" | "cpYellow" | "slate";
 }
 
 function StatCard({ title, value, subtitle, icon: Icon, color }: StatCardProps) {
   const colorClasses = {
-    cpPink: "bg-cpPink/10 text-cpPink",
+    cpCoral: "bg-cpCoral/10 text-cpCoral",
     cpAqua: "bg-cpAqua/10 text-cpAqua",
     cpYellow: "bg-cpYellow/10 text-cpYellow",
     slate: "bg-slate-100 text-slate-600",

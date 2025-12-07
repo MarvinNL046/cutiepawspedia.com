@@ -233,7 +233,7 @@ export function BusinessListingsTab({
                         variant="secondary"
                         className={
                           listing.leadCount > 0
-                            ? "bg-cpPink/20 text-cpPink"
+                            ? "bg-cpCoral/20 text-cpCoral"
                             : "bg-slate-100 text-slate-600"
                         }
                       >

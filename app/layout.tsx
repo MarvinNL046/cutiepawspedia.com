@@ -93,7 +93,7 @@ export default function RootLayout({
     return (
       <html lang="en" suppressHydrationWarning>
         {preconnectLinks}
-        <body className={bodyClasses}>
+        <body className={bodyClasses} suppressHydrationWarning>
           {adsenseScript}
           <ThemeProvider>
             <StackProvider app={stackServerApp}>

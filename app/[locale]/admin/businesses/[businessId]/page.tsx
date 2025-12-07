@@ -154,7 +154,7 @@ export default async function BusinessDetailPage({ params, searchParams }: Busin
                   label="Leads (30d)"
                   value={stats.leadsLast30Days}
                   icon={TrendingUp}
-                  color="cpPink"
+                  color="cpCoral"
                 />
                 <QuickStat
                   label="Avg Rating"
@@ -241,12 +241,12 @@ interface QuickStatProps {
   label: string;
   value: number;
   icon: React.ComponentType<{ className?: string }>;
-  color: "cpPink" | "cpAqua" | "cpYellow" | "slate";
+  color: "cpCoral" | "cpAqua" | "cpYellow" | "slate";
 }
 
 function QuickStat({ label, value, icon: Icon, color }: QuickStatProps) {
   const colorClasses = {
-    cpPink: "text-cpPink",
+    cpCoral: "text-cpCoral",
     cpAqua: "text-cpAqua",
     cpYellow: "text-cpYellow",
     slate: "text-slate-600",

@@ -108,14 +108,14 @@ export default async function NewCampaignPage({
         <div>
           <Link
             href={`/${locale}/dashboard/business/${businessId}/advertising`}
-            className="inline-flex items-center gap-2 text-slate-600 hover:text-cpPink mb-4"
+            className="inline-flex items-center gap-2 text-slate-600 hover:text-cpCoral mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
             {isNl ? "Terug naar adverteren" : "Back to advertising"}
           </Link>
 
           <h1 className="text-2xl font-bold text-cpDark flex items-center gap-2">
-            <Megaphone className="w-6 h-6 text-cpPink" />
+            <Megaphone className="w-6 h-6 text-cpCoral" />
             {isNl ? "Nieuwe Campagne" : "New Campaign"}
           </h1>
           <p className="text-slate-600 mt-1">
@@ -149,9 +149,9 @@ export default async function NewCampaignPage({
 
           {/* Selected Package Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl border-2 border-cpPink p-6 sticky top-6">
+            <div className="bg-white rounded-2xl border-2 border-cpCoral p-6 sticky top-6">
               <div className="flex items-center gap-2 mb-4">
-                <Sparkles className="w-5 h-5 text-cpPink" />
+                <Sparkles className="w-5 h-5 text-cpCoral" />
                 <h3 className="font-semibold text-cpDark">
                   {isNl ? "Geselecteerd Pakket" : "Selected Package"}
                 </h3>
@@ -197,7 +197,7 @@ export default async function NewCampaignPage({
                           key={placement}
                           className="flex items-center gap-2 text-sm"
                         >
-                          <Check className="w-4 h-4 text-cpPink" />
+                          <Check className="w-4 h-4 text-cpCoral" />
                           <span className="text-slate-700">
                             {placementLabels[placement]?.[isNl ? "nl" : "en"] ||
                               placement}

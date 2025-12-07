@@ -85,12 +85,12 @@ export default async function BusinessIndexPage({ params }: BusinessIndexPagePro
           // No businesses state
           <Card className="max-w-md mx-auto mt-12">
             <CardContent className="pt-6 text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-cpPink/10 mb-4">
-                <Building2 className="h-8 w-8 text-cpPink" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-cpCoral/10 mb-4">
+                <Building2 className="h-8 w-8 text-cpCoral" />
               </div>
               <h3 className="text-xl font-semibold text-cpDark mb-2">{t.noBusiness}</h3>
               <p className="text-slate-600 mb-6">{t.noBusinessDesc}</p>
-              <Button asChild className="bg-cpPink hover:bg-cpPink/90">
+              <Button asChild className="bg-cpCoral hover:bg-cpCoral/90">
                 <Link href={`/${locale}/onboarding/business`}>
                   <Plus className="h-4 w-4 mr-2" />
                   {t.claimListing}
@@ -117,8 +117,8 @@ export default async function BusinessIndexPage({ params }: BusinessIndexPagePro
                             className="w-12 h-12 rounded-lg object-cover"
                           />
                         ) : (
-                          <div className="w-12 h-12 rounded-lg bg-cpPink/10 flex items-center justify-center">
-                            <Building2 className="h-6 w-6 text-cpPink" />
+                          <div className="w-12 h-12 rounded-lg bg-cpCoral/10 flex items-center justify-center">
+                            <Building2 className="h-6 w-6 text-cpCoral" />
                           </div>
                         )}
                         <div>

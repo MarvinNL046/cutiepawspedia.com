@@ -268,7 +268,7 @@ export default async function BestInCountryPage({ params }: BestInCountryPagePro
                   <div className="flex items-center gap-2 mb-1">
                     <a
                       href={`/${locale}/${countrySlug}/${getCitySlug(place)}/${categorySlug}/${place.slug}`}
-                      className="font-semibold text-lg hover:text-cpPink transition-colors truncate"
+                      className="font-semibold text-lg hover:text-cpCoral transition-colors truncate"
                     >
                       {place.name}
                     </a>
@@ -324,12 +324,12 @@ export default async function BestInCountryPage({ params }: BestInCountryPagePro
         <div className="container mx-auto max-w-6xl px-4">
           <SectionHeader title={locale === "nl" ? "Bekijk ook" : "See also"} />
           <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className="cursor-pointer hover:bg-cpPink/10">
+            <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10">
               <a href={`/${locale}/${countrySlug}/c/${categorySlug}`}>
                 {locale === "nl" ? `Alle ${categoryLabel} in ${countryName}` : `All ${categoryLabel} in ${countryName}`}
               </a>
             </Badge>
-            <Badge variant="outline" className="cursor-pointer hover:bg-cpPink/10">
+            <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10">
               <a href={`/${locale}/${countrySlug}/top/${categorySlug}`}>
                 {locale === "nl" ? `Top 10 ${categoryLabel}` : `Top 10 ${categoryLabel}`}
               </a>

@@ -224,7 +224,7 @@ export default async function PlaceDetailPage({ params }: PlaceDetailPageProps) 
               <div>
                 <p className="text-sm text-slate-500 mb-1">{t.location}</p>
                 <div className="flex items-center gap-1 font-medium">
-                  <MapPin className="h-4 w-4 text-cpPink" />
+                  <MapPin className="h-4 w-4 text-cpCoral" />
                   {place.cityName}, {place.countryName}
                 </div>
               </div>

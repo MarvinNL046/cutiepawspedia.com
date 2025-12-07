@@ -107,7 +107,7 @@ export default async function AccountLayout({
             <div className="flex items-center gap-4">
               <Link
                 href={`/${locale}`}
-                className="text-xl font-bold text-cpPink hover:opacity-80 transition-opacity"
+                className="text-xl font-bold text-cpCoral hover:opacity-80 transition-opacity"
               >
                 CutiePawsPedia
               </Link>
@@ -132,7 +132,7 @@ export default async function AccountLayout({
               {userBusinesses.length > 0 ? (
                 <Link
                   href={`/${locale}/dashboard/business/${userBusinesses[0].id}`}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-cpPink/10 text-cpPink rounded-full text-sm font-medium hover:bg-cpPink/20 transition-colors"
+                  className="flex items-center gap-2 px-3 py-1.5 bg-cpCoral/10 text-cpCoral rounded-full text-sm font-medium hover:bg-cpCoral/20 transition-colors"
                 >
                   <Building2 className="h-4 w-4" />
                   <span className="hidden sm:inline">
@@ -143,7 +143,7 @@ export default async function AccountLayout({
               ) : (
                 <Link
                   href={`/${locale}/for-businesses`}
-                  className="flex items-center gap-2 px-3 py-1.5 border border-cpPink text-cpPink rounded-full text-sm font-medium hover:bg-cpPink/10 transition-colors"
+                  className="flex items-center gap-2 px-3 py-1.5 border border-cpCoral text-cpCoral rounded-full text-sm font-medium hover:bg-cpCoral/10 transition-colors"
                 >
                   <Plus className="h-4 w-4" />
                   <span className="hidden sm:inline">
@@ -172,7 +172,7 @@ export default async function AccountLayout({
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex items-center gap-2 py-4 text-sm font-medium text-slate-600 hover:text-cpPink border-b-2 border-transparent hover:border-cpPink transition-colors"
+                className="flex items-center gap-2 py-4 text-sm font-medium text-slate-600 hover:text-cpCoral border-b-2 border-transparent hover:border-cpCoral transition-colors"
               >
                 <item.icon className="h-4 w-4" />
                 {item.label}

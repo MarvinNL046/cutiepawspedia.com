@@ -60,7 +60,7 @@ export function TableOfContents({ items, locale }: TableOfContentsProps) {
   return (
     <nav className="bg-card dark:bg-cpSurface/30 rounded-xl border border-border dark:border-cpAmber/10 p-4">
       <h3 className="flex items-center gap-2 font-semibold text-foreground dark:text-cpCream mb-3">
-        <List className="w-4 h-4 text-cpPink" />
+        <List className="w-4 h-4 text-cpCoral" />
         {locale === "nl" ? "Inhoud" : "Contents"}
       </h3>
       <ul className="space-y-2">
@@ -73,7 +73,7 @@ export function TableOfContents({ items, locale }: TableOfContentsProps) {
               onClick={() => scrollToHeading(item.id)}
               className={`text-left text-sm transition-colors w-full py-1 px-2 rounded-lg hover:bg-muted dark:hover:bg-cpSurface/50 ${
                 activeId === item.id
-                  ? "text-cpPink font-medium bg-cpPink/10"
+                  ? "text-cpCoral font-medium bg-cpCoral/10"
                   : "text-muted-foreground dark:text-cpCream/70"
               }`}
             >

@@ -316,7 +316,7 @@ export function BusinessesTable({
                         variant="secondary"
                         className={
                           business.leadsCount > 0
-                            ? "bg-cpPink/20 text-cpPink border-0"
+                            ? "bg-cpCoral/20 text-cpCoral border-0"
                             : "bg-slate-100"
                         }
                       >

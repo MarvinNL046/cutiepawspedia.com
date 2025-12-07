@@ -126,7 +126,7 @@ export default async function CityPage({ params }: CityPageProps) {
     <>
       <PageHeader
         title={locale === "nl" ? `Huisdierdiensten in ${cityName}` : `Pet Services in ${cityName}`}
-        icon={<MapPin className="h-7 w-7 text-cpPink" />}
+        icon={<MapPin className="h-7 w-7 text-cpCoral" />}
         variant="gradient-pink"
         breadcrumbs={[
           { label: locale === "nl" ? "Overzicht" : "Directory", href: `/${locale}` },
@@ -182,7 +182,7 @@ export default async function CityPage({ params }: CityPageProps) {
             </p>
             <Link
               href={`/${locale}/for-businesses`}
-              className="inline-block px-6 py-3 bg-cpPink hover:bg-cpPink/90 text-white font-medium rounded-lg transition-colors mt-4"
+              className="inline-block px-6 py-3 bg-cpCoral hover:bg-cpCoral/90 text-white font-medium rounded-lg transition-colors mt-4"
             >
               {locale === "nl" ? "Voeg je Bedrijf Toe" : "Add Your Business"}
             </Link>

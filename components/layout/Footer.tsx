@@ -28,7 +28,7 @@ export function Footer({ locale }: FooterProps) {
   return (
     <footer className="border-t border-border bg-muted/50">
       {/* Newsletter Section */}
-      <div className="bg-cpPink/5 dark:bg-cpPink/10 border-b border-border">
+      <div className="bg-cpCoral/5 dark:bg-cpCoral/10 border-b border-border">
         <div className="container mx-auto max-w-6xl px-4 py-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
@@ -55,7 +55,7 @@ export function Footer({ locale }: FooterProps) {
             <Link href={`/${locale}`} className="flex items-center gap-2">
               <span className="text-2xl">🐾</span>
               <span className="text-xl font-bold text-foreground">
-                Cutie<span className="text-cpPink">Paws</span>Pedia
+                Cutie<span className="text-cpCoral">Paws</span>Pedia
               </span>
             </Link>
             <p className="text-sm text-muted-foreground">
@@ -75,7 +75,7 @@ export function Footer({ locale }: FooterProps) {
                 <li key={cat.slug}>
                   <Link
                     href={`/${locale}/netherlands/c/${cat.slug}`}
-                    className="hover:text-cpPink transition-colors"
+                    className="hover:text-cpCoral transition-colors"
                   >
                     {cat.icon} {isNl ? cat.labelNl : cat.labelEn}
                   </Link>
@@ -94,7 +94,7 @@ export function Footer({ locale }: FooterProps) {
                 <li key={city.slug}>
                   <Link
                     href={`/${locale}/netherlands/${city.slug}`}
-                    className="hover:text-cpPink transition-colors"
+                    className="hover:text-cpCoral transition-colors"
                   >
                     📍 {city.name}
                   </Link>
@@ -103,7 +103,7 @@ export function Footer({ locale }: FooterProps) {
               <li>
                 <Link
                   href={`/${locale}/netherlands`}
-                  className="hover:text-cpPink transition-colors font-medium"
+                  className="hover:text-cpCoral transition-colors font-medium"
                 >
                   {isNl ? "→ Alle steden" : "→ All cities"}
                 </Link>
@@ -120,7 +120,7 @@ export function Footer({ locale }: FooterProps) {
               <li>
                 <Link
                   href={`/${locale}/netherlands/top/veterinary`}
-                  className="hover:text-cpPink transition-colors"
+                  className="hover:text-cpCoral transition-colors"
                 >
                   🏆 Top 10 {isNl ? "Dierenartsen" : "Veterinarians"}
                 </Link>
@@ -128,7 +128,7 @@ export function Footer({ locale }: FooterProps) {
               <li>
                 <Link
                   href={`/${locale}/netherlands/best/grooming`}
-                  className="hover:text-cpPink transition-colors"
+                  className="hover:text-cpCoral transition-colors"
                 >
                   ⭐ {isNl ? "Beste Trimsalons" : "Best Grooming"}
                 </Link>
@@ -136,7 +136,7 @@ export function Footer({ locale }: FooterProps) {
               <li>
                 <Link
                   href={`/${locale}/netherlands/amsterdam/best/veterinary`}
-                  className="hover:text-cpPink transition-colors"
+                  className="hover:text-cpCoral transition-colors"
                 >
                   🩺 {isNl ? "Beste in Amsterdam" : "Best in Amsterdam"}
                 </Link>
@@ -144,7 +144,7 @@ export function Footer({ locale }: FooterProps) {
               <li>
                 <Link
                   href={`/${locale}/netherlands/top/pet-store`}
-                  className="hover:text-cpPink transition-colors"
+                  className="hover:text-cpCoral transition-colors"
                 >
                   🛒 Top 10 {isNl ? "Dierenwinkels" : "Pet Stores"}
                 </Link>
@@ -159,32 +159,32 @@ export function Footer({ locale }: FooterProps) {
             </h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link href={`/${locale}`} className="hover:text-cpPink transition-colors">
+                <Link href={`/${locale}`} className="hover:text-cpCoral transition-colors">
                   🏠 {isNl ? "Home" : "Home"}
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}/search`} className="hover:text-cpPink transition-colors">
+                <Link href={`/${locale}/search`} className="hover:text-cpCoral transition-colors">
                   🔍 {isNl ? "Zoeken" : "Search"}
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}/blog`} className="hover:text-cpPink transition-colors">
+                <Link href={`/${locale}/blog`} className="hover:text-cpCoral transition-colors">
                   📝 Blog
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}/for-businesses`} className="hover:text-cpPink transition-colors">
+                <Link href={`/${locale}/for-businesses`} className="hover:text-cpCoral transition-colors">
                   💼 {isNl ? "Voor Bedrijven" : "For Businesses"}
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}/about`} className="hover:text-cpPink transition-colors">
+                <Link href={`/${locale}/about`} className="hover:text-cpCoral transition-colors">
                   ℹ️ {isNl ? "Over Ons" : "About Us"}
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}/contact`} className="hover:text-cpPink transition-colors">
+                <Link href={`/${locale}/contact`} className="hover:text-cpCoral transition-colors">
                   ✉️ Contact
                 </Link>
               </li>
@@ -197,22 +197,22 @@ export function Footer({ locale }: FooterProps) {
           <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-muted-foreground">
             <p>© {currentYear} CutiePawsPedia</p>
             <span className="hidden sm:inline">•</span>
-            <Link href={`/${locale}/privacy`} className="hover:text-cpPink transition-colors">
+            <Link href={`/${locale}/privacy`} className="hover:text-cpCoral transition-colors">
               {isNl ? "Privacy" : "Privacy Policy"}
             </Link>
             <span className="hidden sm:inline">•</span>
-            <Link href={`/${locale}/terms`} className="hover:text-cpPink transition-colors">
+            <Link href={`/${locale}/terms`} className="hover:text-cpCoral transition-colors">
               {isNl ? "Voorwaarden" : "Terms"}
             </Link>
           </div>
           <div className="flex gap-4">
-            <span className="text-muted-foreground/70 hover:text-cpPink cursor-pointer transition-colors">
+            <span className="text-muted-foreground/70 hover:text-cpCoral cursor-pointer transition-colors">
               Twitter
             </span>
-            <span className="text-muted-foreground/70 hover:text-cpPink cursor-pointer transition-colors">
+            <span className="text-muted-foreground/70 hover:text-cpCoral cursor-pointer transition-colors">
               Instagram
             </span>
-            <span className="text-muted-foreground/70 hover:text-cpPink cursor-pointer transition-colors">
+            <span className="text-muted-foreground/70 hover:text-cpCoral cursor-pointer transition-colors">
               Facebook
             </span>
           </div>

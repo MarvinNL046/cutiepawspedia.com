@@ -72,7 +72,7 @@ export default async function AdminDashboard({ params }: AdminDashboardProps) {
             title="Cities"
             value={stats.cities}
             icon={MapPin}
-            color="cpPink"
+            color="cpCoral"
           />
           <StatCard
             title="Categories"
@@ -113,7 +113,7 @@ export default async function AdminDashboard({ params }: AdminDashboardProps) {
             title="Pending Review"
             value={stats.places.pendingReview}
             icon={Clock}
-            color="cpPink"
+            color="cpCoral"
           />
         </div>
 
@@ -130,7 +130,7 @@ export default async function AdminDashboard({ params }: AdminDashboardProps) {
             title="Leads (7 days)"
             value={stats.leads.last7Days}
             icon={MessageSquare}
-            color="cpPink"
+            color="cpCoral"
           />
           <StatCard
             title="Leads (30 days)"
@@ -181,7 +181,7 @@ export default async function AdminDashboard({ params }: AdminDashboardProps) {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Building2 className="h-5 w-5 text-cpPink" aria-hidden="true" />
+                <Building2 className="h-5 w-5 text-cpCoral" aria-hidden="true" />
                 Latest Places
               </CardTitle>
               <CardDescription>Recently created listings</CardDescription>
@@ -360,13 +360,13 @@ interface StatCardProps {
   title: string;
   value: number;
   icon: React.ComponentType<{ className?: string }>;
-  color: "cpPink" | "cpAqua" | "cpYellow" | "slate";
+  color: "cpCoral" | "cpAqua" | "cpYellow" | "slate";
   subtitle?: string;
 }
 
 function StatCard({ title, value, icon: Icon, color, subtitle }: StatCardProps) {
   const colorClasses = {
-    cpPink: "bg-cpPink/10 text-cpPink",
+    cpCoral: "bg-cpCoral/10 text-cpCoral",
     cpAqua: "bg-cpAqua/10 text-cpAqua",
     cpYellow: "bg-cpYellow/10 text-cpYellow",
     slate: "bg-slate-100 text-slate-600",

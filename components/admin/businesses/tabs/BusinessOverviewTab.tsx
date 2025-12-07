@@ -210,7 +210,7 @@ export function BusinessOverviewTab({ business, stats }: BusinessOverviewTabProp
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-cpPink" />
+            <TrendingUp className="h-5 w-5 text-cpCoral" />
             Performance
           </CardTitle>
           <CardDescription>Listings and lead generation metrics</CardDescription>
@@ -235,7 +235,7 @@ export function BusinessOverviewTab({ business, stats }: BusinessOverviewTabProp
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 <span className="font-semibold">{stats.totalLeads}</span>
                 {stats.leadsLast30Days > 0 && (
-                  <Badge variant="secondary" className="bg-cpPink/10 text-cpPink">
+                  <Badge variant="secondary" className="bg-cpCoral/10 text-cpCoral">
                     +{stats.leadsLast30Days} last 30d
                   </Badge>
                 )}

@@ -60,9 +60,9 @@ export function AccountStep({ locale, initialPlan }: AccountStepProps) {
 
       <div className="grid gap-4 sm:grid-cols-2">
         {/* Sign In */}
-        <div className="p-6 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-cpPink/50 transition-colors">
-          <div className="w-12 h-12 rounded-full bg-cpPink/10 flex items-center justify-center mb-4">
-            <LogIn className="w-6 h-6 text-cpPink" />
+        <div className="p-6 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-cpCoral/50 transition-colors">
+          <div className="w-12 h-12 rounded-full bg-cpCoral/10 flex items-center justify-center mb-4">
+            <LogIn className="w-6 h-6 text-cpCoral" />
           </div>
           <h3 className="font-semibold text-cpDark dark:text-white mb-2">
             {t.signIn}
@@ -70,7 +70,7 @@ export function AccountStep({ locale, initialPlan }: AccountStepProps) {
           <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
             {t.signInDesc}
           </p>
-          <Button asChild className="w-full bg-cpPink hover:bg-cpPink/90">
+          <Button asChild className="w-full bg-cpCoral hover:bg-cpCoral/90">
             <a href={`/handler/sign-in?after_auth_return_to=${encodeURIComponent(returnUrl)}`}>
               {t.signIn}
             </a>

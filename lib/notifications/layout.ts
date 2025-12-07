@@ -22,8 +22,8 @@ export const BRAND = {
     de: "Finde tierfreundliche Orte in deiner Nähe",
   },
   colors: {
-    primary: "#FF7FA1", // Pink
-    primaryDark: "#E86A8A",
+    primary: "#FF8C73", // Coral
+    primaryDark: "#E67A63",
     secondary: "#1F2937", // Dark gray
     background: "#FFFFFF",
     cardBg: "#F9FAFB",

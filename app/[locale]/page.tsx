@@ -170,6 +170,25 @@ export default async function HomePage({ params }: HomePageProps) {
           </div>
         </section>
 
+        {/* Stats - Trusted by Thousands */}
+        <section className="container mx-auto max-w-6xl px-4 py-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { value: totalPlaces.toLocaleString() || "10,000+", label: locale === "nl" ? "Bedrijven" : "Businesses" },
+              { value: countries.length.toString() || "50+", label: locale === "nl" ? "Landen" : "Countries" },
+              { value: totalCities.toLocaleString() || "500+", label: locale === "nl" ? "Steden" : "Cities" },
+              { value: "4.8", label: locale === "nl" ? "Gem. Rating" : "Avg Rating" },
+            ].map((stat, i) => (
+              <div key={stat.label} className="bg-card dark:bg-cpSurface/50 rounded-2xl p-4 md:p-6 text-center border border-border dark:border-cpAmber/20 shadow-sm">
+                <div className={`text-2xl md:text-3xl font-bold mb-1 ${i % 2 === 0 ? 'text-cpCoral' : 'text-cpAmber'}`}>
+                  {stat.value}
+                </div>
+                <div className="text-sm text-muted-foreground dark:text-cpCream/70">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* Homepage Featured Sponsor Ad */}
         {homepageSponsorAd && (
           <section className="container mx-auto max-w-6xl px-4 py-8">
@@ -407,30 +426,6 @@ export default async function HomePage({ params }: HomePageProps) {
                 </summary>
                 <div className="px-5 pb-5 text-muted-foreground dark:text-slate-400">{faq.answer[locale as 'en' | 'nl']}</div>
               </details>
-            ))}
-          </div>
-        </section>
-
-        {/* Stats */}
-        <section className="container mx-auto max-w-6xl px-4 py-16">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
-              {locale === "nl" ? "Vertrouwd door duizenden" : "Trusted by Thousands"}
-            </h2>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              { value: totalPlaces.toLocaleString() || "10,000+", label: locale === "nl" ? "Bedrijven" : "Businesses" },
-              { value: countries.length.toString() || "50+", label: locale === "nl" ? "Landen" : "Countries" },
-              { value: totalCities.toLocaleString() || "500+", label: locale === "nl" ? "Steden" : "Cities" },
-              { value: "4.8", label: locale === "nl" ? "Gem. Rating" : "Avg Rating" },
-            ].map((stat, i) => (
-              <div key={stat.label} className="bg-card dark:bg-cpSurface/50 rounded-2xl p-6 text-center border border-border dark:border-cpAmber/20 shadow-sm">
-                <div className={`text-3xl md:text-4xl font-bold mb-2 ${i % 2 === 0 ? 'text-cpCoral' : 'text-cpAmber'}`}>
-                  {stat.value}
-                </div>
-                <div className="text-muted-foreground dark:text-cpCream/70">{stat.label}</div>
-              </div>
             ))}
           </div>
         </section>

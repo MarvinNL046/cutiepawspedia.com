@@ -118,8 +118,13 @@ export function AdSlot({ slotId, type, format = "auto", className = "", testMode
     return null;
   }
 
+  // Don't render if AdSense is not configured (return null, not a placeholder)
+  if (!ADSENSE_CLIENT && !testMode) {
+    return null;
+  }
+
   // Test/development mode - show placeholder
-  if (testMode || !ADSENSE_CLIENT || !resolvedSlotId) {
+  if (testMode || !resolvedSlotId) {
     return (
       <div
         className={`bg-slate-100 border-2 border-dashed border-slate-300 rounded-lg flex items-center justify-center text-slate-400 text-sm ${className}`}

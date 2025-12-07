@@ -75,14 +75,14 @@ export function PlaceCard({ place, locale, countrySlug, citySlug, provinceSlug, 
     }
   };
 
-  // Featured card styling (PRO and above)
+  // Featured card styling (PRO and above) - Cozy Theme
   const featuredStyles = isFeatured
-    ? "border-cpYellow border-2 bg-gradient-to-br from-cpYellow/5 to-white dark:from-cpYellow/10 dark:to-slate-800 shadow-md ring-1 ring-cpYellow/20"
-    : "bg-white dark:bg-slate-800/80 border-slate-100 dark:border-slate-700/50";
+    ? "border-cpAmber border-2 bg-gradient-to-br from-cpAmber/5 to-white dark:from-cpAmber/10 dark:to-cpSurface shadow-md ring-1 ring-cpAmber/20"
+    : "bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20";
 
   return (
     <Link href={href} className="block">
-      <Card className={`group hover-lift hover:shadow-xl hover:shadow-cpPink/10 dark:hover:shadow-cpPink/20 relative overflow-hidden transition-all duration-300 hover:-translate-y-1 ${featuredStyles}`}>
+      <Card className={`group hover-lift hover:shadow-xl hover:shadow-cpCoral/10 dark:hover:shadow-cpCoral/20 relative overflow-hidden transition-all duration-300 hover:-translate-y-1 rounded-2xl ${featuredStyles}`}>
         {/* Plan Badge Ribbon */}
         {place.planBadge && (
           <div className="absolute top-0 right-0 z-10">
@@ -99,7 +99,7 @@ export function PlaceCard({ place, locale, countrySlug, citySlug, provinceSlug, 
         {/* Fallback: Legacy Premium Ribbon (when no planBadge but isPremium) */}
         {!place.planBadge && place.isPremium && (
           <div className="absolute top-0 right-0 z-10">
-            <div className="bg-gradient-to-r from-cpYellow to-amber-400 text-white text-xs font-bold px-3 py-1 flex items-center gap-1 rounded-bl-lg shadow-sm">
+            <div className="bg-gradient-to-r from-cpAmber to-amber-400 text-cpCharcoal text-xs font-bold px-3 py-1 flex items-center gap-1 rounded-bl-lg shadow-sm">
               <Crown className="h-3 w-3" />
               Featured
             </div>
@@ -111,11 +111,11 @@ export function PlaceCard({ place, locale, countrySlug, citySlug, provinceSlug, 
           <div className="flex items-start justify-between gap-2 mb-2">
             <div className="flex-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <h3 className={`font-semibold line-clamp-1 group-hover:text-cpPink transition-colors ${isFeatured ? "text-amber-900 dark:text-amber-200" : "text-cpDark dark:text-white"}`}>
+                <h3 className={`font-semibold line-clamp-1 group-hover:text-cpCoral transition-colors ${isFeatured ? "text-amber-900 dark:text-amber-200" : "text-foreground dark:text-cpCream"}`}>
                   {place.name}
                 </h3>
                 {place.isVerified && (
-                  <Badge variant="secondary" className="bg-cpAqua/20 text-cpAqua border-cpAqua text-xs gap-0.5">
+                  <Badge variant="secondary" className="bg-cpCoral/10 text-cpCoral border-cpCoral/30 text-xs gap-0.5">
                     <CheckCircle className="h-3 w-3" />
                     Verified
                   </Badge>
@@ -125,22 +125,22 @@ export function PlaceCard({ place, locale, countrySlug, citySlug, provinceSlug, 
             {/* Rating - only show if there are actual reviews */}
             {place.avgRating && Number(place.avgRating) > 0 && place.reviewCount > 0 && (
               <div className="flex items-center gap-1 text-sm shrink-0">
-                <Star className="h-4 w-4 fill-cpYellow text-cpYellow" />
-                <span className="font-medium text-cpDark dark:text-white">{Number(place.avgRating).toFixed(1)}</span>
-                <span className="text-slate-400 dark:text-slate-500">({place.reviewCount.toLocaleString()})</span>
+                <Star className="h-4 w-4 fill-cpAmber text-cpAmber" />
+                <span className="font-medium text-foreground dark:text-cpCream">{Number(place.avgRating).toFixed(1)}</span>
+                <span className="text-muted-foreground dark:text-cpCream/60">({place.reviewCount.toLocaleString()})</span>
               </div>
             )}
           </div>
 
           {/* Description */}
           {place.description && (
-            <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-3">
+            <p className="text-sm text-muted-foreground dark:text-cpCream/70 line-clamp-2 mb-3">
               {place.description}
             </p>
           )}
 
           {/* Info */}
-          <div className="flex flex-col gap-1 text-sm text-slate-500 dark:text-slate-400">
+          <div className="flex flex-col gap-1 text-sm text-muted-foreground dark:text-cpCream/70">
             {place.address && (
               <div className="flex items-center gap-2">
                 <MapPin className="h-3.5 w-3.5" />

@@ -154,14 +154,14 @@ export default async function PlacesPage({ params }: PlacesPageProps) {
       <div className="flex-1 overflow-auto p-6">
         {listings.length === 0 ? (
           // Empty state
-          <Card className="max-w-md mx-auto mt-12">
+          <Card className="max-w-md mx-auto mt-12 bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
             <CardContent className="pt-6 text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-cpAqua/10 mb-4">
-                <Building2 className="h-8 w-8 text-cpAqua" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-cpCoral/10 dark:bg-cpCoral/20 mb-4">
+                <Building2 className="h-8 w-8 text-cpCoral" />
               </div>
-              <h3 className="text-xl font-semibold text-cpDark mb-2">{t.noPlaces}</h3>
-              <p className="text-slate-600 mb-6">{t.noPlacesDesc}</p>
-              <Button asChild className="bg-cpPink hover:bg-cpPink/90">
+              <h3 className="text-xl font-semibold text-foreground dark:text-cpCream mb-2">{t.noPlaces}</h3>
+              <p className="text-muted-foreground dark:text-cpCream/60 mb-6">{t.noPlacesDesc}</p>
+              <Button asChild className="bg-cpCoral hover:bg-cpCoral/90">
                 <Link href={`/${locale}`}>
                   <Search className="h-4 w-4 mr-2" />
                   {t.claimListing}
@@ -174,25 +174,25 @@ export default async function PlacesPage({ params }: PlacesPageProps) {
             {/* Mobile Card Layout */}
             <div className="md:hidden space-y-4">
               {listings.map((place) => (
-                <Card key={place.id}>
+                <Card key={place.id} className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
                   <CardContent className="p-4 space-y-3">
                     {/* Header: Name + Status */}
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
-                        <h3 className="font-medium text-cpDark truncate">{place.name}</h3>
-                        <div className="flex items-center gap-1 text-sm text-slate-500 mt-0.5">
+                        <h3 className="font-medium text-foreground dark:text-cpCream truncate">{place.name}</h3>
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground dark:text-cpCream/60 mt-0.5">
                           <MapPin className="h-3 w-3 flex-shrink-0" />
                           <span className="truncate">{place.cityName}, {place.countryName}</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-1 flex-shrink-0">
                         {place.isVerified && (
-                          <Badge className="bg-cpAqua/20 text-cpAqua border-cpAqua text-xs">
+                          <Badge className="bg-cpCoral/20 text-cpCoral border-cpCoral text-xs">
                             <CheckCircle className="h-3 w-3" />
                           </Badge>
                         )}
                         {place.isPremium && (
-                          <Badge className="bg-cpYellow/20 text-cpYellow border-cpYellow text-xs">
+                          <Badge className="bg-cpAmber/20 text-cpAmber border-cpAmber text-xs">
                             <Crown className="h-3 w-3" />
                           </Badge>
                         )}
@@ -202,31 +202,31 @@ export default async function PlacesPage({ params }: PlacesPageProps) {
                     {/* Stats Row */}
                     <div className="flex items-center gap-4 text-sm">
                       {place.categoryName && (
-                        <Badge variant="secondary" className="text-xs">{place.categoryName}</Badge>
+                        <Badge variant="secondary" className="text-xs dark:bg-cpSurface dark:text-cpCream/80">{place.categoryName}</Badge>
                       )}
                       {place.avgRating && place.avgRating > 0 ? (
                         <div className="flex items-center gap-1">
-                          <Star className="h-3.5 w-3.5 fill-cpYellow text-cpYellow" />
-                          <span className="font-medium">{place.avgRating.toFixed(1)}</span>
-                          <span className="text-slate-400">({place.reviewCount})</span>
+                          <Star className="h-3.5 w-3.5 fill-cpAmber text-cpAmber" />
+                          <span className="font-medium text-foreground dark:text-cpCream">{place.avgRating.toFixed(1)}</span>
+                          <span className="text-muted-foreground dark:text-cpCream/50">({place.reviewCount})</span>
                         </div>
                       ) : (
-                        <span className="text-slate-400 text-xs">{t.noRating}</span>
+                        <span className="text-muted-foreground dark:text-cpCream/50 text-xs">{t.noRating}</span>
                       )}
-                      <div className="flex items-center gap-1 text-slate-600">
-                        <MessageSquare className="h-3.5 w-3.5 text-cpPink" />
+                      <div className="flex items-center gap-1 text-muted-foreground dark:text-cpCream/70">
+                        <MessageSquare className="h-3.5 w-3.5 text-cpCoral" />
                         <span>{place.leadCount}</span>
                       </div>
                     </div>
 
                     {/* Actions */}
                     <div className="flex gap-2 pt-1">
-                      <Button size="sm" className="flex-1 bg-cpPink hover:bg-cpPink/90" asChild>
+                      <Button size="sm" className="flex-1 bg-cpCoral hover:bg-cpCoral/90" asChild>
                         <Link href={`/${locale}/dashboard/business/${businessId}/places/${place.id}`}>
                           {t.manage}
                         </Link>
                       </Button>
-                      <Button size="sm" variant="outline" asChild>
+                      <Button size="sm" variant="outline" className="dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10" asChild>
                         <Link
                           href={`/${locale}/${place.countryName?.toLowerCase().replace(/\s+/g, "-") || "unknown"}/${place.cityName?.toLowerCase().replace(/\s+/g, "-") || "unknown"}/${place.categoryName || "business"}/${place.slug}`}
                           target="_blank"
@@ -242,7 +242,7 @@ export default async function PlacesPage({ params }: PlacesPageProps) {
 
             {/* Add Location / Upgrade Banner */}
             <div className="mb-4 flex items-center justify-between">
-              <div className="text-sm text-slate-600">
+              <div className="text-sm text-muted-foreground dark:text-cpCream/70">
                 {isUnlimited ? (
                   <span>{total} {total === 1 ? "location" : "locations"}</span>
                 ) : (
@@ -250,7 +250,7 @@ export default async function PlacesPage({ params }: PlacesPageProps) {
                 )}
               </div>
               {canAddMore ? (
-                <Button asChild className="bg-cpPink hover:bg-cpPink/90">
+                <Button asChild className="bg-cpCoral hover:bg-cpCoral/90">
                   <Link href={`/${locale}`}>
                     <Plus className="h-4 w-4 mr-2" />
                     {t.addLocation}
@@ -258,7 +258,7 @@ export default async function PlacesPage({ params }: PlacesPageProps) {
                 </Button>
               ) : (
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-amber-600">{t.locationLimit}</span>
+                  <span className="text-sm text-cpAmber">{t.locationLimit}</span>
                   <Button asChild className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700">
                     <Link href={`/${locale}/dashboard/business/${businessId}/plan`}>
                       <Sparkles className="h-4 w-4 mr-2" />
@@ -270,84 +270,84 @@ export default async function PlacesPage({ params }: PlacesPageProps) {
             </div>
 
             {/* Desktop Table Layout */}
-            <Card className="hidden md:block">
+            <Card className="hidden md:block bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
               <CardContent className="p-0">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>{t.name}</TableHead>
-                      <TableHead>{t.location}</TableHead>
-                      <TableHead>{t.category}</TableHead>
-                      <TableHead>{t.rating}</TableHead>
-                      <TableHead>{t.leads}</TableHead>
-                      <TableHead>{t.status}</TableHead>
-                      <TableHead className="text-right">{t.actions}</TableHead>
+                    <TableRow className="border-border dark:border-cpAmber/20">
+                      <TableHead className="text-muted-foreground dark:text-cpCream/70">{t.name}</TableHead>
+                      <TableHead className="text-muted-foreground dark:text-cpCream/70">{t.location}</TableHead>
+                      <TableHead className="text-muted-foreground dark:text-cpCream/70">{t.category}</TableHead>
+                      <TableHead className="text-muted-foreground dark:text-cpCream/70">{t.rating}</TableHead>
+                      <TableHead className="text-muted-foreground dark:text-cpCream/70">{t.leads}</TableHead>
+                      <TableHead className="text-muted-foreground dark:text-cpCream/70">{t.status}</TableHead>
+                      <TableHead className="text-right text-muted-foreground dark:text-cpCream/70">{t.actions}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {listings.map((place) => (
-                      <TableRow key={place.id}>
+                      <TableRow key={place.id} className="border-border dark:border-cpAmber/10">
                         <TableCell>
-                          <div className="font-medium text-cpDark">{place.name}</div>
-                          <div className="text-sm text-slate-500">{place.slug}</div>
+                          <div className="font-medium text-foreground dark:text-cpCream">{place.name}</div>
+                          <div className="text-sm text-muted-foreground dark:text-cpCream/50">{place.slug}</div>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-1 text-sm text-slate-600">
+                          <div className="flex items-center gap-1 text-sm text-muted-foreground dark:text-cpCream/70">
                             <MapPin className="h-3 w-3" />
                             {place.cityName}, {place.countryName}
                           </div>
                         </TableCell>
                         <TableCell>
                           {place.categoryName ? (
-                            <Badge variant="secondary">{place.categoryName}</Badge>
+                            <Badge variant="secondary" className="dark:bg-cpSurface dark:text-cpCream/80">{place.categoryName}</Badge>
                           ) : (
-                            <span className="text-slate-400">-</span>
+                            <span className="text-muted-foreground dark:text-cpCream/50">-</span>
                           )}
                         </TableCell>
                         <TableCell>
                           {place.avgRating && place.avgRating > 0 ? (
                             <div className="flex items-center gap-1">
-                              <Star className="h-4 w-4 fill-cpYellow text-cpYellow" />
-                              <span className="font-medium">{place.avgRating.toFixed(1)}</span>
-                              <span className="text-slate-500 text-sm">({place.reviewCount})</span>
+                              <Star className="h-4 w-4 fill-cpAmber text-cpAmber" />
+                              <span className="font-medium text-foreground dark:text-cpCream">{place.avgRating.toFixed(1)}</span>
+                              <span className="text-muted-foreground dark:text-cpCream/50 text-sm">({place.reviewCount})</span>
                             </div>
                           ) : (
-                            <span className="text-slate-400 text-sm">{t.noRating}</span>
+                            <span className="text-muted-foreground dark:text-cpCream/50 text-sm">{t.noRating}</span>
                           )}
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-1">
-                            <MessageSquare className="h-4 w-4 text-cpPink" />
+                          <div className="flex items-center gap-1 text-foreground dark:text-cpCream">
+                            <MessageSquare className="h-4 w-4 text-cpCoral" />
                             <span className="font-medium">{place.leadCount}</span>
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1">
                             {place.isVerified && (
-                              <Badge className="bg-cpAqua/20 text-cpAqua border-cpAqua gap-1">
+                              <Badge className="bg-cpCoral/20 text-cpCoral border-cpCoral gap-1">
                                 <CheckCircle className="h-3 w-3" />
                                 {t.verified}
                               </Badge>
                             )}
                             {place.isPremium && (
-                              <Badge className="bg-cpYellow/20 text-cpYellow border-cpYellow gap-1">
+                              <Badge className="bg-cpAmber/20 text-cpAmber border-cpAmber gap-1">
                                 <Crown className="h-3 w-3" />
                                 {t.premium}
                               </Badge>
                             )}
                             {!place.isVerified && !place.isPremium && (
-                              <span className="text-slate-400">-</span>
+                              <span className="text-muted-foreground dark:text-cpCream/50">-</span>
                             )}
                           </div>
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-2">
-                            <Button size="sm" variant="default" asChild className="bg-cpPink hover:bg-cpPink/90">
+                            <Button size="sm" variant="default" asChild className="bg-cpCoral hover:bg-cpCoral/90">
                               <Link href={`/${locale}/dashboard/business/${businessId}/places/${place.id}`}>
                                 {t.manage}
                               </Link>
                             </Button>
-                            <Button size="sm" variant="outline" asChild>
+                            <Button size="sm" variant="outline" className="dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10" asChild>
                               <Link
                                 href={`/${locale}/${place.countryName?.toLowerCase().replace(/\s+/g, "-") || "unknown"}/${place.cityName?.toLowerCase().replace(/\s+/g, "-") || "unknown"}/${place.categoryName || "business"}/${place.slug}`}
                                 target="_blank"

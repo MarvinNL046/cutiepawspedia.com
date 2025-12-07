@@ -110,7 +110,7 @@ export function PlanActions({
   // Current plan button
   if (isCurrent) {
     return (
-      <Button disabled className="w-full" variant="outline">
+      <Button disabled className="w-full dark:border-cpAmber/30 dark:text-cpCream/50" variant="outline">
         {labels.current}
       </Button>
     );
@@ -124,7 +124,7 @@ export function PlanActions({
           onClick={handleManageSubscription}
           disabled={loading}
           variant="outline"
-          className="w-full"
+          className="w-full dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10"
         >
           {loading ? (
             <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -136,7 +136,7 @@ export function PlanActions({
       );
     }
     return (
-      <Button disabled className="w-full" variant="outline">
+      <Button disabled className="w-full dark:border-cpAmber/30 dark:text-cpCream/50" variant="outline">
         {labels.current}
       </Button>
     );
@@ -149,7 +149,7 @@ export function PlanActions({
         <Button
           onClick={handleManageSubscription}
           disabled={loading}
-          className={`w-full ${isUpgrade ? "bg-cpPink hover:bg-cpPink/90" : ""}`}
+          className={`w-full ${isUpgrade ? "bg-cpCoral hover:bg-cpCoral/90" : "dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10"}`}
           variant={isUpgrade ? "default" : "outline"}
         >
           {loading ? (
@@ -158,7 +158,7 @@ export function PlanActions({
           {isUpgrade ? labels.upgrade : labels.downgrade}
           <ArrowRight className="h-4 w-4 ml-2" />
         </Button>
-        {error && <p className="text-xs text-red-500">{error}</p>}
+        {error && <p className="text-xs text-red-500 dark:text-red-400">{error}</p>}
       </div>
     );
   }
@@ -169,7 +169,7 @@ export function PlanActions({
       <Button
         onClick={handleUpgrade}
         disabled={loading}
-        className={`w-full ${isUpgrade ? "bg-cpPink hover:bg-cpPink/90" : ""}`}
+        className={`w-full ${isUpgrade ? "bg-cpCoral hover:bg-cpCoral/90" : "dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10"}`}
         variant={isUpgrade ? "default" : "outline"}
       >
         {loading ? (
@@ -178,7 +178,7 @@ export function PlanActions({
         {isUpgrade ? labels.upgrade : labels.downgrade}
         <ArrowRight className="h-4 w-4 ml-2" />
       </Button>
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-red-500 dark:text-red-400">{error}</p>}
     </div>
   );
 }
@@ -233,7 +233,7 @@ export function ManageSubscriptionButton({
         onClick={handleClick}
         disabled={loading}
         variant="outline"
-        className="gap-2"
+        className="gap-2 dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10"
       >
         {loading ? (
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -242,7 +242,7 @@ export function ManageSubscriptionButton({
         )}
         {label}
       </Button>
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-red-500 dark:text-red-400">{error}</p>}
     </div>
   );
 }

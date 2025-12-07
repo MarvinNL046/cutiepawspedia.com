@@ -60,13 +60,13 @@ export function MessageComposer({
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         rows={2}
-        className="flex-1 resize-none"
+        className="flex-1 resize-none dark:bg-cpCharcoal/50 dark:border-cpAmber/30 dark:text-cpCream dark:placeholder:text-cpCream/40"
         disabled={isPending}
       />
       <Button
         type="submit"
         disabled={!message.trim() || isPending}
-        className="bg-cpPink hover:bg-cpPink/90 self-end"
+        className="bg-cpCoral hover:bg-cpCoral/90 self-end"
       >
         {isPending ? (
           <Loader2 className="h-4 w-4 animate-spin" />

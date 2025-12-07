@@ -209,19 +209,22 @@ export function ReviewForm({
 
   if (!isLoggedIn) {
     return (
-      <Card>
+      <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
         <CardHeader>
-          <CardTitle className="text-lg">Write a Review</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-lg text-foreground dark:text-cpCream">Write a Review</CardTitle>
+          <CardDescription className="dark:text-cpCream/70">
             Share your experience at {placeName}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center py-4">
-            <p className="text-muted-foreground mb-4">
+            <p className="text-muted-foreground dark:text-cpCream/70 mb-4">
               Please sign in to leave a review
             </p>
-            <Button onClick={() => router.push("/handler/sign-in")}>
+            <Button
+              onClick={() => router.push("/handler/sign-in")}
+              className="bg-cpCoral hover:bg-cpCoral/90"
+            >
               Sign In to Review
             </Button>
           </div>
@@ -231,10 +234,10 @@ export function ReviewForm({
   }
 
   return (
-    <Card>
+    <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
       <CardHeader>
-        <CardTitle className="text-lg">Write a Review</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-lg text-foreground dark:text-cpCream">Write a Review</CardTitle>
+        <CardDescription className="dark:text-cpCream/70">
           Share your experience at {placeName}
         </CardDescription>
       </CardHeader>
@@ -346,7 +349,7 @@ export function ReviewForm({
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full sm:w-auto"
+                className="w-full sm:w-auto bg-cpCoral hover:bg-cpCoral/90"
               >
                 {isSubmitting ? (
                   <>
@@ -360,7 +363,7 @@ export function ReviewForm({
                   </>
                 )}
               </Button>
-              <p className="text-xs text-muted-foreground mt-2">
+              <p className="text-xs text-muted-foreground dark:text-cpCream/60 mt-2">
                 Your review will be published after moderation
               </p>
             </div>

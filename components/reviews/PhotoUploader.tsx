@@ -5,7 +5,7 @@ import { X, ImagePlus, Loader2, AlertCircle } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { REVIEW_PHOTO_CONFIG } from "@/lib/storage/reviewPhotos";
+import { REVIEW_PHOTO_CONFIG } from "@/lib/storage/reviewPhotosConfig";
 
 // ============================================================================
 // TYPES
@@ -151,7 +151,7 @@ export function PhotoUploader({
           {photos.map((photo) => (
             <div
               key={photo.id}
-              className="relative w-20 h-20 rounded-lg overflow-hidden border bg-muted"
+              className="relative w-20 h-20 rounded-lg overflow-hidden border border-border dark:border-cpAmber/20 bg-muted dark:bg-cpSurface/50"
             >
               <Image
                 src={photo.preview}
@@ -215,8 +215,8 @@ export function PhotoUploader({
           tabIndex={disabled ? -1 : 0}
           className={cn(
             "relative border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors",
-            isDragging && "border-primary bg-primary/5",
-            !isDragging && "border-muted-foreground/25 hover:border-primary/50",
+            isDragging && "border-cpCoral bg-cpCoral/5",
+            !isDragging && "border-muted-foreground/25 dark:border-cpCream/20 hover:border-cpCoral/50",
             disabled && "opacity-50 cursor-not-allowed"
           )}
           onDragOver={handleDragOver}
@@ -241,12 +241,12 @@ export function PhotoUploader({
           />
 
           <div className="flex flex-col items-center gap-2">
-            <ImagePlus className="h-8 w-8 text-muted-foreground" />
+            <ImagePlus className="h-8 w-8 text-muted-foreground dark:text-cpCream/50" />
             <div className="text-sm">
-              <span className="font-medium text-primary">Click to upload</span>{" "}
-              <span className="text-muted-foreground">or drag and drop</span>
+              <span className="font-medium text-cpCoral">Click to upload</span>{" "}
+              <span className="text-muted-foreground dark:text-cpCream/60">or drag and drop</span>
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground dark:text-cpCream/50">
               JPG, PNG, WebP up to {REVIEW_PHOTO_CONFIG.MAX_FILE_SIZE / 1024 / 1024}MB
             </p>
           </div>
@@ -254,7 +254,7 @@ export function PhotoUploader({
       )}
 
       {/* Photo count */}
-      <p className="text-xs text-muted-foreground">
+      <p className="text-xs text-muted-foreground dark:text-cpCream/60">
         {photos.length}/{maxPhotos} photos
         {photos.some((p) => p.status === "error") && (
           <span className="text-red-500 ml-2">

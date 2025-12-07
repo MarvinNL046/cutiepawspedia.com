@@ -39,12 +39,12 @@ export default async function FavoritesPage({ params }: FavoritesPageProps) {
       {/* Page Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 bg-cpPink/10 rounded-lg">
-            <Heart className="h-6 w-6 text-cpPink" />
+          <div className="p-2 bg-cpCoral/10 rounded-lg">
+            <Heart className="h-6 w-6 text-cpCoral" />
           </div>
-          <h1 className="text-2xl font-bold text-cpDark">Saved Places</h1>
+          <h1 className="text-2xl font-bold text-foreground dark:text-cpCream">Saved Places</h1>
         </div>
-        <p className="text-slate-600">
+        <p className="text-muted-foreground dark:text-cpCream/70">
           {favorites.length === 0
             ? "You haven't saved any places yet. Browse our directory and click the heart icon to save your favorites!"
             : `You have ${favorites.length} saved place${favorites.length === 1 ? "" : "s"}.`}
@@ -53,21 +53,21 @@ export default async function FavoritesPage({ params }: FavoritesPageProps) {
 
       {/* Empty State */}
       {favorites.length === 0 && (
-        <Card className="border-dashed border-2 border-slate-200">
+        <Card className="border-dashed border-2 border-border dark:border-cpAmber/20 bg-card dark:bg-cpSurface/50">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="p-4 bg-slate-100 rounded-full mb-4">
-              <Heart className="h-8 w-8 text-slate-400" />
+            <div className="p-4 bg-muted dark:bg-cpSurface rounded-full mb-4">
+              <Heart className="h-8 w-8 text-muted-foreground dark:text-cpCream/60" />
             </div>
-            <h3 className="text-lg font-semibold text-cpDark mb-2">
+            <h3 className="text-lg font-semibold text-foreground dark:text-cpCream mb-2">
               No saved places yet
             </h3>
-            <p className="text-slate-600 mb-6 max-w-md">
+            <p className="text-muted-foreground dark:text-cpCream/70 mb-6 max-w-md">
               Start exploring pet care places and save your favorites by clicking
               the heart icon on any listing.
             </p>
             <Link
               href={`/${locale}`}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-cpPink text-white rounded-lg hover:bg-cpPink/90 transition-colors font-medium"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-cpCoral text-white rounded-lg hover:bg-cpCoral/90 transition-colors font-medium"
             >
               Browse Places
             </Link>
@@ -83,20 +83,20 @@ export default async function FavoritesPage({ params }: FavoritesPageProps) {
               place.placeCategories[0]?.category?.slug || "all";
             const href = `/${locale}/${place.city.country.slug}/${place.city.slug}/${firstCategorySlug}/${place.slug}`;
 
-            // Premium card styling
+            // Premium card styling - Cozy Theme
             const premiumStyles = place.isPremium
-              ? "border-cpYellow border-2 bg-gradient-to-br from-cpYellow/5 to-white shadow-md ring-1 ring-cpYellow/20"
-              : "";
+              ? "border-cpAmber border-2 bg-gradient-to-br from-cpAmber/5 to-white dark:from-cpAmber/10 dark:to-cpSurface shadow-md ring-1 ring-cpAmber/20"
+              : "bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20";
 
             return (
               <Card
                 key={place.id}
-                className={`group relative overflow-hidden hover:shadow-lg transition-shadow ${premiumStyles}`}
+                className={`group relative overflow-hidden hover:shadow-lg hover:shadow-cpCoral/10 dark:hover:shadow-cpCoral/20 transition-all duration-300 hover:-translate-y-1 rounded-2xl ${premiumStyles}`}
               >
                 {/* Premium Ribbon */}
                 {place.isPremium && (
                   <div className="absolute top-0 right-0 z-10">
-                    <div className="bg-gradient-to-r from-cpYellow to-amber-400 text-white text-xs font-bold px-3 py-1 flex items-center gap-1 rounded-bl-lg shadow-sm">
+                    <div className="bg-gradient-to-r from-cpAmber to-amber-400 text-cpCharcoal text-xs font-bold px-3 py-1 flex items-center gap-1 rounded-bl-lg shadow-sm">
                       <Crown className="h-3 w-3" />
                       Featured
                     </div>
@@ -117,8 +117,8 @@ export default async function FavoritesPage({ params }: FavoritesPageProps) {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <h3
-                            className={`font-semibold line-clamp-1 group-hover:text-cpPink transition-colors ${
-                              place.isPremium ? "text-amber-900" : "text-cpDark"
+                            className={`font-semibold line-clamp-1 group-hover:text-cpCoral transition-colors ${
+                              place.isPremium ? "text-amber-900 dark:text-amber-200" : "text-foreground dark:text-cpCream"
                             }`}
                           >
                             {place.name}
@@ -126,7 +126,7 @@ export default async function FavoritesPage({ params }: FavoritesPageProps) {
                           {place.isVerified && (
                             <Badge
                               variant="secondary"
-                              className="bg-cpAqua/20 text-cpAqua border-cpAqua text-xs gap-0.5"
+                              className="bg-cpCoral/10 text-cpCoral border-cpCoral/30 text-xs gap-0.5"
                             >
                               <CheckCircle className="h-3 w-3" />
                               Verified
@@ -137,11 +137,11 @@ export default async function FavoritesPage({ params }: FavoritesPageProps) {
                       {/* Rating */}
                       {place.avgRating && Number(place.avgRating) > 0 && (
                         <div className="flex items-center gap-1 text-sm shrink-0">
-                          <Star className="h-4 w-4 fill-cpYellow text-cpYellow" />
-                          <span className="font-medium">
+                          <Star className="h-4 w-4 fill-cpAmber text-cpAmber" />
+                          <span className="font-medium text-foreground dark:text-cpCream">
                             {Number(place.avgRating).toFixed(1)}
                           </span>
-                          <span className="text-slate-400">
+                          <span className="text-muted-foreground dark:text-cpCream/60">
                             ({place.reviewCount})
                           </span>
                         </div>
@@ -150,14 +150,14 @@ export default async function FavoritesPage({ params }: FavoritesPageProps) {
 
                     {/* Description */}
                     {place.description && (
-                      <p className="text-sm text-slate-600 line-clamp-2 mb-3">
+                      <p className="text-sm text-muted-foreground dark:text-cpCream/70 line-clamp-2 mb-3">
                         {place.description}
                       </p>
                     )}
 
                     {/* Location */}
                     {place.address && (
-                      <div className="flex items-center gap-2 text-sm text-slate-500 mb-3">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-cpCream/70 mb-3">
                         <MapPin className="h-3.5 w-3.5 shrink-0" />
                         <span className="line-clamp-1">{place.address}</span>
                       </div>
@@ -179,7 +179,7 @@ export default async function FavoritesPage({ params }: FavoritesPageProps) {
                     )}
 
                     {/* Saved date */}
-                    <div className="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-400">
+                    <div className="mt-3 pt-3 border-t border-border dark:border-cpAmber/10 text-xs text-muted-foreground dark:text-cpCream/60">
                       Saved{" "}
                       {new Date(place.favoritedAt).toLocaleDateString(locale, {
                         month: "short",

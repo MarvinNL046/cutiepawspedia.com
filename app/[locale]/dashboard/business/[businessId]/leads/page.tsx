@@ -169,10 +169,10 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
                 <Button
                   variant={isActive ? "default" : "outline"}
                   size="sm"
-                  className={isActive ? "bg-cpPink hover:bg-cpPink/90" : ""}
+                  className={isActive ? "bg-cpCoral hover:bg-cpCoral/90" : "dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10"}
                 >
                   {filter.label}
-                  <Badge variant="secondary" className="ml-2 bg-white/20">
+                  <Badge variant="secondary" className="ml-2 bg-white/20 dark:bg-cpAmber/20">
                     {filter.count}
                   </Badge>
                 </Button>
@@ -183,13 +183,13 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
 
         {leads.length === 0 ? (
           // Empty state
-          <Card className="max-w-md mx-auto mt-8">
+          <Card className="max-w-md mx-auto mt-8 bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
             <CardContent className="pt-6 text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-cpPink/10 mb-4">
-                <MessageSquare className="h-8 w-8 text-cpPink" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-cpCoral/10 dark:bg-cpCoral/20 mb-4">
+                <MessageSquare className="h-8 w-8 text-cpCoral" />
               </div>
-              <h3 className="text-xl font-semibold text-cpDark mb-2">{t.noLeads}</h3>
-              <p className="text-slate-600">{t.noLeadsDesc}</p>
+              <h3 className="text-xl font-semibold text-foreground dark:text-cpCream mb-2">{t.noLeads}</h3>
+              <p className="text-muted-foreground dark:text-cpCream/60">{t.noLeadsDesc}</p>
             </CardContent>
           </Card>
         ) : (
@@ -197,7 +197,7 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
             {/* Mobile Card Layout */}
             <div className="md:hidden space-y-4">
               {leads.map((lead) => (
-                <Card key={lead.id}>
+                <Card key={lead.id} className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
                   <CardContent className="p-4 space-y-3">
                     {/* Header: Status + Date */}
                     <div className="flex items-center justify-between">
@@ -207,7 +207,7 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
                         currentStatus={lead.status as LeadStatus}
                         locale={locale}
                       />
-                      <div className="flex items-center gap-1 text-xs text-slate-500">
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground dark:text-cpCream/60">
                         <Calendar className="h-3 w-3" />
                         {new Date(lead.createdAt).toLocaleDateString(locale, {
                           month: "short",
@@ -218,18 +218,18 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
 
                     {/* Place */}
                     <div className="flex items-center gap-2 text-sm">
-                      <Building2 className="h-4 w-4 text-cpAqua flex-shrink-0" />
-                      <span className="font-medium text-cpDark truncate">{lead.placeName}</span>
-                      <span className="text-slate-400">·</span>
-                      <span className="text-slate-500 truncate">{lead.cityName}</span>
+                      <Building2 className="h-4 w-4 text-cpAmber flex-shrink-0" />
+                      <span className="font-medium text-foreground dark:text-cpCream truncate">{lead.placeName}</span>
+                      <span className="text-muted-foreground dark:text-cpCream/50">·</span>
+                      <span className="text-muted-foreground dark:text-cpCream/60 truncate">{lead.cityName}</span>
                     </div>
 
                     {/* Contact Info */}
-                    <div className="bg-slate-50 rounded-lg p-3 space-y-2">
-                      <div className="font-medium text-cpDark">{lead.name}</div>
+                    <div className="bg-muted/50 dark:bg-cpCharcoal/50 rounded-lg p-3 space-y-2 border border-border dark:border-cpAmber/10">
+                      <div className="font-medium text-foreground dark:text-cpCream">{lead.name}</div>
                       <a
                         href={`mailto:${lead.email}`}
-                        className="flex items-center gap-2 text-sm text-cpPink hover:underline"
+                        className="flex items-center gap-2 text-sm text-cpCoral hover:underline"
                       >
                         <Mail className="h-4 w-4" />
                         <span className="truncate">{lead.email}</span>
@@ -237,7 +237,7 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
                       {lead.phone && (
                         <a
                           href={`tel:${lead.phone}`}
-                          className="flex items-center gap-2 text-sm text-slate-600 hover:text-cpPink"
+                          className="flex items-center gap-2 text-sm text-muted-foreground dark:text-cpCream/70 hover:text-cpCoral"
                         >
                           <Phone className="h-4 w-4" />
                           {lead.phone}
@@ -247,19 +247,19 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
 
                     {/* Message */}
                     {lead.message && (
-                      <p className="text-sm text-slate-600 line-clamp-2">{lead.message}</p>
+                      <p className="text-sm text-muted-foreground dark:text-cpCream/60 line-clamp-2">{lead.message}</p>
                     )}
 
                     {/* Actions */}
                     <div className="flex gap-2 pt-2">
-                      <Button size="sm" className="flex-1 bg-cpPink hover:bg-cpPink/90" asChild>
+                      <Button size="sm" className="flex-1 bg-cpCoral hover:bg-cpCoral/90" asChild>
                         <a href={`mailto:${lead.email}`}>
                           <Mail className="h-4 w-4 mr-2" />
                           {t.reply}
                         </a>
                       </Button>
                       {lead.phone && (
-                        <Button size="sm" variant="outline" className="flex-1" asChild>
+                        <Button size="sm" variant="outline" className="flex-1 dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10" asChild>
                           <a href={`tel:${lead.phone}`}>
                             <Phone className="h-4 w-4 mr-2" />
                             {t.call}
@@ -273,24 +273,24 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
             </div>
 
             {/* Desktop Table Layout */}
-            <Card className="hidden md:block">
+            <Card className="hidden md:block bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
               <CardContent className="p-0">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>{t.date}</TableHead>
-                      <TableHead>{t.place}</TableHead>
-                      <TableHead>{t.contact}</TableHead>
-                      <TableHead>{t.message}</TableHead>
-                      <TableHead>{t.status}</TableHead>
-                      <TableHead className="text-right">{t.actions}</TableHead>
+                    <TableRow className="border-border dark:border-cpAmber/20">
+                      <TableHead className="text-muted-foreground dark:text-cpCream/70">{t.date}</TableHead>
+                      <TableHead className="text-muted-foreground dark:text-cpCream/70">{t.place}</TableHead>
+                      <TableHead className="text-muted-foreground dark:text-cpCream/70">{t.contact}</TableHead>
+                      <TableHead className="text-muted-foreground dark:text-cpCream/70">{t.message}</TableHead>
+                      <TableHead className="text-muted-foreground dark:text-cpCream/70">{t.status}</TableHead>
+                      <TableHead className="text-right text-muted-foreground dark:text-cpCream/70">{t.actions}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {leads.map((lead) => (
-                      <TableRow key={lead.id}>
+                      <TableRow key={lead.id} className="border-border dark:border-cpAmber/10">
                         <TableCell>
-                          <div className="flex items-center gap-1 text-sm text-slate-600">
+                          <div className="flex items-center gap-1 text-sm text-muted-foreground dark:text-cpCream/70">
                             <Calendar className="h-3 w-3" />
                             {new Date(lead.createdAt).toLocaleDateString(locale, {
                               year: "numeric",
@@ -299,28 +299,28 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
                             })}
                           </div>
                           {lead.viewedAt && (
-                            <div className="text-xs text-slate-400 mt-1">
+                            <div className="text-xs text-muted-foreground dark:text-cpCream/50 mt-1">
                               Viewed: {new Date(lead.viewedAt).toLocaleDateString()}
                             </div>
                           )}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <Building2 className="h-4 w-4 text-cpAqua" />
+                            <Building2 className="h-4 w-4 text-cpAmber" />
                             <div>
-                              <div className="font-medium text-cpDark">{lead.placeName}</div>
-                              <div className="text-xs text-slate-500">{lead.cityName}</div>
+                              <div className="font-medium text-foreground dark:text-cpCream">{lead.placeName}</div>
+                              <div className="text-xs text-muted-foreground dark:text-cpCream/60">{lead.cityName}</div>
                             </div>
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="space-y-1">
-                            <div className="font-medium text-cpDark">
+                            <div className="font-medium text-foreground dark:text-cpCream">
                               {lead.name}
                             </div>
                             <a
                               href={`mailto:${lead.email}`}
-                              className="flex items-center gap-1 text-sm text-cpPink hover:underline"
+                              className="flex items-center gap-1 text-sm text-cpCoral hover:underline"
                             >
                               <Mail className="h-3 w-3" />
                               {lead.email}
@@ -328,7 +328,7 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
                             {lead.phone && (
                               <a
                                 href={`tel:${lead.phone}`}
-                                className="flex items-center gap-1 text-sm text-slate-600 hover:text-cpPink"
+                                className="flex items-center gap-1 text-sm text-muted-foreground dark:text-cpCream/70 hover:text-cpCoral"
                               >
                                 <Phone className="h-3 w-3" />
                                 {lead.phone}
@@ -338,11 +338,11 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
                         </TableCell>
                         <TableCell>
                           {lead.message ? (
-                            <p className="text-sm truncate max-w-[200px] text-slate-600" title={lead.message}>
+                            <p className="text-sm truncate max-w-[200px] text-muted-foreground dark:text-cpCream/60" title={lead.message}>
                               {lead.message}
                             </p>
                           ) : (
-                            <span className="text-slate-400 text-sm italic">No message</span>
+                            <span className="text-muted-foreground dark:text-cpCream/50 text-sm italic">No message</span>
                           )}
                         </TableCell>
                         <TableCell>
@@ -355,14 +355,14 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-2">
-                            <Button size="sm" className="bg-cpPink hover:bg-cpPink/90" asChild>
+                            <Button size="sm" className="bg-cpCoral hover:bg-cpCoral/90" asChild>
                               <a href={`mailto:${lead.email}`}>
                                 <Mail className="h-4 w-4 mr-1" />
                                 {t.reply}
                               </a>
                             </Button>
                             {lead.phone && (
-                              <Button size="sm" variant="outline" asChild>
+                              <Button size="sm" variant="outline" className="dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10" asChild>
                                 <a href={`tel:${lead.phone}`}>
                                   <Phone className="h-4 w-4 mr-1" />
                                   {t.call}

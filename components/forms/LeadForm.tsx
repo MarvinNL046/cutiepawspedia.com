@@ -119,21 +119,21 @@ export function LeadForm({
   // Success state with animation
   if (status === "success") {
     return (
-      <Card className={`border-cpAqua/50 bg-cpAqua/5 animate-fade-in ${className}`}>
+      <Card className={`border-green-500/50 dark:border-green-400/50 bg-green-50 dark:bg-green-900/20 animate-fade-in ${className}`}>
         <CardContent className="p-6 text-center">
           <div className="animate-bounce-in">
-            <CheckCircle className="h-12 w-12 text-cpAqua mx-auto mb-4" aria-hidden="true" />
+            <CheckCircle className="h-12 w-12 text-green-600 dark:text-green-400 mx-auto mb-4" aria-hidden="true" />
           </div>
-          <h3 className="text-lg font-semibold text-foreground mb-2 animate-slide-up">
+          <h3 className="text-lg font-semibold text-foreground dark:text-cpCream mb-2 animate-slide-up">
             Message Sent!
           </h3>
-          <p className="text-muted-foreground mb-4 animate-slide-up" style={{ animationDelay: "0.1s" }}>
+          <p className="text-muted-foreground dark:text-cpCream/70 mb-4 animate-slide-up" style={{ animationDelay: "0.1s" }}>
             Your inquiry has been sent to {placeName}. They will contact you soon.
           </p>
           <Button
             variant="outline"
             onClick={() => setStatus("idle")}
-            className="border-cpAqua text-cpAqua hover:bg-cpAqua/10 animate-slide-up"
+            className="border-cpCoral text-cpCoral hover:bg-cpCoral/10 dark:border-cpCoral dark:hover:bg-cpCoral/20 animate-slide-up"
             style={{ animationDelay: "0.2s" }}
           >
             Send Another Message
@@ -147,9 +147,9 @@ export function LeadForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Error Message */}
       {status === "error" && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2" role="alert">
-          <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" aria-hidden="true" />
-          <p className="text-sm text-red-700">{errorMessage}</p>
+        <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/30 rounded-lg flex items-start gap-2" role="alert">
+          <AlertCircle className="h-5 w-5 text-red-500 dark:text-red-400 shrink-0 mt-0.5" aria-hidden="true" />
+          <p className="text-sm text-red-700 dark:text-red-300">{errorMessage}</p>
         </div>
       )}
 
@@ -213,7 +213,7 @@ export function LeadForm({
       {/* Submit Button */}
       <Button
         type="submit"
-        className="w-full bg-cpPink hover:bg-cpPink/90 gap-2"
+        className="w-full bg-cpCoral hover:bg-cpCoral/90 gap-2"
         disabled={isSubmitting}
       >
         {isSubmitting ? (
@@ -230,15 +230,15 @@ export function LeadForm({
       </Button>
 
       {/* Privacy note with reCAPTCHA disclosure */}
-      <p className="text-xs text-slate-500 text-center">
+      <p className="text-xs text-muted-foreground dark:text-cpCream/60 text-center">
         {recaptchaConfigured && (
           <span className="flex items-center justify-center gap-1 mb-1">
-            <ShieldCheck className="h-3 w-3 text-green-500" />
+            <ShieldCheck className="h-3 w-3 text-green-500 dark:text-green-400" />
             Protected by reCAPTCHA
           </span>
         )}
         By submitting, you agree to our{" "}
-        <a href="/privacy" className="text-cpPink hover:underline">
+        <a href="/privacy" className="text-cpCoral hover:underline">
           Privacy Policy
         </a>
         {recaptchaConfigured && (
@@ -248,7 +248,7 @@ export function LeadForm({
               href="https://policies.google.com/privacy"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-cpPink hover:underline"
+              className="text-cpCoral hover:underline"
             >
               Privacy Policy
             </a>{" "}
@@ -257,7 +257,7 @@ export function LeadForm({
               href="https://policies.google.com/terms"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-cpPink hover:underline"
+              className="text-cpCoral hover:underline"
             >
               Terms
             </a>
@@ -270,13 +270,13 @@ export function LeadForm({
   // Card variant (default)
   if (variant === "card") {
     return (
-      <Card className={className}>
+      <Card className={`bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20 ${className}`}>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5 text-cpPink" aria-hidden="true" />
+          <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
+            <MessageSquare className="h-5 w-5 text-cpCoral" aria-hidden="true" />
             Contact {placeName}
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="dark:text-cpCream/70">
             Send an inquiry directly to this business
           </CardDescription>
         </CardHeader>

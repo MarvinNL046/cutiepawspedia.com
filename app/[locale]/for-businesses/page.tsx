@@ -206,9 +206,9 @@ const iconMap = {
 // Plan card styling based on plan key
 function getPlanCardStyle(plan: PlanDefinition): string {
   if (plan.isPopular) {
-    return "border-cpPink border-2 shadow-lg scale-105 relative z-10";
+    return "border-cpCoral border-2 shadow-lg scale-105 relative z-10 dark:border-cpCoral";
   }
-  return "border-slate-200";
+  return "border-border dark:border-cpAmber/20";
 }
 
 // Plan icon based on plan key
@@ -236,22 +236,22 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
   const plans = getActivePlans();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-gradient-to-b from-cpCream to-white dark:from-cpCharcoal dark:to-cpSurface">
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <Badge variant="secondary" className="mb-4 bg-cpPink/10 text-cpPink border-cpPink/20">
+          <Badge variant="secondary" className="mb-4 bg-cpCoral/10 text-cpCoral border-cpCoral/20 dark:bg-cpCoral/20 dark:border-cpCoral/30">
             <Building2 className="h-3.5 w-3.5 mr-1" />
             {t.badge}
           </Badge>
-          <h1 className="text-4xl md:text-5xl font-bold text-cpDark dark:text-white mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
             {t.title}
           </h1>
-          <p className="text-lg text-slate-600 dark:text-slate-300 mb-8">
+          <p className="text-lg text-muted-foreground mb-8">
             {t.subtitle}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" className="bg-cpPink hover:bg-cpPink/90">
+            <Button asChild size="lg" className="bg-cpCoral hover:bg-cpCoral/90 text-white">
               <Link href={`/${locale}/onboarding/business`}>
                 <ArrowRight className="h-4 w-4 mr-2" />
                 {t.getStarted}
@@ -262,15 +262,15 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
 
         {/* How It Works */}
         <div className="max-w-4xl mx-auto mb-20">
-          <h2 className="text-2xl font-bold text-cpDark dark:text-white text-center mb-10">{t.howItWorksTitle}</h2>
+          <h2 className="text-2xl font-bold text-foreground text-center mb-10">{t.howItWorksTitle}</h2>
           <div className="grid md:grid-cols-3 gap-8">
             {t.howItWorksSteps.map((step, index) => (
               <div key={index} className="text-center">
-                <div className="w-12 h-12 rounded-full bg-cpPink text-white flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                <div className="w-12 h-12 rounded-full bg-cpCoral text-white flex items-center justify-center mx-auto mb-4 text-xl font-bold">
                   {index + 1}
                 </div>
-                <h3 className="font-semibold text-cpDark dark:text-white mb-2">{step.title}</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400">{step.description}</p>
+                <h3 className="font-semibold text-foreground mb-2">{step.title}</h3>
+                <p className="text-sm text-muted-foreground">{step.description}</p>
               </div>
             ))}
           </div>
@@ -294,8 +294,8 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
         {/* Pricing Section */}
         <div className="max-w-6xl mx-auto mb-20">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold text-cpDark dark:text-white mb-2">{t.pricingTitle}</h2>
-            <p className="text-slate-600 dark:text-slate-400">{t.pricingSubtitle}</p>
+            <h2 className="text-2xl font-bold text-foreground mb-2">{t.pricingTitle}</h2>
+            <p className="text-muted-foreground">{t.pricingSubtitle}</p>
           </div>
 
           {/* Pricing Cards */}
@@ -313,7 +313,7 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
                 <Card key={plan.key} className={`relative ${getPlanCardStyle(plan)}`}>
                   {/* Popular badge */}
                   {plan.isPopular && (
-                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-cpPink">
+                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-cpCoral text-white">
                       <Star className="h-3 w-3 mr-1" />
                       {t.popular}
                     </Badge>
@@ -322,10 +322,10 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
                   <CardHeader className="pb-4">
                     <div className="flex items-center gap-2 mb-2">
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                        plan.isPopular ? "bg-cpPink/10" : "bg-slate-100 dark:bg-slate-700"
+                        plan.isPopular ? "bg-cpCoral/10 dark:bg-cpCoral/20" : "bg-muted"
                       }`}>
                         <PlanIcon className={`h-4 w-4 ${
-                          plan.isPopular ? "text-cpPink" : "text-slate-600 dark:text-slate-300"
+                          plan.isPopular ? "text-cpCoral" : "text-muted-foreground"
                         }`} />
                       </div>
                       <CardTitle className="text-xl">{planName}</CardTitle>
@@ -335,15 +335,15 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
                     {/* Pricing */}
                     <div className="mt-4 space-y-1">
                       <div className="flex items-baseline gap-1">
-                        <span className="text-4xl font-bold text-cpDark dark:text-white">
+                        <span className="text-4xl font-bold text-foreground">
                           {monthlyPrice}
                         </span>
                         {plan.monthlyPriceCents > 0 && (
-                          <span className="text-slate-500 dark:text-slate-400">{t.perMonth}</span>
+                          <span className="text-muted-foreground">{t.perMonth}</span>
                         )}
                       </div>
                       {yearlyPrice && (
-                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                        <p className="text-sm text-muted-foreground">
                           {yearlyPrice}{t.perYear} <span className="text-green-600 dark:text-green-400 font-medium">({t.yearlySave})</span>
                         </p>
                       )}
@@ -355,8 +355,8 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
                     <ul className="space-y-3 text-sm mb-6">
                       {/* Photos */}
                       <li className="flex items-center gap-2">
-                        <Camera className={`h-4 w-4 ${plan.features.maxPhotos > 0 ? "text-cpPink" : "text-slate-300 dark:text-slate-600"}`} />
-                        <span className={plan.features.maxPhotos > 0 ? "text-slate-700 dark:text-slate-200" : "text-slate-400 dark:text-slate-500"}>
+                        <Camera className={`h-4 w-4 ${plan.features.maxPhotos > 0 ? "text-cpCoral" : "text-muted-foreground/40"}`} />
+                        <span className={plan.features.maxPhotos > 0 ? "text-foreground" : "text-muted-foreground"}>
                           {plan.features.maxPhotos === 0
                             ? (isNl ? "Geen foto's" : "No photos")
                             : `${plan.features.maxPhotos} ${isNl ? "foto's" : "photos"}`
@@ -367,45 +367,45 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
                       {/* Website */}
                       <li className="flex items-center gap-2">
                         {plan.features.canShowWebsite ? (
-                          <Globe className="h-4 w-4 text-cpPink" />
+                          <Globe className="h-4 w-4 text-cpCoral" />
                         ) : (
-                          <Globe className="h-4 w-4 text-slate-300 dark:text-slate-600" />
+                          <Globe className="h-4 w-4 text-muted-foreground/40" />
                         )}
-                        <span className={plan.features.canShowWebsite ? "text-slate-700 dark:text-slate-200" : "text-slate-400 dark:text-slate-500"}>
+                        <span className={plan.features.canShowWebsite ? "text-foreground" : "text-muted-foreground"}>
                           {isNl ? "Website link" : "Website link"}
                         </span>
-                        {!plan.features.canShowWebsite && <X className="h-3 w-3 text-slate-300 dark:text-slate-600 ml-auto" />}
+                        {!plan.features.canShowWebsite && <X className="h-3 w-3 text-muted-foreground/40 ml-auto" />}
                       </li>
 
                       {/* Contact info */}
                       <li className="flex items-center gap-2">
                         {plan.features.canShowPhone ? (
-                          <Phone className="h-4 w-4 text-cpPink" />
+                          <Phone className="h-4 w-4 text-cpCoral" />
                         ) : (
-                          <Phone className="h-4 w-4 text-slate-300 dark:text-slate-600" />
+                          <Phone className="h-4 w-4 text-muted-foreground/40" />
                         )}
-                        <span className={plan.features.canShowPhone ? "text-slate-700 dark:text-slate-200" : "text-slate-400 dark:text-slate-500"}>
+                        <span className={plan.features.canShowPhone ? "text-foreground" : "text-muted-foreground"}>
                           {isNl ? "Telefoon & e-mail" : "Phone & email"}
                         </span>
-                        {!plan.features.canShowPhone && <X className="h-3 w-3 text-slate-300 dark:text-slate-600 ml-auto" />}
+                        {!plan.features.canShowPhone && <X className="h-3 w-3 text-muted-foreground/40 ml-auto" />}
                       </li>
 
                       {/* Description */}
                       <li className="flex items-center gap-2">
                         {plan.features.canShowDescription ? (
-                          <Check className="h-4 w-4 text-cpPink" />
+                          <Check className="h-4 w-4 text-cpCoral" />
                         ) : (
-                          <X className="h-4 w-4 text-slate-300 dark:text-slate-600" />
+                          <X className="h-4 w-4 text-muted-foreground/40" />
                         )}
-                        <span className={plan.features.canShowDescription ? "text-slate-700 dark:text-slate-200" : "text-slate-400 dark:text-slate-500"}>
+                        <span className={plan.features.canShowDescription ? "text-foreground" : "text-muted-foreground"}>
                           {isNl ? "Bedrijfsomschrijving" : "Business description"}
                         </span>
                       </li>
 
                       {/* Categories */}
                       <li className="flex items-center gap-2">
-                        <Check className="h-4 w-4 text-cpPink" />
-                        <span className="text-slate-700 dark:text-slate-200">
+                        <Check className="h-4 w-4 text-cpCoral" />
+                        <span className="text-foreground">
                           {plan.features.maxCategories} {plan.features.maxCategories === 1
                             ? (isNl ? "categorie" : "category")
                             : (isNl ? "categorieën" : "categories")
@@ -415,8 +415,8 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
 
                       {/* Search ranking */}
                       <li className="flex items-center gap-2">
-                        <TrendingUp className={`h-4 w-4 ${plan.features.priorityRank > 1 ? "text-cpPink" : "text-slate-400"}`} />
-                        <span className={plan.features.priorityRank > 1 ? "text-slate-700 dark:text-slate-200" : "text-slate-400 dark:text-slate-500"}>
+                        <TrendingUp className={`h-4 w-4 ${plan.features.priorityRank > 1 ? "text-cpCoral" : "text-muted-foreground"}`} />
+                        <span className={plan.features.priorityRank > 1 ? "text-foreground" : "text-muted-foreground"}>
                           {plan.features.priorityRank === 4
                             ? (isNl ? "Hoogste zoekprioriteit" : "Highest search priority")
                             : plan.features.priorityRank === 3
@@ -431,8 +431,8 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
                       {/* Featured styling (PRO+) */}
                       {plan.features.hasFeaturedStyling && (
                         <li className="flex items-center gap-2">
-                          <Crown className="h-4 w-4 text-amber-500" />
-                          <span className="text-slate-700 dark:text-slate-200 font-medium">
+                          <Crown className="h-4 w-4 text-cpAmber" />
+                          <span className="text-foreground font-medium">
                             {isNl ? "Uitgelichte styling" : "Featured styling"}
                           </span>
                         </li>
@@ -441,8 +441,8 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
                       {/* ELITE-exclusive: Verified Badge */}
                       {plan.features.hasVerifiedBadge && (
                         <li className="flex items-center gap-2">
-                          <Shield className="h-4 w-4 text-purple-500" />
-                          <span className="text-slate-700 dark:text-slate-200 font-medium">
+                          <Shield className="h-4 w-4 text-purple-500 dark:text-purple-400" />
+                          <span className="text-foreground font-medium">
                             {isNl ? "Geverifieerd badge" : "Verified badge"}
                           </span>
                         </li>
@@ -451,8 +451,8 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
                       {/* ELITE-exclusive: Homepage Spotlight */}
                       {plan.features.hasHomepageSpotlight && (
                         <li className="flex items-center gap-2">
-                          <Star className="h-4 w-4 text-purple-500" />
-                          <span className="text-slate-700 dark:text-slate-200 font-medium">
+                          <Star className="h-4 w-4 text-purple-500 dark:text-purple-400" />
+                          <span className="text-foreground font-medium">
                             {isNl ? "Homepage uitgelicht" : "Homepage spotlight"}
                           </span>
                         </li>
@@ -462,17 +462,17 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
                       <li className="flex items-center gap-2">
                         <Building2 className={`h-4 w-4 ${
                           plan.features.maxLocations === 0
-                            ? "text-purple-500"
+                            ? "text-purple-500 dark:text-purple-400"
                             : plan.features.maxLocations > 1
-                              ? "text-cpPink"
-                              : "text-slate-400"
+                              ? "text-cpCoral"
+                              : "text-muted-foreground"
                         }`} />
                         <span className={`${
                           plan.features.maxLocations === 0
-                            ? "text-slate-700 dark:text-slate-200 font-medium"
+                            ? "text-foreground font-medium"
                             : plan.features.maxLocations > 1
-                              ? "text-slate-700 dark:text-slate-200 font-medium"
-                              : "text-slate-600 dark:text-slate-400"
+                              ? "text-foreground font-medium"
+                              : "text-muted-foreground"
                         }`}>
                           {plan.features.maxLocations === 0
                             ? (isNl ? "Onbeperkt locaties" : "Unlimited locations")
@@ -486,11 +486,11 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
                       {/* Analytics */}
                       <li className="flex items-center gap-2">
                         {plan.features.hasBasicAnalytics ? (
-                          <BarChart3 className="h-4 w-4 text-cpPink" />
+                          <BarChart3 className="h-4 w-4 text-cpCoral" />
                         ) : (
-                          <BarChart3 className="h-4 w-4 text-slate-300 dark:text-slate-600" />
+                          <BarChart3 className="h-4 w-4 text-muted-foreground/40" />
                         )}
-                        <span className={plan.features.hasBasicAnalytics ? "text-slate-700 dark:text-slate-200" : "text-slate-400 dark:text-slate-500"}>
+                        <span className={plan.features.hasBasicAnalytics ? "text-foreground" : "text-muted-foreground"}>
                           {plan.features.hasAdvancedAnalytics
                             ? (isNl ? "Geavanceerde statistieken" : "Advanced analytics")
                             : plan.features.hasBasicAnalytics
@@ -501,7 +501,7 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
                       </li>
 
                       {/* Reviews - Always included! */}
-                      <li className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
+                      <li className="flex items-center gap-2 pt-2 border-t border-border">
                         <MessageSquare className="h-4 w-4 text-green-500" />
                         <span className="text-green-700 dark:text-green-300 font-medium">
                           {isNl ? "Reviews inbegrepen" : "Reviews included"}
@@ -515,8 +515,8 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
                       asChild
                       className={`w-full ${
                         plan.isPopular
-                          ? "bg-cpPink hover:bg-cpPink/90"
-                          : ""
+                          ? "bg-cpCoral hover:bg-cpCoral/90 text-white"
+                          : "border-border hover:bg-muted"
                       }`}
                       variant={plan.isPopular ? "default" : "outline"}
                     >
@@ -534,20 +534,20 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
 
         {/* Feature Comparison Table */}
         <div className="max-w-5xl mx-auto mb-20">
-          <h2 className="text-2xl font-bold text-cpDark dark:text-white text-center mb-10">{t.featuresTitle}</h2>
+          <h2 className="text-2xl font-bold text-foreground text-center mb-10">{t.featuresTitle}</h2>
 
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="border-b border-slate-200 dark:border-slate-700">
-                  <th className="text-left py-4 px-4 font-semibold text-slate-600 dark:text-slate-300">
+                <tr className="border-b border-border">
+                  <th className="text-left py-4 px-4 font-semibold text-muted-foreground">
                     {isNl ? "Functie" : "Feature"}
                   </th>
                   {plans.map((plan) => (
-                    <th key={plan.key} className="text-center py-4 px-4 font-semibold text-cpDark dark:text-white">
+                    <th key={plan.key} className="text-center py-4 px-4 font-semibold text-foreground">
                       <div className="flex flex-col items-center gap-1">
                         <span>{isNl ? plan.nameNl : plan.name}</span>
-                        <span className="text-sm font-normal text-slate-500">
+                        <span className="text-sm font-normal text-muted-foreground">
                           {formatPlanPrice(plan.monthlyPriceCents, locale)}
                           {plan.monthlyPriceCents > 0 && (isNl ? "/mnd" : "/mo")}
                         </span>
@@ -560,9 +560,9 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
                 {FEATURE_COMPARISONS.map((feature, index) => (
                   <tr
                     key={index}
-                    className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                    className="border-b border-border/50 hover:bg-muted/50"
                   >
-                    <td className="py-3 px-4 text-sm text-slate-700 dark:text-slate-300">
+                    <td className="py-3 px-4 text-sm text-foreground">
                       {isNl ? feature.nameNl : feature.name}
                     </td>
                     <td className="py-3 px-4 text-center">
@@ -586,20 +586,20 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
 
         {/* Benefits */}
         <div className="max-w-4xl mx-auto mb-20">
-          <h2 className="text-2xl font-bold text-cpDark dark:text-white text-center mb-10">{t.benefitsTitle}</h2>
+          <h2 className="text-2xl font-bold text-foreground text-center mb-10">{t.benefitsTitle}</h2>
           <div className="grid sm:grid-cols-2 gap-6">
             {t.benefits.map((benefit, index) => {
               const IconComponent = iconMap[benefit.icon as keyof typeof iconMap];
               return (
-                <Card key={index} className="border-slate-200 dark:border-slate-700">
+                <Card key={index} className="border-border bg-card">
                   <CardContent className="pt-6">
                     <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-lg bg-cpPink/10 flex items-center justify-center shrink-0">
-                        <IconComponent className="h-5 w-5 text-cpPink" />
+                      <div className="w-10 h-10 rounded-lg bg-cpCoral/10 dark:bg-cpCoral/20 flex items-center justify-center shrink-0">
+                        <IconComponent className="h-5 w-5 text-cpCoral" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-cpDark dark:text-white mb-1">{benefit.title}</h3>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">{benefit.description}</p>
+                        <h3 className="font-semibold text-foreground mb-1">{benefit.title}</h3>
+                        <p className="text-sm text-muted-foreground">{benefit.description}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -611,20 +611,20 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
 
         {/* CTA Section */}
         <div className="max-w-3xl mx-auto text-center mb-16">
-          <Card className="bg-gradient-to-r from-cpPink/5 to-cpYellow/5 border-cpPink/20">
+          <Card className="bg-gradient-to-r from-cpCoral/5 to-cpAmber/5 dark:from-cpCoral/10 dark:to-cpAmber/10 border-cpCoral/20 dark:border-cpCoral/30">
             <CardContent className="pt-8 pb-8">
-              <h2 className="text-2xl font-bold text-cpDark dark:text-white mb-2">{t.ctaTitle}</h2>
-              <p className="text-slate-600 dark:text-slate-400 mb-6">{t.ctaSubtitle}</p>
-              <Button asChild size="lg" className="bg-cpPink hover:bg-cpPink/90">
+              <h2 className="text-2xl font-bold text-foreground mb-2">{t.ctaTitle}</h2>
+              <p className="text-muted-foreground mb-6">{t.ctaSubtitle}</p>
+              <Button asChild size="lg" className="bg-cpCoral hover:bg-cpCoral/90 text-white">
                 <Link href={`/${locale}/onboarding/business`}>
                   <ArrowRight className="h-4 w-4 mr-2" />
                   {t.getStarted}
                 </Link>
               </Button>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-4">
+              <p className="text-sm text-muted-foreground mt-4">
                 {t.ctaHelp}{" "}
-                <a href="mailto:business@cutiepawspedia.com" className="text-cpPink hover:underline">
-                  business@cutiepawspedia.com
+                <a href="mailto:hello@cutiepawspedia.com" className="text-cpCoral hover:underline">
+                  hello@cutiepawspedia.com
                 </a>
               </p>
             </CardContent>
@@ -633,12 +633,12 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
 
         {/* Enterprise Section */}
         <div className="max-w-2xl mx-auto text-center">
-          <Card className="border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800">
+          <Card className="border-border bg-muted/50">
             <CardContent className="pt-6 pb-6">
-              <h3 className="font-semibold text-cpDark dark:text-white mb-2">{t.enterpriseTitle}</h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">{t.enterpriseDescription}</p>
-              <Button asChild variant="outline">
-                <a href="mailto:enterprise@cutiepawspedia.com">
+              <h3 className="font-semibold text-foreground mb-2">{t.enterpriseTitle}</h3>
+              <p className="text-sm text-muted-foreground mb-4">{t.enterpriseDescription}</p>
+              <Button asChild variant="outline" className="border-border hover:bg-muted">
+                <a href="mailto:hello@cutiepawspedia.com">
                   <Mail className="h-4 w-4 mr-2" />
                   {t.enterpriseButton}
                 </a>
@@ -655,13 +655,13 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
 function FeatureValue({ value, highlight, highlightElite }: { value: string | boolean; highlight?: boolean; highlightElite?: boolean }) {
   if (typeof value === "boolean") {
     return value ? (
-      <Check className={`h-5 w-5 mx-auto ${highlightElite ? "text-purple-500" : highlight ? "text-cpPink" : "text-green-500"}`} />
+      <Check className={`h-5 w-5 mx-auto ${highlightElite ? "text-purple-500 dark:text-purple-400" : highlight ? "text-cpCoral" : "text-green-500"}`} />
     ) : (
-      <X className="h-5 w-5 mx-auto text-slate-300 dark:text-slate-600" />
+      <X className="h-5 w-5 mx-auto text-muted-foreground/40" />
     );
   }
   return (
-    <span className={`text-sm ${highlightElite ? "text-purple-600 font-semibold" : highlight ? "text-cpPink font-semibold" : "text-slate-600 dark:text-slate-400"}`}>
+    <span className={`text-sm ${highlightElite ? "text-purple-600 dark:text-purple-400 font-semibold" : highlight ? "text-cpCoral font-semibold" : "text-muted-foreground"}`}>
       {value}
     </span>
   );

@@ -1,0 +1,34 @@
+/**
+ * Provinces Sitemap Route (/sitemap-provinces.xml)
+ *
+ * Contains URLs for all province landing pages across all locales.
+ *
+ * CACHING STRATEGY: ISR
+ * - revalidate: 3600s (1 hour) - Provinces rarely change
+ */
+
+import { NextResponse } from "next/server";
+import { buildSitemapXml, buildProvinceUrls, DEFAULT_SITEMAP_CONFIG } from "@/lib/sitemap";
+
+export const revalidate = 3600;
+
+export async function GET() {
+  try {
+    const urls = await buildProvinceUrls(DEFAULT_SITEMAP_CONFIG);
+    const xml = buildSitemapXml(urls);
+
+    return new NextResponse(xml, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/xml",
+        "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
+      },
+    });
+  } catch (error) {
+    console.error("Error generating provinces sitemap:", error);
+    return new NextResponse(
+      `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>`,
+      { status: 200, headers: { "Content-Type": "application/xml" } }
+    );
+  }
+}

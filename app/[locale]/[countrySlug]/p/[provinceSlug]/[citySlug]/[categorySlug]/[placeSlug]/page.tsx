@@ -39,7 +39,8 @@ import { PlaceViewTracker } from "@/components/analytics";
 import { Breadcrumbs } from "@/components/layout";
 import { FavoriteButton } from "@/components/favorites/FavoriteButton";
 import { isFavorite } from "@/db/queries/favorites";
-import { MapPin, Phone, Globe, Mail, Star, CheckCircle, MessageSquare, Lock, Shield, Crown } from "lucide-react";
+import { MapPin, Phone, Globe, Mail, Star, CheckCircle, Lock, Shield, Crown, MessageSquare } from "lucide-react";
+import { ReviewSection } from "@/components/reviews";
 import { AboutSection, ServicesSection, HighlightsSection, BusinessSnapshot, BusinessPhotoGallery } from "@/components/place";
 import { getActivePhotosByPlaceId } from "@/db/queries/businessPhotos";
 import { getBusinessPhotoUrl } from "@/lib/storage/businessPhotos";
@@ -144,9 +145,11 @@ export default async function PlacePage({ params }: PlacePageProps) {
   // Check if current user has a pending claim for this place and if they favorited it
   let hasPendingClaim = false;
   let isPlaceFavorited = false;
+  let isUserLoggedIn = false;
   try {
     const stackUser = await stackServerApp?.getUser();
     if (stackUser) {
+      isUserLoggedIn = true;
       const dbUser = await getUserByStackAuthId(stackUser.id);
       if (dbUser) {
         const [claimsResult, favoriteStatus] = await Promise.all([
@@ -296,17 +299,17 @@ export default async function PlacePage({ params }: PlacePageProps) {
       {/* Hero Header */}
       <section className={`relative overflow-hidden ${
         placeFeatures.hasEnhancedStyling
-          ? "bg-gradient-to-br from-purple-100 via-white to-purple-50 border-b-4 border-purple-400"
+          ? "bg-gradient-to-br from-purple-100 via-white to-purple-50 dark:from-purple-900/30 dark:via-cpSurface dark:to-purple-900/10 border-b-4 border-purple-400 dark:border-purple-500"
           : placeFeatures.hasFeaturedStyling
-            ? "bg-gradient-to-br from-amber-50 via-white to-cpYellow/10 border-b-4 border-cpYellow"
-            : "bg-gradient-to-br from-cpPink/10 via-white to-cpAqua/10"
+            ? "bg-gradient-to-br from-amber-50 via-white to-cpAmber/10 dark:from-cpAmber/20 dark:via-cpSurface dark:to-cpAmber/5 border-b-4 border-cpAmber"
+            : "bg-gradient-to-br from-cpCoral/10 via-white to-cpAmber/10 dark:from-cpCoral/20 dark:via-cpSurface dark:to-cpAmber/10"
       }`}>
         <div className={`absolute inset-0 ${
           placeFeatures.hasEnhancedStyling
-            ? "bg-[radial-gradient(circle_at_80%_20%,rgba(147,51,234,0.15),transparent_50%)]"
+            ? "bg-[radial-gradient(circle_at_80%_20%,rgba(147,51,234,0.15),transparent_50%)] dark:bg-[radial-gradient(circle_at_80%_20%,rgba(147,51,234,0.25),transparent_50%)]"
             : placeFeatures.hasFeaturedStyling
-              ? "bg-[radial-gradient(circle_at_80%_20%,rgba(251,191,36,0.2),transparent_50%)]"
-              : "bg-[radial-gradient(circle_at_80%_20%,rgba(255,127,161,0.15),transparent_50%)]"
+              ? "bg-[radial-gradient(circle_at_80%_20%,rgba(251,191,36,0.2),transparent_50%)] dark:bg-[radial-gradient(circle_at_80%_20%,rgba(255,209,102,0.2),transparent_50%)]"
+              : "bg-[radial-gradient(circle_at_80%_20%,rgba(255,140,115,0.15),transparent_50%)] dark:bg-[radial-gradient(circle_at_80%_20%,rgba(255,140,115,0.2),transparent_50%)]"
         }`} />
         <div className="relative container mx-auto max-w-6xl px-4 py-8 md:py-12">
           {/* Breadcrumbs */}
@@ -325,16 +328,16 @@ export default async function PlacePage({ params }: PlacePageProps) {
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
             <div>
               <div className="flex items-center gap-3 mb-3 flex-wrap">
-                <h1 className="text-3xl md:text-4xl font-bold text-cpDark tracking-tight">
+                <h1 className="text-3xl md:text-4xl font-bold text-foreground dark:text-cpCream tracking-tight">
                   {place.name}
                 </h1>
                 {placeFeatures.planBadge && (
                   <Badge className={`gap-1 ${
                     placeFeatures.planBadge.color === "purple"
-                      ? "bg-purple-100 text-purple-700 border-purple-300"
+                      ? "bg-purple-100 text-purple-700 border-purple-300 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-500"
                       : placeFeatures.planBadge.color === "amber"
-                        ? "bg-amber-100 text-amber-700 border-amber-300"
-                        : "bg-blue-100 text-blue-700 border-blue-300"
+                        ? "bg-amber-100 text-amber-700 border-amber-300 dark:bg-cpAmber/20 dark:text-cpAmber dark:border-cpAmber/50"
+                        : "bg-blue-100 text-blue-700 border-blue-300 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-500"
                   }`}>
                     {placeFeatures.planBadge.color === "purple" ? (
                       <Crown className="h-3 w-3" />
@@ -345,20 +348,20 @@ export default async function PlacePage({ params }: PlacePageProps) {
                   </Badge>
                 )}
                 {placeFeatures.hasVerifiedBadge && (
-                  <Badge className="bg-purple-100 text-purple-700 border-purple-300 gap-1">
+                  <Badge className="bg-purple-100 text-purple-700 border-purple-300 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-500 gap-1">
                     <Shield className="h-3 w-3" />
                     {locale === "nl" ? "Geverifieerd" : "Verified"}
                   </Badge>
                 )}
                 {place.isVerified && !placeFeatures.hasVerifiedBadge && (
-                  <Badge className="bg-cpAqua/20 text-cpAqua border-cpAqua gap-1">
+                  <Badge className="bg-cpCoral/10 text-cpCoral border-cpCoral/30 gap-1">
                     <CheckCircle className="h-3 w-3" />Verified
                   </Badge>
                 )}
               </div>
               <div className="flex flex-wrap gap-2 mb-4">
                 {place.placeCategories?.map((pc) => (
-                  <Badge key={pc.category.slug} variant="secondary">
+                  <Badge key={pc.category.slug} variant="secondary" className="dark:bg-cpSurface dark:text-cpCream/80 dark:border-cpAmber/20">
                     {getLocalizedCategoryName(pc.category.slug, locale as ContentLocale)}
                   </Badge>
                 ))}
@@ -369,31 +372,31 @@ export default async function PlacePage({ params }: PlacePageProps) {
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star
                         key={star}
-                        className={`h-5 w-5 ${star <= Math.round(Number(place.avgRating)) ? "fill-cpYellow text-cpYellow" : "text-slate-300"}`}
+                        className={`h-5 w-5 ${star <= Math.round(Number(place.avgRating)) ? "fill-cpAmber text-cpAmber" : "text-muted-foreground/30 dark:text-cpCream/20"}`}
                       />
                     ))}
                   </div>
-                  <span className="font-semibold text-cpDark">{Number(place.avgRating).toFixed(1)}</span>
-                  <span className="text-slate-500">({place.reviewCount} reviews)</span>
+                  <span className="font-semibold text-foreground dark:text-cpCream">{Number(place.avgRating).toFixed(1)}</span>
+                  <span className="text-muted-foreground dark:text-cpCream/60">({place.reviewCount} reviews)</span>
                 </div>
               )}
             </div>
             <div className="flex flex-col gap-2 min-w-[200px]">
               <FavoriteButton placeId={place.id} initialIsFavorite={isPlaceFavorited} variant="default" />
               {place.phone && placeFeatures.canShowPhone ? (
-                <Button asChild className="bg-cpPink hover:bg-cpPink/90 gap-2">
+                <Button asChild className="bg-cpCoral hover:bg-cpCoral/90 gap-2">
                   <a href={`tel:${place.phone}`}><Phone className="h-4 w-4" />{locale === "nl" ? "Bel Nu" : "Call Now"}</a>
                 </Button>
               ) : place.phone && !placeFeatures.canShowPhone ? (
-                <Button variant="outline" className="gap-2 text-slate-400" disabled>
+                <Button variant="outline" className="gap-2 text-muted-foreground dark:text-cpCream/50 dark:border-cpAmber/20" disabled>
                   <Lock className="h-4 w-4" />{locale === "nl" ? "Telefoon verborgen" : "Phone hidden"}
                 </Button>
               ) : null}
-              <Button asChild variant="outline" className="gap-2">
+              <Button asChild variant="outline" className="gap-2 dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10">
                 <a href="#inquiry-form"><MessageSquare className="h-4 w-4" />{locale === "nl" ? "Stuur Bericht" : "Send Inquiry"}</a>
               </Button>
               {placeFeatures.hasVerifiedBadge && (
-                <Badge className="justify-center bg-purple-100 text-purple-700 border-purple-300 gap-1">
+                <Badge className="justify-center bg-purple-100 text-purple-700 border-purple-300 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-500 gap-1">
                   <Shield className="h-3 w-3" />
                   {locale === "nl" ? "Geverifieerd Bedrijf" : "Verified Business"}
                 </Badge>
@@ -452,79 +455,36 @@ export default async function PlacePage({ params }: PlacePageProps) {
 
             <BetweenContentAd />
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>{locale === "nl" ? "Beoordelingen" : "Reviews"}</CardTitle>
-                <Button variant="outline" size="sm">
-                  {locale === "nl" ? "Schrijf een Review" : "Write a Review"}
-                </Button>
-              </CardHeader>
-              <CardContent>
-                {publishedReviews.length > 0 ? (
-                  <div className="space-y-4">
-                    {publishedReviews.map((review) => (
-                      <div key={review.id} className="border-b pb-4 last:border-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="flex">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <Star
-                                key={star}
-                                className={`h-4 w-4 ${star <= review.rating ? "fill-cpYellow text-cpYellow" : "text-slate-300"}`}
-                              />
-                            ))}
-                          </div>
-                          <span className="text-sm text-slate-500">
-                            {(() => {
-                              const user = Array.isArray(review.user) ? review.user[0] : review.user;
-                              return user?.name || "Anonymous";
-                            })()}
-                          </span>
-                          <span className="text-xs text-slate-400">
-                            {new Date(review.createdAt).toLocaleDateString(locale, { year: "numeric", month: "short", day: "numeric" })}
-                          </span>
-                        </div>
-                        {review.title && <p className="font-medium text-cpDark mb-1">{review.title}</p>}
-                        {review.body && <p className="text-slate-600">{review.body}</p>}
-                        {review.replies && review.replies.length > 0 && (
-                          <div className="mt-3 pl-4 border-l-2 border-cpPink/30">
-                            {review.replies.map((reply) => (
-                              <div key={reply.id} className="bg-slate-50 rounded p-3 mt-2">
-                                <p className="text-xs text-cpPink font-medium mb-1">
-                                  {reply.authorType === "business" ? (locale === "nl" ? "Reactie van bedrijf" : "Business Response") : (locale === "nl" ? "Reactie van beheerder" : "Admin Response")}
-                                </p>
-                                <p className="text-sm text-slate-600">{reply.body}</p>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <MessageSquare className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-                    <p className="text-slate-500">
-                      {locale === "nl" ? "Nog geen reviews. Wees de eerste!" : "No reviews yet. Be the first!"}
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <ReviewSection
+              placeId={place.id}
+              placeName={place.name}
+              reviews={publishedReviews.map((review) => ({
+                id: review.id,
+                rating: review.rating,
+                title: review.title,
+                body: review.body,
+                createdAt: review.createdAt,
+                user: review.user,
+                replies: review.replies,
+              }))}
+              isLoggedIn={isUserLoggedIn}
+              locale={locale}
+            />
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
-            <Card>
+            <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
               <CardHeader>
-                <CardTitle>{locale === "nl" ? "Contactgegevens" : "Contact Information"}</CardTitle>
+                <CardTitle className="text-foreground dark:text-cpCream">{locale === "nl" ? "Contactgegevens" : "Contact Information"}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {place.address && (
                   <div className="flex items-start gap-3">
-                    <MapPin className="h-5 w-5 text-cpPink shrink-0 mt-0.5" />
+                    <MapPin className="h-5 w-5 text-cpCoral shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-slate-600">{place.address}</p>
-                      <p className="text-slate-500 text-sm">
+                      <p className="text-muted-foreground dark:text-cpCream/70">{place.address}</p>
+                      <p className="text-muted-foreground/80 dark:text-cpCream/60 text-sm">
                         {[place.postalCode, cityName].filter(Boolean).join(" ")}
                       </p>
                     </div>
@@ -533,13 +493,13 @@ export default async function PlacePage({ params }: PlacePageProps) {
 
                 {place.phone && placeFeatures.canShowPhone ? (
                   <div className="flex items-center gap-3">
-                    <Phone className="h-5 w-5 text-cpPink" />
-                    <a href={`tel:${place.phone}`} className="text-cpDark hover:text-cpPink transition-colors">
+                    <Phone className="h-5 w-5 text-cpCoral" />
+                    <a href={`tel:${place.phone}`} className="text-foreground dark:text-cpCream hover:text-cpCoral transition-colors">
                       {place.phone}
                     </a>
                   </div>
                 ) : place.phone && !placeFeatures.canShowPhone ? (
-                  <div className="flex items-center gap-3 text-slate-400">
+                  <div className="flex items-center gap-3 text-muted-foreground dark:text-cpCream/50">
                     <Phone className="h-5 w-5" />
                     <span className="flex items-center gap-1">
                       <Lock className="h-3 w-3" />
@@ -550,13 +510,13 @@ export default async function PlacePage({ params }: PlacePageProps) {
 
                 {place.email && placeFeatures.canShowEmail ? (
                   <div className="flex items-center gap-3">
-                    <Mail className="h-5 w-5 text-cpPink" />
-                    <a href={`mailto:${place.email}`} className="text-cpDark hover:text-cpPink transition-colors truncate">
+                    <Mail className="h-5 w-5 text-cpCoral" />
+                    <a href={`mailto:${place.email}`} className="text-foreground dark:text-cpCream hover:text-cpCoral transition-colors truncate">
                       {place.email}
                     </a>
                   </div>
                 ) : place.email && !placeFeatures.canShowEmail ? (
-                  <div className="flex items-center gap-3 text-slate-400">
+                  <div className="flex items-center gap-3 text-muted-foreground dark:text-cpCream/50">
                     <Mail className="h-5 w-5" />
                     <span className="flex items-center gap-1">
                       <Lock className="h-3 w-3" />
@@ -567,13 +527,13 @@ export default async function PlacePage({ params }: PlacePageProps) {
 
                 {place.website && placeFeatures.canShowWebsite ? (
                   <div className="flex items-center gap-3">
-                    <Globe className="h-5 w-5 text-cpPink" />
-                    <a href={place.website} target="_blank" rel="noopener noreferrer" className="text-cpDark hover:text-cpPink transition-colors">
+                    <Globe className="h-5 w-5 text-cpCoral" />
+                    <a href={place.website} target="_blank" rel="noopener noreferrer" className="text-foreground dark:text-cpCream hover:text-cpCoral transition-colors">
                       {locale === "nl" ? "Bezoek Website" : "Visit Website"}
                     </a>
                   </div>
                 ) : place.website && !placeFeatures.canShowWebsite ? (
-                  <div className="flex items-center gap-3 text-slate-400">
+                  <div className="flex items-center gap-3 text-muted-foreground dark:text-cpCream/50">
                     <Globe className="h-5 w-5" />
                     <span className="flex items-center gap-1">
                       <Lock className="h-3 w-3" />
@@ -583,9 +543,9 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 ) : null}
 
                 {upgradeCTA && (
-                  <div className="pt-3 border-t border-slate-100">
-                    <p className="text-xs text-slate-500 mb-2">{upgradeCTA.message}</p>
-                    <Button asChild size="sm" variant="outline" className="w-full gap-1 text-cpPink border-cpPink/30 hover:bg-cpPink/5">
+                  <div className="pt-3 border-t border-border dark:border-cpAmber/10">
+                    <p className="text-xs text-muted-foreground dark:text-cpCream/60 mb-2">{upgradeCTA.message}</p>
+                    <Button asChild size="sm" variant="outline" className="w-full gap-1 text-cpCoral border-cpCoral/30 hover:bg-cpCoral/5 dark:hover:bg-cpCoral/10">
                       <a href={`/${locale}/for-businesses`}>
                         <Crown className="h-3 w-3" />
                         {locale === "nl" ? "Bekijk Abonnementen" : "View Plans"}
@@ -606,12 +566,18 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 dataQualityFlags: place.dataQualityFlags as string[] | undefined,
               }}
               locale={locale}
+              cutieRating={{
+                avgRating: publishedReviews.length > 0
+                  ? publishedReviews.reduce((sum, r) => sum + r.rating, 0) / publishedReviews.length
+                  : null,
+                reviewCount: publishedReviews.length,
+              }}
             />
 
             {place.lat && place.lng && (
-              <Card>
+              <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
                 <CardHeader>
-                  <CardTitle>{locale === "nl" ? "Locatie" : "Location"}</CardTitle>
+                  <CardTitle className="text-foreground dark:text-cpCream">{locale === "nl" ? "Locatie" : "Location"}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <StaticMap
@@ -628,7 +594,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                       href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.address)}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 mt-3 text-sm text-cpAqua hover:text-cpPink transition-colors"
+                      className="flex items-center justify-center gap-2 mt-3 text-sm text-cpCoral hover:text-cpCoral/80 transition-colors"
                     >
                       <MapPin className="h-4 w-4" />
                       {locale === "nl" ? "Open in Google Maps" : "Open in Google Maps"}

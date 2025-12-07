@@ -140,7 +140,7 @@ export function SponsorAdWithTracking({
         ref={adRef}
         href={href}
         onClick={handleClick}
-        className={`block bg-gradient-to-br from-cpPink/5 to-cpCoral/5 rounded-xl border border-cpPink/20 overflow-hidden hover:border-cpPink/40 transition-all group ${className}`}
+        className={`block bg-gradient-to-br from-cpCoral/5 to-cpAmber/5 dark:from-cpCoral/10 dark:to-cpAmber/10 rounded-xl border border-cpCoral/20 dark:border-cpCoral/30 overflow-hidden hover:border-cpCoral/40 dark:hover:border-cpCoral/50 transition-all group ${className}`}
       >
         <div className="relative aspect-[4/3] w-full">
           <Image
@@ -149,20 +149,20 @@ export function SponsorAdWithTracking({
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
-          <div className="absolute top-2 right-2 bg-cpPink/90 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+          <div className="absolute top-2 right-2 bg-cpCoral/90 text-white text-xs px-2 py-0.5 rounded-full font-medium">
             Sponsor
           </div>
         </div>
         <div className="p-4">
-          <h4 className="font-semibold text-cpDark group-hover:text-cpPink transition-colors">
+          <h4 className="font-semibold text-foreground dark:text-cpCream group-hover:text-cpCoral transition-colors">
             {ad.headline}
           </h4>
           {ad.description && (
-            <p className="text-sm text-slate-600 mt-1 line-clamp-2">
+            <p className="text-sm text-muted-foreground dark:text-cpCream/70 mt-1 line-clamp-2">
               {ad.description}
             </p>
           )}
-          <span className="inline-flex items-center gap-1 text-cpPink text-sm font-medium mt-3">
+          <span className="inline-flex items-center gap-1 text-cpCoral text-sm font-medium mt-3">
             {ad.ctaText} →
           </span>
         </div>
@@ -176,22 +176,22 @@ export function SponsorAdWithTracking({
         ref={adRef}
         href={href}
         onClick={handleClick}
-        className={`flex gap-4 bg-gradient-to-r from-cpPink/5 to-cpCoral/5 rounded-xl border border-cpPink/20 p-4 my-6 hover:border-cpPink/40 transition-all group ${className}`}
+        className={`flex gap-4 bg-gradient-to-r from-cpCoral/5 to-cpAmber/5 dark:from-cpCoral/10 dark:to-cpAmber/10 rounded-xl border border-cpCoral/20 dark:border-cpCoral/30 p-4 my-6 hover:border-cpCoral/40 dark:hover:border-cpCoral/50 transition-all group ${className}`}
       >
         <div className="relative w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden">
           <Image src={imageUrl} alt={ad.businessName} fill className="object-cover" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="bg-cpPink/90 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+            <span className="bg-cpCoral/90 text-white text-xs px-2 py-0.5 rounded-full font-medium">
               Sponsor
             </span>
           </div>
-          <h4 className="font-semibold text-cpDark group-hover:text-cpPink transition-colors">
+          <h4 className="font-semibold text-foreground dark:text-cpCream group-hover:text-cpCoral transition-colors">
             {ad.headline}
           </h4>
           {ad.description && (
-            <p className="text-sm text-slate-600 line-clamp-1 mt-1">{ad.description}</p>
+            <p className="text-sm text-muted-foreground dark:text-cpCream/70 line-clamp-1 mt-1">{ad.description}</p>
           )}
         </div>
       </Link>
@@ -204,7 +204,7 @@ export function SponsorAdWithTracking({
         ref={adRef}
         href={href}
         onClick={handleClick}
-        className={`block bg-gradient-to-r from-cpPink/10 to-cpCoral/10 rounded-2xl border-2 border-cpPink/30 overflow-hidden hover:border-cpPink/50 transition-all group ${className}`}
+        className={`block bg-gradient-to-r from-cpCoral/10 to-cpAmber/10 dark:from-cpCoral/15 dark:to-cpAmber/15 rounded-2xl border-2 border-cpCoral/30 dark:border-cpCoral/40 overflow-hidden hover:border-cpCoral/50 dark:hover:border-cpCoral/60 transition-all group ${className}`}
       >
         <div className="flex flex-col md:flex-row">
           <div className="relative w-full md:w-1/3 aspect-[16/9] md:aspect-auto">
@@ -217,17 +217,17 @@ export function SponsorAdWithTracking({
           </div>
           <div className="flex-1 p-6">
             <div className="flex items-center gap-2 mb-2">
-              <span className="bg-cpPink text-white text-xs px-3 py-1 rounded-full font-medium">
+              <span className="bg-cpCoral text-white text-xs px-3 py-1 rounded-full font-medium">
                 ⭐ Featured Sponsor
               </span>
             </div>
-            <h3 className="text-xl font-bold text-cpDark group-hover:text-cpPink transition-colors">
+            <h3 className="text-xl font-bold text-foreground dark:text-cpCream group-hover:text-cpCoral transition-colors">
               {ad.headline}
             </h3>
             {ad.description && (
-              <p className="text-slate-600 mt-2 line-clamp-2">{ad.description}</p>
+              <p className="text-muted-foreground dark:text-cpCream/70 mt-2 line-clamp-2">{ad.description}</p>
             )}
-            <span className="inline-flex items-center gap-2 text-cpPink font-medium mt-4">
+            <span className="inline-flex items-center gap-2 text-cpCoral font-medium mt-4">
               {ad.ctaText} →
             </span>
           </div>
@@ -242,16 +242,16 @@ export function SponsorAdWithTracking({
       ref={adRef}
       href={href}
       onClick={handleClick}
-      className={`flex items-center gap-3 bg-gradient-to-r from-cpPink/5 to-cpCoral/5 rounded-lg border border-cpPink/20 p-3 hover:border-cpPink/40 transition-all group ${className}`}
+      className={`flex items-center gap-3 bg-gradient-to-r from-cpCoral/5 to-cpAmber/5 dark:from-cpCoral/10 dark:to-cpAmber/10 rounded-lg border border-cpCoral/20 dark:border-cpCoral/30 p-3 hover:border-cpCoral/40 dark:hover:border-cpCoral/50 transition-all group ${className}`}
     >
       <div className="relative w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden">
         <Image src={imageUrl} alt={ad.businessName} fill className="object-cover" />
       </div>
       <div className="flex-1 min-w-0">
-        <span className="text-[10px] bg-cpPink/90 text-white px-1.5 py-0.5 rounded-full font-medium">
+        <span className="text-[10px] bg-cpCoral/90 text-white px-1.5 py-0.5 rounded-full font-medium">
           Sponsor
         </span>
-        <h5 className="font-medium text-sm text-cpDark group-hover:text-cpPink transition-colors truncate">
+        <h5 className="font-medium text-sm text-foreground dark:text-cpCream group-hover:text-cpCoral transition-colors truncate">
           {ad.headline}
         </h5>
       </div>

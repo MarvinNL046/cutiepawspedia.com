@@ -6,7 +6,7 @@
  */
 
 import { db } from "@/db";
-import { countries, cities, categories, places, placeCategories } from "@/db/schema";
+import { countries, cities, provinces, categories, places, placeCategories } from "@/db/schema";
 import { eq, isNotNull, sql } from "drizzle-orm";
 import {
   type SitemapUrl,
@@ -67,7 +67,42 @@ export async function buildCountryUrls(
 }
 
 /**
+ * Build province page URLs
+ * e.g., /nl/netherlands/p/noord-holland
+ */
+export async function buildProvinceUrls(
+  config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
+): Promise<SitemapUrl[]> {
+  if (!db) return [];
+  const urls: SitemapUrl[] = [];
+  const today = new Date().toISOString().split("T")[0];
+
+  const allProvinces = await db
+    .select({
+      provinceSlug: provinces.slug,
+      countrySlug: countries.slug,
+      updatedAt: provinces.updatedAt,
+    })
+    .from(provinces)
+    .innerJoin(countries, eq(provinces.countryId, countries.id));
+
+  for (const province of allProvinces) {
+    for (const locale of config.locales) {
+      urls.push({
+        loc: `${config.baseUrl}/${locale}/${province.countrySlug}/p/${province.provinceSlug}`,
+        lastmod: province.updatedAt?.toISOString().split("T")[0] || today,
+        changefreq: PAGE_CHANGEFREQ.city, // Use city frequency for provinces
+        priority: 0.85, // Slightly higher than cities
+      });
+    }
+  }
+
+  return urls;
+}
+
+/**
  * Build city page URLs
+ * e.g., /nl/netherlands/p/noord-holland/amsterdam
  */
 export async function buildCityUrls(
   config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
@@ -79,15 +114,21 @@ export async function buildCityUrls(
   const allCities = await db
     .select({
       citySlug: cities.slug,
+      provinceSlug: provinces.slug,
       countrySlug: countries.slug,
     })
     .from(cities)
-    .innerJoin(countries, eq(cities.countryId, countries.id));
+    .innerJoin(countries, eq(cities.countryId, countries.id))
+    .leftJoin(provinces, eq(cities.provinceId, provinces.id));
 
   for (const city of allCities) {
     for (const locale of config.locales) {
+      // Include province in URL if available
+      const url = city.provinceSlug
+        ? `${config.baseUrl}/${locale}/${city.countrySlug}/p/${city.provinceSlug}/${city.citySlug}`
+        : `${config.baseUrl}/${locale}/${city.countrySlug}/${city.citySlug}`;
       urls.push({
-        loc: `${config.baseUrl}/${locale}/${city.countrySlug}/${city.citySlug}`,
+        loc: url,
         lastmod: today,
         changefreq: PAGE_CHANGEFREQ.city,
         priority: PAGE_PRIORITIES.city,
@@ -100,6 +141,7 @@ export async function buildCityUrls(
 
 /**
  * Build category page URLs (within cities)
+ * e.g., /nl/netherlands/p/noord-holland/amsterdam/veterinary
  */
 export async function buildCategoryUrls(
   config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
@@ -112,6 +154,7 @@ export async function buildCategoryUrls(
   const cityCategoryPairs = await db
     .selectDistinct({
       citySlug: cities.slug,
+      provinceSlug: provinces.slug,
       countrySlug: countries.slug,
       categorySlug: categories.slug,
     })
@@ -119,12 +162,17 @@ export async function buildCategoryUrls(
     .innerJoin(places, eq(placeCategories.placeId, places.id))
     .innerJoin(cities, eq(places.cityId, cities.id))
     .innerJoin(countries, eq(cities.countryId, countries.id))
+    .leftJoin(provinces, eq(cities.provinceId, provinces.id))
     .innerJoin(categories, eq(placeCategories.categoryId, categories.id));
 
   for (const pair of cityCategoryPairs) {
     for (const locale of config.locales) {
+      // Include province in URL if available
+      const url = pair.provinceSlug
+        ? `${config.baseUrl}/${locale}/${pair.countrySlug}/p/${pair.provinceSlug}/${pair.citySlug}/${pair.categorySlug}`
+        : `${config.baseUrl}/${locale}/${pair.countrySlug}/${pair.citySlug}/${pair.categorySlug}`;
       urls.push({
-        loc: `${config.baseUrl}/${locale}/${pair.countrySlug}/${pair.citySlug}/${pair.categorySlug}`,
+        loc: url,
         lastmod: today,
         changefreq: PAGE_CHANGEFREQ.category,
         priority: PAGE_PRIORITIES.category,
@@ -137,6 +185,7 @@ export async function buildCategoryUrls(
 
 /**
  * Build place (individual business) page URLs
+ * e.g., /nl/netherlands/p/noord-holland/amsterdam/veterinary/dierenarts-amsterdam
  */
 export async function buildPlaceUrls(
   config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
@@ -145,11 +194,13 @@ export async function buildPlaceUrls(
   const urls: SitemapUrl[] = [];
   const today = new Date().toISOString().split("T")[0];
 
-  // Get all places with their location and primary category
+  // Get all active places with their location and primary category
   const allPlaces = await db
     .select({
       placeSlug: places.slug,
+      placeStatus: places.status,
       citySlug: cities.slug,
+      provinceSlug: provinces.slug,
       countrySlug: countries.slug,
       categorySlug: categories.slug,
       updatedAt: places.updatedAt,
@@ -158,6 +209,7 @@ export async function buildPlaceUrls(
     .from(places)
     .innerJoin(cities, eq(places.cityId, cities.id))
     .innerJoin(countries, eq(cities.countryId, countries.id))
+    .leftJoin(provinces, eq(cities.provinceId, provinces.id))
     .innerJoin(placeCategories, eq(places.id, placeCategories.placeId))
     .innerJoin(categories, eq(placeCategories.categoryId, categories.id))
     .where(isNotNull(places.slug));
@@ -166,8 +218,14 @@ export async function buildPlaceUrls(
   const seenUrls = new Set<string>();
 
   for (const place of allPlaces) {
+    // Skip permanently closed places
+    if (place.placeStatus === "permanently_closed") continue;
+
     for (const locale of config.locales) {
-      const url = `${config.baseUrl}/${locale}/${place.countrySlug}/${place.citySlug}/${place.categorySlug}/${place.placeSlug}`;
+      // Include province in URL if available
+      const url = place.provinceSlug
+        ? `${config.baseUrl}/${locale}/${place.countrySlug}/p/${place.provinceSlug}/${place.citySlug}/${place.categorySlug}/${place.placeSlug}`
+        : `${config.baseUrl}/${locale}/${place.countrySlug}/${place.citySlug}/${place.categorySlug}/${place.placeSlug}`;
 
       if (!seenUrls.has(url)) {
         seenUrls.add(url);

@@ -3,6 +3,7 @@ export { RatingStars, RatingBadge } from "./RatingStars";
 export { ReviewCard, ReviewCardCompact } from "./ReviewCard";
 export type { ReviewData, ReviewReply } from "./ReviewCard";
 export { ReviewForm } from "./ReviewForm";
+export { ReviewSection } from "./ReviewSection";
 export { ReviewList, ReviewListServer } from "./ReviewList";
 export { ReviewSummary, ReviewSummaryCompact } from "./ReviewSummary";
 export type { ReviewStats } from "./ReviewSummary";

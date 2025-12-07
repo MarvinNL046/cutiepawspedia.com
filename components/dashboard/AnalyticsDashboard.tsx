@@ -167,7 +167,7 @@ function BarChart({
   data,
   valueKey,
   maxValue,
-  color = "bg-cpPink",
+  color = "bg-cpCoral",
 }: {
   data: DailyData[];
   valueKey: "views" | "leads";
@@ -180,7 +180,7 @@ function BarChart({
         {Array.from({ length: 30 }).map((_, i) => (
           <div
             key={i}
-            className="flex-1 max-w-2 bg-slate-200 rounded-t"
+            className="flex-1 max-w-2 bg-muted dark:bg-cpSurface rounded-t"
             style={{ height: "4px" }}
           />
         ))}
@@ -209,13 +209,13 @@ function BarChart({
 // Progress bar for breakdown items
 function ProgressBar({
   value,
-  color = "bg-cpPink",
+  color = "bg-cpCoral",
 }: {
   value: number;
   color?: string;
 }) {
   return (
-    <div className="w-full bg-slate-200 rounded-full h-2">
+    <div className="w-full bg-muted dark:bg-cpSurface rounded-full h-2">
       <div
         className={cn("h-2 rounded-full transition-all", color)}
         style={{ width: `${Math.min(value, 100)}%` }}
@@ -308,11 +308,11 @@ export function AnalyticsDashboard({
 
   if (isLoading) {
     return (
-      <Card>
+      <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
         <CardContent className="py-12">
           <div className="flex flex-col items-center justify-center gap-3">
-            <Loader2 className="h-8 w-8 animate-spin text-cpPink" />
-            <p className="text-sm text-slate-500">{t.loading}</p>
+            <Loader2 className="h-8 w-8 animate-spin text-cpCoral" />
+            <p className="text-sm text-muted-foreground dark:text-cpCream/60">{t.loading}</p>
           </div>
         </CardContent>
       </Card>
@@ -322,19 +322,19 @@ export function AnalyticsDashboard({
   // No analytics access (FREE plan)
   if (!hasBasicAnalytics) {
     return (
-      <Card>
+      <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
         <CardContent className="py-12">
           <div className="flex flex-col items-center justify-center gap-4 text-center">
-            <div className="p-4 bg-slate-100 rounded-full">
-              <Lock className="h-8 w-8 text-slate-400" />
+            <div className="p-4 bg-muted dark:bg-cpSurface rounded-full">
+              <Lock className="h-8 w-8 text-muted-foreground dark:text-cpCream/50" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-cpDark mb-1">
+              <h3 className="text-lg font-semibold text-foreground dark:text-cpCream mb-1">
                 {t.upgradeTitle}
               </h3>
-              <p className="text-slate-600 max-w-md">{t.upgradeDescription}</p>
+              <p className="text-muted-foreground dark:text-cpCream/70 max-w-md">{t.upgradeDescription}</p>
             </div>
-            <Button className="bg-cpPink hover:bg-cpPink/90" asChild>
+            <Button className="bg-cpCoral hover:bg-cpCoral/90" asChild>
               <Link href={`/${locale}/dashboard/business/${businessId}/plan`}>
                 <Crown className="h-4 w-4 mr-2" />
                 {t.upgradeButton}
@@ -348,9 +348,9 @@ export function AnalyticsDashboard({
 
   if (error) {
     return (
-      <Card>
+      <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
         <CardContent className="py-12">
-          <div className="flex flex-col items-center justify-center gap-3 text-red-600">
+          <div className="flex flex-col items-center justify-center gap-3 text-red-600 dark:text-red-400">
             <AlertCircle className="h-8 w-8" />
             <p className="text-sm">{error}</p>
           </div>
@@ -364,36 +364,36 @@ export function AnalyticsDashboard({
       {/* Basic Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         {/* Total Views */}
-        <Card>
+        <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
           <CardContent className="p-4 sm:pt-6">
             <div className="flex items-center justify-between mb-1 sm:mb-2">
-              <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-cpAqua" />
-              <span className="text-lg sm:text-2xl font-bold text-cpDark">
+              <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-cpAmber" />
+              <span className="text-lg sm:text-2xl font-bold text-foreground dark:text-cpCream">
                 {basic?.totalViews.toLocaleString() || 0}
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-500 truncate">{t.totalViews}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground dark:text-cpCream/60 truncate">{t.totalViews}</p>
           </CardContent>
         </Card>
 
         {/* Total Leads */}
-        <Card>
+        <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
           <CardContent className="p-4 sm:pt-6">
             <div className="flex items-center justify-between mb-1 sm:mb-2">
-              <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-cpPink" />
-              <span className="text-lg sm:text-2xl font-bold text-cpDark">
+              <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-cpCoral" />
+              <span className="text-lg sm:text-2xl font-bold text-foreground dark:text-cpCream">
                 {basic?.totalLeads.toLocaleString() || 0}
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-500 truncate">{t.totalLeads}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground dark:text-cpCream/60 truncate">{t.totalLeads}</p>
           </CardContent>
         </Card>
 
         {/* This Month Views */}
-        <Card>
+        <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
           <CardContent className="p-4 sm:pt-6">
             <div className="flex items-center justify-between mb-1 sm:mb-2">
-              <span className="text-lg sm:text-2xl font-bold text-cpDark">
+              <span className="text-lg sm:text-2xl font-bold text-foreground dark:text-cpCream">
                 {basic?.thisMonthViews.toLocaleString() || 0}
               </span>
               {viewsChange !== 0 && (
@@ -402,8 +402,8 @@ export function AnalyticsDashboard({
                   className={cn(
                     "text-xs px-1.5",
                     viewsChange > 0
-                      ? "bg-green-50 text-green-700 border-green-200"
-                      : "bg-red-50 text-red-700 border-red-200"
+                      ? "bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-700"
+                      : "bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-700"
                   )}
                 >
                   {viewsChange > 0 ? (
@@ -415,17 +415,17 @@ export function AnalyticsDashboard({
                 </Badge>
               )}
             </div>
-            <p className="text-xs sm:text-sm text-slate-500 truncate">
+            <p className="text-xs sm:text-sm text-muted-foreground dark:text-cpCream/60 truncate">
               {t.views} - {t.thisMonth}
             </p>
           </CardContent>
         </Card>
 
         {/* This Month Leads */}
-        <Card>
+        <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
           <CardContent className="p-4 sm:pt-6">
             <div className="flex items-center justify-between mb-1 sm:mb-2">
-              <span className="text-lg sm:text-2xl font-bold text-cpDark">
+              <span className="text-lg sm:text-2xl font-bold text-foreground dark:text-cpCream">
                 {basic?.thisMonthLeads.toLocaleString() || 0}
               </span>
               {leadsChange !== 0 && (
@@ -434,8 +434,8 @@ export function AnalyticsDashboard({
                   className={cn(
                     "text-xs px-1.5",
                     leadsChange > 0
-                      ? "bg-green-50 text-green-700 border-green-200"
-                      : "bg-red-50 text-red-700 border-red-200"
+                      ? "bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-700"
+                      : "bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-700"
                   )}
                 >
                   {leadsChange > 0 ? (
@@ -447,7 +447,7 @@ export function AnalyticsDashboard({
                 </Badge>
               )}
             </div>
-            <p className="text-xs sm:text-sm text-slate-500 truncate">
+            <p className="text-xs sm:text-sm text-muted-foreground dark:text-cpCream/60 truncate">
               {t.leads} - {t.thisMonth}
             </p>
           </CardContent>
@@ -458,39 +458,39 @@ export function AnalyticsDashboard({
       {hasAdvancedAnalytics && advanced ? (
         <>
           {/* Views Chart */}
-          <Card>
+          <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-cpAqua" />
+              <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
+                <BarChart3 className="h-5 w-5 text-cpAmber" />
                 {t.views}
               </CardTitle>
-              <CardDescription>{t.last30Days}</CardDescription>
+              <CardDescription className="dark:text-cpCream/60">{t.last30Days}</CardDescription>
             </CardHeader>
             <CardContent>
               <BarChart
                 data={advanced.dailyViews}
                 valueKey="views"
                 maxValue={maxDailyViews}
-                color="bg-cpAqua"
+                color="bg-cpAmber"
               />
             </CardContent>
           </Card>
 
           {/* Leads Chart */}
-          <Card>
+          <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Mail className="h-5 w-5 text-cpPink" />
+              <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
+                <Mail className="h-5 w-5 text-cpCoral" />
                 {t.leads}
               </CardTitle>
-              <CardDescription>{t.last30Days}</CardDescription>
+              <CardDescription className="dark:text-cpCream/60">{t.last30Days}</CardDescription>
             </CardHeader>
             <CardContent>
               <BarChart
                 data={advanced.dailyLeads}
                 valueKey="leads"
                 maxValue={maxDailyLeads}
-                color="bg-cpPink"
+                color="bg-cpCoral"
               />
             </CardContent>
           </Card>
@@ -498,30 +498,30 @@ export function AnalyticsDashboard({
           {/* Breakdowns Row */}
           <div className="grid md:grid-cols-2 gap-6">
             {/* Conversion Rate */}
-            <Card>
+            <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-cpYellow" />
+                <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
+                  <TrendingUp className="h-5 w-5 text-cpAmber" />
                   {t.conversionRate}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-center py-4">
-                  <span className="text-4xl font-bold text-cpDark">
+                  <span className="text-4xl font-bold text-foreground dark:text-cpCream">
                     {advanced.conversionRate.toFixed(2)}%
                   </span>
                 </div>
-                <p className="text-sm text-slate-500 text-center">
+                <p className="text-sm text-muted-foreground dark:text-cpCream/60 text-center">
                   {t.leads} / {t.views}
                 </p>
               </CardContent>
             </Card>
 
             {/* Device Breakdown */}
-            <Card>
+            <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Monitor className="h-5 w-5 text-cpAqua" />
+                <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
+                  <Monitor className="h-5 w-5 text-cpAmber" />
                   {t.deviceBreakdown}
                 </CardTitle>
               </CardHeader>
@@ -530,7 +530,7 @@ export function AnalyticsDashboard({
                   advanced.deviceBreakdown.map((item, index) => (
                     <div key={index} className="space-y-1">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="flex items-center gap-2 text-slate-700">
+                        <span className="flex items-center gap-2 text-foreground/80 dark:text-cpCream/80">
                           <DeviceIcon device={item.device || "unknown"} />
                           {item.device === "desktop"
                             ? t.desktop
@@ -540,13 +540,13 @@ export function AnalyticsDashboard({
                                 ? t.tablet
                                 : t.unknown}
                         </span>
-                        <span className="font-medium">{item.percentage}%</span>
+                        <span className="font-medium text-foreground dark:text-cpCream">{item.percentage}%</span>
                       </div>
-                      <ProgressBar value={item.percentage} color="bg-cpAqua" />
+                      <ProgressBar value={item.percentage} color="bg-cpAmber" />
                     </div>
                   ))
                 ) : (
-                  <p className="text-sm text-slate-500 text-center py-4">
+                  <p className="text-sm text-muted-foreground dark:text-cpCream/60 text-center py-4">
                     {t.noData}
                   </p>
                 )}
@@ -555,10 +555,10 @@ export function AnalyticsDashboard({
           </div>
 
           {/* Source Breakdown */}
-          <Card>
+          <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Globe className="h-5 w-5 text-cpPink" />
+              <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
+                <Globe className="h-5 w-5 text-cpCoral" />
                 {t.sourceBreakdown}
               </CardTitle>
             </CardHeader>
@@ -568,19 +568,19 @@ export function AnalyticsDashboard({
                   {advanced.sourceBreakdown.map((item, index) => (
                     <div key={index} className="space-y-1">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-slate-700 capitalize">
+                        <span className="text-foreground/80 dark:text-cpCream/80 capitalize">
                           {item.source || "direct"}
                         </span>
-                        <span className="font-medium">
+                        <span className="font-medium text-foreground dark:text-cpCream">
                           {item.count} ({item.percentage}%)
                         </span>
                       </div>
-                      <ProgressBar value={item.percentage} color="bg-cpPink" />
+                      <ProgressBar value={item.percentage} color="bg-cpCoral" />
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-slate-500 text-center py-4">
+                <p className="text-sm text-muted-foreground dark:text-cpCream/60 text-center py-4">
                   {t.noData}
                 </p>
               )}
@@ -589,10 +589,10 @@ export function AnalyticsDashboard({
 
           {/* Place Performance */}
           {advanced.placeAnalytics.length > 0 && (
-            <Card>
+            <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5 text-cpYellow" />
+                <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
+                  <BarChart3 className="h-5 w-5 text-cpAmber" />
                   {t.placePerformance}
                 </CardTitle>
               </CardHeader>
@@ -601,17 +601,17 @@ export function AnalyticsDashboard({
                   {advanced.placeAnalytics.map((place) => (
                     <div
                       key={place.placeId}
-                      className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
+                      className="flex items-center justify-between p-3 bg-muted dark:bg-cpSurface rounded-lg"
                     >
-                      <span className="font-medium text-cpDark">
+                      <span className="font-medium text-foreground dark:text-cpCream">
                         {place.placeName}
                       </span>
                       <div className="flex items-center gap-4 text-sm">
-                        <span className="flex items-center gap-1 text-slate-600">
+                        <span className="flex items-center gap-1 text-muted-foreground dark:text-cpCream/70">
                           <Eye className="h-4 w-4" />
                           {place.views}
                         </span>
-                        <span className="flex items-center gap-1 text-slate-600">
+                        <span className="flex items-center gap-1 text-muted-foreground dark:text-cpCream/70">
                           <Mail className="h-4 w-4" />
                           {place.leads}
                         </span>
@@ -625,21 +625,21 @@ export function AnalyticsDashboard({
         </>
       ) : (
         /* Upgrade prompt for advanced analytics */
-        <Card className="border-dashed border-2">
+        <Card className="border-dashed border-2 bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/30">
           <CardContent className="py-8">
             <div className="flex flex-col items-center justify-center gap-4 text-center">
-              <div className="p-3 bg-cpPink/10 rounded-full">
-                <BarChart3 className="h-6 w-6 text-cpPink" />
+              <div className="p-3 bg-cpCoral/10 rounded-full">
+                <BarChart3 className="h-6 w-6 text-cpCoral" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-cpDark mb-1">
+                <h3 className="text-lg font-semibold text-foreground dark:text-cpCream mb-1">
                   {t.upgradeTitle}
                 </h3>
-                <p className="text-slate-600 text-sm max-w-md">
+                <p className="text-muted-foreground dark:text-cpCream/70 text-sm max-w-md">
                   {t.upgradeDescription}
                 </p>
               </div>
-              <Button variant="outline" className="border-cpPink text-cpPink hover:bg-cpPink/10" asChild>
+              <Button variant="outline" className="border-cpCoral text-cpCoral hover:bg-cpCoral/10 dark:border-cpCoral dark:hover:bg-cpCoral/20" asChild>
                 <Link href={`/${locale}/dashboard/business/${businessId}/plan`}>
                   <Crown className="h-4 w-4 mr-2" />
                   {t.upgradeButton}

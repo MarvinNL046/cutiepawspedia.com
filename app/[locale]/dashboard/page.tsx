@@ -43,13 +43,13 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
   // If user has multiple businesses, show selector
   if (businesses.length > 1) {
     return (
-      <div className="min-h-screen bg-slate-50 p-8">
+      <div className="min-h-screen bg-background dark:bg-cpCharcoal p-8">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-cpDark">
+            <h1 className="text-3xl font-bold text-foreground dark:text-cpCream">
               {locale === "nl" ? "Kies een bedrijf" : "Select a Business"}
             </h1>
-            <p className="text-slate-600 mt-2">
+            <p className="text-muted-foreground dark:text-cpCream/70 mt-2">
               {locale === "nl"
                 ? "Je hebt meerdere bedrijven. Kies welke je wilt beheren."
                 : "You have multiple businesses. Choose which one to manage."}
@@ -59,7 +59,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
           <div className="grid md:grid-cols-2 gap-4">
             {businesses.map((business) => (
               <Link key={business.id} href={`/${locale}/dashboard/business/${business.id}`}>
-                <Card className="hover:border-cpPink hover:shadow-md transition-all cursor-pointer">
+                <Card className="hover:border-cpCoral hover:shadow-md hover:shadow-cpCoral/10 transition-all cursor-pointer bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
                   <CardHeader className="flex flex-row items-center gap-4">
                     {business.logo ? (
                       <img
@@ -68,15 +68,15 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
                         className="w-12 h-12 rounded-lg object-cover"
                       />
                     ) : (
-                      <div className="w-12 h-12 rounded-lg bg-cpPink/10 flex items-center justify-center">
-                        <Building2 className="h-6 w-6 text-cpPink" />
+                      <div className="w-12 h-12 rounded-lg bg-cpCoral/10 flex items-center justify-center">
+                        <Building2 className="h-6 w-6 text-cpCoral" />
                       </div>
                     )}
                     <div className="flex-1">
-                      <CardTitle className="text-lg">{business.name}</CardTitle>
-                      <CardDescription className="capitalize">{business.plan} plan</CardDescription>
+                      <CardTitle className="text-lg text-foreground dark:text-cpCream">{business.name}</CardTitle>
+                      <CardDescription className="capitalize dark:text-cpCream/60">{business.plan} plan</CardDescription>
                     </div>
-                    <ArrowRight className="h-5 w-5 text-slate-400" />
+                    <ArrowRight className="h-5 w-5 text-muted-foreground dark:text-cpCream/60" />
                   </CardHeader>
                 </Card>
               </Link>
@@ -85,9 +85,9 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
 
           {/* Admin link */}
           {dbUser.role === "admin" && (
-            <div className="mt-8 pt-8 border-t">
+            <div className="mt-8 pt-8 border-t border-border dark:border-cpAmber/20">
               <Link href={`/${locale}/admin`}>
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" className="gap-2 dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10">
                   <Shield className="h-4 w-4" />
                   {locale === "nl" ? "Ga naar Admin Panel" : "Go to Admin Panel"}
                 </Button>
@@ -101,16 +101,16 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
 
   // No businesses - show CTA
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-8">
-      <Card className="max-w-md w-full">
+    <div className="min-h-screen bg-background dark:bg-cpCharcoal flex items-center justify-center p-8">
+      <Card className="max-w-md w-full bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
         <CardHeader className="text-center">
-          <div className="w-16 h-16 rounded-full bg-cpPink/10 flex items-center justify-center mx-auto mb-4">
-            <Building2 className="h-8 w-8 text-cpPink" />
+          <div className="w-16 h-16 rounded-full bg-cpCoral/10 flex items-center justify-center mx-auto mb-4">
+            <Building2 className="h-8 w-8 text-cpCoral" />
           </div>
-          <CardTitle className="text-2xl">
+          <CardTitle className="text-2xl text-foreground dark:text-cpCream">
             {locale === "nl" ? "Geen bedrijven" : "No Businesses"}
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="dark:text-cpCream/70">
             {locale === "nl"
               ? "Je hebt nog geen bedrijven gekoppeld aan je account."
               : "You don't have any businesses linked to your account yet."}
@@ -118,14 +118,14 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
         </CardHeader>
         <CardContent className="space-y-4">
           <Link href={`/${locale}/onboarding/business`} className="block">
-            <Button className="w-full bg-cpPink hover:bg-cpPink/90 gap-2">
+            <Button className="w-full bg-cpCoral hover:bg-cpCoral/90 gap-2">
               <Plus className="h-4 w-4" />
               {locale === "nl" ? "Registreer je bedrijf" : "Register Your Business"}
             </Button>
           </Link>
 
           <Link href={`/${locale}/account/favorites`} className="block">
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-full dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10">
               {locale === "nl" ? "Terug naar Mijn Account" : "Back to My Account"}
             </Button>
           </Link>
@@ -133,7 +133,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
           {/* Admin link */}
           {dbUser.role === "admin" && (
             <Link href={`/${locale}/admin`} className="block">
-              <Button variant="ghost" className="w-full gap-2 text-slate-500">
+              <Button variant="ghost" className="w-full gap-2 text-muted-foreground dark:text-cpCream/70">
                 <Shield className="h-4 w-4" />
                 {locale === "nl" ? "Admin Panel" : "Admin Panel"}
               </Button>

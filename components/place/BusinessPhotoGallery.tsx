@@ -105,8 +105,8 @@ export function BusinessPhotoGallery({
       {/* Photo Grid */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-cpDark flex items-center gap-2">
-            <ImageIcon className="h-5 w-5 text-cpPink" />
+          <h3 className="text-lg font-semibold text-foreground dark:text-cpCream flex items-center gap-2">
+            <ImageIcon className="h-5 w-5 text-cpCoral" />
             {t.photos}
           </h3>
           {sortedPhotos.length > 1 && (
@@ -114,7 +114,7 @@ export function BusinessPhotoGallery({
               variant="ghost"
               size="sm"
               onClick={() => openLightbox(0)}
-              className="text-cpPink hover:text-cpPink/80"
+              className="text-cpCoral hover:text-cpCoral/80 dark:hover:bg-cpCoral/10"
             >
               {t.viewAll} ({sortedPhotos.length})
             </Button>

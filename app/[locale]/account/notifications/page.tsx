@@ -16,7 +16,7 @@ export default async function NotificationsPage({ params }: NotificationsPagePro
   if (!stackServerApp) {
     return (
       <div className="text-center py-12">
-        <p className="text-slate-600">Authentication not configured.</p>
+        <p className="text-muted-foreground dark:text-cpCream/60">Authentication not configured.</p>
       </div>
     );
   }
@@ -40,7 +40,7 @@ export default async function NotificationsPage({ params }: NotificationsPagePro
   if (!user) {
     return (
       <div className="text-center py-12">
-        <p className="text-slate-600">Unable to load user data.</p>
+        <p className="text-muted-foreground dark:text-cpCream/60">Unable to load user data.</p>
       </div>
     );
   }
@@ -58,11 +58,11 @@ export default async function NotificationsPage({ params }: NotificationsPagePro
   return (
     <div className="max-w-2xl">
       <div className="flex items-center gap-3 mb-6">
-        <Bell className="h-6 w-6 text-cpPink" />
-        <h1 className="text-2xl font-bold text-cpDark">Email Notifications</h1>
+        <Bell className="h-6 w-6 text-cpCoral" />
+        <h1 className="text-2xl font-bold text-foreground dark:text-cpCream">Email Notifications</h1>
       </div>
 
-      <p className="text-slate-600 mb-8">
+      <p className="text-muted-foreground dark:text-cpCream/70 mb-8">
         Manage your email preferences. Choose which types of emails you want to receive.
       </p>
 

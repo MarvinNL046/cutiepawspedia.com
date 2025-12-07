@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Star, Clock, ChevronRight, Globe, Info } from "lucide-react";
+import { Star, Clock, ChevronRight, Globe, Info, PawPrint } from "lucide-react";
 import {
   formatRating,
   getRatingSource,
@@ -22,12 +22,18 @@ import {
   type PlaceData,
 } from "@/lib/enrichment/ui";
 
+interface CutieRating {
+  avgRating: number | null;
+  reviewCount: number;
+}
+
 interface BusinessSnapshotProps {
   place: PlaceData;
   locale?: string;
+  cutieRating?: CutieRating; // Our own platform reviews
 }
 
-export function BusinessSnapshot({ place, locale = "en" }: BusinessSnapshotProps) {
+export function BusinessSnapshot({ place, locale = "en", cutieRating }: BusinessSnapshotProps) {
   const [hoursOpen, setHoursOpen] = useState(false);
 
   const rating = formatRating(place.avgRating);
@@ -37,18 +43,21 @@ export function BusinessSnapshot({ place, locale = "en" }: BusinessSnapshotProps
   const hoursSource = getOpeningHoursSource(place.dataQualityFlags);
   const allHours = formatOpeningHours(place.openingHours, locale);
 
+  // Check if we have Cutie reviews
+  const hasCutieRating = cutieRating && cutieRating.reviewCount > 0 && cutieRating.avgRating;
+
   return (
-    <Card>
+    <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
       <CardHeader className="pb-3">
-        <CardTitle className="text-base">
+        <CardTitle className="text-base text-foreground dark:text-cpCream">
           {locale === "nl" ? "Bedrijfsinfo" : "Business Info"}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
-        {/* Rating Section - only show rating if there are actual reviews */}
+        {/* Rating Section - Google rating */}
         <div className="space-y-1">
-          <p className="text-xs font-medium uppercase text-slate-400 tracking-wide">
-            {locale === "nl" ? "Beoordeling" : "Rating"}
+          <p className="text-xs font-medium uppercase text-muted-foreground dark:text-cpCream/60 tracking-wide">
+            {locale === "nl" ? "Google Beoordeling" : "Google Rating"}
           </p>
           {rating.hasRating && place.reviewCount && place.reviewCount > 0 ? (
             <div className="flex items-center gap-2">
@@ -56,37 +65,77 @@ export function BusinessSnapshot({ place, locale = "en" }: BusinessSnapshotProps
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star
                     key={star}
-                    className={`h-5 w-5 ${
+                    className={`h-4 w-4 ${
                       star <= Math.round(rating.value)
-                        ? "fill-cpYellow text-cpYellow"
-                        : "text-slate-200"
+                        ? "fill-cpAmber text-cpAmber"
+                        : "text-muted dark:text-cpCream/20"
                     }`}
                   />
                 ))}
               </div>
-              <span className="text-lg font-semibold text-slate-900">
+              <span className="text-base font-semibold text-foreground dark:text-cpCream">
                 {rating.display}
               </span>
-              <span className="text-sm text-slate-500">
+              <span className="text-sm text-muted-foreground dark:text-cpCream/60">
                 ({place.reviewCount.toLocaleString()})
               </span>
             </div>
           ) : (
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-muted-foreground dark:text-cpCream/60">
               {locale === "nl" ? "Nog geen beoordeling" : "No rating yet"}
             </p>
           )}
           {rating.hasRating && place.reviewCount && place.reviewCount > 0 && ratingSource && (
-            <p className="text-xs text-slate-400 flex items-center gap-1">
-              {ratingSource.icon === "google" && <Globe className="h-3 w-3" />}
-              {locale === "nl" ? "Bron" : "Source"}: {ratingSource.source}
+            <p className="text-xs text-muted-foreground dark:text-cpCream/60 flex items-center gap-1">
+              <Globe className="h-3 w-3" />
+              Google
+            </p>
+          )}
+        </div>
+
+        {/* Cutie Rating Section - Our platform reviews */}
+        <div className="space-y-1">
+          <p className="text-xs font-medium uppercase text-muted-foreground dark:text-cpCream/60 tracking-wide flex items-center gap-1">
+            <PawPrint className="h-3 w-3 text-cpCoral" />
+            {locale === "nl" ? "Cutie Beoordeling" : "Cutie Rating"}
+          </p>
+          {hasCutieRating ? (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className={`h-4 w-4 ${
+                      star <= Math.round(cutieRating.avgRating!)
+                        ? "fill-cpCoral text-cpCoral"
+                        : "text-muted dark:text-cpCream/20"
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-base font-semibold text-foreground dark:text-cpCream">
+                {cutieRating.avgRating!.toFixed(1)}
+              </span>
+              <span className="text-sm text-muted-foreground dark:text-cpCream/60">
+                ({cutieRating.reviewCount.toLocaleString()})
+              </span>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground dark:text-cpCream/60">
+              {locale === "nl" ? "Nog geen reviews - wees de eerste! 🐾" : "No reviews yet - be the first! 🐾"}
+            </p>
+          )}
+          {hasCutieRating && (
+            <p className="text-xs text-muted-foreground dark:text-cpCream/60 flex items-center gap-1">
+              <PawPrint className="h-3 w-3 text-cpCoral" />
+              CutiePawsPedia
             </p>
           )}
         </div>
 
         {/* Opening Hours Section */}
         <div className="space-y-2">
-          <p className="text-xs font-medium uppercase text-slate-400 tracking-wide flex items-center gap-1">
+          <p className="text-xs font-medium uppercase text-muted-foreground dark:text-cpCream/60 tracking-wide flex items-center gap-1">
             <Clock className="h-3 w-3" />
             {locale === "nl" ? "Openingstijden" : "Business Hours"}
           </p>
@@ -96,7 +145,7 @@ export function BusinessSnapshot({ place, locale = "en" }: BusinessSnapshotProps
               {/* Today's status */}
               <div
                 className={`text-sm font-medium ${
-                  todayStatus.isOpen ? "text-green-600" : "text-slate-600"
+                  todayStatus.isOpen ? "text-green-600 dark:text-green-400" : "text-muted-foreground dark:text-cpCream/70"
                 }`}
               >
                 {todayStatus.text}
@@ -108,7 +157,7 @@ export function BusinessSnapshot({ place, locale = "en" }: BusinessSnapshotProps
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-cpPink hover:text-cpPink/80 hover:bg-cpPink/5 gap-1 -ml-3 h-auto py-1"
+                    className="text-cpCoral hover:text-cpCoral/80 hover:bg-cpCoral/5 dark:hover:bg-cpCoral/10 gap-1 -ml-3 h-auto py-1"
                   >
                     {locale === "nl"
                       ? "Bekijk alle openingstijden"
@@ -116,13 +165,13 @@ export function BusinessSnapshot({ place, locale = "en" }: BusinessSnapshotProps
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
+                <DialogContent className="sm:max-w-md bg-card dark:bg-cpSurface border-border dark:border-cpAmber/20">
                   <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                      <Clock className="h-5 w-5 text-cpPink" />
+                    <DialogTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
+                      <Clock className="h-5 w-5 text-cpCoral" />
                       {locale === "nl" ? "Openingstijden" : "Opening Hours"}
                     </DialogTitle>
-                    <DialogDescription>{place.name}</DialogDescription>
+                    <DialogDescription className="dark:text-cpCream/70">{place.name}</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-2 mt-4">
                     {allHours.map((dayHours) => (
@@ -130,15 +179,15 @@ export function BusinessSnapshot({ place, locale = "en" }: BusinessSnapshotProps
                         key={dayHours.day}
                         className={`flex justify-between py-2 px-3 rounded-lg ${
                           dayHours.day === getCurrentDayName(locale)
-                            ? "bg-cpPink/5 border border-cpPink/20"
-                            : "bg-slate-50"
+                            ? "bg-cpCoral/5 dark:bg-cpCoral/10 border border-cpCoral/20 dark:border-cpCoral/30"
+                            : "bg-muted dark:bg-cpSurface/50"
                         }`}
                       >
                         <span
                           className={`font-medium ${
                             dayHours.day === getCurrentDayName(locale)
-                              ? "text-cpPink"
-                              : "text-slate-700"
+                              ? "text-cpCoral"
+                              : "text-foreground dark:text-cpCream"
                           }`}
                         >
                           {dayHours.day}
@@ -146,8 +195,8 @@ export function BusinessSnapshot({ place, locale = "en" }: BusinessSnapshotProps
                         <span
                           className={
                             dayHours.isClosed
-                              ? "text-slate-400"
-                              : "text-slate-600"
+                              ? "text-muted-foreground dark:text-cpCream/50"
+                              : "text-muted-foreground dark:text-cpCream/70"
                           }
                         >
                           {dayHours.hours}
@@ -156,11 +205,11 @@ export function BusinessSnapshot({ place, locale = "en" }: BusinessSnapshotProps
                     ))}
                   </div>
                   {hoursSource && (
-                    <p className="text-xs text-slate-400 flex items-center gap-1 mt-4 pt-4 border-t">
+                    <p className="text-xs text-muted-foreground dark:text-cpCream/60 flex items-center gap-1 mt-4 pt-4 border-t border-border dark:border-cpAmber/20">
                       <Info className="h-3 w-3" />
                       {locale === "nl" ? "Bron" : "Source"}: {hoursSource.source}
                       {hoursSource.reliability === "low" && (
-                        <span className="text-yellow-600 ml-1">
+                        <span className="text-yellow-600 dark:text-yellow-400 ml-1">
                           ({locale === "nl" ? "mogelijk onnauwkeurig" : "may be inaccurate"})
                         </span>
                       )}
@@ -170,7 +219,7 @@ export function BusinessSnapshot({ place, locale = "en" }: BusinessSnapshotProps
               </Dialog>
             </>
           ) : (
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-muted-foreground dark:text-cpCream/60">
               {locale === "nl"
                 ? "Neem contact op met het bedrijf voor openingstijden."
                 : "Contact the business for opening hours."}

@@ -52,15 +52,15 @@ function getLinkIcon(type: InternalLinkItem["type"]) {
   switch (type) {
     case "city_category":
     case "place_city_category":
-      return <Tag className="h-4 w-4 text-cpPink" />;
+      return <Tag className="h-4 w-4 text-cpCoral" />;
     case "category_city":
     case "country_city":
     case "place_city":
-      return <MapPin className="h-4 w-4 text-cpAqua" />;
+      return <MapPin className="h-4 w-4 text-cpCoral" />;
     case "place_related":
-      return <Building2 className="h-4 w-4 text-cpYellow" />;
+      return <Building2 className="h-4 w-4 text-cpAmber" />;
     default:
-      return <ChevronRight className="h-4 w-4 text-slate-400" />;
+      return <ChevronRight className="h-4 w-4 text-muted-foreground dark:text-cpCream/60" />;
   }
 }
 
@@ -81,7 +81,7 @@ function LinkItem({
       <Link href={link.href}>
         <Badge
           variant="outline"
-          className="cursor-pointer hover:bg-cpPink/10 hover:border-cpPink transition-colors"
+          className="cursor-pointer hover:bg-cpCoral/10 hover:border-cpCoral dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpCoral/20 dark:hover:border-cpCoral transition-colors"
         >
           {link.label}
         </Badge>
@@ -93,7 +93,7 @@ function LinkItem({
     return (
       <Link
         href={link.href}
-        className="text-sm text-slate-600 hover:text-cpPink transition-colors flex items-center gap-1"
+        className="text-sm text-muted-foreground dark:text-cpCream/70 hover:text-cpCoral transition-colors flex items-center gap-1"
       >
         <ChevronRight className="h-3 w-3" />
         {link.label}
@@ -104,20 +104,20 @@ function LinkItem({
   return (
     <Link
       href={link.href}
-      className="group flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 transition-colors"
+      className="group flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 dark:hover:bg-cpSurface/50 transition-colors"
     >
       <span className="mt-0.5">{getLinkIcon(link.type)}</span>
       <div className="flex-1 min-w-0">
-        <span className="font-medium text-slate-900 group-hover:text-cpPink transition-colors">
+        <span className="font-medium text-foreground dark:text-cpCream group-hover:text-cpCoral transition-colors">
           {link.label}
         </span>
         {showDescription && link.description && (
-          <p className="text-xs text-muted-foreground mt-0.5 truncate">
+          <p className="text-xs text-muted-foreground dark:text-cpCream/60 mt-0.5 truncate">
             {link.description}
           </p>
         )}
       </div>
-      <ArrowRight className="h-4 w-4 text-slate-300 group-hover:text-cpPink transition-colors mt-1" />
+      <ArrowRight className="h-4 w-4 text-muted dark:text-cpCream/40 group-hover:text-cpCoral transition-colors mt-1" />
     </Link>
   );
 }
@@ -140,9 +140,9 @@ function LinkGroup({
 
   if (variant === "cards") {
     return (
-      <Card>
+      <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold">{group.title}</CardTitle>
+          <CardTitle className="text-base font-semibold text-foreground dark:text-cpCream">{group.title}</CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
           <div className="grid gap-1">
@@ -163,7 +163,7 @@ function LinkGroup({
   if (variant === "badges") {
     return (
       <div>
-        <h3 className="text-sm font-semibold text-slate-700 mb-3">
+        <h3 className="text-sm font-semibold text-foreground dark:text-cpCream mb-3">
           {group.title}
         </h3>
         <div className="flex flex-wrap gap-2">
@@ -182,7 +182,7 @@ function LinkGroup({
   if (variant === "compact") {
     return (
       <div>
-        <h3 className="text-sm font-semibold text-slate-700 mb-2">
+        <h3 className="text-sm font-semibold text-foreground dark:text-cpCream mb-2">
           {group.title}
         </h3>
         <div className="flex flex-wrap gap-x-4 gap-y-1">
@@ -201,7 +201,7 @@ function LinkGroup({
   // Default list variant
   return (
     <div>
-      <h3 className="text-base font-semibold text-slate-900 mb-3">
+      <h3 className="text-base font-semibold text-foreground dark:text-cpCream mb-3">
         {group.title}
       </h3>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-1">
@@ -254,9 +254,9 @@ export function InternalLinksSection({
       {/* Section header (only if title provided and not using result) */}
       {title && !result && (
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+          <h2 className="text-lg font-semibold text-foreground dark:text-cpCream">{title}</h2>
           {subtitle && (
-            <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
+            <p className="text-sm text-muted-foreground dark:text-cpCream/70 mt-1">{subtitle}</p>
           )}
         </div>
       )}
@@ -298,16 +298,16 @@ export function InternalLinksCompact({
   const displayLinks = links.slice(0, maxDisplay);
 
   return (
-    <div className={`bg-slate-50 rounded-lg p-4 ${className}`}>
+    <div className={`bg-muted dark:bg-cpSurface/50 rounded-lg p-4 ${className}`}>
       {title && (
-        <h3 className="text-sm font-semibold text-slate-700 mb-3">{title}</h3>
+        <h3 className="text-sm font-semibold text-foreground dark:text-cpCream mb-3">{title}</h3>
       )}
       <div className="space-y-2">
         {displayLinks.map((link, index) => (
           <Link
             key={`${link.href}-${index}`}
             href={link.href}
-            className="text-sm text-slate-600 hover:text-cpPink transition-colors flex items-center gap-2"
+            className="text-sm text-muted-foreground dark:text-cpCream/70 hover:text-cpCoral transition-colors flex items-center gap-2"
           >
             <ChevronRight className="h-3 w-3" />
             {link.label}
@@ -342,7 +342,7 @@ export function InternalLinksBadges({
         <Link key={`${link.href}-${index}`} href={link.href}>
           <Badge
             variant="outline"
-            className="cursor-pointer hover:bg-cpPink/10 hover:border-cpPink transition-colors"
+            className="cursor-pointer hover:bg-cpCoral/10 hover:border-cpCoral dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpCoral/20 dark:hover:border-cpCoral transition-colors"
           >
             {link.label}
           </Badge>

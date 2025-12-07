@@ -207,11 +207,11 @@ export function CategorySelector({
 
   if (isLoading) {
     return (
-      <Card>
+      <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
         <CardContent className="py-12">
           <div className="flex flex-col items-center justify-center gap-3">
-            <Loader2 className="h-8 w-8 animate-spin text-cpPink" />
-            <p className="text-sm text-slate-500">{t.loading}</p>
+            <Loader2 className="h-8 w-8 animate-spin text-cpCoral" />
+            <p className="text-sm text-muted-foreground dark:text-cpCream/60">{t.loading}</p>
           </div>
         </CardContent>
       </Card>
@@ -219,15 +219,15 @@ export function CategorySelector({
   }
 
   return (
-    <Card>
+    <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2">
-              <Tag className="h-5 w-5 text-cpPink" />
+            <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
+              <Tag className="h-5 w-5 text-cpCoral" />
               {t.title}
             </CardTitle>
-            <CardDescription className="mt-1">{t.description}</CardDescription>
+            <CardDescription className="mt-1 dark:text-cpCream/70">{t.description}</CardDescription>
           </div>
           <Badge
             variant="outline"
@@ -250,14 +250,14 @@ export function CategorySelector({
         {/* Usage indicator */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-slate-600">
+            <span className="text-muted-foreground dark:text-cpCream/70">
               {selectedIds.size} {t.of} {maxCategories} {t.usage}
             </span>
             {atLimit && planKey !== "ELITE" && (
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-cpPink hover:text-cpPink/80 gap-1"
+                className="text-cpCoral hover:text-cpCoral/80 gap-1"
               >
                 <Crown className="h-3 w-3" />
                 {t.upgrade}
@@ -269,7 +269,7 @@ export function CategorySelector({
 
         {/* Category list */}
         {allCategories.length === 0 ? (
-          <div className="text-center py-8 text-slate-500">
+          <div className="text-center py-8 text-muted-foreground dark:text-cpCream/60">
             {t.noCategoriesAvailable}
           </div>
         ) : (
@@ -284,10 +284,10 @@ export function CategorySelector({
                   className={cn(
                     "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors",
                     isSelected
-                      ? "bg-cpPink/10 border-cpPink"
+                      ? "bg-cpCoral/10 dark:bg-cpCoral/20 border-cpCoral"
                       : isDisabled
-                        ? "bg-slate-50 border-slate-200 opacity-50 cursor-not-allowed"
-                        : "hover:bg-slate-50 border-slate-200"
+                        ? "bg-muted dark:bg-cpSurface border-border dark:border-cpAmber/20 opacity-50 cursor-not-allowed"
+                        : "hover:bg-muted dark:hover:bg-cpSurface/50 border-border dark:border-cpAmber/30"
                   )}
                   onClick={() => !isDisabled && toggleCategory(category.id)}
                 >
@@ -295,8 +295,8 @@ export function CategorySelector({
                     className={cn(
                       "flex items-center justify-center w-5 h-5 rounded border transition-colors",
                       isSelected
-                        ? "bg-cpPink border-cpPink text-white"
-                        : "border-slate-300"
+                        ? "bg-cpCoral border-cpCoral text-white"
+                        : "border-muted-foreground/40 dark:border-cpCream/40"
                     )}
                   >
                     {isSelected && <Check className="h-3 w-3" />}
@@ -304,7 +304,7 @@ export function CategorySelector({
                   <span
                     className={cn(
                       "text-sm font-medium",
-                      isSelected ? "text-cpDark" : "text-slate-700"
+                      isSelected ? "text-foreground dark:text-cpCream" : "text-foreground/80 dark:text-cpCream/80"
                     )}
                   >
                     {category.labelKey}
@@ -324,8 +324,8 @@ export function CategorySelector({
         )}
 
         {/* Save button */}
-        <div className="flex items-center justify-between pt-4 border-t">
-          <p className="text-sm text-slate-500">
+        <div className="flex items-center justify-between pt-4 border-t border-border dark:border-cpAmber/20">
+          <p className="text-sm text-muted-foreground dark:text-cpCream/60">
             {t.planLimit} {maxCategories}{" "}
             {maxCategories === 1 ? t.category : t.categories}
           </p>
@@ -336,7 +336,7 @@ export function CategorySelector({
               "min-w-[140px]",
               saveStatus === "saved"
                 ? "bg-green-600 hover:bg-green-600"
-                : "bg-cpPink hover:bg-cpPink/90"
+                : "bg-cpCoral hover:bg-cpCoral/90"
             )}
           >
             {saveStatus === "saving" ? (

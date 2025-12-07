@@ -38,6 +38,13 @@ function getSitemapSections(): SitemapSection[] {
       lastmod: today,
     },
 
+    // Geographic hierarchy - Provinces
+    {
+      id: "provinces",
+      path: "/sitemap-provinces.xml",
+      lastmod: today,
+    },
+
     // Geographic hierarchy - Cities
     {
       id: "cities",

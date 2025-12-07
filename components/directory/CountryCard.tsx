@@ -9,27 +9,27 @@ interface CountryCardProps {
 
 /**
  * Modern country card with subtle gradient and hover effects.
- * Inspired by postforge.ai and seogrove.ai design patterns.
+ * Uses cozy theme colors (cpCoral, cpAmber, cpCream, cpCharcoal).
  */
 export function CountryCard({ href, code, name }: CountryCardProps) {
   return (
     <Link href={href} className="group block">
-      <div className="relative rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50 p-4 transition-all duration-300 hover:shadow-lg hover:shadow-cpAqua/10 hover:-translate-y-1 hover:border-cpAqua/30 overflow-hidden">
+      <div className="relative rounded-2xl bg-card dark:bg-cpSurface/50 border border-border dark:border-cpAmber/20 p-4 transition-all duration-300 hover:shadow-lg hover:shadow-cpCoral/10 hover:-translate-y-1 hover:border-cpCoral/30 dark:hover:border-cpAmber/40 overflow-hidden">
         {/* Gradient overlay on hover */}
-        <div className="absolute inset-0 bg-gradient-to-br from-cpAqua/5 to-cpPink/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-br from-cpCoral/5 to-cpAmber/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
         {/* Content */}
         <div className="relative flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             {/* Flag with gradient background */}
-            <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-cpAqua/10 to-cpAqua/5 group-hover:scale-110 transition-transform duration-300">
+            <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-cpCoral/10 to-cpAmber/5 group-hover:scale-110 transition-transform duration-300">
               <span className="text-xl">{getCountryFlag(code)}</span>
             </div>
-            <span className="font-semibold text-foreground group-hover:text-cpAqua transition-colors">
+            <span className="font-semibold text-foreground dark:text-cpCream group-hover:text-cpCoral transition-colors">
               {name}
             </span>
           </div>
-          <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-cpAqua group-hover:translate-x-1 transition-all duration-300" aria-hidden="true" />
+          <ChevronRight className="h-4 w-4 text-muted-foreground dark:text-cpCream/60 group-hover:text-cpCoral group-hover:translate-x-1 transition-all duration-300" aria-hidden="true" />
         </div>
       </div>
     </Link>

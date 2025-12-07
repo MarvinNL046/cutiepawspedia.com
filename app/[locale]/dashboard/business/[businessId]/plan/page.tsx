@@ -66,7 +66,7 @@ function getBadgeColor(planKey: string) {
     case "ELITE":
       return "bg-gradient-to-r from-purple-500 to-purple-400 text-white";
     default:
-      return "bg-slate-100 text-slate-600";
+      return "bg-muted text-muted-foreground dark:bg-cpSurface dark:text-cpCream/70";
   }
 }
 
@@ -256,12 +256,12 @@ export default async function PlanPage({ params }: PlanPageProps) {
         </Alert>
 
         {/* Current Plan Card */}
-        <Card className="border-2 border-cpPink/20 bg-gradient-to-br from-cpPink/5 to-white dark:from-cpPink/10 dark:to-slate-800">
+        <Card className="border-2 border-cpCoral/20 bg-gradient-to-br from-cpCoral/5 to-white dark:from-cpCoral/10 dark:to-cpSurface">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-cpPink/10 flex items-center justify-center">
-                  <PlanIcon planKey={currentPlanKey} className="h-6 w-6 text-cpPink" />
+                <div className="w-12 h-12 rounded-xl bg-cpCoral/10 dark:bg-cpCoral/20 flex items-center justify-center">
+                  <PlanIcon planKey={currentPlanKey} className="h-6 w-6 text-cpCoral" />
                 </div>
                 <div>
                   <CardTitle className="text-xl">
@@ -280,11 +280,11 @@ export default async function PlanPage({ params }: PlanPageProps) {
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-3xl font-bold text-cpDark dark:text-white">
+                <div className="text-3xl font-bold text-foreground dark:text-cpCream">
                   {formatPlanPrice(currentPlan.monthlyPriceCents, locale)}
                 </div>
                 {currentPlan.monthlyPriceCents > 0 && (
-                  <span className="text-slate-500">{t.perMonth}</span>
+                  <span className="text-muted-foreground dark:text-cpCream/60">{t.perMonth}</span>
                 )}
               </div>
             </div>
@@ -294,13 +294,13 @@ export default async function PlanPage({ params }: PlanPageProps) {
             {(business.planValidUntil || business.trialEndsAt) && (
               <div className="flex gap-4 mb-4 text-sm">
                 {business.planValidUntil && (
-                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                  <div className="flex items-center gap-2 text-muted-foreground dark:text-cpCream/70">
                     <Calendar className="h-4 w-4" />
                     {t.planValidUntil}: {new Date(business.planValidUntil).toLocaleDateString(locale)}
                   </div>
                 )}
                 {business.trialEndsAt && (
-                  <div className="flex items-center gap-2 text-amber-600">
+                  <div className="flex items-center gap-2 text-cpAmber">
                     <Calendar className="h-4 w-4" />
                     {t.trialEndsAt}: {new Date(business.trialEndsAt).toLocaleDateString(locale)}
                   </div>
@@ -311,13 +311,13 @@ export default async function PlanPage({ params }: PlanPageProps) {
             {/* Current plan features */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Photos */}
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-white dark:bg-slate-800 border">
-                <Camera className={`h-5 w-5 ${currentPlan.features.maxPhotos > 0 ? "text-cpPink" : "text-slate-300"}`} />
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-card dark:bg-cpSurface/50 border border-border dark:border-cpAmber/20">
+                <Camera className={`h-5 w-5 ${currentPlan.features.maxPhotos > 0 ? "text-cpCoral" : "text-muted-foreground/50"}`} />
                 <div>
-                  <p className="text-sm font-medium text-cpDark dark:text-white">
+                  <p className="text-sm font-medium text-foreground dark:text-cpCream">
                     {t.featureLabels.photos}
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground dark:text-cpCream/60">
                     {currentPlan.features.maxPhotos === 0
                       ? "0"
                       : currentPlan.features.maxPhotos
@@ -327,87 +327,87 @@ export default async function PlanPage({ params }: PlanPageProps) {
               </div>
 
               {/* Website */}
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-white dark:bg-slate-800 border">
-                <Globe className={`h-5 w-5 ${currentPlan.features.canShowWebsite ? "text-cpPink" : "text-slate-300"}`} />
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-card dark:bg-cpSurface/50 border border-border dark:border-cpAmber/20">
+                <Globe className={`h-5 w-5 ${currentPlan.features.canShowWebsite ? "text-cpCoral" : "text-muted-foreground/50"}`} />
                 <div>
-                  <p className="text-sm font-medium text-cpDark dark:text-white">
+                  <p className="text-sm font-medium text-foreground dark:text-cpCream">
                     {t.featureLabels.website}
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground dark:text-cpCream/60">
                     {currentPlan.features.canShowWebsite ? <Check className="h-3 w-3 inline text-green-500" /> : <X className="h-3 w-3 inline text-red-400" />}
                   </p>
                 </div>
               </div>
 
               {/* Contact */}
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-white dark:bg-slate-800 border">
-                <Phone className={`h-5 w-5 ${currentPlan.features.canShowPhone ? "text-cpPink" : "text-slate-300"}`} />
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-card dark:bg-cpSurface/50 border border-border dark:border-cpAmber/20">
+                <Phone className={`h-5 w-5 ${currentPlan.features.canShowPhone ? "text-cpCoral" : "text-muted-foreground/50"}`} />
                 <div>
-                  <p className="text-sm font-medium text-cpDark dark:text-white">
+                  <p className="text-sm font-medium text-foreground dark:text-cpCream">
                     {t.featureLabels.contact}
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground dark:text-cpCream/60">
                     {currentPlan.features.canShowPhone ? <Check className="h-3 w-3 inline text-green-500" /> : <X className="h-3 w-3 inline text-red-400" />}
                   </p>
                 </div>
               </div>
 
               {/* Categories */}
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-white dark:bg-slate-800 border">
-                <Check className="h-5 w-5 text-cpPink" />
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-card dark:bg-cpSurface/50 border border-border dark:border-cpAmber/20">
+                <Check className="h-5 w-5 text-cpCoral" />
                 <div>
-                  <p className="text-sm font-medium text-cpDark dark:text-white">
+                  <p className="text-sm font-medium text-foreground dark:text-cpCream">
                     {t.featureLabels.categories}
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground dark:text-cpCream/60">
                     {currentPlan.features.maxCategories}
                   </p>
                 </div>
               </div>
 
               {/* Search Priority */}
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-white dark:bg-slate-800 border">
-                <TrendingUp className={`h-5 w-5 ${currentPlan.features.priorityRank > 1 ? "text-cpPink" : "text-slate-300"}`} />
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-card dark:bg-cpSurface/50 border border-border dark:border-cpAmber/20">
+                <TrendingUp className={`h-5 w-5 ${currentPlan.features.priorityRank > 1 ? "text-cpCoral" : "text-muted-foreground/50"}`} />
                 <div>
-                  <p className="text-sm font-medium text-cpDark dark:text-white">
+                  <p className="text-sm font-medium text-foreground dark:text-cpCream">
                     {t.featureLabels.searchPriority}
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground dark:text-cpCream/60">
                     {getPriorityLabel(currentPlan.features.priorityRank)}
                   </p>
                 </div>
               </div>
 
               {/* Analytics */}
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-white dark:bg-slate-800 border">
-                <BarChart3 className={`h-5 w-5 ${currentPlan.features.hasBasicAnalytics ? "text-cpPink" : "text-slate-300"}`} />
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-card dark:bg-cpSurface/50 border border-border dark:border-cpAmber/20">
+                <BarChart3 className={`h-5 w-5 ${currentPlan.features.hasBasicAnalytics ? "text-cpCoral" : "text-muted-foreground/50"}`} />
                 <div>
-                  <p className="text-sm font-medium text-cpDark dark:text-white">
+                  <p className="text-sm font-medium text-foreground dark:text-cpCream">
                     {currentPlan.features.hasAdvancedAnalytics
                       ? t.featureLabels.advancedAnalytics
                       : t.featureLabels.basicAnalytics
                     }
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground dark:text-cpCream/60">
                     {currentPlan.features.hasBasicAnalytics ? <Check className="h-3 w-3 inline text-green-500" /> : <X className="h-3 w-3 inline text-red-400" />}
                   </p>
                 </div>
               </div>
 
               {/* Locations */}
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-white dark:bg-slate-800 border">
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-card dark:bg-cpSurface/50 border border-border dark:border-cpAmber/20">
                 <Building2 className={`h-5 w-5 ${
                   currentPlan.features.maxLocations === 0
                     ? "text-purple-500"
                     : currentPlan.features.maxLocations > 1
-                      ? "text-cpPink"
-                      : "text-slate-400"
+                      ? "text-cpCoral"
+                      : "text-muted-foreground/50"
                 }`} />
                 <div>
-                  <p className="text-sm font-medium text-cpDark dark:text-white">
+                  <p className="text-sm font-medium text-foreground dark:text-cpCream">
                     {t.featureLabels.locations}
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground dark:text-cpCream/60">
                     {currentPlan.features.maxLocations === 0
                       ? t.unlimited
                       : currentPlan.features.maxLocations
@@ -419,7 +419,7 @@ export default async function PlanPage({ params }: PlanPageProps) {
 
             {/* Manage Subscription Button - only show if has active subscription */}
             {business.stripeSubscriptionId && (
-              <div className="mt-6 pt-4 border-t">
+              <div className="mt-6 pt-4 border-t border-border dark:border-cpAmber/20">
                 <ManageSubscriptionButton
                   businessId={businessIdNum}
                   locale={locale}
@@ -446,7 +446,7 @@ export default async function PlanPage({ params }: PlanPageProps) {
 
         {/* Available Plans */}
         <div>
-          <h2 className="text-xl font-bold text-cpDark dark:text-white mb-4">{t.availablePlans}</h2>
+          <h2 className="text-xl font-bold text-foreground dark:text-cpCream mb-4">{t.availablePlans}</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {allPlans.map((plan) => {
               const isCurrent = plan.key === currentPlanKey;
@@ -455,17 +455,17 @@ export default async function PlanPage({ params }: PlanPageProps) {
               return (
                 <Card
                   key={plan.key}
-                  className={`relative ${
+                  className={`relative bg-card dark:bg-cpSurface/50 ${
                     isCurrent
-                      ? "border-cpPink border-2 bg-cpPink/5"
+                      ? "border-cpCoral border-2 bg-cpCoral/5 dark:bg-cpCoral/10"
                       : plan.isPopular
-                        ? "border-amber-300 border-2"
-                        : ""
+                        ? "border-cpAmber border-2"
+                        : "border-border dark:border-cpAmber/20"
                   }`}
                 >
                   {/* Popular badge */}
                   {plan.isPopular && !isCurrent && (
-                    <Badge className="absolute -top-2 left-1/2 -translate-x-1/2 bg-amber-500">
+                    <Badge className="absolute -top-2 left-1/2 -translate-x-1/2 bg-cpAmber text-cpCharcoal">
                       <Star className="h-3 w-3 mr-1" />
                       Popular
                     </Badge>
@@ -473,7 +473,7 @@ export default async function PlanPage({ params }: PlanPageProps) {
 
                   {/* Current badge */}
                   {isCurrent && (
-                    <Badge className="absolute -top-2 left-1/2 -translate-x-1/2 bg-cpPink">
+                    <Badge className="absolute -top-2 left-1/2 -translate-x-1/2 bg-cpCoral">
                       <Check className="h-3 w-3 mr-1" />
                       {t.current}
                     </Badge>
@@ -481,20 +481,20 @@ export default async function PlanPage({ params }: PlanPageProps) {
 
                   <CardHeader className="pb-2">
                     <div className="flex items-center gap-2">
-                      <PlanIcon planKey={plan.key} className={`h-5 w-5 ${isCurrent ? "text-cpPink" : "text-slate-400"}`} />
-                      <CardTitle className="text-lg">
+                      <PlanIcon planKey={plan.key} className={`h-5 w-5 ${isCurrent ? "text-cpCoral" : "text-muted-foreground dark:text-cpCream/50"}`} />
+                      <CardTitle className="text-lg text-foreground dark:text-cpCream">
                         {isNl ? plan.nameNl : plan.name}
                       </CardTitle>
                     </div>
-                    <CardDescription className="text-xs min-h-[32px]">
+                    <CardDescription className="text-xs min-h-[32px] dark:text-cpCream/60">
                       {isNl ? plan.descriptionNl : plan.description}
                     </CardDescription>
                     <div className="mt-2">
-                      <span className="text-2xl font-bold text-cpDark dark:text-white">
+                      <span className="text-2xl font-bold text-foreground dark:text-cpCream">
                         {formatPlanPrice(plan.monthlyPriceCents, locale)}
                       </span>
                       {plan.monthlyPriceCents > 0 && (
-                        <span className="text-slate-500 text-sm">{t.perMonth}</span>
+                        <span className="text-muted-foreground dark:text-cpCream/60 text-sm">{t.perMonth}</span>
                       )}
                     </div>
                     {plan.yearlyPriceCents && (
@@ -507,8 +507,8 @@ export default async function PlanPage({ params }: PlanPageProps) {
                     {/* Key features list */}
                     <ul className="space-y-2 text-sm mb-4">
                       <li className="flex items-center gap-2">
-                        <Camera className={`h-4 w-4 ${plan.features.maxPhotos > 0 ? "text-cpPink" : "text-slate-300"}`} />
-                        <span className={plan.features.maxPhotos > 0 ? "" : "text-slate-400"}>
+                        <Camera className={`h-4 w-4 ${plan.features.maxPhotos > 0 ? "text-cpCoral" : "text-muted-foreground/50"}`} />
+                        <span className={plan.features.maxPhotos > 0 ? "text-foreground dark:text-cpCream" : "text-muted-foreground dark:text-cpCream/50"}>
                           {plan.features.maxPhotos} {isNl ? "foto's" : "photos"}
                         </span>
                       </li>
@@ -516,9 +516,9 @@ export default async function PlanPage({ params }: PlanPageProps) {
                         {plan.features.canShowWebsite ? (
                           <Check className="h-4 w-4 text-green-500" />
                         ) : (
-                          <X className="h-4 w-4 text-slate-300" />
+                          <X className="h-4 w-4 text-muted-foreground/50" />
                         )}
-                        <span className={plan.features.canShowWebsite ? "" : "text-slate-400"}>
+                        <span className={plan.features.canShowWebsite ? "text-foreground dark:text-cpCream" : "text-muted-foreground dark:text-cpCream/50"}>
                           {t.featureLabels.website}
                         </span>
                       </li>
@@ -526,9 +526,9 @@ export default async function PlanPage({ params }: PlanPageProps) {
                         {plan.features.hasBasicAnalytics ? (
                           <Check className="h-4 w-4 text-green-500" />
                         ) : (
-                          <X className="h-4 w-4 text-slate-300" />
+                          <X className="h-4 w-4 text-muted-foreground/50" />
                         )}
-                        <span className={plan.features.hasBasicAnalytics ? "" : "text-slate-400"}>
+                        <span className={plan.features.hasBasicAnalytics ? "text-foreground dark:text-cpCream" : "text-muted-foreground dark:text-cpCream/50"}>
                           {plan.features.hasAdvancedAnalytics
                             ? t.featureLabels.advancedAnalytics
                             : t.featureLabels.basicAnalytics
@@ -537,8 +537,8 @@ export default async function PlanPage({ params }: PlanPageProps) {
                       </li>
                       {plan.features.hasFeaturedStyling && (
                         <li className="flex items-center gap-2">
-                          <Crown className="h-4 w-4 text-amber-500" />
-                          <span className="font-medium">{t.featureLabels.featuredStyling}</span>
+                          <Crown className="h-4 w-4 text-cpAmber" />
+                          <span className="font-medium text-foreground dark:text-cpCream">{t.featureLabels.featuredStyling}</span>
                         </li>
                       )}
                       {/* Locations */}
@@ -547,15 +547,15 @@ export default async function PlanPage({ params }: PlanPageProps) {
                           plan.features.maxLocations === 0
                             ? "text-purple-500"
                             : plan.features.maxLocations > 1
-                              ? "text-cpPink"
-                              : "text-slate-400"
+                              ? "text-cpCoral"
+                              : "text-muted-foreground/50"
                         }`} />
                         <span className={
                           plan.features.maxLocations === 0
-                            ? "font-medium text-purple-600"
+                            ? "font-medium text-purple-600 dark:text-purple-400"
                             : plan.features.maxLocations > 1
-                              ? "font-medium"
-                              : "text-slate-500"
+                              ? "font-medium text-foreground dark:text-cpCream"
+                              : "text-muted-foreground dark:text-cpCream/50"
                         }>
                           {plan.features.maxLocations === 0
                             ? (isNl ? "Onbeperkt locaties" : "Unlimited locations")
@@ -591,7 +591,7 @@ export default async function PlanPage({ params }: PlanPageProps) {
 
         {/* Link to public pricing page */}
         <div className="text-center">
-          <Link href={`/${locale}/for-businesses`} className="text-cpPink hover:underline text-sm">
+          <Link href={`/${locale}/for-businesses`} className="text-cpCoral hover:underline text-sm">
             {isNl ? "Bekijk volledige prijsvergelijking" : "View full pricing comparison"}
             <ExternalLink className="h-3 w-3 inline ml-1" />
           </Link>

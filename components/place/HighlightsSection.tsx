@@ -18,18 +18,18 @@ export function HighlightsSection({
   if (highlights.length === 0) return null;
 
   return (
-    <section className="mt-6 p-4 bg-gradient-to-br from-cpPink/5 to-cpAqua/5 rounded-xl">
-      <h3 className="text-sm font-semibold text-slate-900 mb-3 flex items-center gap-2">
-        <Sparkles className="h-4 w-4 text-cpYellow" />
+    <section className="mt-6 p-4 bg-gradient-to-br from-cpCoral/5 to-cpAmber/5 dark:from-cpCoral/10 dark:to-cpAmber/10 rounded-xl border border-cpCoral/10 dark:border-cpAmber/20">
+      <h3 className="text-sm font-semibold text-foreground dark:text-cpCream mb-3 flex items-center gap-2">
+        <Sparkles className="h-4 w-4 text-cpAmber" />
         {locale === "nl" ? "Waarom mensen kiezen voor dit bedrijf" : "Why people choose this place"}
       </h3>
       <ul className="space-y-2">
         {highlights.map((highlight, index) => (
           <li
             key={index}
-            className="flex items-start gap-2 text-sm text-slate-600"
+            className="flex items-start gap-2 text-sm text-muted-foreground dark:text-cpCream/70"
           >
-            <span className="text-cpPink font-medium shrink-0">
+            <span className="text-cpCoral font-medium shrink-0">
               {index + 1}.
             </span>
             <span>{highlight}</span>

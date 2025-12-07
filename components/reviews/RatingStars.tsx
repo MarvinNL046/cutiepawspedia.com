@@ -87,11 +87,11 @@ export function RatingStars({
                   starSize,
                   "transition-colors",
                   isFilled
-                    ? "text-yellow-500 fill-yellow-500"
+                    ? "text-cpAmber fill-cpAmber"
                     : isHalf
-                      ? "text-yellow-500 fill-yellow-500/50"
-                      : "text-gray-300",
-                  interactive && hoverRating && starIndex <= hoverRating && "text-yellow-400 fill-yellow-400"
+                      ? "text-cpAmber fill-cpAmber/50"
+                      : "text-gray-300 dark:text-cpCream/30",
+                  interactive && hoverRating && starIndex <= hoverRating && "text-cpAmber fill-cpAmber"
                 )}
               />
             </button>
@@ -133,7 +133,7 @@ export function RatingBadge({
     <div className={cn("flex items-center gap-1", className)}>
       <Star
         className={cn(
-          "text-yellow-500 fill-yellow-500",
+          "text-cpAmber fill-cpAmber",
           size === "sm" ? "h-3 w-3" : "h-4 w-4"
         )}
       />

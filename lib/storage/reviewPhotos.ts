@@ -3,31 +3,18 @@
  *
  * Specialized utilities for handling review photo uploads.
  * Includes validation, key generation, and image processing stubs.
+ *
+ * NOTE: For client components, import REVIEW_PHOTO_CONFIG from
+ * "@/lib/storage/reviewPhotosConfig" instead to avoid Node.js dependencies.
  */
 
 import { v4 as uuidv4 } from "uuid";
 import { getStorage } from "./index";
 import type { UploadResult } from "./types";
+import { REVIEW_PHOTO_CONFIG } from "./reviewPhotosConfig";
 
-// ============================================================================
-// CONSTANTS
-// ============================================================================
-
-export const REVIEW_PHOTO_CONFIG = {
-  // Maximum file size in bytes (5MB)
-  MAX_FILE_SIZE: 5 * 1024 * 1024,
-  // Maximum photos per review
-  MAX_PHOTOS_PER_REVIEW: 5,
-  // Allowed MIME types
-  ALLOWED_MIME_TYPES: ["image/jpeg", "image/png", "image/webp"] as const,
-  // Maximum dimensions (will be resized if larger)
-  MAX_WIDTH: 1920,
-  MAX_HEIGHT: 1920,
-  // JPEG quality for compression
-  JPEG_QUALITY: 85,
-  // Storage path prefix
-  STORAGE_PREFIX: "review_photos",
-} as const;
+// Re-export config for backwards compatibility
+export { REVIEW_PHOTO_CONFIG } from "./reviewPhotosConfig";
 
 // ============================================================================
 // TYPES

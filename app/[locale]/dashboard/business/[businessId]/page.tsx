@@ -170,10 +170,10 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
 
       <div className="flex-1 overflow-auto p-6 space-y-6">
         {/* Business Profile Card */}
-        <Card>
+        <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-cpPink" />
+            <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
+              <Building2 className="h-5 w-5 text-cpCoral" />
               {t.profile}
             </CardTitle>
           </CardHeader>
@@ -188,8 +188,8 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
                     className="w-20 h-20 rounded-xl object-cover"
                   />
                 ) : (
-                  <div className="w-20 h-20 rounded-xl bg-cpPink/10 flex items-center justify-center">
-                    <Building2 className="h-10 w-10 text-cpPink" />
+                  <div className="w-20 h-20 rounded-xl bg-cpCoral/10 flex items-center justify-center">
+                    <Building2 className="h-10 w-10 text-cpCoral" />
                   </div>
                 )}
               </div>
@@ -197,16 +197,16 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
               {/* Info */}
               <div className="flex-1 space-y-3">
                 <div>
-                  <h3 className="text-xl font-bold text-cpDark">{business.name}</h3>
+                  <h3 className="text-xl font-bold text-foreground dark:text-cpCream">{business.name}</h3>
                   <div className="flex items-center gap-2 mt-1">
                     <Badge
                       variant="outline"
                       className={
                         (business.planKey as PlanKey) === "PRO"
-                          ? "bg-amber-50 text-amber-700 border-amber-300"
+                          ? "bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-700"
                           : (business.planKey as PlanKey) === "STARTER"
-                            ? "bg-blue-50 text-blue-700 border-blue-300"
-                            : ""
+                            ? "bg-blue-50 text-blue-700 border-blue-300 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700"
+                            : "dark:border-cpAmber/30 dark:text-cpCream/80"
                       }
                     >
                       {getPlan((business.planKey as PlanKey) || "FREE").name}
@@ -214,8 +214,8 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
                     <Badge
                       className={
                         business.status === "active"
-                          ? "bg-cpAqua/20 text-cpAqua border-cpAqua"
-                          : "bg-slate-100 text-slate-600"
+                          ? "bg-cpCoral/10 text-cpCoral border-cpCoral/30"
+                          : "bg-muted text-muted-foreground dark:bg-cpSurface dark:text-cpCream/60"
                       }
                     >
                       {business.status}
@@ -225,27 +225,27 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
 
                 <div className="grid md:grid-cols-3 gap-4 text-sm">
                   {business.website && (
-                    <div className="flex items-center gap-2 text-slate-600">
-                      <Globe className="h-4 w-4 text-cpPink" />
+                    <div className="flex items-center gap-2 text-muted-foreground dark:text-cpCream/70">
+                      <Globe className="h-4 w-4 text-cpCoral" />
                       <a
                         href={business.website}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hover:text-cpPink truncate"
+                        className="hover:text-cpCoral truncate"
                       >
                         {business.website.replace(/^https?:\/\//, "")}
                       </a>
                     </div>
                   )}
                   {business.contactEmail && (
-                    <div className="flex items-center gap-2 text-slate-600">
-                      <Mail className="h-4 w-4 text-cpPink" />
+                    <div className="flex items-center gap-2 text-muted-foreground dark:text-cpCream/70">
+                      <Mail className="h-4 w-4 text-cpCoral" />
                       <span className="truncate">{business.contactEmail}</span>
                     </div>
                   )}
                   {business.contactPhone && (
-                    <div className="flex items-center gap-2 text-slate-600">
-                      <Phone className="h-4 w-4 text-cpPink" />
+                    <div className="flex items-center gap-2 text-muted-foreground dark:text-cpCream/70">
+                      <Phone className="h-4 w-4 text-cpCoral" />
                       <span>{business.contactPhone}</span>
                     </div>
                   )}
@@ -258,73 +258,73 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
         {/* Stats Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Places */}
-          <Card>
+          <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">
+              <CardTitle className="text-sm font-medium text-muted-foreground dark:text-cpCream/70">
                 {t.places}
               </CardTitle>
-              <Building2 className="h-4 w-4 text-cpAqua" />
+              <Building2 className="h-4 w-4 text-cpCoral" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-cpDark">{stats.totalListings}</div>
-              <p className="text-xs text-slate-500">{t.placesDesc}</p>
+              <div className="text-3xl font-bold text-foreground dark:text-cpCream">{stats.totalListings}</div>
+              <p className="text-xs text-muted-foreground dark:text-cpCream/60">{t.placesDesc}</p>
             </CardContent>
           </Card>
 
           {/* Leads */}
-          <Card>
+          <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">
+              <CardTitle className="text-sm font-medium text-muted-foreground dark:text-cpCream/70">
                 {t.leads}
               </CardTitle>
-              <MessageSquare className="h-4 w-4 text-cpPink" />
+              <MessageSquare className="h-4 w-4 text-cpCoral" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-cpDark">{stats.totalLeads}</div>
-              <p className="text-xs text-slate-500">
+              <div className="text-3xl font-bold text-foreground dark:text-cpCream">{stats.totalLeads}</div>
+              <p className="text-xs text-muted-foreground dark:text-cpCream/60">
                 {stats.leadsLast30Days} {t.leadsLast30.toLowerCase()}
               </p>
             </CardContent>
           </Card>
 
           {/* Plan */}
-          <Card>
+          <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">
+              <CardTitle className="text-sm font-medium text-muted-foreground dark:text-cpCream/70">
                 {t.plan}
               </CardTitle>
-              <Crown className="h-4 w-4 text-cpYellow" />
+              <Crown className="h-4 w-4 text-cpAmber" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-cpDark">
+              <div className="text-3xl font-bold text-foreground dark:text-cpCream">
                 {getPlan((business.planKey as PlanKey) || "FREE").name}
               </div>
-              <p className="text-xs text-slate-500">{t.planDesc}</p>
+              <p className="text-xs text-muted-foreground dark:text-cpCream/60">{t.planDesc}</p>
             </CardContent>
           </Card>
 
           {/* Average Rating */}
-          <Card>
+          <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">
+              <CardTitle className="text-sm font-medium text-muted-foreground dark:text-cpCream/70">
                 {t.avgRating}
               </CardTitle>
-              <Star className="h-4 w-4 text-cpYellow" />
+              <Star className="h-4 w-4 text-cpAmber" />
             </CardHeader>
             <CardContent>
               {stats.avgRating > 0 ? (
                 <>
-                  <div className="text-3xl font-bold text-cpDark">
+                  <div className="text-3xl font-bold text-foreground dark:text-cpCream">
                     {stats.avgRating.toFixed(1)}
                   </div>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground dark:text-cpCream/60">
                     {stats.totalReviews} reviews
                   </p>
                 </>
               ) : (
                 <>
-                  <div className="text-xl font-bold text-slate-400">-</div>
-                  <p className="text-xs text-slate-500">{t.noRating}</p>
+                  <div className="text-xl font-bold text-muted-foreground dark:text-cpCream/50">-</div>
+                  <p className="text-xs text-muted-foreground dark:text-cpCream/60">{t.noRating}</p>
                 </>
               )}
             </CardContent>
@@ -332,40 +332,40 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
         </div>
 
         {/* Analytics Section - Plan Gated */}
-        <Card>
+        <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-cpPink" />
+            <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
+              <BarChart3 className="h-5 w-5 text-cpCoral" />
               {t.analytics}
             </CardTitle>
-            <CardDescription>{t.analyticsDesc}</CardDescription>
+            <CardDescription className="dark:text-cpCream/70">{t.analyticsDesc}</CardDescription>
           </CardHeader>
           <CardContent>
             {planFeatures.hasBasicAnalytics ? (
               <div className="space-y-4">
                 {/* Basic Analytics - Available for STARTER+ */}
                 <div className="grid md:grid-cols-2 gap-4">
-                  <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50">
-                    <div className="flex items-center gap-2 text-sm text-slate-600 mb-1">
+                  <div className="p-4 rounded-lg bg-muted dark:bg-cpSurface">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-cpCream/70 mb-1">
                       <TrendingUp className="h-4 w-4" />
                       {t.viewsThisMonth}
                     </div>
-                    <div className="text-2xl font-bold text-cpDark">
+                    <div className="text-2xl font-bold text-foreground dark:text-cpCream">
                       {analytics.thisMonthViews}
                     </div>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-muted-foreground dark:text-cpCream/60">
                       {viewsChange >= 0 ? "+" : ""}{viewsChange}% vs last month
                     </p>
                   </div>
-                  <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50">
-                    <div className="flex items-center gap-2 text-sm text-slate-600 mb-1">
+                  <div className="p-4 rounded-lg bg-muted dark:bg-cpSurface">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-cpCream/70 mb-1">
                       <MessageSquare className="h-4 w-4" />
                       {t.conversionRate}
                     </div>
-                    <div className="text-2xl font-bold text-cpDark">
+                    <div className="text-2xl font-bold text-foreground dark:text-cpCream">
                       {conversionRate}%
                     </div>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-muted-foreground dark:text-cpCream/60">
                       {analytics.thisMonthLeads} leads / {analytics.thisMonthViews} views
                     </p>
                   </div>
@@ -395,12 +395,12 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
 
                 {/* Advanced Analytics Content for PRO/ELITE */}
                 {planFeatures.hasAdvancedAnalytics && (
-                  <div className="p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <div className="p-4 rounded-lg border border-border dark:border-cpAmber/20">
                     <div className="flex items-center gap-2 mb-3">
-                      <Badge className="bg-cpPink/20 text-cpPink border-cpPink">PRO</Badge>
-                      <span className="font-medium text-cpDark">{t.advancedAnalytics}</span>
+                      <Badge className="bg-cpCoral/10 text-cpCoral border-cpCoral/30">PRO</Badge>
+                      <span className="font-medium text-foreground dark:text-cpCream">{t.advancedAnalytics}</span>
                     </div>
-                    <p className="text-sm text-slate-600">
+                    <p className="text-sm text-muted-foreground dark:text-cpCream/70">
                       {locale === "nl"
                         ? "Gedetailleerde analytics komen binnenkort beschikbaar."
                         : locale === "de"
@@ -412,19 +412,19 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
               </div>
             ) : (
               /* Locked State for FREE tier */
-              <div className="p-6 rounded-lg bg-gradient-to-r from-slate-50 to-slate-100/50 dark:from-slate-800/50 dark:to-slate-800/30 border border-slate-200 dark:border-slate-700">
+              <div className="p-6 rounded-lg bg-gradient-to-r from-muted to-muted/50 dark:from-cpSurface dark:to-cpSurface/50 border border-border dark:border-cpAmber/20">
                 <div className="flex flex-col items-center text-center">
-                  <div className="p-3 rounded-full bg-slate-200 dark:bg-slate-700 mb-4">
-                    <Lock className="h-6 w-6 text-slate-500" />
+                  <div className="p-3 rounded-full bg-muted dark:bg-cpSurface mb-4">
+                    <Lock className="h-6 w-6 text-muted-foreground dark:text-cpCream/60" />
                   </div>
-                  <h3 className="font-semibold text-cpDark dark:text-white mb-1">
+                  <h3 className="font-semibold text-foreground dark:text-cpCream mb-1">
                     {t.analytics}
                   </h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 max-w-sm">
+                  <p className="text-sm text-muted-foreground dark:text-cpCream/70 mb-4 max-w-sm">
                     {t.upgradeForAnalytics}
                   </p>
                   <Link href={`/${locale}/dashboard/business/${businessId}/plan`}>
-                    <Button className="bg-cpPink hover:bg-cpPink/90 gap-2">
+                    <Button className="bg-cpCoral hover:bg-cpCoral/90 gap-2">
                       <Crown className="h-4 w-4" />
                       {locale === "nl" ? "Upgrade Nu" : locale === "de" ? "Jetzt Upgraden" : "Upgrade Now"}
                     </Button>
@@ -437,19 +437,19 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-3 gap-4">
-          <Card>
+          <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Building2 className="h-5 w-5 text-cpAqua" />
+              <CardTitle className="text-lg flex items-center gap-2 text-foreground dark:text-cpCream">
+                <Building2 className="h-5 w-5 text-cpCoral" />
                 {t.places}
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="dark:text-cpCream/60">
                 {stats.verifiedListings} verified, {stats.premiumListings} premium
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Link href={`/${locale}/dashboard/business/${businessId}/places`}>
-                <Button className="bg-cpAqua hover:bg-cpAqua/90 gap-2">
+                <Button className="bg-cpCoral hover:bg-cpCoral/90 gap-2">
                   {t.viewPlaces}
                   <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -457,19 +457,19 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <MessageSquare className="h-5 w-5 text-cpPink" />
+              <CardTitle className="text-lg flex items-center gap-2 text-foreground dark:text-cpCream">
+                <MessageSquare className="h-5 w-5 text-cpCoral" />
                 {t.leads}
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="dark:text-cpCream/60">
                 {stats.leadsLast7Days} new this week
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Link href={`/${locale}/dashboard/business/${businessId}/leads`}>
-                <Button className="bg-cpPink hover:bg-cpPink/90 gap-2">
+                <Button className="bg-cpCoral hover:bg-cpCoral/90 gap-2">
                   {t.viewLeads}
                   <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -477,19 +477,19 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Crown className="h-5 w-5 text-cpYellow" />
+              <CardTitle className="text-lg flex items-center gap-2 text-foreground dark:text-cpCream">
+                <Crown className="h-5 w-5 text-cpAmber" />
                 {t.plan}
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="dark:text-cpCream/60">
                 {getPlan((business.planKey as PlanKey) || "FREE").name} plan
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Link href={`/${locale}/dashboard/business/${businessId}/plan`}>
-                <Button className="bg-cpYellow hover:bg-cpYellow/90 gap-2">
+                <Button className="bg-cpAmber hover:bg-cpAmber/90 text-cpCharcoal gap-2">
                   {t.managePlan}
                   <ArrowRight className="h-4 w-4" />
                 </Button>

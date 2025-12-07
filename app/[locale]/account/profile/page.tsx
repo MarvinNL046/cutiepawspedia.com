@@ -59,7 +59,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   if (!stackServerApp) {
     return (
       <div className="text-center py-12">
-        <p className="text-slate-600">Authentication not configured.</p>
+        <p className="text-muted-foreground dark:text-cpCream/60">Authentication not configured.</p>
       </div>
     );
   }
@@ -83,7 +83,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   if (!user) {
     return (
       <div className="text-center py-12">
-        <p className="text-slate-600">Unable to load user data.</p>
+        <p className="text-muted-foreground dark:text-cpCream/60">Unable to load user data.</p>
       </div>
     );
   }
@@ -117,11 +117,11 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
       {/* Profile Settings */}
       <div>
         <div className="flex items-center gap-3 mb-6">
-          <User className="h-6 w-6 text-cpPink" />
-          <h1 className="text-2xl font-bold text-cpDark">{text.title}</h1>
+          <User className="h-6 w-6 text-cpCoral" />
+          <h1 className="text-2xl font-bold text-foreground dark:text-cpCream">{text.title}</h1>
         </div>
 
-        <p className="text-slate-600 mb-8">{text.subtitle}</p>
+        <p className="text-muted-foreground dark:text-cpCream/70 mb-8">{text.subtitle}</p>
 
         <ProfileSettingsForm
           profile={{
@@ -139,13 +139,13 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
       </div>
 
       {/* Trust Level & Karma Section */}
-      <Card>
+      <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Star className="h-5 w-5 text-cpPink" />
+          <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
+            <Star className="h-5 w-5 text-cpCoral" />
             {text.trustLevelTitle}
           </CardTitle>
-          <CardDescription>{text.trustLevelSubtitle}</CardDescription>
+          <CardDescription className="dark:text-cpCream/60">{text.trustLevelSubtitle}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-4">
@@ -158,7 +158,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               showProgress
               size="lg"
             />
-            <div className="text-sm text-slate-500">
+            <div className="text-sm text-muted-foreground dark:text-cpCream/60">
               {karmaSummary?.totalKarma ?? 0} {text.karmaPoints}
             </div>
           </div>
@@ -166,23 +166,23 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
       </Card>
 
       {/* Badges Section */}
-      <Card>
+      <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Award className="h-5 w-5 text-cpYellow" />
+          <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
+            <Award className="h-5 w-5 text-cpAmber" />
             {text.badgesTitle}
           </CardTitle>
-          <CardDescription>{text.badgesSubtitle}</CardDescription>
+          <CardDescription className="dark:text-cpCream/60">{text.badgesSubtitle}</CardDescription>
         </CardHeader>
         <CardContent>
           {earnedBadges.length === 0 && unearnedBadges.length === 0 ? (
-            <p className="text-slate-500 text-sm">{text.noBadges}</p>
+            <p className="text-muted-foreground dark:text-cpCream/60 text-sm">{text.noBadges}</p>
           ) : (
             <div className="space-y-6">
               {/* Earned Badges */}
               {earnedBadges.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-medium text-slate-700 mb-3">
+                  <h3 className="text-sm font-medium text-foreground/80 dark:text-cpCream/80 mb-3">
                     {text.earnedBadges} ({earnedBadges.length})
                   </h3>
                   <BadgeDisplay
@@ -196,7 +196,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               {/* Unearned Badges */}
               {unearnedBadges.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-medium text-slate-700 mb-3">
+                  <h3 className="text-sm font-medium text-foreground/80 dark:text-cpCream/80 mb-3">
                     {text.availableBadges} ({unearnedBadges.length})
                   </h3>
                   <BadgeDisplay

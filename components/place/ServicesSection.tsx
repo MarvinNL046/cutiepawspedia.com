@@ -19,7 +19,7 @@ export function ServicesSection({
 
   return (
     <section className="mt-4">
-      <h3 className="text-sm font-semibold text-slate-900 mb-3">
+      <h3 className="text-sm font-semibold text-foreground dark:text-cpCream mb-3">
         {locale === "nl" ? "Diensten & Aanbod" : "Services & Offerings"}
       </h3>
       <div className="flex flex-wrap gap-2">
@@ -27,7 +27,7 @@ export function ServicesSection({
           <Badge
             key={service}
             variant="outline"
-            className="bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+            className="bg-muted dark:bg-cpSurface text-muted-foreground dark:text-cpCream/80 border-border dark:border-cpAmber/30 hover:bg-muted/80 dark:hover:bg-cpSurface/80"
           >
             {service}
           </Badge>

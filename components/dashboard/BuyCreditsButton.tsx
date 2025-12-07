@@ -75,15 +75,15 @@ export function BuyCreditsButton({
           Buy Credits
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md dark:bg-cpSurface dark:border-cpAmber/20">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Coins className="h-5 w-5 text-cpAqua" />
+          <DialogTitle className="flex items-center gap-2 dark:text-cpCream">
+            <Coins className="h-5 w-5 text-cpAmber" />
             Top Up Credits
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="dark:text-cpCream/70">
             Current balance:{" "}
-            <span className="font-semibold text-cpDark">
+            <span className="font-semibold text-foreground dark:text-cpCream">
               {(currentBalance / 100).toFixed(2)}
             </span>
           </DialogDescription>
@@ -95,18 +95,18 @@ export function BuyCreditsButton({
               key={pkg.id}
               onClick={() => handlePurchase(pkg.id)}
               disabled={isLoading}
-              className="flex items-center justify-between p-4 border rounded-lg hover:border-cpAqua hover:bg-cpAqua/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center justify-between p-4 border border-border dark:border-cpAmber/30 rounded-lg hover:border-cpAmber hover:bg-cpAmber/5 dark:hover:bg-cpAmber/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div className="text-left">
-                <p className="font-medium text-cpDark">{pkg.label}</p>
-                <p className="text-sm text-slate-500">
+                <p className="font-medium text-foreground dark:text-cpCream">{pkg.label}</p>
+                <p className="text-sm text-muted-foreground dark:text-cpCream/60">
                   {pkg.credits} credits
                 </p>
               </div>
               {isLoading && selectedPackage === pkg.id ? (
-                <Loader2 className="h-5 w-5 animate-spin text-cpAqua" />
+                <Loader2 className="h-5 w-5 animate-spin text-cpAmber" />
               ) : (
-                <span className="text-cpAqua font-semibold">
+                <span className="text-cpAmber font-semibold">
                   {pkg.label}
                 </span>
               )}
@@ -114,7 +114,7 @@ export function BuyCreditsButton({
           ))}
         </div>
 
-        <p className="text-xs text-slate-400 text-center">
+        <p className="text-xs text-muted-foreground dark:text-cpCream/50 text-center">
           Secure payment via Stripe. Credits never expire.
         </p>
       </DialogContent>

@@ -326,15 +326,15 @@ export function PhotoManager({
   });
 
   return (
-    <Card>
+    <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2">
-              <ImagePlus className="h-5 w-5 text-cpPink" />
+            <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
+              <ImagePlus className="h-5 w-5 text-cpCoral" />
               {t.title}
             </CardTitle>
-            <CardDescription>{t.description}</CardDescription>
+            <CardDescription className="dark:text-cpCream/70">{t.description}</CardDescription>
           </div>
           {canUpload && (
             <div>
@@ -369,20 +369,20 @@ export function PhotoManager({
         {/* Plan limit indicator */}
         <div className="mt-4 space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-slate-600">{t.photoLimit}</span>
-            <span className="font-medium">
+            <span className="text-muted-foreground dark:text-cpCream/70">{t.photoLimit}</span>
+            <span className="font-medium text-foreground dark:text-cpCream">
               {currentCount} / {maxPhotos} {t.photosUsed}
             </span>
           </div>
           <Progress value={percentUsed} className="h-2" />
           {maxPhotos === 0 && (
-            <p className="text-sm text-amber-600 flex items-center gap-1">
+            <p className="text-sm text-cpAmber flex items-center gap-1">
               <AlertCircle className="h-4 w-4" />
               {t.noPhotosAllowed}
             </p>
           )}
           {currentCount >= maxPhotos && maxPhotos > 0 && (
-            <p className="text-sm text-amber-600 flex items-center gap-1">
+            <p className="text-sm text-cpAmber flex items-center gap-1">
               <AlertCircle className="h-4 w-4" />
               {t.upgradeToAdd}
             </p>
@@ -399,8 +399,8 @@ export function PhotoManager({
 
       <CardContent>
         {sortedPhotos.length === 0 ? (
-          <div className="text-center py-12 text-slate-500">
-            <ImagePlus className="h-12 w-12 mx-auto mb-4 text-slate-300" />
+          <div className="text-center py-12 text-muted-foreground dark:text-cpCream/60">
+            <ImagePlus className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50 dark:text-cpCream/40" />
             <p className="font-medium">{t.noPhotos}</p>
             <p className="text-sm">{t.noPhotosDesc}</p>
           </div>
@@ -412,8 +412,8 @@ export function PhotoManager({
                 className={cn(
                   "group relative aspect-square rounded-lg overflow-hidden border-2 transition-all",
                   photo.isPrimary
-                    ? "border-cpPink ring-2 ring-cpPink/20"
-                    : "border-slate-200 hover:border-slate-300"
+                    ? "border-cpCoral ring-2 ring-cpCoral/20"
+                    : "border-border dark:border-cpAmber/30 hover:border-muted-foreground dark:hover:border-cpAmber/50"
                 )}
               >
                 <Image
@@ -426,7 +426,7 @@ export function PhotoManager({
 
                 {/* Primary badge */}
                 {photo.isPrimary && (
-                  <Badge className="absolute top-2 left-2 bg-cpPink text-white gap-1">
+                  <Badge className="absolute top-2 left-2 bg-cpCoral text-white gap-1">
                     <Star className="h-3 w-3 fill-current" />
                     {t.primary}
                   </Badge>
@@ -499,12 +499,12 @@ export function PhotoManager({
 
       {/* Edit alt text dialog */}
       <Dialog open={!!editingPhoto} onOpenChange={() => setEditingPhoto(null)}>
-        <DialogContent>
+        <DialogContent className="dark:bg-cpSurface dark:border-cpAmber/20">
           <DialogHeader>
-            <DialogTitle>{t.editAlt}</DialogTitle>
+            <DialogTitle className="dark:text-cpCream">{t.editAlt}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="aspect-video relative rounded-lg overflow-hidden bg-slate-100">
+            <div className="aspect-video relative rounded-lg overflow-hidden bg-muted dark:bg-cpCharcoal">
               {editingPhoto && (
                 <Image
                   src={editingPhoto.url}
@@ -515,20 +515,21 @@ export function PhotoManager({
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="alt-text">{t.altTextLabel}</Label>
+              <Label htmlFor="alt-text" className="dark:text-cpCream">{t.altTextLabel}</Label>
               <Input
                 id="alt-text"
                 value={altText}
                 onChange={(e) => setAltText(e.target.value)}
                 placeholder={t.altTextPlaceholder}
+                className="dark:bg-cpSurface dark:border-cpAmber/30 dark:text-cpCream"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingPhoto(null)}>
+            <Button variant="outline" onClick={() => setEditingPhoto(null)} className="dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10">
               {t.cancel}
             </Button>
-            <Button onClick={handleSaveAltText}>{t.save}</Button>
+            <Button onClick={handleSaveAltText} className="bg-cpCoral hover:bg-cpCoral/90">{t.save}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -52,7 +52,7 @@ export default async function AdvertisingPage({ params }: AdvertisingPageProps) 
   if (!stackServerApp) {
     return (
       <div className="p-8 text-center">
-        <p className="text-slate-600">Authentication not configured.</p>
+        <p className="text-muted-foreground dark:text-cpCream/60">Authentication not configured.</p>
       </div>
     );
   }
@@ -168,11 +168,11 @@ export default async function AdvertisingPage({ params }: AdvertisingPageProps) 
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-cpDark flex items-center gap-2">
-              <Megaphone className="w-6 h-6 text-cpPink" />
+            <h1 className="text-2xl font-bold text-foreground dark:text-cpCream flex items-center gap-2">
+              <Megaphone className="w-6 h-6 text-cpCoral" />
               {isNl ? "Adverteren" : "Advertising"}
             </h1>
-            <p className="text-slate-600 mt-1">
+            <p className="text-muted-foreground dark:text-cpCream/60 mt-1">
               {isNl
                 ? "Bereik meer klanten met gesponsorde advertenties op onze website"
                 : "Reach more customers with sponsored ads on our website"}
@@ -182,39 +182,39 @@ export default async function AdvertisingPage({ params }: AdvertisingPageProps) 
 
         {/* Stats Overview */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white rounded-xl border p-4">
-            <div className="flex items-center gap-2 text-slate-600 text-sm">
+          <div className="bg-card dark:bg-cpSurface/50 rounded-xl border border-border dark:border-cpAmber/20 p-4">
+            <div className="flex items-center gap-2 text-muted-foreground dark:text-cpCream/60 text-sm">
               <Megaphone className="w-4 h-4" />
               {isNl ? "Actieve Campagnes" : "Active Campaigns"}
             </div>
-            <p className="text-2xl font-bold text-cpDark mt-1">
+            <p className="text-2xl font-bold text-foreground dark:text-cpCream mt-1">
               {campaigns.filter((c) => c.status === "active").length}
             </p>
           </div>
-          <div className="bg-white rounded-xl border p-4">
-            <div className="flex items-center gap-2 text-slate-600 text-sm">
+          <div className="bg-card dark:bg-cpSurface/50 rounded-xl border border-border dark:border-cpAmber/20 p-4">
+            <div className="flex items-center gap-2 text-muted-foreground dark:text-cpCream/60 text-sm">
               <Eye className="w-4 h-4" />
               {isNl ? "Totaal Impressies" : "Total Impressions"}
             </div>
-            <p className="text-2xl font-bold text-cpDark mt-1">
+            <p className="text-2xl font-bold text-foreground dark:text-cpCream mt-1">
               {campaigns.reduce((sum, c) => sum + c.impressions, 0).toLocaleString()}
             </p>
           </div>
-          <div className="bg-white rounded-xl border p-4">
-            <div className="flex items-center gap-2 text-slate-600 text-sm">
+          <div className="bg-card dark:bg-cpSurface/50 rounded-xl border border-border dark:border-cpAmber/20 p-4">
+            <div className="flex items-center gap-2 text-muted-foreground dark:text-cpCream/60 text-sm">
               <MousePointerClick className="w-4 h-4" />
               {isNl ? "Totaal Clicks" : "Total Clicks"}
             </div>
-            <p className="text-2xl font-bold text-cpDark mt-1">
+            <p className="text-2xl font-bold text-foreground dark:text-cpCream mt-1">
               {campaigns.reduce((sum, c) => sum + c.clicks, 0).toLocaleString()}
             </p>
           </div>
-          <div className="bg-white rounded-xl border p-4">
-            <div className="flex items-center gap-2 text-slate-600 text-sm">
+          <div className="bg-card dark:bg-cpSurface/50 rounded-xl border border-border dark:border-cpAmber/20 p-4">
+            <div className="flex items-center gap-2 text-muted-foreground dark:text-cpCream/60 text-sm">
               <TrendingUp className="w-4 h-4" />
               CTR
             </div>
-            <p className="text-2xl font-bold text-cpDark mt-1">
+            <p className="text-2xl font-bold text-foreground dark:text-cpCream mt-1">
               {(() => {
                 const totalImpressions = campaigns.reduce((sum, c) => sum + c.impressions, 0);
                 const totalClicks = campaigns.reduce((sum, c) => sum + c.clicks, 0);
@@ -229,8 +229,8 @@ export default async function AdvertisingPage({ params }: AdvertisingPageProps) 
         {/* Performance by Placement */}
         {placementStats.length > 0 && (
           <div>
-            <h2 className="text-lg font-semibold text-cpDark mb-4 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-cpPink" />
+            <h2 className="text-lg font-semibold text-foreground dark:text-cpCream mb-4 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-cpCoral" />
               {isNl ? "Prestaties per Plaatsing" : "Performance by Placement"}
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -240,24 +240,24 @@ export default async function AdvertisingPage({ params }: AdvertisingPageProps) 
                 return (
                   <div
                     key={stat.placement}
-                    className="bg-white rounded-xl border p-4 hover:shadow-md transition-shadow"
+                    className="bg-card dark:bg-cpSurface/50 rounded-xl border border-border dark:border-cpAmber/20 p-4 hover:shadow-md transition-shadow"
                   >
                     <div className="flex items-center gap-3 mb-3">
                       <div className={`p-2 rounded-lg ${
-                        info?.intent === "buyer" ? "bg-green-100" : "bg-blue-100"
+                        info?.intent === "buyer" ? "bg-green-100 dark:bg-green-900/30" : "bg-blue-100 dark:bg-blue-900/30"
                       }`}>
                         <Icon className={`w-5 h-5 ${
-                          info?.intent === "buyer" ? "text-green-600" : "text-blue-600"
+                          info?.intent === "buyer" ? "text-green-600 dark:text-green-400" : "text-blue-600 dark:text-blue-400"
                         }`} />
                       </div>
                       <div>
-                        <h3 className="font-medium text-cpDark text-sm">
+                        <h3 className="font-medium text-foreground dark:text-cpCream text-sm">
                           {info?.label[isNl ? "nl" : "en"] || stat.placement}
                         </h3>
                         <span className={`text-xs px-1.5 py-0.5 rounded ${
                           info?.intent === "buyer"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-blue-100 text-blue-700"
+                            ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                            : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
                         }`}>
                           {info?.intent === "buyer"
                             ? (isNl ? "Koopintentie" : "High Intent")
@@ -268,22 +268,22 @@ export default async function AdvertisingPage({ params }: AdvertisingPageProps) 
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-center">
                       <div>
-                        <p className="text-lg font-bold text-cpDark">
+                        <p className="text-lg font-bold text-foreground dark:text-cpCream">
                           {Number(stat.impressions || 0).toLocaleString()}
                         </p>
-                        <p className="text-xs text-slate-500">{isNl ? "Impressies" : "Views"}</p>
+                        <p className="text-xs text-muted-foreground dark:text-cpCream/60">{isNl ? "Impressies" : "Views"}</p>
                       </div>
                       <div>
-                        <p className="text-lg font-bold text-cpDark">
+                        <p className="text-lg font-bold text-foreground dark:text-cpCream">
                           {Number(stat.clicks || 0).toLocaleString()}
                         </p>
-                        <p className="text-xs text-slate-500">Clicks</p>
+                        <p className="text-xs text-muted-foreground dark:text-cpCream/60">Clicks</p>
                       </div>
                       <div>
                         <p className="text-lg font-bold text-cpCoral">
                           {stat.ctr ? Number(stat.ctr).toFixed(2) : "0.00"}%
                         </p>
-                        <p className="text-xs text-slate-500">CTR</p>
+                        <p className="text-xs text-muted-foreground dark:text-cpCream/60">CTR</p>
                       </div>
                     </div>
                   </div>
@@ -295,28 +295,28 @@ export default async function AdvertisingPage({ params }: AdvertisingPageProps) 
 
         {/* Placements Explanation */}
         <div>
-          <h2 className="text-lg font-semibold text-cpDark mb-4 flex items-center gap-2">
-            <Info className="w-5 h-5 text-cpPink" />
+          <h2 className="text-lg font-semibold text-foreground dark:text-cpCream mb-4 flex items-center gap-2">
+            <Info className="w-5 h-5 text-cpCoral" />
             {isNl ? "Waar verschijnen je advertenties?" : "Where do your ads appear?"}
           </h2>
 
           {/* Intent type legend */}
           <div className="flex flex-wrap gap-4 mb-4">
             <div className="flex items-center gap-2 text-sm">
-              <span className="flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+              <span className="flex items-center gap-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-1 rounded-full">
                 <Sparkles className="w-3 h-3" />
                 {isNl ? "Naamsbekendheid" : "Brand Awareness"}
               </span>
-              <span className="text-slate-500">
+              <span className="text-muted-foreground dark:text-cpCream/60">
                 {isNl ? "Lezers ontdekken je merk" : "Readers discover your brand"}
               </span>
             </div>
             <div className="flex items-center gap-2 text-sm">
-              <span className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-full">
+              <span className="flex items-center gap-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded-full">
                 <Target className="w-3 h-3" />
                 {isNl ? "Koopintentie" : "Buyer Intent"}
               </span>
-              <span className="text-slate-500">
+              <span className="text-muted-foreground dark:text-cpCream/60">
                 {isNl ? "Actief zoekend naar diensten" : "Actively looking for services"}
               </span>
             </div>
@@ -328,25 +328,25 @@ export default async function AdvertisingPage({ params }: AdvertisingPageProps) 
               return (
                 <div
                   key={key}
-                  className="bg-white rounded-xl border p-4 hover:shadow-md transition-shadow"
+                  className="bg-card dark:bg-cpSurface/50 rounded-xl border border-border dark:border-cpAmber/20 p-4 hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-start gap-3">
                     <div className={`p-2 rounded-lg ${
-                      info.intent === "buyer" ? "bg-green-100" : "bg-blue-100"
+                      info.intent === "buyer" ? "bg-green-100 dark:bg-green-900/30" : "bg-blue-100 dark:bg-blue-900/30"
                     }`}>
                       <Icon className={`w-5 h-5 ${
-                        info.intent === "buyer" ? "text-green-600" : "text-blue-600"
+                        info.intent === "buyer" ? "text-green-600 dark:text-green-400" : "text-blue-600 dark:text-blue-400"
                       }`} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-medium text-cpDark">
+                        <h3 className="font-medium text-foreground dark:text-cpCream">
                           {info.label[isNl ? "nl" : "en"]}
                         </h3>
                         <span className={`text-xs px-2 py-0.5 rounded-full ${
                           info.intent === "buyer"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-blue-100 text-blue-700"
+                            ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                            : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
                         }`}>
                           {info.intent === "buyer"
                             ? (isNl ? "Koopintentie" : "High Intent")
@@ -354,10 +354,10 @@ export default async function AdvertisingPage({ params }: AdvertisingPageProps) 
                           }
                         </span>
                       </div>
-                      <p className="text-sm text-slate-600 mt-1">
+                      <p className="text-sm text-muted-foreground dark:text-cpCream/70 mt-1">
                         {info.description[isNl ? "nl" : "en"]}
                       </p>
-                      <div className="flex items-center gap-1 mt-2 text-xs text-slate-500">
+                      <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground dark:text-cpCream/60">
                         <Users className="w-3 h-3" />
                         {isNl ? "Bereik:" : "Reach:"} {info.reach}
                       </div>
@@ -371,8 +371,8 @@ export default async function AdvertisingPage({ params }: AdvertisingPageProps) 
 
         {/* Packages Section */}
         <div>
-          <h2 className="text-lg font-semibold text-cpDark mb-4 flex items-center gap-2">
-            <Zap className="w-5 h-5 text-cpPink" />
+          <h2 className="text-lg font-semibold text-foreground dark:text-cpCream mb-4 flex items-center gap-2">
+            <Zap className="w-5 h-5 text-cpCoral" />
             {isNl ? "Advertentiepakketten" : "Advertising Packages"}
           </h2>
 
@@ -381,38 +381,38 @@ export default async function AdvertisingPage({ params }: AdvertisingPageProps) 
               packages.map((pkg) => (
                 <div
                   key={pkg.id}
-                  className={`bg-white rounded-2xl border-2 p-6 relative transition-all hover:shadow-lg ${
+                  className={`bg-card dark:bg-cpSurface/50 rounded-2xl border-2 p-6 relative transition-all hover:shadow-lg ${
                     pkg.isPopular
-                      ? "border-cpPink shadow-md"
-                      : "border-slate-200 hover:border-cpPink/50"
+                      ? "border-cpCoral shadow-md"
+                      : "border-border dark:border-cpAmber/20 hover:border-cpCoral/50"
                   }`}
                 >
                   {pkg.isPopular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="bg-cpPink text-white text-xs font-medium px-3 py-1 rounded-full flex items-center gap-1">
+                      <span className="bg-cpCoral text-white text-xs font-medium px-3 py-1 rounded-full flex items-center gap-1">
                         <Star className="w-3 h-3" />
                         {isNl ? "Populair" : "Popular"}
                       </span>
                     </div>
                   )}
 
-                  <h3 className="font-bold text-lg text-cpDark">{String(pkg.name)}</h3>
-                  <p className="text-slate-600 text-sm mt-1 min-h-[40px]">
+                  <h3 className="font-bold text-lg text-foreground dark:text-cpCream">{String(pkg.name)}</h3>
+                  <p className="text-muted-foreground dark:text-cpCream/60 text-sm mt-1 min-h-[40px]">
                     {pkg.description ? String(pkg.description) : ""}
                   </p>
 
                   <div className="mt-4">
-                    <span className="text-3xl font-bold text-cpDark">
+                    <span className="text-3xl font-bold text-foreground dark:text-cpCream">
                       {formatPrice(pkg.priceCents)}
                     </span>
-                    <span className="text-slate-500 text-sm">
+                    <span className="text-muted-foreground dark:text-cpCream/60 text-sm">
                       / {pkg.durationDays} {isNl ? "dagen" : "days"}
                     </span>
                   </div>
 
                   {/* Placements */}
                   <div className="mt-4 space-y-2">
-                    <p className="text-xs font-medium text-slate-500 uppercase">
+                    <p className="text-xs font-medium text-muted-foreground dark:text-cpCream/60 uppercase">
                       {isNl ? "Plaatsingen:" : "Placements:"}
                     </p>
                     {pkg.includedPlacements.split(",").map((placement) => {
@@ -423,7 +423,7 @@ export default async function AdvertisingPage({ params }: AdvertisingPageProps) 
                           <PlacementIcon className={`w-4 h-4 ${
                             info?.intent === "buyer" ? "text-green-500" : "text-blue-500"
                           }`} />
-                          <span className="text-slate-700">
+                          <span className="text-foreground/80 dark:text-cpCream/80">
                             {info?.label[isNl ? "nl" : "en"] || placement}
                           </span>
                           {info?.intent === "buyer" && (
@@ -433,7 +433,7 @@ export default async function AdvertisingPage({ params }: AdvertisingPageProps) 
                       );
                     })}
                     {pkg.maxImpressions && (
-                      <div className="flex items-center gap-2 text-sm text-slate-500">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-cpCream/60">
                         <Eye className="w-4 h-4" />
                         {isNl ? "Tot" : "Up to"} {pkg.maxImpressions.toLocaleString()} {isNl ? "impressies" : "impressions"}
                       </div>
@@ -446,8 +446,8 @@ export default async function AdvertisingPage({ params }: AdvertisingPageProps) 
                     <Button
                       className={`w-full mt-6 gap-2 ${
                         pkg.isPopular
-                          ? "bg-cpPink hover:bg-cpPink/90"
-                          : "bg-slate-900 hover:bg-slate-800"
+                          ? "bg-cpCoral hover:bg-cpCoral/90"
+                          : "bg-foreground dark:bg-cpCream text-background dark:text-cpCharcoal hover:bg-foreground/90 dark:hover:bg-cpCream/90"
                       }`}
                     >
                       {isNl ? "Selecteer" : "Select"}
@@ -494,32 +494,32 @@ export default async function AdvertisingPage({ params }: AdvertisingPageProps) 
 
         {/* Active Campaigns */}
         <div>
-          <h2 className="text-lg font-semibold text-cpDark mb-4 flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-cpPink" />
+          <h2 className="text-lg font-semibold text-foreground dark:text-cpCream mb-4 flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-cpCoral" />
             {isNl ? "Jouw Campagnes" : "Your Campaigns"}
           </h2>
 
           {campaigns.length > 0 ? (
-            <div className="bg-white rounded-xl border overflow-hidden overflow-x-auto">
+            <div className="bg-card dark:bg-cpSurface/50 rounded-xl border border-border dark:border-cpAmber/20 overflow-hidden overflow-x-auto">
               <table className="w-full min-w-[700px]">
-                <thead className="bg-slate-50 border-b">
+                <thead className="bg-muted dark:bg-cpCharcoal border-b border-border dark:border-cpAmber/20">
                   <tr>
-                    <th className="text-left text-sm font-medium text-slate-600 p-4">
+                    <th className="text-left text-sm font-medium text-muted-foreground dark:text-cpCream/70 p-4">
                       {isNl ? "Campagne" : "Campaign"}
                     </th>
-                    <th className="text-left text-sm font-medium text-slate-600 p-4">
+                    <th className="text-left text-sm font-medium text-muted-foreground dark:text-cpCream/70 p-4">
                       Status
                     </th>
-                    <th className="text-left text-sm font-medium text-slate-600 p-4">
+                    <th className="text-left text-sm font-medium text-muted-foreground dark:text-cpCream/70 p-4">
                       {isNl ? "Periode" : "Period"}
                     </th>
-                    <th className="text-right text-sm font-medium text-slate-600 p-4">
+                    <th className="text-right text-sm font-medium text-muted-foreground dark:text-cpCream/70 p-4">
                       {isNl ? "Impressies" : "Impressions"}
                     </th>
-                    <th className="text-right text-sm font-medium text-slate-600 p-4">
+                    <th className="text-right text-sm font-medium text-muted-foreground dark:text-cpCream/70 p-4">
                       Clicks
                     </th>
-                    <th className="text-right text-sm font-medium text-slate-600 p-4">
+                    <th className="text-right text-sm font-medium text-muted-foreground dark:text-cpCream/70 p-4">
                       CTR
                     </th>
                   </tr>
@@ -540,11 +540,11 @@ export default async function AdvertisingPage({ params }: AdvertisingPageProps) 
                       : null;
 
                     return (
-                      <tr key={campaign.id} className="border-b last:border-b-0 hover:bg-slate-50">
+                      <tr key={campaign.id} className="border-b border-border dark:border-cpAmber/10 last:border-b-0 hover:bg-muted/50 dark:hover:bg-cpAmber/10">
                         <td className="p-4">
                           <div>
-                            <p className="font-medium text-cpDark">{campaign.name}</p>
-                            <p className="text-xs text-slate-500">{campaign.headline}</p>
+                            <p className="font-medium text-foreground dark:text-cpCream">{campaign.name}</p>
+                            <p className="text-xs text-muted-foreground dark:text-cpCream/60">{campaign.headline}</p>
                           </div>
                         </td>
                         <td className="p-4">
@@ -552,11 +552,11 @@ export default async function AdvertisingPage({ params }: AdvertisingPageProps) 
                         </td>
                         <td className="p-4">
                           <div className="text-sm">
-                            <p className="text-slate-700">
+                            <p className="text-foreground/80 dark:text-cpCream/80">
                               {formatDate(campaign.startsAt)} - {formatDate(campaign.endsAt)}
                             </p>
                             {campaign.status === "active" && daysLeft !== null && !isExpired && (
-                              <p className={`text-xs ${daysLeft <= 3 ? "text-orange-500 font-medium" : "text-slate-500"}`}>
+                              <p className={`text-xs ${daysLeft <= 3 ? "text-orange-500 dark:text-orange-400 font-medium" : "text-muted-foreground dark:text-cpCream/60"}`}>
                                 {daysLeft === 0
                                   ? (isNl ? "Laatste dag!" : "Last day!")
                                   : `${daysLeft} ${isNl ? "dagen over" : "days left"}`
@@ -564,23 +564,23 @@ export default async function AdvertisingPage({ params }: AdvertisingPageProps) 
                               </p>
                             )}
                             {isExpired && campaign.status === "active" && (
-                              <p className="text-xs text-red-500 font-medium">
+                              <p className="text-xs text-red-500 dark:text-red-400 font-medium">
                                 {isNl ? "Verlopen" : "Expired"}
                               </p>
                             )}
                           </div>
                         </td>
                         <td className="p-4 text-right">
-                          <span className="font-medium">{campaign.impressions.toLocaleString()}</span>
+                          <span className="font-medium text-foreground dark:text-cpCream">{campaign.impressions.toLocaleString()}</span>
                         </td>
                         <td className="p-4 text-right">
-                          <span className="font-medium">{campaign.clicks.toLocaleString()}</span>
+                          <span className="font-medium text-foreground dark:text-cpCream">{campaign.clicks.toLocaleString()}</span>
                         </td>
                         <td className="p-4 text-right">
                           <span className={`font-medium ${
                             campaign.impressions > 0 && (campaign.clicks / campaign.impressions) >= 0.02
-                              ? "text-green-600"
-                              : ""
+                              ? "text-green-600 dark:text-green-400"
+                              : "text-foreground dark:text-cpCream"
                           }`}>
                             {campaign.impressions > 0
                               ? ((campaign.clicks / campaign.impressions) * 100).toFixed(2) + "%"
@@ -595,40 +595,40 @@ export default async function AdvertisingPage({ params }: AdvertisingPageProps) 
             </div>
           ) : (
             /* Empty state when no campaigns */
-            <div className="bg-white rounded-xl border p-8 text-center">
+            <div className="bg-card dark:bg-cpSurface/50 rounded-xl border border-border dark:border-cpAmber/20 p-8 text-center">
               <div className="max-w-md mx-auto">
-                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Megaphone className="w-8 h-8 text-slate-400" />
+                <div className="w-16 h-16 bg-muted dark:bg-cpAmber/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Megaphone className="w-8 h-8 text-muted-foreground dark:text-cpCream/50" />
                 </div>
-                <h3 className="text-lg font-semibold text-cpDark mb-2">
+                <h3 className="text-lg font-semibold text-foreground dark:text-cpCream mb-2">
                   {isNl ? "Nog geen campagnes" : "No campaigns yet"}
                 </h3>
-                <p className="text-slate-600 mb-4">
+                <p className="text-muted-foreground dark:text-cpCream/60 mb-4">
                   {isNl
                     ? "Start je eerste advertentiecampagne en bereik duizenden huisdiereigenaren."
                     : "Start your first ad campaign and reach thousands of pet owners."}
                 </p>
-                <div className="bg-slate-50 rounded-lg p-4 text-left mb-4">
-                  <p className="text-sm text-slate-600 mb-2 font-medium">
+                <div className="bg-muted dark:bg-cpCharcoal/50 rounded-lg p-4 text-left mb-4">
+                  <p className="text-sm text-foreground/80 dark:text-cpCream/70 mb-2 font-medium">
                     {isNl ? "Wat je zult zien:" : "What you'll see:"}
                   </p>
-                  <ul className="text-sm text-slate-500 space-y-1">
+                  <ul className="text-sm text-muted-foreground dark:text-cpCream/60 space-y-1">
                     <li className="flex items-center gap-2">
-                      <Eye className="w-4 h-4 text-cpPink" />
+                      <Eye className="w-4 h-4 text-cpCoral" />
                       {isNl ? "Real-time impressies & clicks" : "Real-time impressions & clicks"}
                     </li>
                     <li className="flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4 text-cpPink" />
+                      <TrendingUp className="w-4 h-4 text-cpCoral" />
                       {isNl ? "CTR per plaatsing" : "CTR per placement"}
                     </li>
                     <li className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-cpPink" />
+                      <Calendar className="w-4 h-4 text-cpCoral" />
                       {isNl ? "Campagneduur & countdown" : "Campaign duration & countdown"}
                     </li>
                   </ul>
                 </div>
                 <Link href={`/${locale}/dashboard/business/${businessId}/advertising/new`}>
-                  <Button className="bg-cpPink hover:bg-cpPink/90 gap-2">
+                  <Button className="bg-cpCoral hover:bg-cpCoral/90 gap-2">
                     <Plus className="w-4 h-4" />
                     {isNl ? "Start Eerste Campagne" : "Start First Campaign"}
                   </Button>
@@ -639,18 +639,18 @@ export default async function AdvertisingPage({ params }: AdvertisingPageProps) 
         </div>
 
         {/* CTA for new campaign */}
-        <div className="bg-gradient-to-r from-cpPink/10 to-cpCoral/10 rounded-2xl p-6 md:p-8 text-center">
-          <Megaphone className="w-12 h-12 text-cpPink mx-auto mb-4" />
-          <h3 className="text-xl font-bold text-cpDark mb-2">
+        <div className="bg-gradient-to-r from-cpCoral/10 to-cpAmber/10 dark:from-cpCoral/20 dark:to-cpAmber/20 rounded-2xl p-6 md:p-8 text-center border border-cpCoral/20 dark:border-cpAmber/20">
+          <Megaphone className="w-12 h-12 text-cpCoral mx-auto mb-4" />
+          <h3 className="text-xl font-bold text-foreground dark:text-cpCream mb-2">
             {isNl ? "Klaar om meer klanten te bereiken?" : "Ready to reach more customers?"}
           </h3>
-          <p className="text-slate-600 mb-4 max-w-md mx-auto">
+          <p className="text-muted-foreground dark:text-cpCream/60 mb-4 max-w-md mx-auto">
             {isNl
               ? "Start vandaag nog met adverteren en laat jouw bedrijf groeien!"
               : "Start advertising today and grow your business!"}
           </p>
           <Link href={`/${locale}/dashboard/business/${businessId}/advertising/new`}>
-            <Button className="bg-cpPink hover:bg-cpPink/90 gap-2">
+            <Button className="bg-cpCoral hover:bg-cpCoral/90 gap-2">
               <Plus className="w-4 h-4" />
               {isNl ? "Nieuwe Campagne Starten" : "Start New Campaign"}
             </Button>
@@ -700,30 +700,30 @@ function DefaultPackageCard({
 
   return (
     <div
-      className={`bg-white rounded-2xl border-2 p-6 relative transition-all hover:shadow-lg ${
-        isPopular ? "border-cpPink shadow-md" : "border-slate-200 hover:border-cpPink/50"
+      className={`bg-card dark:bg-cpSurface/50 rounded-2xl border-2 p-6 relative transition-all hover:shadow-lg ${
+        isPopular ? "border-cpCoral shadow-md" : "border-border dark:border-cpAmber/20 hover:border-cpCoral/50"
       }`}
     >
       {isPopular && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <span className="bg-cpPink text-white text-xs font-medium px-3 py-1 rounded-full flex items-center gap-1">
+          <span className="bg-cpCoral text-white text-xs font-medium px-3 py-1 rounded-full flex items-center gap-1">
             <Star className="w-3 h-3" />
             {isNl ? "Populair" : "Popular"}
           </span>
         </div>
       )}
 
-      <h3 className="font-bold text-lg text-cpDark">{name}</h3>
+      <h3 className="font-bold text-lg text-foreground dark:text-cpCream">{name}</h3>
 
       <div className="mt-4">
-        <span className="text-3xl font-bold text-cpDark">€{price}</span>
-        <span className="text-slate-500 text-sm">
+        <span className="text-3xl font-bold text-foreground dark:text-cpCream">€{price}</span>
+        <span className="text-muted-foreground dark:text-cpCream/60 text-sm">
           / {duration} {isNl ? "dagen" : "days"}
         </span>
       </div>
 
       <div className="mt-4 space-y-2">
-        <p className="text-xs font-medium text-slate-500 uppercase">
+        <p className="text-xs font-medium text-muted-foreground dark:text-cpCream/60 uppercase">
           {isNl ? "Plaatsingen:" : "Placements:"}
         </p>
         {placements.map((placement) => {
@@ -733,7 +733,7 @@ function DefaultPackageCard({
               <Check className={`w-4 h-4 ${
                 intent === "buyer" ? "text-green-500" : "text-blue-500"
               }`} />
-              <span className="text-slate-700">
+              <span className="text-foreground/80 dark:text-cpCream/80">
                 {labels[placement]?.[isNl ? "nl" : "en"] || placement}
               </span>
               {intent === "buyer" && (
@@ -747,7 +747,7 @@ function DefaultPackageCard({
       <Link href={`/${locale}/dashboard/business/${businessId}/advertising/new?package=${name.toLowerCase()}`}>
         <Button
           className={`w-full mt-6 gap-2 ${
-            isPopular ? "bg-cpPink hover:bg-cpPink/90" : "bg-slate-900 hover:bg-slate-800"
+            isPopular ? "bg-cpCoral hover:bg-cpCoral/90" : "bg-foreground dark:bg-cpCream text-background dark:text-cpCharcoal hover:bg-foreground/90 dark:hover:bg-cpCream/90"
           }`}
         >
           {isNl ? "Selecteer" : "Select"}
@@ -761,12 +761,12 @@ function DefaultPackageCard({
 // Status badge component
 function StatusBadge({ status, isNl }: { status: string; isNl: boolean }) {
   const statusStyles: Record<string, string> = {
-    draft: "bg-slate-100 text-slate-600",
-    pending_payment: "bg-yellow-100 text-yellow-700",
-    active: "bg-green-100 text-green-700",
-    paused: "bg-orange-100 text-orange-700",
-    completed: "bg-blue-100 text-blue-700",
-    cancelled: "bg-red-100 text-red-700",
+    draft: "bg-muted text-muted-foreground dark:bg-cpSurface dark:text-cpCream/70",
+    pending_payment: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+    active: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+    paused: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
+    completed: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+    cancelled: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
   };
 
   const statusLabels: Record<string, { en: string; nl: string }> = {
@@ -779,7 +779,7 @@ function StatusBadge({ status, isNl }: { status: string; isNl: boolean }) {
   };
 
   return (
-    <span className={`text-xs font-medium px-2 py-1 rounded-full ${statusStyles[status] || "bg-slate-100"}`}>
+    <span className={`text-xs font-medium px-2 py-1 rounded-full ${statusStyles[status] || "bg-muted dark:bg-cpSurface"}`}>
       {statusLabels[status]?.[isNl ? "nl" : "en"] || status}
     </span>
   );

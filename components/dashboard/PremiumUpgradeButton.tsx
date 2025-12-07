@@ -101,14 +101,14 @@ export function PremiumUpgradeButton({
           Upgrade to Premium
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md dark:bg-cpSurface dark:border-cpAmber/20">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2 dark:text-cpCream">
             <Sparkles className="h-5 w-5 text-amber-500" />
             Upgrade to Premium
           </DialogTitle>
-          <DialogDescription>
-            Make <span className="font-medium text-cpDark">{placeName}</span>{" "}
+          <DialogDescription className="dark:text-cpCream/70">
+            Make <span className="font-medium text-foreground dark:text-cpCream">{placeName}</span>{" "}
             stand out with premium features.
           </DialogDescription>
         </DialogHeader>
@@ -119,39 +119,39 @@ export function PremiumUpgradeButton({
             {PREMIUM_FEATURES.map((feature) => (
               <div key={feature} className="flex items-center gap-2">
                 <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                <span className="text-sm text-slate-600">{feature}</span>
+                <span className="text-sm text-muted-foreground dark:text-cpCream/70">{feature}</span>
               </div>
             ))}
           </div>
 
           {/* Pricing */}
-          <div className="bg-slate-50 rounded-lg p-4 space-y-2">
+          <div className="bg-muted dark:bg-cpCharcoal rounded-lg p-4 space-y-2">
             <div className="flex justify-between">
-              <span className="text-slate-600">Premium upgrade</span>
-              <span className="font-semibold text-cpDark">{priceFormatted}</span>
+              <span className="text-muted-foreground dark:text-cpCream/70">Premium upgrade</span>
+              <span className="font-semibold text-foreground dark:text-cpCream">{priceFormatted}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-500">Your balance</span>
+              <span className="text-muted-foreground dark:text-cpCream/60">Your balance</span>
               <span
-                className={hasEnoughCredits ? "text-green-600" : "text-red-500"}
+                className={hasEnoughCredits ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"}
               >
                 {balanceFormatted}
               </span>
             </div>
             {!hasEnoughCredits && (
-              <p className="text-xs text-red-500 mt-2">
+              <p className="text-xs text-red-500 dark:text-red-400 mt-2">
                 Insufficient credits. Please top up first.
               </p>
             )}
           </div>
 
           {error && (
-            <p className="text-sm text-red-500 mt-3 text-center">{error}</p>
+            <p className="text-sm text-red-500 dark:text-red-400 mt-3 text-center">{error}</p>
           )}
         </div>
 
         <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={() => setIsOpen(false)}>
+          <Button variant="outline" onClick={() => setIsOpen(false)} className="dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10">
             Cancel
           </Button>
           <Button

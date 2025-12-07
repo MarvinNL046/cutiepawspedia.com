@@ -24,10 +24,10 @@ export default async function DashboardLayout({
   // Check if StackAuth is configured
   if (!stackServerApp) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-background dark:bg-cpCharcoal">
         <div className="text-center p-8">
-          <h1 className="text-2xl font-bold text-cpDark mb-2">Dashboard Unavailable</h1>
-          <p className="text-slate-600">Authentication is not configured.</p>
+          <h1 className="text-2xl font-bold text-foreground dark:text-cpCream mb-2">Dashboard Unavailable</h1>
+          <p className="text-muted-foreground dark:text-cpCream/70">Authentication is not configured.</p>
         </div>
       </div>
     );
@@ -47,18 +47,18 @@ export default async function DashboardLayout({
   // Check if user has business or admin role
   if (!dbUser || !["business", "admin"].includes(dbUser.role)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-background dark:bg-cpCharcoal">
         <div className="text-center p-8 max-w-md">
-          <h1 className="text-2xl font-bold text-cpDark mb-2">Access Denied</h1>
-          <p className="text-slate-600 mb-4">
+          <h1 className="text-2xl font-bold text-foreground dark:text-cpCream mb-2">Access Denied</h1>
+          <p className="text-muted-foreground dark:text-cpCream/70 mb-4">
             You need a business account to access the dashboard.
           </p>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-muted-foreground dark:text-cpCream/60">
             If you own a business listed on CutiePawsPedia, please contact us to claim your listing.
           </p>
           <a
             href={`/${locale}/for-businesses`}
-            className="inline-block mt-4 px-4 py-2 bg-cpPink text-white rounded-lg hover:bg-cpPink/90 transition-colors"
+            className="inline-block mt-4 px-4 py-2 bg-cpCoral text-white rounded-lg hover:bg-cpCoral/90 transition-colors"
           >
             Learn More
           </a>
@@ -68,7 +68,7 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 overflow-hidden">
+    <div className="min-h-screen bg-background dark:bg-cpCharcoal overflow-hidden">
       {/* Sidebar */}
       <DashboardSidebar locale={locale} />
 

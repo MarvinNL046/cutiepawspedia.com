@@ -21,7 +21,7 @@ export const emailTemplates = {
    * Welcome email for newsletter subscribers
    */
   welcomeNewsletter: (email: string) => ({
-    from: "CutiePawsPedia <newsletter@cutiepawspedia.com>",
+    from: "CutiePawsPedia <hello@cutiepawspedia.com>",
     to: email,
     subject: "Welcome to CutiePawsPedia Newsletter! 🐾",
     html: `
@@ -76,7 +76,7 @@ export const emailTemplates = {
     leadPhone?: string;
     message?: string;
   }) => ({
-    from: "CutiePawsPedia <leads@cutiepawspedia.com>",
+    from: "CutiePawsPedia <hello@cutiepawspedia.com>",
     to: data.businessEmail,
     subject: `New inquiry for ${data.businessName}! 📬`,
     html: `
@@ -176,11 +176,11 @@ export async function sendNewClaimNotification(data: {
   businessRole: string;
   message?: string;
 }) {
-  const adminEmail = process.env.ADMIN_CLAIMS_EMAIL || "admin@cutiepawspedia.com";
+  const adminEmail = process.env.ADMIN_CLAIMS_EMAIL || "hello@cutiepawspedia.com";
   const adminUrl = process.env.APP_BASE_URL || "https://cutiepawspedia.com";
 
   return sendEmail({
-    from: "CutiePawsPedia <claims@cutiepawspedia.com>",
+    from: "CutiePawsPedia <hello@cutiepawspedia.com>",
     to: adminEmail,
     subject: `[New Claim] ${data.placeName} - ${data.placeCity}`,
     html: `

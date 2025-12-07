@@ -51,14 +51,14 @@ function SearchSkeleton() {
   return (
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
       {[...Array(6)].map((_, i) => (
-        <Card key={i} className="animate-pulse">
+        <Card key={i} className="animate-pulse bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
           <CardContent className="p-4">
-            <div className="h-4 bg-slate-200 rounded w-3/4 mb-2" />
-            <div className="h-3 bg-slate-200 rounded w-1/2 mb-4" />
-            <div className="h-20 bg-slate-100 rounded mb-3" />
+            <div className="h-4 bg-muted dark:bg-cpSurface rounded w-3/4 mb-2" />
+            <div className="h-3 bg-muted dark:bg-cpSurface rounded w-1/2 mb-4" />
+            <div className="h-20 bg-muted/50 dark:bg-cpSurface/30 rounded mb-3" />
             <div className="flex gap-2">
-              <div className="h-6 bg-slate-200 rounded w-16" />
-              <div className="h-6 bg-slate-200 rounded w-16" />
+              <div className="h-6 bg-muted dark:bg-cpSurface rounded w-16" />
+              <div className="h-6 bg-muted dark:bg-cpSurface rounded w-16" />
             </div>
           </CardContent>
         </Card>
@@ -70,20 +70,20 @@ function SearchSkeleton() {
 // No results component
 function NoResults({ query }: { query?: string }) {
   return (
-    <div className="text-center py-16 bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
-      <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-cpPink/10 to-cpAqua/10 mb-6">
-        <Search className="h-10 w-10 text-cpPink" />
+    <div className="text-center py-16 bg-card dark:bg-cpSurface/50 rounded-3xl border border-border dark:border-cpAmber/20 shadow-sm">
+      <div className="category-circle mx-auto mb-6">
+        <Search className="h-10 w-10 text-cpAmber" />
       </div>
-      <h2 className="text-xl font-semibold text-cpDark dark:text-white mb-2">
+      <h2 className="text-xl font-semibold text-foreground dark:text-cpCream mb-2">
         {query ? `No results for "${query}"` : "No results found"}
       </h2>
-      <p className="text-slate-500 dark:text-slate-400 mb-6 max-w-md mx-auto">
+      <p className="text-muted-foreground dark:text-slate-400 mb-6 max-w-md mx-auto">
         {query
           ? "Try adjusting your search terms or filters to find what you're looking for."
           : "Try searching for pet services, locations, or categories."}
       </p>
       <div className="flex justify-center gap-3">
-        <Button variant="outline" className="hover:border-cpPink hover:text-cpPink" asChild>
+        <Button className="btn-coral" asChild>
           <Link href="/">Browse All</Link>
         </Button>
       </div>
@@ -162,14 +162,14 @@ async function SearchResults({
             <MapWidget
               markers={markers}
               height="calc(100vh - 200px)"
-              className="rounded-xl shadow-sm border min-h-[400px]"
+              className="rounded-2xl shadow-sm border border-border dark:border-cpAmber/20 min-h-[400px]"
             />
           </div>
         </div>
 
         {/* Results List */}
         <div className="lg:order-1 space-y-4">
-          <p className="text-sm text-slate-500 mb-4">
+          <p className="text-sm text-muted-foreground dark:text-cpCream/70 mb-4">
             {results.places.length} results{markers.length > 0 && ` (${markers.length} on map)`}
           </p>
           {results.places.map((place) => (
@@ -283,52 +283,46 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
 
   return (
     <>
-      {/* Search Header - Modern Design */}
-      <section className="relative overflow-hidden min-h-[280px]">
-        {/* Gradient mesh background */}
-        <div className="absolute inset-0 gradient-mesh-bg" />
-
-        {/* Animated gradient blobs */}
-        <div className="gradient-blob gradient-blob-animated w-[400px] h-[400px] bg-cpAqua/25 -top-32 -left-32" />
-        <div className="gradient-blob gradient-blob-animated w-[300px] h-[300px] bg-cpPink/20 top-0 -right-20" style={{ animationDelay: '-5s' }} />
-
+      {/* Search Header - Cozy Theme */}
+      <section className="relative overflow-hidden min-h-[280px] bg-secondary dark:bg-cpCharcoal">
         {/* Decorative elements */}
-        <div className="absolute top-12 right-24 w-32 h-32 border-2 border-cpAqua/10 rounded-full hidden lg:block" />
+        <div className="absolute top-12 right-24 w-32 h-32 border-2 border-cpAmber/20 dark:border-cpAmber/10 rounded-full hidden lg:block" />
+        <div className="absolute bottom-8 left-16 w-20 h-20 border-2 border-cpCoral/20 dark:border-cpCoral/10 rounded-full hidden lg:block" />
 
         <div className="relative container mx-auto max-w-6xl px-4 py-12 md:py-16">
           {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-6 flex-wrap">
-            <Link href={`/${locale}`} className="hover:text-cpPink transition-colors">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-cpCream/70 mb-6 flex-wrap">
+            <Link href={`/${locale}`} className="hover:text-cpCoral transition-colors">
               Directory
             </Link>
             <ChevronRight className="h-4 w-4" />
-            <span className="text-cpDark dark:text-white font-medium">Search</span>
+            <span className="text-foreground dark:text-cpCream font-medium">Search</span>
           </div>
 
           <div className="flex items-start gap-4 mb-8">
-            {/* Icon with gradient background */}
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-cpAqua/20 to-cpAqua/5 shadow-sm">
-              <Search className="h-7 w-7 text-cpAqua" />
+            {/* Icon with category-circle styling */}
+            <div className="category-circle !w-14 !h-14">
+              <Search className="h-7 w-7 text-cpAmber" />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-cpDark dark:text-white tracking-tight">
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground dark:text-cpCream tracking-tight">
                 {searchSummary.length > 0 ? `Search: ${searchSummary.join(" in ")}` : "Search Pet Services"}
               </h1>
-              <p className="text-slate-600 dark:text-slate-400 mt-1">Find the best pet services near you</p>
+              <p className="text-muted-foreground dark:text-cpCream/70 mt-1">Find the best pet services near you</p>
             </div>
           </div>
 
-          {/* Search Form with glassmorphism */}
+          {/* Search Form with cozy styling */}
           <div className="max-w-2xl">
-            <div className="glass-card-strong rounded-2xl p-3 shadow-lg">
+            <div className="cozy-card rounded-3xl p-4 shadow-lg">
               <SearchBar locale={locale} initialQuery={query} initialLocation={citySlug} />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Filters Bar */}
-      <section className="sticky top-16 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-700/50 shadow-sm">
+      {/* Filters Bar - Cozy Theme */}
+      <section className="sticky top-16 z-40 bg-card/95 dark:bg-cpSurface/95 backdrop-blur-lg border-b border-border dark:border-cpAmber/20 shadow-sm">
         <div className="container mx-auto max-w-6xl px-4 py-3">
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-2 flex-wrap">
@@ -336,7 +330,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
               <div className="flex items-center gap-2">
                 <Badge
                   variant={!categorySlug ? "default" : "outline"}
-                  className={!categorySlug ? "bg-cpPink" : "cursor-pointer hover:bg-cpPink/10"}
+                  className={!categorySlug ? "bg-cpCoral text-white" : "cursor-pointer hover:bg-cpCoral/10 hover:border-cpCoral/40"}
                   asChild
                 >
                   <Link
@@ -354,7 +348,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
                   <Badge
                     key={cat.slug}
                     variant={categorySlug === cat.slug ? "default" : "outline"}
-                    className={categorySlug === cat.slug ? "bg-cpPink" : "cursor-pointer hover:bg-cpPink/10"}
+                    className={categorySlug === cat.slug ? "bg-cpCoral text-white" : "cursor-pointer hover:bg-cpCoral/10 hover:border-cpCoral/40"}
                     asChild
                   >
                     <Link
@@ -376,7 +370,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
             {/* Sort Options & View Toggle */}
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <span className="text-sm text-slate-500 dark:text-slate-400">Sort:</span>
+                <span className="text-sm text-muted-foreground dark:text-cpCream/70">Sort:</span>
                 {[
                   { value: "relevance", label: "Relevance" },
                   { value: "rating", label: "Rating" },
@@ -388,8 +382,8 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
                     variant={(sortBy || "relevance") === option.value ? "default" : "outline"}
                     className={
                       (sortBy || "relevance") === option.value
-                        ? "bg-cpAqua"
-                        : "cursor-pointer hover:bg-cpAqua/10"
+                        ? "bg-cpAmber text-cpCharcoal"
+                        : "cursor-pointer hover:bg-cpAmber/10 hover:border-cpAmber/40"
                     }
                     asChild
                   >
@@ -408,7 +402,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
                   </Badge>
                 ))}
               </div>
-              <div className="flex items-center border-l border-slate-200 dark:border-slate-700 pl-4 gap-1">
+              <div className="flex items-center border-l border-border dark:border-cpAmber/20 pl-4 gap-1">
                 <Button
                   variant={showMap ? "ghost" : "secondary"}
                   size="icon"
@@ -452,49 +446,53 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
         </div>
       </section>
 
-      {/* Search Results */}
-      <section className="container mx-auto max-w-6xl px-4 py-8">
-        {/* Sponsor Ad - High intent placement */}
-        <SearchAd sponsorAd={searchAd} className="mb-6" />
+      {/* Search Results - Cozy Background */}
+      <section className="bg-background dark:bg-cpCharcoal">
+        <div className="container mx-auto max-w-6xl px-4 py-8">
+          {/* Sponsor Ad - High intent placement */}
+          <SearchAd sponsorAd={searchAd} className="mb-6" />
 
-        <Suspense fallback={<SearchSkeleton />}>
-          <SearchResults
-            locale={locale}
-            query={query}
-            citySlug={citySlug}
-            countrySlug={countrySlug}
-            categorySlug={categorySlug}
-            sortBy={sortBy}
-            page={page}
-            showMap={showMap}
-          />
-        </Suspense>
+          <Suspense fallback={<SearchSkeleton />}>
+            <SearchResults
+              locale={locale}
+              query={query}
+              citySlug={citySlug}
+              countrySlug={countrySlug}
+              categorySlug={categorySlug}
+              sortBy={sortBy}
+              page={page}
+              showMap={showMap}
+            />
+          </Suspense>
 
-        {/* Ad: Between search results and countries (for non-logged-in users) */}
-        <BetweenContentAd className="mt-8" />
+          {/* Ad: Between search results and countries (for non-logged-in users) */}
+          <BetweenContentAd className="mt-8" />
+        </div>
       </section>
 
-      {/* Popular Countries */}
+      {/* Popular Countries - Cozy Theme */}
       {countries.length > 0 && (
-        <section className="container mx-auto max-w-6xl px-4 py-12 pb-16">
-          <div className="text-center mb-8">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-cpAqua/10 text-cpAqua text-sm font-medium mb-4">
-              Explore
-            </span>
-            <h2 className="text-2xl md:text-3xl font-bold text-cpDark dark:text-white tracking-tight">Browse by Country</h2>
-          </div>
-          <div className="flex flex-wrap justify-center gap-3">
-            {countries.map((country) => (
-              <Link key={country.slug} href={`/${locale}/${country.slug}`}>
-                <Badge
-                  variant="outline"
-                  className="hover:bg-cpPink/10 hover:border-cpPink dark:hover:bg-cpPink/20 transition-all duration-300 cursor-pointer py-2.5 px-4 text-sm hover:-translate-y-0.5"
-                >
-                  <MapPin className="h-3.5 w-3.5 mr-1.5 text-cpPink" />
-                  {country.name}
-                </Badge>
-              </Link>
-            ))}
+        <section className="bg-secondary dark:bg-cpCharcoal">
+          <div className="container mx-auto max-w-6xl px-4 py-12 pb-16">
+            <div className="text-center mb-8">
+              <span className="inline-block px-4 py-1.5 rounded-full bg-cpCoral/10 dark:bg-cpCoral/20 text-cpCoral text-sm font-medium mb-4">
+                Explore
+              </span>
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream tracking-tight">Browse by Country</h2>
+            </div>
+            <div className="flex flex-wrap justify-center gap-3">
+              {countries.map((country) => (
+                <Link key={country.slug} href={`/${locale}/${country.slug}`}>
+                  <Badge
+                    variant="outline"
+                    className="hover:bg-cpCoral/10 hover:border-cpCoral dark:hover:bg-cpCoral/20 transition-all duration-300 cursor-pointer py-2.5 px-4 text-sm hover:-translate-y-0.5 border-border dark:border-cpAmber/20"
+                  >
+                    <MapPin className="h-3.5 w-3.5 mr-1.5 text-cpCoral" />
+                    {country.name}
+                  </Badge>
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
       )}

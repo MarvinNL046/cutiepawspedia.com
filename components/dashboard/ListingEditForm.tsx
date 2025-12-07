@@ -149,7 +149,7 @@ export function ListingEditForm({ listingId, initialData, locale }: ListingEditF
 
       {/* Description Field */}
       <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description" className="dark:text-cpCream">Description</Label>
         <Textarea
           id="description"
           name="description"
@@ -158,24 +158,26 @@ export function ListingEditForm({ listingId, initialData, locale }: ListingEditF
           placeholder="Tell customers about your business..."
           rows={5}
           maxLength={2000}
+          className="dark:bg-cpSurface dark:border-cpAmber/30 dark:text-cpCream"
         />
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-muted-foreground dark:text-cpCream/60">
           {formData.description.length}/2000 characters
         </p>
       </div>
 
       {/* Actions */}
-      <div className="flex items-center justify-between pt-4 border-t">
+      <div className="flex items-center justify-between pt-4 border-t border-border dark:border-cpAmber/20">
         <Button
           type="button"
           variant="outline"
           onClick={() => router.push(`/${locale}/dashboard/listings`)}
+          className="dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10"
         >
           Cancel
         </Button>
         <Button
           type="submit"
-          className="bg-cpPink hover:bg-cpPink/90"
+          className="bg-cpCoral hover:bg-cpCoral/90"
           disabled={isSubmitting}
         >
           {isSubmitting ? (

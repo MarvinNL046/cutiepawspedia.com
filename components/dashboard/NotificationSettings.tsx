@@ -190,22 +190,22 @@ export function NotificationSettings({ initialSettings, onUpdate, locale = "en" 
       </div>
 
       {/* Email Categories */}
-      <Card>
+      <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5 text-cpAqua" />
+          <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
+            <Bell className="h-5 w-5 text-cpCoral" />
             {t.title}
           </CardTitle>
-          <CardDescription>{t.description}</CardDescription>
+          <CardDescription className="dark:text-cpCream/70">{t.description}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* General */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Mail className="h-5 w-5 text-slate-400" />
+              <Mail className="h-5 w-5 text-muted-foreground dark:text-cpCream/60" />
               <div>
-                <Label className="font-medium">{t.general}</Label>
-                <p className="text-sm text-slate-500">{t.generalDesc}</p>
+                <Label className="font-medium dark:text-cpCream">{t.general}</Label>
+                <p className="text-sm text-muted-foreground dark:text-cpCream/60">{t.generalDesc}</p>
               </div>
             </div>
             <Switch
@@ -218,10 +218,10 @@ export function NotificationSettings({ initialSettings, onUpdate, locale = "en" 
           {/* Reviews */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <MessageSquare className="h-5 w-5 text-slate-400" />
+              <MessageSquare className="h-5 w-5 text-muted-foreground dark:text-cpCream/60" />
               <div>
-                <Label className="font-medium">{t.reviews}</Label>
-                <p className="text-sm text-slate-500">{t.reviewsDesc}</p>
+                <Label className="font-medium dark:text-cpCream">{t.reviews}</Label>
+                <p className="text-sm text-muted-foreground dark:text-cpCream/60">{t.reviewsDesc}</p>
               </div>
             </div>
             <Switch
@@ -234,10 +234,10 @@ export function NotificationSettings({ initialSettings, onUpdate, locale = "en" 
           {/* Favorites */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Heart className="h-5 w-5 text-slate-400" />
+              <Heart className="h-5 w-5 text-muted-foreground dark:text-cpCream/60" />
               <div>
-                <Label className="font-medium">{t.favorites}</Label>
-                <p className="text-sm text-slate-500">{t.favoritesDesc}</p>
+                <Label className="font-medium dark:text-cpCream">{t.favorites}</Label>
+                <p className="text-sm text-muted-foreground dark:text-cpCream/60">{t.favoritesDesc}</p>
               </div>
             </div>
             <Switch
@@ -250,10 +250,10 @@ export function NotificationSettings({ initialSettings, onUpdate, locale = "en" 
           {/* Leads */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Mail className="h-5 w-5 text-slate-400" />
+              <Mail className="h-5 w-5 text-muted-foreground dark:text-cpCream/60" />
               <div>
-                <Label className="font-medium">{t.leads}</Label>
-                <p className="text-sm text-slate-500">{t.leadsDesc}</p>
+                <Label className="font-medium dark:text-cpCream">{t.leads}</Label>
+                <p className="text-sm text-muted-foreground dark:text-cpCream/60">{t.leadsDesc}</p>
               </div>
             </div>
             <Switch
@@ -266,10 +266,10 @@ export function NotificationSettings({ initialSettings, onUpdate, locale = "en" 
           {/* Business */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Building2 className="h-5 w-5 text-slate-400" />
+              <Building2 className="h-5 w-5 text-muted-foreground dark:text-cpCream/60" />
               <div>
-                <Label className="font-medium">{t.business}</Label>
-                <p className="text-sm text-slate-500">{t.businessDesc}</p>
+                <Label className="font-medium dark:text-cpCream">{t.business}</Label>
+                <p className="text-sm text-muted-foreground dark:text-cpCream/60">{t.businessDesc}</p>
               </div>
             </div>
             <Switch
@@ -282,10 +282,10 @@ export function NotificationSettings({ initialSettings, onUpdate, locale = "en" 
           {/* Digest */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <FileText className="h-5 w-5 text-slate-400" />
+              <FileText className="h-5 w-5 text-muted-foreground dark:text-cpCream/60" />
               <div>
-                <Label className="font-medium">{t.digest}</Label>
-                <p className="text-sm text-slate-500">{t.digestDesc}</p>
+                <Label className="font-medium dark:text-cpCream">{t.digest}</Label>
+                <p className="text-sm text-muted-foreground dark:text-cpCream/60">{t.digestDesc}</p>
               </div>
             </div>
             <Switch
@@ -298,22 +298,22 @@ export function NotificationSettings({ initialSettings, onUpdate, locale = "en" 
       </Card>
 
       {/* Advanced Settings */}
-      <Card>
+      <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-cpPink" />
+          <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
+            <Clock className="h-5 w-5 text-cpCoral" />
             {t.advanced}
           </CardTitle>
-          <CardDescription>{t.advancedDesc}</CardDescription>
+          <CardDescription className="dark:text-cpCream/70">{t.advancedDesc}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Email Language */}
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <Globe className="h-5 w-5 text-slate-400" />
+              <Globe className="h-5 w-5 text-muted-foreground dark:text-cpCream/60" />
               <div>
-                <Label className="font-medium">{t.language}</Label>
-                <p className="text-sm text-slate-500">{t.languageDesc}</p>
+                <Label className="font-medium dark:text-cpCream">{t.language}</Label>
+                <p className="text-sm text-muted-foreground dark:text-cpCream/60">{t.languageDesc}</p>
               </div>
             </div>
             <Select
@@ -338,10 +338,10 @@ export function NotificationSettings({ initialSettings, onUpdate, locale = "en" 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Clock className="h-5 w-5 text-slate-400" />
+                <Clock className="h-5 w-5 text-muted-foreground dark:text-cpCream/60" />
                 <div>
-                  <Label className="font-medium">{t.quietHours}</Label>
-                  <p className="text-sm text-slate-500">{t.quietHoursDesc}</p>
+                  <Label className="font-medium dark:text-cpCream">{t.quietHours}</Label>
+                  <p className="text-sm text-muted-foreground dark:text-cpCream/60">{t.quietHoursDesc}</p>
                 </div>
               </div>
               <Switch
@@ -352,10 +352,10 @@ export function NotificationSettings({ initialSettings, onUpdate, locale = "en" 
             </div>
 
             {settings.quietHoursEnabled && (
-              <div className="ml-8 space-y-4 p-4 bg-slate-50 rounded-lg">
+              <div className="ml-8 space-y-4 p-4 bg-muted dark:bg-cpSurface rounded-lg">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>{t.from}</Label>
+                    <Label className="dark:text-cpCream">{t.from}</Label>
                     <Select
                       value={(settings.quietHoursStart ?? 22).toString()}
                       onValueChange={(value) => handleUpdate({ quietHoursStart: parseInt(value) })}
@@ -374,7 +374,7 @@ export function NotificationSettings({ initialSettings, onUpdate, locale = "en" 
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>{t.to}</Label>
+                    <Label className="dark:text-cpCream">{t.to}</Label>
                     <Select
                       value={(settings.quietHoursEnd ?? 8).toString()}
                       onValueChange={(value) => handleUpdate({ quietHoursEnd: parseInt(value) })}
@@ -395,7 +395,7 @@ export function NotificationSettings({ initialSettings, onUpdate, locale = "en" 
                 </div>
 
                 <div className="space-y-2">
-                  <Label>{t.timezone}</Label>
+                  <Label className="dark:text-cpCream">{t.timezone}</Label>
                   <Select
                     value={settings.timezone || "Europe/Amsterdam"}
                     onValueChange={(value) => handleUpdate({ timezone: value })}
@@ -420,10 +420,10 @@ export function NotificationSettings({ initialSettings, onUpdate, locale = "en" 
           {/* Max Emails Per Week */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <Mail className="h-5 w-5 text-slate-400" />
+              <Mail className="h-5 w-5 text-muted-foreground dark:text-cpCream/60" />
               <div>
-                <Label className="font-medium">{t.maxEmails}</Label>
-                <p className="text-sm text-slate-500">{t.maxEmailsDesc}</p>
+                <Label className="font-medium dark:text-cpCream">{t.maxEmails}</Label>
+                <p className="text-sm text-muted-foreground dark:text-cpCream/60">{t.maxEmailsDesc}</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -439,10 +439,10 @@ export function NotificationSettings({ initialSettings, onUpdate, locale = "en" 
                 min={1}
                 max={1000}
                 step={5}
-                className="w-24"
+                className="w-24 dark:bg-cpSurface dark:border-cpAmber/30 dark:text-cpCream"
                 disabled={isPending}
               />
-              <span className="text-sm text-slate-500">
+              <span className="text-sm text-muted-foreground dark:text-cpCream/60">
                 {locale === "nl" ? "e-mails per week" : locale === "de" ? "E-Mails pro Woche" : "emails per week"}
               </span>
             </div>
@@ -451,7 +451,7 @@ export function NotificationSettings({ initialSettings, onUpdate, locale = "en" 
       </Card>
 
       {isPending && (
-        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 bg-slate-100 text-slate-800 px-4 py-2 rounded-lg shadow-lg">
+        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 bg-muted dark:bg-cpSurface text-foreground dark:text-cpCream px-4 py-2 rounded-lg shadow-lg">
           <Loader2 className="h-4 w-4 animate-spin" />
           Saving...
         </div>

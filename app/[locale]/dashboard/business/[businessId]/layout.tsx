@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 import { getPlan, type PlanKey } from "@/lib/plans/config";
 import { MobileSidebar } from "@/components/dashboard/MobileSidebar";
+import { ThemeToggle, LanguageSwitcher } from "@/components/theme";
 
 interface BusinessLayoutProps {
   children: React.ReactNode;
@@ -50,10 +51,10 @@ export default async function BusinessLayout({
   // Check if StackAuth is configured
   if (!stackServerApp) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-background dark:bg-cpCharcoal">
         <div className="text-center p-8">
-          <h1 className="text-2xl font-bold text-cpDark mb-2">Dashboard Unavailable</h1>
-          <p className="text-slate-600">Authentication is not configured.</p>
+          <h1 className="text-2xl font-bold text-foreground dark:text-cpCream mb-2">Dashboard Unavailable</h1>
+          <p className="text-muted-foreground dark:text-cpCream/70">Authentication is not configured.</p>
         </div>
       </div>
     );
@@ -165,9 +166,9 @@ export default async function BusinessLayout({
   const planInfo = getPlan((business.planKey as PlanKey) || "FREE");
 
   return (
-    <div className="fixed inset-0 z-[100] bg-slate-50 flex flex-col">
+    <div className="fixed inset-0 z-[100] bg-background dark:bg-cpCharcoal flex flex-col">
       {/* Mobile Header */}
-      <header className="lg:hidden h-14 bg-white border-b flex items-center justify-between px-4 flex-shrink-0">
+      <header className="lg:hidden h-14 bg-card dark:bg-cpCharcoal border-b border-border dark:border-cpAmber/20 flex items-center justify-between px-4 flex-shrink-0">
         <MobileSidebar
           businessName={business.name}
           businessLogo={business.logo}
@@ -183,30 +184,33 @@ export default async function BusinessLayout({
           businessId={businessId}
         />
         <div className="flex items-center gap-2">
-          <PawPrint className="h-5 w-5 text-cpPink" />
-          <span className="font-bold text-cpDark text-sm">CutiePawsPedia</span>
+          <PawPrint className="h-5 w-5 text-cpCoral" />
+          <span className="font-bold text-foreground dark:text-cpCream text-sm">CutiePawsPedia</span>
         </div>
-        <div className="w-10" /> {/* Spacer for centering */}
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <LanguageSwitcher locale={locale} />
+        </div>
       </header>
 
       {/* Content wrapper - flex row on desktop */}
       <div className="flex-1 flex overflow-hidden">
         {/* Desktop Sidebar */}
-        <aside className="hidden lg:flex w-64 bg-white border-r flex-col flex-shrink-0">
+        <aside className="hidden lg:flex w-64 bg-card dark:bg-cpCharcoal border-r border-border dark:border-cpAmber/20 flex-col flex-shrink-0">
           {/* Logo */}
-          <div className="h-16 flex items-center gap-2 px-4 border-b">
-            <div className="p-2 rounded-lg bg-cpPink/10">
-              <PawPrint className="h-5 w-5 text-cpPink" />
+          <div className="h-16 flex items-center gap-2 px-4 border-b border-border dark:border-cpAmber/20">
+            <div className="p-2 rounded-lg bg-cpCoral/10">
+              <PawPrint className="h-5 w-5 text-cpCoral" />
             </div>
             <div>
-              <span className="font-bold text-cpDark">CutiePawsPedia</span>
-              <span className="text-xs text-slate-500 block">Business Dashboard</span>
+              <span className="font-bold text-foreground dark:text-cpCream">CutiePawsPedia</span>
+              <span className="text-xs text-muted-foreground dark:text-cpCream/60 block">Business Dashboard</span>
             </div>
           </div>
 
           {/* Business Selector (if multiple businesses) */}
           {allBusinesses.length > 1 && (
-            <div className="p-4 border-b">
+            <div className="p-4 border-b border-border dark:border-cpAmber/20">
               <BusinessSelector
                 businesses={allBusinesses}
                 currentBusinessId={businessIdNum}
@@ -216,7 +220,7 @@ export default async function BusinessLayout({
           )}
 
           {/* Current Business Info */}
-          <div className="p-4 border-b">
+          <div className="p-4 border-b border-border dark:border-cpAmber/20">
             <div className="flex items-center gap-3">
               {business.logo ? (
                 <img
@@ -225,13 +229,13 @@ export default async function BusinessLayout({
                   className="w-10 h-10 rounded-lg object-cover"
                 />
               ) : (
-                <div className="w-10 h-10 rounded-lg bg-cpPink/10 flex items-center justify-center">
-                  <Building2 className="h-5 w-5 text-cpPink" />
+                <div className="w-10 h-10 rounded-lg bg-cpCoral/10 flex items-center justify-center">
+                  <Building2 className="h-5 w-5 text-cpCoral" />
                 </div>
               )}
               <div className="truncate">
-                <p className="font-medium text-cpDark truncate">{business.name}</p>
-                <p className="text-xs text-slate-500">
+                <p className="font-medium text-foreground dark:text-cpCream truncate">{business.name}</p>
+                <p className="text-xs text-muted-foreground dark:text-cpCream/60">
                   {planInfo.name} plan
                 </p>
               </div>
@@ -248,25 +252,36 @@ export default async function BusinessLayout({
           </nav>
 
           {/* Quick Links */}
-          <div className="p-4 border-t space-y-1">
+          <div className="p-4 border-t border-border dark:border-cpAmber/20 space-y-1">
             <Link href={`/${locale}`}>
-              <Button variant="ghost" className="w-full justify-start gap-3 text-slate-500 hover:text-cpPink">
+              <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground dark:text-cpCream/70 hover:text-cpCoral dark:hover:text-cpCoral">
                 <Home className="h-4 w-4" />
                 {t.home}
               </Button>
             </Link>
             <Link href={`/${locale}/account/favorites`}>
-              <Button variant="ghost" className="w-full justify-start gap-3 text-slate-500 hover:text-cpPink">
+              <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground dark:text-cpCream/70 hover:text-cpCoral dark:hover:text-cpCoral">
                 <Heart className="h-4 w-4" />
                 {t.favorites}
               </Button>
             </Link>
           </div>
 
+          {/* Settings */}
+          <div className="p-4 border-t border-border dark:border-cpAmber/20">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground dark:text-cpCream/60 uppercase tracking-wider">Settings</span>
+              <div className="flex items-center gap-1">
+                <ThemeToggle />
+                <LanguageSwitcher locale={locale} />
+              </div>
+            </div>
+          </div>
+
           {/* Footer */}
-          <div className="p-4 border-t space-y-1">
+          <div className="p-4 border-t border-border dark:border-cpAmber/20 space-y-1">
             <Link href="/handler/sign-out">
-              <Button variant="ghost" className="w-full justify-start gap-3 text-slate-500 hover:text-red-600">
+              <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground dark:text-cpCream/70 hover:text-red-600 dark:hover:text-red-400">
                 <LogOut className="h-4 w-4" />
                 {t.signOut}
               </Button>
@@ -341,7 +356,7 @@ function BusinessNavItems({
               variant="ghost"
               className={cn(
                 "w-full justify-start gap-3",
-                "hover:bg-cpPink/10 hover:text-cpPink"
+                "hover:bg-cpCoral/10 hover:text-cpCoral dark:hover:bg-cpCoral/20"
               )}
             >
               <Icon className="h-4 w-4" />

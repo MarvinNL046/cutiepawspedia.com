@@ -99,10 +99,10 @@ export function FavoriteButton({
         disabled={isPending}
         className={cn(
           "p-2 rounded-full transition-all duration-200",
-          "hover:bg-cpPink/10 focus:outline-none focus:ring-2 focus:ring-cpPink/50",
+          "hover:bg-cpCoral/10 focus:outline-none focus:ring-2 focus:ring-cpCoral/50",
           isFavorite
-            ? "text-cpPink"
-            : "text-slate-400 hover:text-cpPink",
+            ? "text-cpCoral"
+            : "text-muted-foreground dark:text-cpCream/50 hover:text-cpCoral",
           isPending && "opacity-50 cursor-not-allowed",
           className
         )}
@@ -111,7 +111,7 @@ export function FavoriteButton({
         <Heart
           className={cn(
             "h-5 w-5 transition-all duration-200",
-            isFavorite && "fill-cpPink"
+            isFavorite && "fill-cpCoral"
           )}
         />
       </button>
@@ -130,12 +130,12 @@ export function FavoriteButton({
         disabled={isPending}
         className={cn(
           "absolute top-2 right-2 z-20 p-2 rounded-full",
-          "bg-white/80 backdrop-blur-sm shadow-md",
+          "bg-white/80 dark:bg-cpSurface/80 backdrop-blur-sm shadow-md",
           "transition-all duration-200",
-          "hover:bg-white hover:scale-110",
+          "hover:bg-white dark:hover:bg-cpSurface hover:scale-110",
           isFavorite
-            ? "text-cpPink"
-            : "text-slate-400 hover:text-cpPink",
+            ? "text-cpCoral"
+            : "text-muted-foreground dark:text-cpCream/50 hover:text-cpCoral",
           isPending && "opacity-50 cursor-not-allowed",
           className
         )}
@@ -144,7 +144,7 @@ export function FavoriteButton({
         <Heart
           className={cn(
             "h-4 w-4 transition-all duration-200",
-            isFavorite && "fill-cpPink"
+            isFavorite && "fill-cpCoral"
           )}
         />
       </button>
@@ -160,8 +160,8 @@ export function FavoriteButton({
       disabled={isPending}
       className={cn(
         isFavorite
-          ? "bg-cpPink hover:bg-cpPink/90 text-white"
-          : "border-cpPink text-cpPink hover:bg-cpPink/10",
+          ? "bg-cpCoral hover:bg-cpCoral/90 text-white"
+          : "border-cpCoral text-cpCoral hover:bg-cpCoral/10 dark:border-cpCoral dark:text-cpCoral dark:hover:bg-cpCoral/20",
         className
       )}
     >

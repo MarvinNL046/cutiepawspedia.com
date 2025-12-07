@@ -85,7 +85,7 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
           key={star}
           className={cn(
             "h-3 w-3",
-            star <= rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"
+            star <= rating ? "text-cpAmber fill-cpAmber" : "text-muted-foreground/30 dark:text-cpCream/30"
           )}
         />
       ))}
@@ -95,13 +95,13 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
   const getStatusBadge = (status: Review["status"]) => {
     switch (status) {
       case "published":
-        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Published</Badge>;
+        return <Badge variant="outline" className="bg-cpCoral/10 text-cpCoral border-cpCoral/30 dark:bg-cpCoral/20">Published</Badge>;
       case "pending":
-        return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">Pending</Badge>;
+        return <Badge variant="outline" className="bg-cpAmber/10 text-cpAmber border-cpAmber/30 dark:bg-cpAmber/20">Pending</Badge>;
       case "flagged":
-        return <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">Flagged</Badge>;
+        return <Badge variant="outline" className="bg-orange-500/10 text-orange-500 border-orange-500/30 dark:bg-orange-500/20">Flagged</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant="outline" className="dark:border-cpAmber/30 dark:text-cpCream">{status}</Badge>;
     }
   };
 
@@ -171,9 +171,9 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
 
   if (localReviews.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
-        <p>No reviews yet</p>
+      <div className="text-center py-8 text-muted-foreground dark:text-cpCream/60">
+        <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50 text-cpCoral" />
+        <p className="text-foreground dark:text-cpCream">No reviews yet</p>
         <p className="text-sm mt-1">
           Reviews from your customers will appear here
         </p>
@@ -186,14 +186,14 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
       {/* Mobile Card Layout */}
       <div className="md:hidden space-y-4">
         {localReviews.map((review) => (
-          <div key={review.id} className="border rounded-lg p-4 space-y-3">
+          <div key={review.id} className="border border-border dark:border-cpAmber/20 rounded-lg p-4 space-y-3 bg-card dark:bg-cpSurface/30">
             {/* Header: Place + Status */}
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0 flex-1">
-                <p className="font-medium text-sm truncate">
+                <p className="font-medium text-sm truncate text-foreground dark:text-cpCream">
                   {getRelation(review.place)?.name || "Unknown"}
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground dark:text-cpCream/60">
                   {getRelation(review.user)?.name || "Anonymous"} · {formatDistanceToNow(new Date(review.createdAt), { addSuffix: true })}
                 </p>
               </div>
@@ -203,22 +203,22 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
             {/* Rating */}
             <div className="flex items-center gap-2">
               {renderStars(review.rating)}
-              <span className="text-sm font-medium">{review.rating}/5</span>
+              <span className="text-sm font-medium text-foreground dark:text-cpCream">{review.rating}/5</span>
             </div>
 
             {/* Review Content */}
             <div className="space-y-1">
               {review.title && (
-                <p className="font-medium text-sm">{review.title}</p>
+                <p className="font-medium text-sm text-foreground dark:text-cpCream">{review.title}</p>
               )}
-              <p className="text-sm text-muted-foreground line-clamp-2">
+              <p className="text-sm text-muted-foreground dark:text-cpCream/60 line-clamp-2">
                 {review.body}
               </p>
             </div>
 
             {/* Replied indicator */}
             {review.replies.length > 0 && (
-              <div className="flex items-center gap-1 text-xs text-blue-600">
+              <div className="flex items-center gap-1 text-xs text-cpCoral">
                 <MessageSquare className="h-3 w-3" />
                 <span>Replied</span>
               </div>
@@ -229,7 +229,7 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
               <Button
                 variant="outline"
                 size="sm"
-                className="flex-1"
+                className="flex-1 dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10"
                 onClick={() => {
                   setSelectedReview(review);
                   setIsDetailOpen(true);
@@ -240,7 +240,7 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
               {review.status === "published" && review.replies.length === 0 && (
                 <Button
                   size="sm"
-                  className="flex-1"
+                  className="flex-1 bg-cpCoral hover:bg-cpCoral/90"
                   onClick={() => openReplyDialog(review)}
                 >
                   <MessageSquare className="h-4 w-4 mr-1" />
@@ -256,42 +256,42 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
       <div className="hidden md:block">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Place</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Rating</TableHead>
-              <TableHead>Review</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+            <TableRow className="border-border dark:border-cpAmber/20">
+              <TableHead className="text-muted-foreground dark:text-cpCream/70">Place</TableHead>
+              <TableHead className="text-muted-foreground dark:text-cpCream/70">Customer</TableHead>
+              <TableHead className="text-muted-foreground dark:text-cpCream/70">Rating</TableHead>
+              <TableHead className="text-muted-foreground dark:text-cpCream/70">Review</TableHead>
+              <TableHead className="text-muted-foreground dark:text-cpCream/70">Status</TableHead>
+              <TableHead className="text-muted-foreground dark:text-cpCream/70">Date</TableHead>
+              <TableHead className="text-right text-muted-foreground dark:text-cpCream/70">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {localReviews.map((review) => (
-              <TableRow key={review.id}>
-                <TableCell className="font-medium">
+              <TableRow key={review.id} className="border-border dark:border-cpAmber/10">
+                <TableCell className="font-medium text-foreground dark:text-cpCream">
                   {getRelation(review.place)?.name || "Unknown"}
                 </TableCell>
                 <TableCell>
-                  <div className="text-sm">{getRelation(review.user)?.name || "Anonymous"}</div>
+                  <div className="text-sm text-foreground dark:text-cpCream">{getRelation(review.user)?.name || "Anonymous"}</div>
                 </TableCell>
                 <TableCell>{renderStars(review.rating)}</TableCell>
                 <TableCell className="max-w-[200px]">
                   {review.title && (
-                    <p className="font-medium text-sm truncate">{review.title}</p>
+                    <p className="font-medium text-sm truncate text-foreground dark:text-cpCream">{review.title}</p>
                   )}
-                  <p className="text-sm text-muted-foreground truncate">
+                  <p className="text-sm text-muted-foreground dark:text-cpCream/60 truncate">
                     {review.body}
                   </p>
                   {review.replies.length > 0 && (
-                    <div className="flex items-center gap-1 mt-1 text-xs text-blue-600">
+                    <div className="flex items-center gap-1 mt-1 text-xs text-cpCoral">
                       <MessageSquare className="h-3 w-3" />
                       <span>Replied</span>
                     </div>
                   )}
                 </TableCell>
                 <TableCell>{getStatusBadge(review.status)}</TableCell>
-                <TableCell className="text-xs text-muted-foreground">
+                <TableCell className="text-xs text-muted-foreground dark:text-cpCream/60">
                   {formatDistanceToNow(new Date(review.createdAt), { addSuffix: true })}
                 </TableCell>
                 <TableCell className="text-right">
@@ -299,6 +299,7 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
                     <Button
                       variant="ghost"
                       size="sm"
+                      className="dark:text-cpCream dark:hover:bg-cpAmber/10"
                       onClick={() => {
                         setSelectedReview(review);
                         setIsDetailOpen(true);
@@ -310,6 +311,7 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
                       <Button
                         variant="outline"
                         size="sm"
+                        className="dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10"
                         onClick={() => openReplyDialog(review)}
                       >
                         <MessageSquare className="h-4 w-4 mr-1" />
@@ -326,10 +328,10 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
 
       {/* Detail Dialog */}
       <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto dark:bg-cpSurface dark:border-cpAmber/20">
           <DialogHeader>
-            <DialogTitle>Review Details</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-foreground dark:text-cpCream">Review Details</DialogTitle>
+            <DialogDescription className="dark:text-cpCream/60">
               {selectedReview && getRelation(selectedReview.place)?.name || "Unknown place"}
             </DialogDescription>
           </DialogHeader>
@@ -338,14 +340,14 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
             <div className="space-y-4">
               {/* Customer Info */}
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="h-5 w-5 text-primary" />
+                <div className="h-10 w-10 rounded-full bg-cpCoral/10 dark:bg-cpCoral/20 flex items-center justify-center">
+                  <User className="h-5 w-5 text-cpCoral" />
                 </div>
                 <div>
-                  <p className="font-medium">
+                  <p className="font-medium text-foreground dark:text-cpCream">
                     {getRelation(selectedReview.user)?.name || "Anonymous"}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground dark:text-cpCream/60">
                     {formatDistanceToNow(new Date(selectedReview.createdAt), {
                       addSuffix: true,
                     })}
@@ -356,20 +358,20 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
               {/* Rating */}
               <div className="flex items-center gap-2">
                 {renderStars(selectedReview.rating)}
-                <span className="font-medium">{selectedReview.rating}/5</span>
+                <span className="font-medium text-foreground dark:text-cpCream">{selectedReview.rating}/5</span>
                 {getStatusBadge(selectedReview.status)}
               </div>
 
               {/* Review Content */}
               <div className="space-y-2">
                 {selectedReview.title && (
-                  <h4 className="font-medium">{selectedReview.title}</h4>
+                  <h4 className="font-medium text-foreground dark:text-cpCream">{selectedReview.title}</h4>
                 )}
-                <p className="text-sm text-muted-foreground whitespace-pre-line">
+                <p className="text-sm text-muted-foreground dark:text-cpCream/60 whitespace-pre-line">
                   {selectedReview.body}
                 </p>
                 {selectedReview.visitDate && (
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground dark:text-cpCream/50">
                     Visited:{" "}
                     {new Date(selectedReview.visitDate).toLocaleDateString()}
                   </p>
@@ -378,14 +380,14 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
 
               {/* Existing Replies */}
               {selectedReview.replies.length > 0 && (
-                <div className="space-y-3 border-t pt-4">
-                  <h4 className="text-sm font-medium">Your Response</h4>
+                <div className="space-y-3 border-t border-border dark:border-cpAmber/20 pt-4">
+                  <h4 className="text-sm font-medium text-foreground dark:text-cpCream">Your Response</h4>
                   {selectedReview.replies.map((reply) => (
                     <div
                       key={reply.id}
-                      className="bg-blue-50 rounded-lg p-3 border border-blue-100"
+                      className="bg-cpCoral/5 dark:bg-cpCoral/10 rounded-lg p-3 border border-cpCoral/20 dark:border-cpCoral/30"
                     >
-                      <div className="flex items-center gap-2 mb-2 text-xs text-blue-700">
+                      <div className="flex items-center gap-2 mb-2 text-xs text-cpCoral">
                         <MessageSquare className="h-3 w-3" />
                         <span>Business Response</span>
                         <span>·</span>
@@ -395,7 +397,7 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
                           })}
                         </span>
                       </div>
-                      <p className="text-sm">{reply.body}</p>
+                      <p className="text-sm text-foreground dark:text-cpCream">{reply.body}</p>
                     </div>
                   ))}
                 </div>
@@ -404,9 +406,9 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
               {/* Reply Button */}
               {selectedReview.status === "published" &&
                 selectedReview.replies.length === 0 && (
-                  <div className="border-t pt-4">
+                  <div className="border-t border-border dark:border-cpAmber/20 pt-4">
                     <Button
-                      className="w-full"
+                      className="w-full bg-cpCoral hover:bg-cpCoral/90"
                       onClick={() => openReplyDialog(selectedReview)}
                     >
                       <MessageSquare className="h-4 w-4 mr-2" />
@@ -421,10 +423,10 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
 
       {/* Reply Dialog */}
       <Dialog open={isReplyOpen} onOpenChange={setIsReplyOpen}>
-        <DialogContent>
+        <DialogContent className="dark:bg-cpSurface dark:border-cpAmber/20">
           <DialogHeader>
-            <DialogTitle>Respond to Review</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-foreground dark:text-cpCream">Respond to Review</DialogTitle>
+            <DialogDescription className="dark:text-cpCream/60">
               Your response will be publicly visible under this review
             </DialogDescription>
           </DialogHeader>
@@ -432,14 +434,14 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
           {selectedReview && (
             <div className="space-y-4">
               {/* Original Review Summary */}
-              <div className="bg-muted/50 rounded-lg p-3">
+              <div className="bg-muted/50 dark:bg-cpCharcoal/50 rounded-lg p-3 border border-border dark:border-cpAmber/20">
                 <div className="flex items-center gap-2 mb-2">
                   {renderStars(selectedReview.rating)}
-                  <span className="text-sm font-medium">
+                  <span className="text-sm font-medium text-foreground dark:text-cpCream">
                     {getRelation(selectedReview.user)?.name || "Anonymous"}
                   </span>
                 </div>
-                <p className="text-sm text-muted-foreground line-clamp-3">
+                <p className="text-sm text-muted-foreground dark:text-cpCream/60 line-clamp-3">
                   {selectedReview.body}
                 </p>
               </div>
@@ -452,8 +454,9 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
                   onChange={(e) => setReplyText(e.target.value)}
                   rows={4}
                   maxLength={2000}
+                  className="dark:bg-cpCharcoal/50 dark:border-cpAmber/30 dark:text-cpCream dark:placeholder:text-cpCream/40"
                 />
-                <p className="text-xs text-muted-foreground text-right">
+                <p className="text-xs text-muted-foreground dark:text-cpCream/50 text-right">
                   {replyText.length}/2000 characters
                 </p>
               </div>
@@ -462,7 +465,9 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
               {submitMessage && (
                 <div className={cn(
                   "p-3 rounded-lg text-sm",
-                  submitMessage.type === "success" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+                  submitMessage.type === "success"
+                    ? "bg-cpCoral/10 text-cpCoral dark:bg-cpCoral/20"
+                    : "bg-red-500/10 text-red-500 dark:bg-red-500/20"
                 )}>
                   {submitMessage.text}
                 </div>
@@ -475,12 +480,14 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
               variant="outline"
               onClick={() => setIsReplyOpen(false)}
               disabled={isSubmitting}
+              className="dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10"
             >
               Cancel
             </Button>
             <Button
               onClick={handleReply}
               disabled={isSubmitting || replyText.trim().length < 5}
+              className="bg-cpCoral hover:bg-cpCoral/90"
             >
               {isSubmitting ? (
                 <>

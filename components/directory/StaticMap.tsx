@@ -48,12 +48,12 @@ function MapFallback({
 }) {
   return (
     <div
-      className={`bg-slate-100 rounded-lg flex items-center justify-center ${className || ""}`}
+      className={`bg-muted dark:bg-cpSurface/50 rounded-lg flex items-center justify-center ${className || ""}`}
       style={{ height }}
     >
       <div className="text-center p-4">
-        <MapPin className="h-8 w-8 text-slate-400 mx-auto mb-2" />
-        <p className="text-sm text-slate-500">{message}</p>
+        <MapPin className="h-8 w-8 text-muted-foreground dark:text-cpCream/40 mx-auto mb-2" />
+        <p className="text-sm text-muted-foreground dark:text-cpCream/60">{message}</p>
       </div>
     </div>
   );
@@ -67,7 +67,7 @@ export function StaticMap({
   width = 400,
   height = 200,
   className = "",
-  markerColor = "FF7FA1", // cpPink without #
+  markerColor = "FF8C73", // cpCoral without #
   alt,
   priority = false,
   showFallback = true,
@@ -118,7 +118,7 @@ export function StaticMap({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-lg bg-slate-100 ${className}`}
+      className={`relative overflow-hidden rounded-lg bg-muted dark:bg-cpSurface/50 ${className}`}
       style={{ height }}
     >
       <Image
@@ -156,7 +156,7 @@ export function StaticMapWithDirections({
         href={googleMapsUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center justify-center gap-2 text-sm text-cpAqua hover:text-cpPink transition-colors py-1"
+        className="flex items-center justify-center gap-2 text-sm text-cpCoral hover:text-cpCoral/80 dark:text-cpCoral dark:hover:text-cpCoral/70 transition-colors py-1"
       >
         <MapPin className="h-4 w-4" />
         Open in Google Maps

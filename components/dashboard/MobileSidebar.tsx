@@ -73,19 +73,19 @@ export function MobileSidebar({
           <span className="sr-only">Open menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-64 p-0">
-        <SheetHeader className="h-16 flex flex-row items-center gap-2 px-4 border-b">
-          <div className="p-2 rounded-lg bg-cpPink/10">
-            <PawPrint className="h-5 w-5 text-cpPink" />
+      <SheetContent side="left" className="w-64 p-0 bg-card dark:bg-cpCharcoal border-r border-border dark:border-cpAmber/20">
+        <SheetHeader className="h-16 flex flex-row items-center gap-2 px-4 border-b border-border dark:border-cpAmber/20">
+          <div className="p-2 rounded-lg bg-cpCoral/10">
+            <PawPrint className="h-5 w-5 text-cpCoral" />
           </div>
           <SheetTitle className="text-left">
-            <span className="font-bold text-cpDark block">CutiePawsPedia</span>
-            <span className="text-xs text-slate-500 font-normal">Business Dashboard</span>
+            <span className="font-bold text-foreground dark:text-cpCream block">CutiePawsPedia</span>
+            <span className="text-xs text-muted-foreground dark:text-cpCream/60 font-normal">Business Dashboard</span>
           </SheetTitle>
         </SheetHeader>
 
         {/* Business Info */}
-        <div className="p-4 border-b">
+        <div className="p-4 border-b border-border dark:border-cpAmber/20">
           <div className="flex items-center gap-3">
             {businessLogo ? (
               <img
@@ -94,13 +94,13 @@ export function MobileSidebar({
                 className="w-10 h-10 rounded-lg object-cover"
               />
             ) : (
-              <div className="w-10 h-10 rounded-lg bg-cpPink/10 flex items-center justify-center">
-                <Building2 className="h-5 w-5 text-cpPink" />
+              <div className="w-10 h-10 rounded-lg bg-cpCoral/10 flex items-center justify-center">
+                <Building2 className="h-5 w-5 text-cpCoral" />
               </div>
             )}
             <div className="truncate">
-              <p className="font-medium text-cpDark truncate">{businessName}</p>
-              <p className="text-xs text-slate-500">{planName} plan</p>
+              <p className="font-medium text-foreground dark:text-cpCream truncate">{businessName}</p>
+              <p className="text-xs text-muted-foreground dark:text-cpCream/60">{planName} plan</p>
             </div>
           </div>
         </div>
@@ -117,7 +117,7 @@ export function MobileSidebar({
               >
                 <Button
                   variant="ghost"
-                  className="w-full justify-start gap-3 hover:bg-cpPink/10 hover:text-cpPink"
+                  className="w-full justify-start gap-3 hover:bg-cpCoral/10 hover:text-cpCoral dark:hover:bg-cpCoral/20"
                 >
                   <Icon className="h-4 w-4" />
                   {item.label}
@@ -128,15 +128,15 @@ export function MobileSidebar({
         </nav>
 
         {/* Quick Links */}
-        <div className="p-4 border-t space-y-1">
+        <div className="p-4 border-t border-border dark:border-cpAmber/20 space-y-1">
           <Link href={`/${locale}`} onClick={() => setOpen(false)}>
-            <Button variant="ghost" className="w-full justify-start gap-3 text-slate-500 hover:text-cpPink">
+            <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground dark:text-cpCream/70 hover:text-cpCoral dark:hover:text-cpCoral">
               <Home className="h-4 w-4" />
               {labels.home}
             </Button>
           </Link>
           <Link href={`/${locale}/account/favorites`} onClick={() => setOpen(false)}>
-            <Button variant="ghost" className="w-full justify-start gap-3 text-slate-500 hover:text-cpPink">
+            <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground dark:text-cpCream/70 hover:text-cpCoral dark:hover:text-cpCoral">
               <Heart className="h-4 w-4" />
               {labels.favorites}
             </Button>
@@ -144,9 +144,9 @@ export function MobileSidebar({
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t space-y-1">
+        <div className="p-4 border-t border-border dark:border-cpAmber/20 space-y-1">
           <Link href="/handler/sign-out">
-            <Button variant="ghost" className="w-full justify-start gap-3 text-slate-500 hover:text-red-600">
+            <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground dark:text-cpCream/70 hover:text-red-600 dark:hover:text-red-400">
               <LogOut className="h-4 w-4" />
               {labels.signOut}
             </Button>

@@ -46,8 +46,8 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
   if (!stackServerApp) {
     return (
       <div className="p-8 text-center">
-        <h1 className="text-2xl font-bold text-cpDark">Dashboard Unavailable</h1>
-        <p className="text-slate-600">Authentication is not configured.</p>
+        <h1 className="text-2xl font-bold text-foreground dark:text-cpCream">Dashboard Unavailable</h1>
+        <p className="text-muted-foreground dark:text-cpCream/60">Authentication is not configured.</p>
       </div>
     );
   }
@@ -135,16 +135,16 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
   return (
     <div className="h-[calc(100vh-64px)] flex flex-col">
       {/* Header */}
-      <div className="flex-shrink-0 bg-white border-b px-6 py-4">
+      <div className="flex-shrink-0 bg-card dark:bg-cpSurface/50 border-b border-border dark:border-cpAmber/20 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href={`/${locale}/dashboard/business/${businessId}/inbox`}>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="dark:text-cpCream dark:hover:bg-cpAmber/10">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 {t.backToInbox}
               </Button>
             </Link>
-            <div className="h-6 w-px bg-slate-200" />
+            <div className="h-6 w-px bg-border dark:bg-cpAmber/20" />
             <div className="flex items-center gap-3">
               {thread.user?.avatarUrl ? (
                 <img
@@ -153,16 +153,16 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
                   className="w-10 h-10 rounded-full object-cover"
                 />
               ) : (
-                <div className="w-10 h-10 rounded-full bg-cpPink/10 flex items-center justify-center">
-                  <User className="h-5 w-5 text-cpPink" />
+                <div className="w-10 h-10 rounded-full bg-cpCoral/10 dark:bg-cpCoral/20 flex items-center justify-center">
+                  <User className="h-5 w-5 text-cpCoral" />
                 </div>
               )}
               <div>
-                <p className="font-medium text-cpDark">
+                <p className="font-medium text-foreground dark:text-cpCream">
                   {thread.user?.name || thread.user?.email || "Unknown User"}
                 </p>
                 {thread.place && (
-                  <p className="text-xs text-slate-500 flex items-center gap-1">
+                  <p className="text-xs text-muted-foreground dark:text-cpCream/60 flex items-center gap-1">
                     <MapPin className="h-3 w-3" />
                     {t.about} {thread.place.name}
                   </p>
@@ -172,16 +172,16 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="capitalize">
+            <Badge variant="outline" className="capitalize dark:border-cpAmber/30 dark:text-cpCream">
               {thread.status}
             </Badge>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="dark:text-cpCream dark:hover:bg-cpAmber/10">
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="dark:bg-cpSurface dark:border-cpAmber/20">
                 {thread.status === "open" ? (
                   <>
                     <form action={updateThreadStatusAction}>
@@ -190,7 +190,7 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="status" value="archived" />
                       <DropdownMenuItem asChild>
-                        <button type="submit" className="w-full flex items-center">
+                        <button type="submit" className="w-full flex items-center dark:text-cpCream">
                           <Archive className="h-4 w-4 mr-2" />
                           {t.archive}
                         </button>
@@ -202,7 +202,7 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="status" value="spam" />
                       <DropdownMenuItem asChild>
-                        <button type="submit" className="w-full flex items-center text-red-600">
+                        <button type="submit" className="w-full flex items-center text-red-500">
                           <Trash2 className="h-4 w-4 mr-2" />
                           {t.markAsSpam}
                         </button>
@@ -216,7 +216,7 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
                     <input type="hidden" name="locale" value={locale} />
                     <input type="hidden" name="status" value="open" />
                     <DropdownMenuItem asChild>
-                      <button type="submit" className="w-full flex items-center">
+                      <button type="submit" className="w-full flex items-center dark:text-cpCream">
                         {t.reopen}
                       </button>
                     </DropdownMenuItem>
@@ -229,9 +229,9 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50">
+      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-muted/50 dark:bg-cpCharcoal/50">
         {sortedMessages.length === 0 ? (
-          <div className="text-center text-slate-500 py-12">
+          <div className="text-center text-muted-foreground dark:text-cpCream/60 py-12">
             No messages yet. Start the conversation!
           </div>
         ) : (
@@ -245,14 +245,14 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
                 <div
                   className={`max-w-[70%] rounded-2xl px-4 py-3 ${
                     isFromBusiness
-                      ? "bg-cpPink text-white rounded-br-md"
-                      : "bg-white border rounded-bl-md"
+                      ? "bg-cpCoral text-white rounded-br-md"
+                      : "bg-card dark:bg-cpSurface border border-border dark:border-cpAmber/20 rounded-bl-md text-foreground dark:text-cpCream"
                   }`}
                 >
                   <p className="whitespace-pre-wrap">{message.body}</p>
                   <p
                     className={`text-xs mt-2 ${
-                      isFromBusiness ? "text-cpPink/70" : "text-slate-400"
+                      isFromBusiness ? "text-white/70" : "text-muted-foreground dark:text-cpCream/50"
                     }`}
                   >
                     {format(new Date(message.createdAt), "PPp", {
@@ -267,7 +267,7 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
       </div>
 
       {/* Composer */}
-      <div className="flex-shrink-0 bg-white border-t p-4">
+      <div className="flex-shrink-0 bg-card dark:bg-cpSurface/50 border-t border-border dark:border-cpAmber/20 p-4">
         <MessageComposer
           threadId={threadIdNum}
           businessId={businessIdNum}

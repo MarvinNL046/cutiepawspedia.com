@@ -54,15 +54,15 @@ export function DashboardSidebar({ locale }: DashboardSidebarProps) {
   };
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r flex flex-col">
+    <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-card dark:bg-cpCharcoal border-r border-border dark:border-cpAmber/20 flex flex-col">
       {/* Logo */}
-      <div className="h-16 flex items-center gap-2 px-4 border-b">
-        <div className="p-2 rounded-lg bg-cpPink/10">
-          <PawPrint className="h-5 w-5 text-cpPink" />
+      <div className="h-16 flex items-center gap-2 px-4 border-b border-border dark:border-cpAmber/20">
+        <div className="p-2 rounded-lg bg-cpCoral/10">
+          <PawPrint className="h-5 w-5 text-cpCoral" />
         </div>
         <div>
-          <span className="font-bold text-cpDark">CutiePawsPedia</span>
-          <span className="text-xs text-slate-500 block">Business Dashboard</span>
+          <span className="font-bold text-foreground dark:text-cpCream">CutiePawsPedia</span>
+          <span className="text-xs text-muted-foreground dark:text-cpCream/60 block">Business Dashboard</span>
         </div>
       </div>
 
@@ -78,7 +78,7 @@ export function DashboardSidebar({ locale }: DashboardSidebarProps) {
                 variant={active ? "secondary" : "ghost"}
                 className={cn(
                   "w-full justify-start gap-3",
-                  active && "bg-cpPink/10 text-cpPink hover:bg-cpPink/15"
+                  active && "bg-cpCoral/10 text-cpCoral hover:bg-cpCoral/15 dark:bg-cpCoral/20"
                 )}
               >
                 <Icon className="h-4 w-4" />
@@ -90,15 +90,15 @@ export function DashboardSidebar({ locale }: DashboardSidebarProps) {
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t space-y-2">
+      <div className="p-4 border-t border-border dark:border-cpAmber/20 space-y-2">
         <Link href={`/${locale}`}>
-          <Button variant="ghost" className="w-full justify-start gap-3 text-slate-500">
+          <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground dark:text-cpCream/70 hover:text-cpCoral dark:hover:text-cpCoral">
             <ChevronLeft className="h-4 w-4" />
             Back to Directory
           </Button>
         </Link>
         <Link href="/handler/sign-out">
-          <Button variant="ghost" className="w-full justify-start gap-3 text-slate-500 hover:text-red-600">
+          <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground dark:text-cpCream/70 hover:text-red-600 dark:hover:text-red-400">
             <LogOut className="h-4 w-4" />
             Sign Out
           </Button>

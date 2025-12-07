@@ -21,11 +21,11 @@ export function DashboardHeader({
   const user = useAuth();
 
   return (
-    <header className="h-14 lg:h-16 border-b bg-white flex items-center justify-between px-4 lg:px-6 flex-shrink-0">
+    <header className="h-14 lg:h-16 border-b border-border dark:border-cpAmber/20 bg-card dark:bg-cpCharcoal flex items-center justify-between px-4 lg:px-6 flex-shrink-0">
       <div className="min-w-0 flex-1">
-        <h1 className="text-lg lg:text-xl font-semibold text-cpDark truncate">{title}</h1>
+        <h1 className="text-lg lg:text-xl font-semibold text-foreground dark:text-cpCream truncate">{title}</h1>
         {description && (
-          <p className="text-xs lg:text-sm text-slate-500 truncate hidden sm:block">{description}</p>
+          <p className="text-xs lg:text-sm text-muted-foreground dark:text-cpCream/60 truncate hidden sm:block">{description}</p>
         )}
       </div>
 
@@ -38,21 +38,21 @@ export function DashboardHeader({
         {/* User info - hidden on mobile, shown on md+ */}
         <div className="hidden md:flex items-center gap-3">
           <div className="text-right">
-            <p className="text-sm font-medium text-cpDark">
+            <p className="text-sm font-medium text-foreground dark:text-cpCream">
               {user?.displayName || user?.primaryEmail?.split("@")[0] || "User"}
             </p>
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-xs dark:border-cpAmber/30 dark:text-cpCream/80">
               Business
             </Badge>
           </div>
-          <div className="h-9 w-9 rounded-full bg-cpAqua/20 flex items-center justify-center">
-            <User className="h-5 w-5 text-cpAqua" />
+          <div className="h-9 w-9 rounded-full bg-cpCoral/10 dark:bg-cpCoral/20 flex items-center justify-center">
+            <User className="h-5 w-5 text-cpCoral" />
           </div>
         </div>
 
         {/* Mobile avatar only */}
-        <div className="md:hidden h-8 w-8 rounded-full bg-cpAqua/20 flex items-center justify-center">
-          <User className="h-4 w-4 text-cpAqua" />
+        <div className="md:hidden h-8 w-8 rounded-full bg-cpCoral/10 dark:bg-cpCoral/20 flex items-center justify-center">
+          <User className="h-4 w-4 text-cpCoral" />
         </div>
       </div>
     </header>

@@ -110,42 +110,42 @@ export default async function BusinessReviewsPage({ params }: PageProps) {
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-3">
-        <Card>
+        <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t.totalReviews}</CardTitle>
-            <MessageSquare className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-foreground dark:text-cpCream">{t.totalReviews}</CardTitle>
+            <MessageSquare className="h-4 w-4 text-muted-foreground dark:text-cpCream/60" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalReviews}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-foreground dark:text-cpCream">{totalReviews}</div>
+            <p className="text-xs text-muted-foreground dark:text-cpCream/60">
               {t.acrossPlaces}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t.avgRating}</CardTitle>
-            <Star className="h-4 w-4 text-yellow-500" />
+            <CardTitle className="text-sm font-medium text-foreground dark:text-cpCream">{t.avgRating}</CardTitle>
+            <Star className="h-4 w-4 text-cpAmber fill-cpAmber" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold text-foreground dark:text-cpCream">
               {avgRating > 0 ? avgRating.toFixed(1) : "-"}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground dark:text-cpCream/60">
               {t.outOf5}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t.needsResponse}</CardTitle>
-            <MessageSquare className="h-4 w-4 text-orange-500" />
+            <CardTitle className="text-sm font-medium text-foreground dark:text-cpCream">{t.needsResponse}</CardTitle>
+            <MessageSquare className="h-4 w-4 text-cpCoral" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{pendingReplies}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-foreground dark:text-cpCream">{pendingReplies}</div>
+            <p className="text-xs text-muted-foreground dark:text-cpCream/60">
               {t.noReply}
             </p>
           </CardContent>
@@ -153,10 +153,10 @@ export default async function BusinessReviewsPage({ params }: PageProps) {
       </div>
 
       {/* Reviews Table */}
-      <Card>
+      <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
         <CardHeader>
-          <CardTitle>{t.customerReviews}</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-foreground dark:text-cpCream">{t.customerReviews}</CardTitle>
+          <CardDescription className="dark:text-cpCream/60">
             {t.viewRespond}
           </CardDescription>
         </CardHeader>

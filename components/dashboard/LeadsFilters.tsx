@@ -96,19 +96,19 @@ export function LeadsFilters({
   };
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between p-4 bg-slate-50 rounded-lg">
+    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between p-4 bg-muted dark:bg-cpSurface/50 rounded-lg">
       <div className="flex flex-wrap gap-3 items-center">
-        <Filter className="h-4 w-4 text-slate-500" />
+        <Filter className="h-4 w-4 text-muted-foreground dark:text-cpCream/70" />
 
         {/* Listing Filter */}
         <Select
           value={currentListingId || "all"}
           onValueChange={(value) => updateFilter("listingId", value)}
         >
-          <SelectTrigger className="w-[200px] bg-white">
+          <SelectTrigger className="w-[200px] bg-card dark:bg-cpSurface dark:border-cpAmber/30 dark:text-cpCream">
             <SelectValue placeholder="All Listings" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="dark:bg-cpSurface dark:border-cpAmber/20">
             <SelectItem value="all">All Listings</SelectItem>
             {listings.map((listing) => (
               <SelectItem key={listing.id} value={String(listing.id)}>
@@ -123,10 +123,10 @@ export function LeadsFilters({
           value={currentPeriod || "all"}
           onValueChange={(value) => updateFilter("period", value)}
         >
-          <SelectTrigger className="w-[150px] bg-white">
+          <SelectTrigger className="w-[150px] bg-card dark:bg-cpSurface dark:border-cpAmber/30 dark:text-cpCream">
             <SelectValue placeholder="All Time" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="dark:bg-cpSurface dark:border-cpAmber/20">
             <SelectItem value="all">All Time</SelectItem>
             <SelectItem value="7days">Last 7 Days</SelectItem>
             <SelectItem value="30days">Last 30 Days</SelectItem>
@@ -139,7 +139,7 @@ export function LeadsFilters({
         onClick={handleExport}
         disabled={isExporting || totalLeads === 0}
         variant="outline"
-        className="gap-2"
+        className="gap-2 dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10"
       >
         {isExporting ? (
           <>

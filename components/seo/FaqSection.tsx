@@ -53,7 +53,7 @@ function FaqItem({ faq, isOpen, onToggle, index, variant = "default" }: FaqItemP
 
   if (variant === "compact") {
     return (
-      <div className="border-b border-slate-100 last:border-b-0">
+      <div className="border-b border-border dark:border-cpAmber/20 last:border-b-0">
         <button
           onClick={onToggle}
           className="w-full py-3 text-left flex items-center justify-between gap-3 group"
@@ -61,12 +61,12 @@ function FaqItem({ faq, isOpen, onToggle, index, variant = "default" }: FaqItemP
           aria-controls={answerId}
           id={itemId}
         >
-          <span className="text-sm font-medium text-slate-800 group-hover:text-cpPink transition-colors">
+          <span className="text-sm font-medium text-foreground dark:text-cpCream group-hover:text-cpCoral transition-colors">
             {faq.question}
           </span>
           <ChevronDown
             className={cn(
-              "h-4 w-4 text-slate-400 flex-shrink-0 transition-transform duration-200",
+              "h-4 w-4 text-muted-foreground dark:text-cpCream/60 flex-shrink-0 transition-transform duration-200",
               isOpen && "rotate-180"
             )}
           />
@@ -81,7 +81,7 @@ function FaqItem({ faq, isOpen, onToggle, index, variant = "default" }: FaqItemP
           )}
         >
           <div
-            className="text-sm text-slate-600 prose prose-sm max-w-none"
+            className="text-sm text-muted-foreground dark:text-cpCream/70 prose prose-sm dark:prose-invert max-w-none"
             dangerouslySetInnerHTML={{ __html: faq.answerHtml }}
           />
         </div>
@@ -91,23 +91,23 @@ function FaqItem({ faq, isOpen, onToggle, index, variant = "default" }: FaqItemP
 
   if (variant === "cards") {
     return (
-      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+      <div className="bg-card dark:bg-cpSurface/50 rounded-lg border border-border dark:border-cpAmber/20 overflow-hidden">
         <button
           onClick={onToggle}
-          className="w-full p-4 text-left flex items-start justify-between gap-3 group hover:bg-slate-50 transition-colors"
+          className="w-full p-4 text-left flex items-start justify-between gap-3 group hover:bg-muted/50 dark:hover:bg-cpSurface/80 transition-colors"
           aria-expanded={isOpen}
           aria-controls={answerId}
           id={itemId}
         >
           <div className="flex items-start gap-3">
-            <HelpCircle className="h-5 w-5 text-cpPink flex-shrink-0 mt-0.5" />
-            <span className="font-medium text-slate-900 group-hover:text-cpPink transition-colors">
+            <HelpCircle className="h-5 w-5 text-cpCoral flex-shrink-0 mt-0.5" />
+            <span className="font-medium text-foreground dark:text-cpCream group-hover:text-cpCoral transition-colors">
               {faq.question}
             </span>
           </div>
           <ChevronDown
             className={cn(
-              "h-5 w-5 text-slate-400 flex-shrink-0 transition-transform duration-200",
+              "h-5 w-5 text-muted-foreground dark:text-cpCream/60 flex-shrink-0 transition-transform duration-200",
               isOpen && "rotate-180"
             )}
           />
@@ -123,7 +123,7 @@ function FaqItem({ faq, isOpen, onToggle, index, variant = "default" }: FaqItemP
         >
           <div className="px-4 pb-4 pt-0 pl-12">
             <div
-              className="text-slate-600 prose prose-slate max-w-none"
+              className="text-muted-foreground dark:text-cpCream/70 prose prose-slate dark:prose-invert max-w-none"
               dangerouslySetInnerHTML={{ __html: faq.answerHtml }}
             />
           </div>
@@ -134,7 +134,7 @@ function FaqItem({ faq, isOpen, onToggle, index, variant = "default" }: FaqItemP
 
   // Default variant
   return (
-    <div className="border-b border-slate-200 last:border-b-0">
+    <div className="border-b border-border dark:border-cpAmber/20 last:border-b-0">
       <button
         onClick={onToggle}
         className="w-full py-4 text-left flex items-center justify-between gap-4 group"
@@ -142,12 +142,12 @@ function FaqItem({ faq, isOpen, onToggle, index, variant = "default" }: FaqItemP
         aria-controls={answerId}
         id={itemId}
       >
-        <span className="font-medium text-slate-900 group-hover:text-cpPink transition-colors">
+        <span className="font-medium text-foreground dark:text-cpCream group-hover:text-cpCoral transition-colors">
           {faq.question}
         </span>
         <ChevronDown
           className={cn(
-            "h-5 w-5 text-slate-400 flex-shrink-0 transition-transform duration-200",
+            "h-5 w-5 text-muted-foreground dark:text-cpCream/60 flex-shrink-0 transition-transform duration-200",
             isOpen && "rotate-180"
           )}
         />
@@ -162,7 +162,7 @@ function FaqItem({ faq, isOpen, onToggle, index, variant = "default" }: FaqItemP
         )}
       >
         <div
-          className="text-slate-600 prose prose-slate max-w-none"
+          className="text-muted-foreground dark:text-cpCream/70 prose prose-slate dark:prose-invert max-w-none"
           dangerouslySetInnerHTML={{ __html: faq.answerHtml }}
         />
       </div>
@@ -237,20 +237,20 @@ export function FaqSection({
 
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-slate-900">{displayHeading}</h2>
+        <h2 className="text-lg font-semibold text-foreground dark:text-cpCream">{displayHeading}</h2>
         {faqs.length > 2 && (
           <div className="flex gap-2 text-xs">
             <button
               onClick={expandAll}
-              className="text-slate-500 hover:text-cpPink transition-colors"
+              className="text-muted-foreground dark:text-cpCream/60 hover:text-cpCoral transition-colors"
               aria-label={locale === "nl" ? "Alles uitklappen" : "Expand all"}
             >
               {locale === "nl" ? "Alles uitklappen" : "Expand all"}
             </button>
-            <span className="text-slate-300">|</span>
+            <span className="text-muted dark:text-cpCream/30">|</span>
             <button
               onClick={collapseAll}
-              className="text-slate-500 hover:text-cpPink transition-colors"
+              className="text-muted-foreground dark:text-cpCream/60 hover:text-cpCoral transition-colors"
               aria-label={locale === "nl" ? "Alles inklappen" : "Collapse all"}
             >
               {locale === "nl" ? "Alles inklappen" : "Collapse all"}
@@ -262,7 +262,7 @@ export function FaqSection({
       {/* FAQ Items */}
       <div
         className={cn(
-          variant === "cards" ? "space-y-3" : "divide-y divide-slate-200 border-t border-slate-200"
+          variant === "cards" ? "space-y-3" : "divide-y divide-border dark:divide-cpAmber/20 border-t border-border dark:border-cpAmber/20"
         )}
       >
         {faqs.map((faq, index) => (
@@ -350,21 +350,21 @@ export function FaqStatic({
     <section className={cn("faq-section", className)} aria-label={heading || defaultHeading}>
       {jsonLd && <JsonLd data={jsonLd} />}
 
-      {heading && <h2 className="text-lg font-semibold text-slate-900 mb-4">{heading}</h2>}
+      {heading && <h2 className="text-lg font-semibold text-foreground dark:text-cpCream mb-4">{heading}</h2>}
 
       <div className="space-y-2">
         {faqs.map((faq, index) => (
           <details
             key={index}
-            className="group border border-slate-200 rounded-lg overflow-hidden"
+            className="group border border-border dark:border-cpAmber/20 rounded-lg overflow-hidden bg-card dark:bg-cpSurface/50"
           >
-            <summary className="cursor-pointer p-4 font-medium text-slate-900 hover:text-cpPink transition-colors list-none flex items-center justify-between">
+            <summary className="cursor-pointer p-4 font-medium text-foreground dark:text-cpCream hover:text-cpCoral transition-colors list-none flex items-center justify-between">
               {faq.question}
-              <ChevronDown className="h-5 w-5 text-slate-400 transition-transform group-open:rotate-180" />
+              <ChevronDown className="h-5 w-5 text-muted-foreground dark:text-cpCream/60 transition-transform group-open:rotate-180" />
             </summary>
             <div className="px-4 pb-4">
               <div
-                className="text-slate-600 prose prose-slate max-w-none"
+                className="text-muted-foreground dark:text-cpCream/70 prose prose-slate dark:prose-invert max-w-none"
                 dangerouslySetInnerHTML={{ __html: faq.answerHtml }}
               />
             </div>

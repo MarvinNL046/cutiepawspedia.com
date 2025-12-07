@@ -29,27 +29,27 @@ const statusConfig: Record<LeadStatus, {
   new: {
     label: { en: "New", nl: "Nieuw", de: "Neu" },
     icon: Sparkles,
-    className: "bg-cpPink/20 text-cpPink border-cpPink",
+    className: "bg-cpCoral/20 text-cpCoral border-cpCoral dark:bg-cpCoral/30",
   },
   sent: {
     label: { en: "Sent", nl: "Verzonden", de: "Gesendet" },
     icon: Send,
-    className: "bg-slate-100 text-slate-600 border-slate-300",
+    className: "bg-muted text-muted-foreground border-border dark:bg-cpSurface dark:text-cpCream/70 dark:border-cpAmber/30",
   },
   viewed: {
     label: { en: "Viewed", nl: "Bekeken", de: "Angesehen" },
     icon: Eye,
-    className: "bg-cpAqua/20 text-cpAqua border-cpAqua",
+    className: "bg-cpAmber/20 text-cpAmber border-cpAmber dark:bg-cpAmber/30",
   },
   converted: {
     label: { en: "Converted", nl: "Geconverteerd", de: "Konvertiert" },
     icon: CheckCircle,
-    className: "bg-green-100 text-green-700 border-green-300",
+    className: "bg-green-500/10 text-green-600 border-green-500/30 dark:bg-green-500/20 dark:text-green-400",
   },
   spam: {
     label: { en: "Spam", nl: "Spam", de: "Spam" },
     icon: AlertCircle,
-    className: "bg-red-100 text-red-600 border-red-300",
+    className: "bg-red-500/10 text-red-500 border-red-500/30 dark:bg-red-500/20",
   },
 };
 
@@ -107,7 +107,7 @@ export function LeadStatusDropdown({
             <ChevronDown className="h-3 w-3 ml-1" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" className="dark:bg-cpSurface dark:border-cpAmber/20">
           {(Object.keys(statusConfig) as LeadStatus[]).map((status) => {
             const cfg = statusConfig[status];
             const StatusIcon = cfg.icon;
@@ -117,12 +117,12 @@ export function LeadStatusDropdown({
               <DropdownMenuItem
                 key={status}
                 onClick={() => handleStatusChange(status)}
-                className={status === currentStatus ? "bg-slate-100" : ""}
+                className={status === currentStatus ? "bg-muted dark:bg-cpAmber/10" : "dark:text-cpCream dark:hover:bg-cpAmber/10"}
               >
                 <StatusIcon className="h-4 w-4 mr-2" />
                 {statusLabel}
                 {status === currentStatus && (
-                  <Badge variant="secondary" className="ml-auto text-xs">
+                  <Badge variant="secondary" className="ml-auto text-xs dark:bg-cpAmber/20 dark:text-cpCream">
                     Current
                   </Badge>
                 )}

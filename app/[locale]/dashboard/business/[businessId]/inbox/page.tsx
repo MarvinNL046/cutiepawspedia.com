@@ -34,8 +34,8 @@ export default async function InboxPage({ params, searchParams }: InboxPageProps
   if (!stackServerApp) {
     return (
       <div className="p-8 text-center">
-        <h1 className="text-2xl font-bold text-cpDark">Dashboard Unavailable</h1>
-        <p className="text-slate-600">Authentication is not configured.</p>
+        <h1 className="text-2xl font-bold text-foreground dark:text-cpCream">Dashboard Unavailable</h1>
+        <p className="text-muted-foreground dark:text-cpCream/60">Authentication is not configured.</p>
       </div>
     );
   }
@@ -138,7 +138,7 @@ export default async function InboxPage({ params, searchParams }: InboxPageProps
                 <Button
                   variant={isActive ? "default" : "outline"}
                   size="sm"
-                  className={isActive ? "bg-cpPink hover:bg-cpPink/90" : ""}
+                  className={isActive ? "bg-cpCoral hover:bg-cpCoral/90" : "dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10"}
                 >
                   <Icon className="h-4 w-4 mr-2" />
                   {tab.label}
@@ -150,20 +150,20 @@ export default async function InboxPage({ params, searchParams }: InboxPageProps
 
         {/* Threads List */}
       {threads.length === 0 ? (
-        <div className="bg-white rounded-xl border p-12 text-center">
-          <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <MessageSquare className="h-8 w-8 text-slate-400" />
+        <div className="bg-card dark:bg-cpSurface/50 rounded-xl border border-border dark:border-cpAmber/20 p-12 text-center">
+          <div className="w-16 h-16 bg-cpCoral/10 dark:bg-cpCoral/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <MessageSquare className="h-8 w-8 text-cpCoral" />
           </div>
-          <h3 className="text-lg font-medium text-cpDark mb-2">{t.noMessages}</h3>
-          <p className="text-slate-500">{t.noMessagesDesc}</p>
+          <h3 className="text-lg font-medium text-foreground dark:text-cpCream mb-2">{t.noMessages}</h3>
+          <p className="text-muted-foreground dark:text-cpCream/60">{t.noMessagesDesc}</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border divide-y">
+        <div className="bg-card dark:bg-cpSurface/50 rounded-xl border border-border dark:border-cpAmber/20 divide-y divide-border dark:divide-cpAmber/10">
           {threads.map((thread) => (
             <Link
               key={thread.id}
               href={`/${locale}/dashboard/business/${businessId}/inbox/${thread.id}`}
-              className="block hover:bg-slate-50 transition-colors"
+              className="block hover:bg-muted/50 dark:hover:bg-cpAmber/5 transition-colors"
             >
               <div className="p-4 flex items-start gap-4">
                 {/* Avatar */}
@@ -175,8 +175,8 @@ export default async function InboxPage({ params, searchParams }: InboxPageProps
                       className="w-12 h-12 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-cpPink/10 flex items-center justify-center">
-                      <User className="h-6 w-6 text-cpPink" />
+                    <div className="w-12 h-12 rounded-full bg-cpCoral/10 dark:bg-cpCoral/20 flex items-center justify-center">
+                      <User className="h-6 w-6 text-cpCoral" />
                     </div>
                   )}
                 </div>
@@ -184,29 +184,29 @@ export default async function InboxPage({ params, searchParams }: InboxPageProps
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-medium text-cpDark truncate">
+                    <span className="font-medium text-foreground dark:text-cpCream truncate">
                       {thread.user?.name || thread.user?.email || "Unknown User"}
                     </span>
                     {thread.unreadCountBusiness > 0 && (
-                      <Badge className="bg-cpPink text-white text-xs">
+                      <Badge className="bg-cpCoral text-white text-xs">
                         {thread.unreadCountBusiness}
                       </Badge>
                     )}
                   </div>
 
                   {thread.subject && (
-                    <p className="text-sm font-medium text-slate-700 mb-1 truncate">
+                    <p className="text-sm font-medium text-foreground/80 dark:text-cpCream/80 mb-1 truncate">
                       {thread.subject}
                     </p>
                   )}
 
                   {thread.lastMessagePreview && (
-                    <p className="text-sm text-slate-500 truncate">
+                    <p className="text-sm text-muted-foreground dark:text-cpCream/60 truncate">
                       {thread.lastMessagePreview}
                     </p>
                   )}
 
-                  <div className="flex items-center gap-3 mt-2 text-xs text-slate-400">
+                  <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground dark:text-cpCream/50">
                     <span>
                       {formatDistanceToNow(new Date(thread.lastMessageAt), {
                         addSuffix: true,
@@ -224,7 +224,7 @@ export default async function InboxPage({ params, searchParams }: InboxPageProps
 
                 {/* Chevron */}
                 <div className="flex-shrink-0 self-center">
-                  <ChevronRight className="h-5 w-5 text-slate-400" />
+                  <ChevronRight className="h-5 w-5 text-muted-foreground dark:text-cpCream/50" />
                 </div>
               </div>
             </Link>

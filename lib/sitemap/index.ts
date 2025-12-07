@@ -21,6 +21,7 @@ export {
 export {
   buildHomeUrls,
   buildCountryUrls,
+  buildProvinceUrls,
   buildCityUrls,
   buildCategoryUrls,
   buildPlaceUrls,

@@ -39,23 +39,23 @@ interface PageIntroProps {
 }
 
 const variantStyles: Record<PageIntroVariant, string> = {
-  default: "bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700",
-  pink: "bg-cpPink/10 dark:bg-cpPink/5 border-b border-cpPink/20 dark:border-cpPink/10",
-  yellow: "bg-cpYellow/10 dark:bg-cpYellow/5 border-b border-cpYellow/20 dark:border-cpYellow/10",
-  aqua: "bg-cpAqua/10 dark:bg-cpAqua/5 border-b border-cpAqua/20 dark:border-cpAqua/10",
-  gradient: "bg-gradient-to-b from-cpPink/10 via-cpYellow/5 to-transparent dark:from-cpPink/5 dark:via-transparent dark:to-transparent border-b border-slate-200/50 dark:border-slate-700/50",
-  white: "bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700",
-  muted: "bg-muted/50 dark:bg-slate-800/50 border-b border-border",
+  default: "bg-muted dark:bg-cpSurface/50 border-b border-border dark:border-cpAmber/20",
+  pink: "bg-cpCoral/10 dark:bg-cpCoral/5 border-b border-cpCoral/20 dark:border-cpCoral/10",
+  yellow: "bg-cpAmber/10 dark:bg-cpAmber/5 border-b border-cpAmber/20 dark:border-cpAmber/10",
+  aqua: "bg-cpCoral/10 dark:bg-cpCoral/5 border-b border-cpCoral/20 dark:border-cpCoral/10",
+  gradient: "bg-gradient-to-b from-cpCoral/10 via-cpAmber/5 to-transparent dark:from-cpCoral/5 dark:via-transparent dark:to-transparent border-b border-border dark:border-cpAmber/20",
+  white: "bg-card dark:bg-cpSurface/50 border-b border-border dark:border-cpAmber/20",
+  muted: "bg-muted/50 dark:bg-cpSurface/50 border-b border-border dark:border-cpAmber/20",
 };
 
 const defaultIcons: Record<PageIntroVariant, React.ReactNode> = {
-  default: <Info className="h-4 w-4 text-slate-500" />,
-  pink: <Star className="h-4 w-4 text-cpPink" />,
-  yellow: <Award className="h-4 w-4 text-cpYellow" />,
-  aqua: <TrendingUp className="h-4 w-4 text-cpAqua" />,
-  gradient: <Star className="h-4 w-4 text-cpPink" />,
-  white: <Info className="h-4 w-4 text-slate-500" />,
-  muted: <Info className="h-4 w-4 text-muted-foreground" />,
+  default: <Info className="h-4 w-4 text-muted-foreground dark:text-cpCream/60" />,
+  pink: <Star className="h-4 w-4 text-cpCoral" />,
+  yellow: <Award className="h-4 w-4 text-cpAmber" />,
+  aqua: <TrendingUp className="h-4 w-4 text-cpCoral" />,
+  gradient: <Star className="h-4 w-4 text-cpCoral" />,
+  white: <Info className="h-4 w-4 text-muted-foreground dark:text-cpCream/60" />,
+  muted: <Info className="h-4 w-4 text-muted-foreground dark:text-cpCream/60" />,
 };
 
 /**
@@ -80,21 +80,21 @@ export function PageIntro({
   }
 
   const displayIcon = icon ?? defaultIcons[variant];
-  const BulletIcon = bulletIcon ?? <CheckCircle2 className="h-4 w-4 text-cpPink flex-shrink-0" />;
+  const BulletIcon = bulletIcon ?? <CheckCircle2 className="h-4 w-4 text-cpCoral flex-shrink-0" />;
 
   return (
     <section className={`${variantStyles[variant]} ${className}`}>
       <div className="container mx-auto max-w-6xl px-4 py-6">
         {/* Main intro text */}
         {intro && (
-          <p className="text-slate-700 dark:text-slate-300 mb-2 leading-relaxed">
+          <p className="text-foreground dark:text-cpCream/90 mb-2 leading-relaxed">
             {intro}
           </p>
         )}
 
         {/* Secondary text */}
         {secondary && (
-          <p className="text-sm text-muted-foreground mb-3">
+          <p className="text-sm text-muted-foreground dark:text-cpCream/70 mb-3">
             {secondary}
           </p>
         )}
@@ -105,7 +105,7 @@ export function PageIntro({
             {bullets.map((bullet, index) => (
               <li
                 key={index}
-                className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400"
+                className="flex items-start gap-2 text-sm text-muted-foreground dark:text-cpCream/70"
               >
                 {BulletIcon}
                 <span>{bullet}</span>
@@ -116,7 +116,7 @@ export function PageIntro({
 
         {/* Note with icon */}
         {note && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mt-3">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-cpCream/70 mt-3">
             {displayIcon}
             <span>{note}</span>
           </div>
@@ -124,7 +124,7 @@ export function PageIntro({
 
         {/* Call to action */}
         {showCta && cta && (
-          <p className="text-sm font-medium text-cpPink mt-4">
+          <p className="text-sm font-medium text-cpCoral mt-4">
             {cta}
           </p>
         )}
@@ -151,9 +151,9 @@ export function PageIntroInline({
 
   return (
     <div className={`text-sm ${className}`}>
-      <p className="text-slate-600 dark:text-slate-400">{intro}</p>
+      <p className="text-muted-foreground dark:text-cpCream/70">{intro}</p>
       {secondary && (
-        <p className="text-muted-foreground mt-1">{secondary}</p>
+        <p className="text-muted-foreground dark:text-cpCream/60 mt-1">{secondary}</p>
       )}
     </div>
   );
@@ -180,27 +180,27 @@ export function PageIntroCard({
   if (!intro) return null;
 
   return (
-    <div className={`bg-white rounded-xl border p-6 shadow-sm ${className}`}>
+    <div className={`bg-card dark:bg-cpSurface/50 rounded-xl border border-border dark:border-cpAmber/20 p-6 shadow-sm ${className}`}>
       {(title || icon) && (
         <div className="flex items-center gap-2 mb-3">
           {icon}
           {title && (
-            <h3 className="font-semibold text-cpDark">{title}</h3>
+            <h3 className="font-semibold text-foreground dark:text-cpCream">{title}</h3>
           )}
         </div>
       )}
-      <p className="text-slate-600">{intro}</p>
+      <p className="text-muted-foreground dark:text-cpCream/70">{intro}</p>
       {secondary && (
-        <p className="text-sm text-muted-foreground mt-2">{secondary}</p>
+        <p className="text-sm text-muted-foreground dark:text-cpCream/60 mt-2">{secondary}</p>
       )}
       {bullets && bullets.length > 0 && (
         <ul className="mt-4 space-y-2">
           {bullets.map((bullet, index) => (
             <li
               key={index}
-              className="flex items-start gap-2 text-sm text-slate-600"
+              className="flex items-start gap-2 text-sm text-muted-foreground dark:text-cpCream/70"
             >
-              <CheckCircle2 className="h-4 w-4 text-cpPink flex-shrink-0 mt-0.5" />
+              <CheckCircle2 className="h-4 w-4 text-cpCoral flex-shrink-0 mt-0.5" />
               <span>{bullet}</span>
             </li>
           ))}

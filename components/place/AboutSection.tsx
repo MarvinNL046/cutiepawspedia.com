@@ -27,12 +27,12 @@ export function AboutSection({ place, aiContent, locale = "en" }: AboutSectionPr
     : text;
 
   return (
-    <Card>
+    <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
           {locale === "nl" ? `Over ${place.name}` : `About ${place.name}`}
           {source === "enriched" && (
-            <span className="text-xs font-normal text-cpAqua bg-cpAqua/10 px-2 py-0.5 rounded-full">
+            <span className="text-xs font-normal text-cpCoral bg-cpCoral/10 dark:bg-cpCoral/20 px-2 py-0.5 rounded-full">
               {locale === "nl" ? "Van website" : "From website"}
             </span>
           )}
@@ -41,11 +41,11 @@ export function AboutSection({ place, aiContent, locale = "en" }: AboutSectionPr
       <CardContent className="space-y-4">
         {/* Main about text */}
         <div className="relative">
-          <p className="text-slate-600 leading-relaxed whitespace-pre-line">
+          <p className="text-muted-foreground dark:text-cpCream/70 leading-relaxed whitespace-pre-line">
             {displayText}
           </p>
           {shouldTruncate && (
-            <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-card dark:from-cpSurface/50 to-transparent pointer-events-none" />
           )}
         </div>
 
@@ -55,7 +55,7 @@ export function AboutSection({ place, aiContent, locale = "en" }: AboutSectionPr
             variant="ghost"
             size="sm"
             onClick={() => setExpanded(!expanded)}
-            className="text-cpPink hover:text-cpPink/80 hover:bg-cpPink/5 gap-1 -ml-2"
+            className="text-cpCoral hover:text-cpCoral/80 hover:bg-cpCoral/5 dark:hover:bg-cpCoral/10 gap-1 -ml-2"
           >
             {expanded ? (
               <>
@@ -73,10 +73,10 @@ export function AboutSection({ place, aiContent, locale = "en" }: AboutSectionPr
 
         {/* AI content bullets if available */}
         {aiContent?.bullets && aiContent.bullets.length > 0 && (
-          <ul className="space-y-2 pt-2 border-t border-slate-100">
+          <ul className="space-y-2 pt-2 border-t border-border dark:border-cpAmber/20">
             {aiContent.bullets.map((bullet, index) => (
-              <li key={index} className="flex items-start gap-2 text-slate-600">
-                <CheckCircle className="h-4 w-4 text-cpAqua shrink-0 mt-0.5" />
+              <li key={index} className="flex items-start gap-2 text-muted-foreground dark:text-cpCream/70">
+                <CheckCircle className="h-4 w-4 text-cpCoral shrink-0 mt-0.5" />
                 <span className="text-sm">{bullet}</span>
               </li>
             ))}
@@ -85,7 +85,7 @@ export function AboutSection({ place, aiContent, locale = "en" }: AboutSectionPr
 
         {/* Source attribution */}
         {source === "enriched" && (
-          <p className="text-xs text-slate-400 flex items-center gap-1 pt-2">
+          <p className="text-xs text-muted-foreground dark:text-cpCream/60 flex items-center gap-1 pt-2">
             <Info className="h-3 w-3" />
             {locale === "nl"
               ? "Gebaseerd op informatie van de website van het bedrijf"

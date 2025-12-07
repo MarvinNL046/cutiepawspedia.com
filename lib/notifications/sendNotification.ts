@@ -40,13 +40,13 @@ import type {
 
 // Default sender addresses
 const FROM_ADDRESSES = {
-  welcome: "CutiePawsPedia <welcome@cutiepawspedia.com>",
-  reviews: "CutiePawsPedia Reviews <reviews@cutiepawspedia.com>",
-  leads: "CutiePawsPedia <leads@cutiepawspedia.com>",
-  claims: "CutiePawsPedia <claims@cutiepawspedia.com>",
-  digest: "CutiePawsPedia <digest@cutiepawspedia.com>",
-  favorites: "CutiePawsPedia Updates <updates@cutiepawspedia.com>",
-  default: "CutiePawsPedia <noreply@cutiepawspedia.com>",
+  welcome: "CutiePawsPedia <hello@cutiepawspedia.com>",
+  reviews: "CutiePawsPedia <hello@cutiepawspedia.com>",
+  leads: "CutiePawsPedia <hello@cutiepawspedia.com>",
+  claims: "CutiePawsPedia <hello@cutiepawspedia.com>",
+  digest: "CutiePawsPedia <hello@cutiepawspedia.com>",
+  favorites: "CutiePawsPedia <hello@cutiepawspedia.com>",
+  default: "CutiePawsPedia <hello@cutiepawspedia.com>",
 };
 
 /**

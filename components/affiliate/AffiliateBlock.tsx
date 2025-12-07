@@ -61,8 +61,8 @@ const affiliateData: Record<
     title: "Pet Insurance",
     description: "Protect your furry friend with comprehensive pet insurance coverage.",
     icon: Shield,
-    color: "text-blue-600",
-    bgColor: "bg-blue-50",
+    color: "text-cpCoral",
+    bgColor: "bg-cpCoral/10 dark:bg-cpCoral/5",
     links: [
       {
         name: "Lemonade Pet",
@@ -88,8 +88,8 @@ const affiliateData: Record<
     title: "Pet Cremation Services",
     description: "Compassionate end-of-life care and memorial services for your beloved pet.",
     icon: Heart,
-    color: "text-purple-600",
-    bgColor: "bg-purple-50",
+    color: "text-cpCoral",
+    bgColor: "bg-cpCoral/10 dark:bg-cpCoral/5",
     links: [
       {
         name: "Paw & Petal",
@@ -112,8 +112,8 @@ const affiliateData: Record<
     title: "Pet Hotels & Boarding",
     description: "Find the perfect home-away-from-home for your pet while you travel.",
     icon: Home,
-    color: "text-amber-600",
-    bgColor: "bg-amber-50",
+    color: "text-cpAmber",
+    bgColor: "bg-cpAmber/10 dark:bg-cpAmber/5",
     links: [
       {
         name: "Rover Boarding",
@@ -138,8 +138,8 @@ const affiliateData: Record<
     title: "Pet Products",
     description: "Quality products for your pet's comfort, health, and happiness.",
     icon: ShoppingBag,
-    color: "text-emerald-600",
-    bgColor: "bg-emerald-50",
+    color: "text-cpCoral",
+    bgColor: "bg-cpCoral/10 dark:bg-cpCoral/5",
     links: [
       {
         name: "Chewy",
@@ -164,8 +164,8 @@ const affiliateData: Record<
     title: "Pet Food Subscriptions",
     description: "Fresh, healthy food delivered to your door for your dog or cat.",
     icon: Package,
-    color: "text-orange-600",
-    bgColor: "bg-orange-50",
+    color: "text-cpAmber",
+    bgColor: "bg-cpAmber/10 dark:bg-cpAmber/5",
     links: [
       {
         name: "The Farmer's Dog",
@@ -197,8 +197,8 @@ const affiliateData: Record<
     title: "Pet Sitting & Dog Walking",
     description: "Trusted pet sitters and dog walkers in your neighborhood.",
     icon: Dog,
-    color: "text-cpPink",
-    bgColor: "bg-cpPink/10",
+    color: "text-cpCoral",
+    bgColor: "bg-cpCoral/10 dark:bg-cpCoral/5",
     links: [
       {
         name: "Rover",
@@ -224,8 +224,8 @@ const affiliateData: Record<
     title: "Pet DNA Tests",
     description: "Discover your pet's breed, health risks, and ancestry.",
     icon: Dna,
-    color: "text-indigo-600",
-    bgColor: "bg-indigo-50",
+    color: "text-cpCoral",
+    bgColor: "bg-cpCoral/10 dark:bg-cpCoral/5",
     links: [
       {
         name: "Embark",
@@ -251,8 +251,8 @@ const affiliateData: Record<
     title: "Vet & Health Products",
     description: "Medications, supplements, and health products for your pet.",
     icon: Pill,
-    color: "text-teal-600",
-    bgColor: "bg-teal-50",
+    color: "text-cpCoral",
+    bgColor: "bg-cpCoral/10 dark:bg-cpCoral/5",
     links: [
       {
         name: "Chewy Pharmacy",
@@ -314,9 +314,9 @@ export function AffiliateBlock({
       <div className={`flex items-center gap-3 p-3 rounded-lg ${data.bgColor} ${className}`}>
         <Icon className={`h-5 w-5 ${data.color} shrink-0`} />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-slate-700 truncate">{data.title}</p>
+          <p className="text-sm font-medium text-foreground dark:text-cpCream truncate">{data.title}</p>
         </div>
-        <Button size="sm" variant="outline" className="shrink-0 gap-1" asChild>
+        <Button size="sm" variant="outline" className="shrink-0 gap-1 dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10" asChild>
           <a
             href={getTrackedUrl(links[0]?.url || "#")}
             target="_blank"
@@ -335,12 +335,12 @@ export function AffiliateBlock({
     return (
       <div className={`p-4 rounded-xl ${data.bgColor} ${className}`}>
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div className={`p-3 rounded-full bg-white shadow-sm`}>
+          <div className={`p-3 rounded-full bg-white dark:bg-cpSurface shadow-sm`}>
             <Icon className={`h-6 w-6 ${data.color}`} />
           </div>
           <div className="flex-1">
-            <h3 className="font-semibold text-slate-800 mb-1">{data.title}</h3>
-            <p className="text-sm text-slate-600">{data.description}</p>
+            <h3 className="font-semibold text-foreground dark:text-cpCream mb-1">{data.title}</h3>
+            <p className="text-sm text-muted-foreground dark:text-cpCream/70">{data.description}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {links.slice(0, 2).map((link, index) => (
@@ -348,7 +348,7 @@ export function AffiliateBlock({
                 key={link.name}
                 size="sm"
                 variant={index === 0 ? "default" : "outline"}
-                className={index === 0 ? "bg-cpPink hover:bg-cpPink/90" : ""}
+                className={index === 0 ? "bg-cpCoral hover:bg-cpCoral/90" : "dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10"}
                 asChild
               >
                 <a
@@ -359,7 +359,7 @@ export function AffiliateBlock({
                 >
                   {link.name}
                   {link.discount && (
-                    <Badge variant="secondary" className="ml-1 text-xs">
+                    <Badge variant="secondary" className="ml-1 text-xs dark:bg-cpAmber/20 dark:text-cpAmber">
                       {link.discount}
                     </Badge>
                   )}
@@ -378,7 +378,7 @@ export function AffiliateBlock({
       <div className={`space-y-3 ${className}`}>
         <div className="flex items-center gap-2">
           <Icon className={`h-5 w-5 ${data.color}`} />
-          <h4 className="font-medium text-slate-700">{data.title}</h4>
+          <h4 className="font-medium text-foreground dark:text-cpCream">{data.title}</h4>
         </div>
         <div className="grid gap-2">
           {links.map((link, index) => (
@@ -388,19 +388,19 @@ export function AffiliateBlock({
               target="_blank"
               rel="noopener noreferrer sponsored"
               onClick={() => handleAffiliateClick(link, index)}
-              className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 transition-colors group"
+              className="flex items-center justify-between p-2 rounded-lg hover:bg-muted dark:hover:bg-cpSurface/50 transition-colors group"
             >
               <div className="flex items-center gap-2">
-                <span className="font-medium text-slate-700 group-hover:text-cpPink transition-colors">
+                <span className="font-medium text-foreground dark:text-cpCream group-hover:text-cpCoral transition-colors">
                   {link.name}
                 </span>
                 {link.discount && (
-                  <Badge variant="secondary" className="text-xs bg-cpAqua/10 text-cpAqua">
+                  <Badge variant="secondary" className="text-xs bg-cpCoral/10 text-cpCoral dark:bg-cpCoral/20 dark:text-cpCoral">
                     {link.discount}
                   </Badge>
                 )}
               </div>
-              <ExternalLink className="h-4 w-4 text-slate-400 group-hover:text-cpPink transition-colors" />
+              <ExternalLink className="h-4 w-4 text-muted-foreground dark:text-cpCream/50 group-hover:text-cpCoral transition-colors" />
             </a>
           ))}
         </div>
@@ -410,24 +410,22 @@ export function AffiliateBlock({
 
   // Card variant (default) - full featured
   return (
-    <Card className={`overflow-hidden hover-lift ${className}`}>
-      <CardHeader className={`${data.bgColor} pb-4`}>
-        <CardTitle className="flex items-center gap-3">
-          <div className="p-2 rounded-full bg-white shadow-sm">
-            <Icon className={`h-5 w-5 ${data.color}`} />
+    <Card className={`overflow-hidden hover-lift bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20 ${className}`}>
+      <div className={`${data.bgColor} px-4 py-2.5`}>
+        <div className="flex items-center gap-2.5">
+          <div className="p-1.5 rounded-md bg-white dark:bg-cpSurface shadow-sm shrink-0">
+            <Icon className={`h-4 w-4 ${data.color}`} />
           </div>
-          <div>
-            <span className="text-lg">{data.title}</span>
-            <Badge variant="outline" className="ml-2 text-xs border-slate-300">
-              <Sparkles className="h-3 w-3 mr-1" />
-              Partner
-            </Badge>
-          </div>
-        </CardTitle>
-      </CardHeader>
+          <span className="text-sm font-semibold text-foreground dark:text-cpCream">{data.title}</span>
+          <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-cpCoral/30 dark:border-cpAmber/30 text-cpCoral dark:text-cpAmber ml-auto shrink-0">
+            <Sparkles className="h-2.5 w-2.5 mr-0.5" />
+            Partner
+          </Badge>
+        </div>
+      </div>
       <CardContent className="pt-4">
-        <p className="text-sm text-slate-600 mb-4">{data.description}</p>
-        <div className="space-y-3">
+        <p className="text-sm text-muted-foreground dark:text-cpCream/70 mb-4">{data.description}</p>
+        <div className="space-y-2">
           {links.map((link, index) => (
             <a
               key={link.name}
@@ -435,33 +433,31 @@ export function AffiliateBlock({
               target="_blank"
               rel="noopener noreferrer sponsored"
               onClick={() => handleAffiliateClick(link, index)}
-              className="block p-3 rounded-lg border border-slate-200 hover:border-cpPink hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group"
+              className="block p-3 rounded-lg border border-border dark:border-cpAmber/20 hover:border-cpCoral dark:hover:border-cpCoral hover:shadow-md transition-all duration-200 group"
             >
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-semibold text-slate-800 group-hover:text-cpPink transition-colors">
+              <div className="flex items-start gap-2">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                    <span className="font-medium text-sm text-foreground dark:text-cpCream group-hover:text-cpCoral transition-colors">
                       {link.name}
                     </span>
                     {index === 0 && (
-                      <Badge className="bg-cpYellow/20 text-amber-700 border-cpYellow text-xs">
-                        <Star className="h-3 w-3 mr-1 fill-current" />
-                        Top Pick
+                      <Badge className="bg-cpAmber/20 text-cpAmber dark:bg-cpAmber/15 dark:text-cpAmber border-0 text-[10px] px-1.5 py-0 h-4">
+                        <Star className="h-2.5 w-2.5 mr-0.5 fill-current" />
+                        Top
+                      </Badge>
+                    )}
+                    {link.discount && (
+                      <Badge className="bg-cpCoral/10 text-cpCoral dark:bg-cpCoral/15 dark:text-cpCoral border-0 text-[10px] px-1.5 py-0 h-4">
+                        {link.discount}
                       </Badge>
                     )}
                   </div>
                   {link.description && (
-                    <p className="text-sm text-slate-500">{link.description}</p>
+                    <p className="text-xs text-muted-foreground dark:text-cpCream/60 line-clamp-1">{link.description}</p>
                   )}
                 </div>
-                <div className="flex flex-col items-end gap-1">
-                  {link.discount && (
-                    <Badge className="bg-cpAqua/10 text-cpAqua border-cpAqua/30 text-xs whitespace-nowrap">
-                      {link.discount}
-                    </Badge>
-                  )}
-                  <ExternalLink className="h-4 w-4 text-slate-400 group-hover:text-cpPink transition-colors" />
-                </div>
+                <ExternalLink className="h-3.5 w-3.5 text-muted-foreground dark:text-cpCream/40 group-hover:text-cpCoral transition-colors shrink-0 mt-0.5" />
               </div>
             </a>
           ))}

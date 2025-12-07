@@ -50,43 +50,45 @@ export default async function SettingsPage({ params }: SettingsPageProps) {
 
       <div className="p-6 space-y-6 max-w-3xl">
         {/* Profile Settings */}
-        <Card>
+        <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5 text-cpPink" />
+            <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
+              <User className="h-5 w-5 text-cpCoral" />
               Profile
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="dark:text-cpCream/70">
               Your account information
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name" className="dark:text-cpCream">Name</Label>
                 <Input
                   id="name"
                   defaultValue={dbUser.name || ""}
                   placeholder="Your name"
                   disabled
+                  className="dark:bg-cpSurface dark:border-cpAmber/30 dark:text-cpCream"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="dark:text-cpCream">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   defaultValue={dbUser.email}
                   disabled
+                  className="dark:bg-cpSurface dark:border-cpAmber/30 dark:text-cpCream"
                 />
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant="secondary">
+              <Badge variant="secondary" className="dark:bg-cpCoral/10 dark:text-cpCoral">
                 <Building2 className="h-3 w-3 mr-1" />
                 {dbUser.role === "admin" ? "Administrator" : "Business Account"}
               </Badge>
-              <Badge variant="outline">
+              <Badge variant="outline" className="dark:border-cpAmber/30 dark:text-cpCream/80">
                 Member since {new Date(dbUser.createdAt).toLocaleDateString()}
               </Badge>
             </div>
@@ -101,25 +103,25 @@ export default async function SettingsPage({ params }: SettingsPageProps) {
         />
 
         {/* Billing (Placeholder) */}
-        <Card>
+        <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5 text-cpYellow" />
+            <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
+              <CreditCard className="h-5 w-5 text-cpAmber" />
               Billing
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="dark:text-cpCream/70">
               Manage your subscription and billing
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-muted dark:bg-cpSurface rounded-lg">
               <div>
-                <p className="font-medium">Free Plan</p>
-                <p className="text-sm text-slate-500">
+                <p className="font-medium text-foreground dark:text-cpCream">Free Plan</p>
+                <p className="text-sm text-muted-foreground dark:text-cpCream/60">
                   Basic listing features
                 </p>
               </div>
-              <Button className="bg-cpPink hover:bg-cpPink/90">
+              <Button className="bg-cpCoral hover:bg-cpCoral/90">
                 Upgrade to Premium
               </Button>
             </div>
@@ -127,18 +129,18 @@ export default async function SettingsPage({ params }: SettingsPageProps) {
         </Card>
 
         {/* Security */}
-        <Card>
+        <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-slate-600" />
+            <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
+              <Shield className="h-5 w-5 text-muted-foreground dark:text-cpCream/70" />
               Security
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="dark:text-cpCream/70">
               Manage your account security
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" asChild>
+            <Button variant="outline" className="dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10" asChild>
               <a href="/handler/account-settings">
                 Manage Account in StackAuth
               </a>

@@ -110,11 +110,11 @@ const getNotificationIcon = (type: string) => {
 const getNotificationColor = (type: string) => {
   switch (type) {
     case "new_review":
-      return "text-cpYellow";
+      return "text-cpAmber";
     case "new_lead":
-      return "text-cpPink";
+      return "text-cpCoral";
     case "review_reply":
-      return "text-cpAqua";
+      return "text-cpCoral";
     case "listing_view":
       return "text-blue-500";
     case "claim_approved":
@@ -126,10 +126,10 @@ const getNotificationColor = (type: string) => {
     case "plan_expiring":
       return "text-orange-500";
     case "weekly_summary":
-      return "text-cpAqua";
+      return "text-cpAmber";
     case "system":
     default:
-      return "text-slate-500";
+      return "text-muted-foreground";
   }
 };
 
@@ -250,23 +250,23 @@ export function NotificationDropdown({
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5 text-slate-500" />
+          <Bell className="h-5 w-5 text-muted-foreground dark:text-cpCream/70" />
           {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 h-5 w-5 flex items-center justify-center bg-cpPink text-white text-xs font-bold rounded-full">
+            <span className="absolute -top-0.5 -right-0.5 h-5 w-5 flex items-center justify-center bg-cpCoral text-white text-xs font-bold rounded-full">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80">
+      <DropdownMenuContent align="end" className="w-80 bg-card dark:bg-cpSurface border-border dark:border-cpAmber/20">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b">
-          <h3 className="font-semibold text-cpDark">{t.notifications}</h3>
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border dark:border-cpAmber/20">
+          <h3 className="font-semibold text-foreground dark:text-cpCream">{t.notifications}</h3>
           {unreadCount > 0 && (
             <Button
               variant="ghost"
               size="sm"
-              className="text-xs text-cpPink hover:text-cpPink/80"
+              className="text-xs text-cpCoral hover:text-cpCoral/80"
               onClick={markAllAsRead}
               disabled={isMarkingAll}
             >
@@ -284,11 +284,11 @@ export function NotificationDropdown({
         <div className="max-h-[400px] overflow-y-auto">
           {isLoading && notifications.length === 0 ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-cpPink" />
+              <Loader2 className="h-6 w-6 animate-spin text-cpCoral" />
             </div>
           ) : notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 text-slate-500">
-              <Bell className="h-8 w-8 mb-2 text-slate-300" />
+            <div className="flex flex-col items-center justify-center py-8 text-muted-foreground dark:text-cpCream/60">
+              <Bell className="h-8 w-8 mb-2 text-muted-foreground/50 dark:text-cpCream/40" />
               <p className="text-sm">{t.noNotifications}</p>
             </div>
           ) : (
@@ -300,8 +300,8 @@ export function NotificationDropdown({
                 <div
                   key={notification.id}
                   className={cn(
-                    "px-4 py-3 hover:bg-slate-50 cursor-pointer border-b last:border-b-0 transition-colors",
-                    !notification.isRead && "bg-cpPink/5"
+                    "px-4 py-3 hover:bg-muted dark:hover:bg-cpSurface/50 cursor-pointer border-b border-border dark:border-cpAmber/10 last:border-b-0 transition-colors",
+                    !notification.isRead && "bg-cpCoral/5 dark:bg-cpCoral/10"
                   )}
                   onClick={() => handleNotificationClick(notification)}
                 >
@@ -309,7 +309,7 @@ export function NotificationDropdown({
                     <div
                       className={cn(
                         "flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center",
-                        !notification.isRead ? "bg-cpPink/10" : "bg-slate-100"
+                        !notification.isRead ? "bg-cpCoral/10" : "bg-muted dark:bg-cpSurface"
                       )}
                     >
                       <Icon className={cn("h-4 w-4", iconColor)} />
@@ -319,16 +319,16 @@ export function NotificationDropdown({
                         className={cn(
                           "text-sm",
                           !notification.isRead
-                            ? "font-medium text-cpDark"
-                            : "text-slate-700"
+                            ? "font-medium text-foreground dark:text-cpCream"
+                            : "text-foreground/80 dark:text-cpCream/80"
                         )}
                       >
                         {notification.title}
                       </p>
-                      <p className="text-xs text-slate-500 line-clamp-2 mt-0.5">
+                      <p className="text-xs text-muted-foreground dark:text-cpCream/60 line-clamp-2 mt-0.5">
                         {notification.message}
                       </p>
-                      <p className="text-xs text-slate-400 mt-1">
+                      <p className="text-xs text-muted-foreground/80 dark:text-cpCream/50 mt-1">
                         {formatDistanceToNow(new Date(notification.createdAt), {
                           addSuffix: true,
                           locale: dateLocale,
@@ -337,7 +337,7 @@ export function NotificationDropdown({
                     </div>
                     {!notification.isRead && (
                       <div className="flex-shrink-0">
-                        <span className="h-2 w-2 rounded-full bg-cpPink block" />
+                        <span className="h-2 w-2 rounded-full bg-cpCoral block" />
                       </div>
                     )}
                   </div>

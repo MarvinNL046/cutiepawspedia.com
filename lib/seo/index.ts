@@ -72,6 +72,13 @@ export {
   reviewSchema,
   reviewsSchema,
   localBusinessWithReviewsSchema,
+  // E-E-A-T Schema functions
+  articleSchema,
+  editorialTeamSchema,
+  aboutPageSchema,
+  personSchema,
+  type ArticleSchemaData,
+  type PersonSchemaData,
 } from "./schema";
 
 // SEO Generator

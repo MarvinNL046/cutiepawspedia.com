@@ -127,6 +127,68 @@ function generateSlug(name: string): string {
     .replace(/^-|-$/g, ""); // Trim hyphens
 }
 
+/**
+ * Track used slugs per city and generate unique slugs for multi-location businesses
+ */
+const usedSlugsPerCity = new Map<string, Map<string, number>>();
+
+function generateUniqueSlug(
+  name: string,
+  citySlug: string,
+  address: string | null | undefined,
+  postalCode: string | null | undefined
+): string {
+  const baseSlug = generateSlug(name);
+
+  // Get or create the slug map for this city
+  if (!usedSlugsPerCity.has(citySlug)) {
+    usedSlugsPerCity.set(citySlug, new Map());
+  }
+  const citySlugs = usedSlugsPerCity.get(citySlug)!;
+
+  // Check if this base slug is already used
+  if (!citySlugs.has(baseSlug)) {
+    // First occurrence - use base slug
+    citySlugs.set(baseSlug, 1);
+    return baseSlug;
+  }
+
+  // Slug collision detected - we need to make it unique
+  // Strategy 1: Try to add street name from address
+  if (address) {
+    // Extract first word of address (usually street name)
+    const streetMatch = address.match(/^([a-zA-Z]+)/);
+    if (streetMatch) {
+      const streetSlug = generateSlug(streetMatch[1]);
+      const withStreet = `${baseSlug}-${streetSlug}`;
+      if (!citySlugs.has(withStreet)) {
+        citySlugs.set(withStreet, 1);
+        return withStreet;
+      }
+    }
+  }
+
+  // Strategy 2: Try to add postal code area
+  if (postalCode) {
+    // For Dutch postal codes, use first 4 digits
+    const postalMatch = postalCode.match(/(\d{4})/);
+    if (postalMatch) {
+      const withPostal = `${baseSlug}-${postalMatch[1]}`;
+      if (!citySlugs.has(withPostal)) {
+        citySlugs.set(withPostal, 1);
+        return withPostal;
+      }
+    }
+  }
+
+  // Strategy 3: Add counter suffix
+  const count = citySlugs.get(baseSlug)!;
+  citySlugs.set(baseSlug, count + 1);
+  const withCounter = `${baseSlug}-${count + 1}`;
+  citySlugs.set(withCounter, 1);
+  return withCounter;
+}
+
 function generateStagedId(place: OsmRawPlace): string {
   // Format: {type}/{id} -> e.g., "node/123456"
   return `${place.type}/${place.id}`;
@@ -483,8 +545,35 @@ function mergePlace(
   const stagedId = generateStagedId(osm);
   const name =
     bright?.businessName || osm.tags.name || osm.tags.brand || "Unknown";
-  const slug = generateSlug(name);
   const now = new Date().toISOString();
+
+  // Build address FIRST (needed for unique slug generation)
+  let address: string | null = null;
+  if (bright?.address) {
+    address = bright.address;
+  } else if (pdok) {
+    const parts = [
+      pdok.openbareRuimteNaam,
+      pdok.huisnummer.toString() + (pdok.huisletter || "") + (pdok.huisnummertoevoeging || ""),
+    ];
+    address = parts.filter(Boolean).join(" ");
+  } else if (osm.tags["addr:street"]) {
+    const parts = [
+      osm.tags["addr:street"],
+      osm.tags["addr:housenumber"],
+    ];
+    address = parts.filter(Boolean).join(" ");
+  }
+
+  // Build postal code FIRST (needed for unique slug generation)
+  const postalCode =
+    normalizePostalCode(bright?.postalCode, COUNTRY) ||
+    normalizePostalCode(pdok?.postcode, COUNTRY) ||
+    normalizePostalCode(osm.tags["addr:postcode"], COUNTRY);
+
+  // Generate unique slug using address and postal code for multi-location businesses
+  // This handles cases like "Maxi Zoo" having 3 locations in Amsterdam
+  const slug = generateUniqueSlug(name, CITY, address, postalCode);
 
   // Build sources tracking
   const sources: StagedSources = {
@@ -515,30 +604,6 @@ function mergePlace(
       confidence: jina.jina.meta.confidence,
     };
   }
-
-  // Build address
-  let address: string | null = null;
-  if (bright?.address) {
-    address = bright.address;
-  } else if (pdok) {
-    const parts = [
-      pdok.openbareRuimteNaam,
-      pdok.huisnummer.toString() + (pdok.huisletter || "") + (pdok.huisnummertoevoeging || ""),
-    ];
-    address = parts.filter(Boolean).join(" ");
-  } else if (osm.tags["addr:street"]) {
-    const parts = [
-      osm.tags["addr:street"],
-      osm.tags["addr:housenumber"],
-    ];
-    address = parts.filter(Boolean).join(" ");
-  }
-
-  // Build postal code
-  const postalCode =
-    normalizePostalCode(bright?.postalCode, COUNTRY) ||
-    normalizePostalCode(pdok?.postcode, COUNTRY) ||
-    normalizePostalCode(osm.tags["addr:postcode"], COUNTRY);
 
   // Build description
   let description: string | null = null;

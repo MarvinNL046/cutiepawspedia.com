@@ -41,7 +41,8 @@ import { FavoriteButton } from "@/components/favorites/FavoriteButton";
 import { isFavorite } from "@/db/queries/favorites";
 import { MapPin, Phone, Globe, Mail, Star, CheckCircle, MessageSquare, Lock, Shield, Crown } from "lucide-react";
 import { getCityName, getCountryName } from "@/lib/utils/place-helpers";
-import { AboutSection, ServicesSection, HighlightsSection, BusinessSnapshot, BusinessPhotoGallery } from "@/components/place";
+import { AboutSection, ServicesSection, HighlightsSection, BusinessSnapshot, BusinessPhotoGallery, ContentSections } from "@/components/place";
+import { EditorialByline } from "@/components/seo";
 import { getActivePhotosByPlaceId } from "@/db/queries/businessPhotos";
 import { getBusinessPhotoUrl } from "@/lib/storage/businessPhotos";
 import { BetweenContentAd, SidebarAd } from "@/components/ads";
@@ -414,6 +415,21 @@ export default async function PlacePage({ params }: PlacePageProps) {
               }}
               locale={locale}
             />
+
+            {/* AI-Generated Content Sections for richer content */}
+            <ContentSections
+              content={content}
+              placeName={place.name}
+              locale={locale}
+            />
+
+            {/* Editorial Byline - E-E-A-T Trust Signal */}
+            <div className="py-4">
+              <EditorialByline
+                updatedAt={place.updatedAt || place.createdAt || undefined}
+                locale={locale}
+              />
+            </div>
 
             {/* Ad: Between content (anonymous users only) */}
             <BetweenContentAd />

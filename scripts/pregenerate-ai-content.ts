@@ -157,7 +157,7 @@ async function getPlaces(): Promise<ContentItem[]> {
   const rows = await sql`
     SELECT
       p.id, p.name, p.slug, p.description, p.avg_rating, p.review_count, p.address,
-      p.scraped_content,
+      p.scraped_content, p.opening_hours, p.phone, p.website,
       c.name as city_name, c.slug as city_slug,
       co.name as country_name, co.slug as country_slug,
       ARRAY_AGG(DISTINCT cat.slug) FILTER (WHERE cat.slug IS NOT NULL) as categories
@@ -167,7 +167,7 @@ async function getPlaces(): Promise<ContentItem[]> {
     LEFT JOIN place_categories pc ON pc.place_id = p.id
     LEFT JOIN categories cat ON pc.category_id = cat.id
     GROUP BY p.id, p.name, p.slug, p.description, p.avg_rating, p.review_count, p.address,
-             p.scraped_content, c.name, c.slug, co.name, co.slug
+             p.scraped_content, p.opening_hours, p.phone, p.website, c.name, c.slug, co.name, co.slug
   `;
 
   return rows.map((row: any) => {
@@ -175,12 +175,18 @@ async function getPlaces(): Promise<ContentItem[]> {
     const scrapedContent = row.scraped_content as {
       aboutUs?: string;
       googleRating?: number;
+      googleReviewCount?: number;
+      description?: string;
+      servicesProvided?: string[];
       facts?: {
         foundedYear?: number;
         specializations?: string[];
         awards?: string[];
       };
     } | null;
+
+    // Parse opening hours
+    const openingHours = row.opening_hours as Record<string, string> | null;
 
     return {
       type: "place" as const,
@@ -197,8 +203,12 @@ async function getPlaces(): Promise<ContentItem[]> {
         rating: row.avg_rating ? parseFloat(row.avg_rating) : undefined,
         reviewCount: row.review_count ? parseInt(row.review_count) : undefined,
         address: row.address,
+        phone: row.phone,
+        website: row.website,
+        openingHours,
         aboutUs: scrapedContent?.aboutUs,
         aboutUsFacts: scrapedContent?.facts,
+        servicesProvided: scrapedContent?.servicesProvided,
       },
       prompt: buildPrompt("place", {
         placeName: row.name,
@@ -206,9 +216,15 @@ async function getPlaces(): Promise<ContentItem[]> {
         countryName: row.country_name,
         categories: row.categories || [],
         rating: row.avg_rating,
+        reviewCount: row.review_count,
         description: row.description,
+        address: row.address,
+        phone: row.phone,
+        website: row.website,
+        openingHours,
         aboutUs: scrapedContent?.aboutUs,
         aboutUsFacts: scrapedContent?.facts,
+        servicesProvided: scrapedContent?.servicesProvided,
       }),
     };
   });
@@ -428,13 +444,124 @@ function getCategoryName(slug: string, locale: string): string {
   return names[slug]?.[locale] || slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-function getSystemPrompt(): string {
+/**
+ * Get category-specific context for better FAQs and content
+ */
+function getCategoryContext(categorySlug: string): string {
+  const categoryContexts: Record<string, { en: string; nl: string }> = {
+    veterinary: {
+      en: `Category Context for Veterinarian:
+- Common services: General checkups, vaccinations, surgery, dental care, emergency care, diagnostics
+- Pet owner concerns: Costs and payment options, wait times, specializations, emergency availability
+- FAQ topics: Appointment booking, what to bring, emergency procedures, insurance acceptance, specific pet types treated`,
+      nl: `Categorie Context voor Dierenarts:
+- Veelvoorkomende diensten: Algemene controles, vaccinaties, chirurgie, tandheelkundige zorg, spoedzorg, diagnostiek
+- Zorgen van eigenaren: Kosten en betalingsmogelijkheden, wachttijden, specialisaties, spoedbeschikbaarheid
+- FAQ onderwerpen: Afspraak maken, wat mee te nemen, spoedprocedures, verzekering, welke diersoorten behandeld worden`,
+    },
+    "pet-groomer": {
+      en: `Category Context for Pet Groomer:
+- Common services: Bathing, haircuts, nail trimming, ear cleaning, teeth brushing, de-shedding
+- Pet owner concerns: Experience with specific breeds, anxiety handling, products used, pricing
+- FAQ topics: How often to groom, first visit preparation, nervous pets, breed-specific grooming`,
+      nl: `Categorie Context voor Trimsalon:
+- Veelvoorkomende diensten: Baden, knippen, nagels knippen, oren schoonmaken, tandenpoetsen, ontvlooien
+- Zorgen van eigenaren: Ervaring met specifieke rassen, angstbehandeling, gebruikte producten, prijzen
+- FAQ onderwerpen: Hoe vaak trimmen, voorbereiding eerste bezoek, nerveuze huisdieren, rasspecifieke verzorging`,
+    },
+    "pet-store": {
+      en: `Category Context for Pet Store:
+- Products: Food, treats, toys, accessories, beds, crates, grooming supplies, health products
+- Pet owner concerns: Product quality, brands available, advice, returns policy
+- FAQ topics: Best food brands, loyalty programs, delivery options, special dietary needs`,
+      nl: `Categorie Context voor Dierenwinkel:
+- Producten: Voer, snacks, speelgoed, accessoires, bedden, benches, verzorgingsproducten, gezondheidsproducten
+- Zorgen van eigenaren: Productkwaliteit, beschikbare merken, advies, retourbeleid
+- FAQ onderwerpen: Beste voermerken, spaarprogramma's, bezorgopties, speciale dieetbehoeften`,
+    },
+    "pet-boarding": {
+      en: `Category Context for Pet Hotel/Boarding:
+- Services: Overnight stays, daycare, exercise, feeding, medication administration
+- Pet owner concerns: Safety, supervision, cleanliness, daily routines, updates
+- FAQ topics: Vaccination requirements, what to bring, visiting hours, pricing per night`,
+      nl: `Categorie Context voor Dierenpension:
+- Diensten: Overnachtingen, dagopvang, beweging, voeding, medicatie toediening
+- Zorgen van eigenaren: Veiligheid, toezicht, hygiëne, dagelijkse routine, updates
+- FAQ onderwerpen: Vaccinatie-eisen, wat mee te nemen, bezoekuren, prijs per nacht`,
+    },
+    "dog-training": {
+      en: `Category Context for Dog Training:
+- Services: Puppy training, obedience, behavioral issues, agility, socialization
+- Pet owner concerns: Training methods, trainer experience, class sizes, results
+- FAQ topics: Best age to start, training duration, group vs private lessons, specific issues`,
+      nl: `Categorie Context voor Hondentraining:
+- Diensten: Puppytraining, gehoorzaamheid, gedragsproblemen, behendigheid, socialisatie
+- Zorgen van eigenaren: Trainingsmethodes, ervaring trainer, groepsgrootte, resultaten
+- FAQ onderwerpen: Beste leeftijd om te starten, trainingsduur, groeps- vs privélessen, specifieke problemen`,
+    },
+    "pet-shelter": {
+      en: `Category Context for Animal Shelter:
+- Services: Pet adoption, fostering, surrender, lost and found
+- Adopter concerns: Adoption process, fees, pet history, health status, home checks
+- FAQ topics: Adoption requirements, meet and greets, return policies, donation options`,
+      nl: `Categorie Context voor Dierenasiel:
+- Diensten: Huisdier adoptie, opvang, afstand doen, gevonden dieren
+- Zorgen van adoptanten: Adoptieproces, kosten, achtergrond dier, gezondheidsstatus, huiscontroles
+- FAQ onderwerpen: Adoptie-eisen, kennismaking, retourbeleid, donatiemogelijkheden`,
+    },
+  };
+
+  const context = categoryContexts[categorySlug];
+  return context ? context[LOCALE] || context.en : "";
+}
+
+function getSystemPrompt(contentType: string = "general"): string {
   const localeInstructions = {
     nl: "Schrijf in het Nederlands. Gebruik een vriendelijke, professionele toon geschikt voor huisdiereigenaren.",
     en: "Write in English. Use a friendly, professional tone suitable for pet owners.",
     de: "Schreiben Sie auf Deutsch. Verwenden Sie einen freundlichen, professionellen Ton, der für Tierbesitzer geeignet ist.",
   };
 
+  // Enhanced system prompt for place pages
+  if (contentType === "place") {
+    return `You are an SEO content writer for CutiePawsPedia, a directory of pet services.
+
+${localeInstructions[LOCALE]}
+
+For business profile pages, provide comprehensive, unique content. Always respond with valid JSON matching this structure:
+{
+  "intro": "Engaging introduction paragraph (3-5 sentences) highlighting what makes this business special",
+  "metaDescription": "SEO meta description (max 155 characters)",
+  "h1": "H1 heading suggestion",
+  "secondary": "Second paragraph with more details about services and expertise",
+  "sections": [
+    { "heading": "What to Expect", "content": "Detailed paragraph about the customer experience at this business (4-6 sentences)" },
+    { "heading": "Services Overview", "content": "Comprehensive overview of services offered (4-6 sentences)" },
+    { "heading": "Why Choose This Business", "content": "Unique selling points and differentiators (4-6 sentences)" }
+  ],
+  "faqs": [
+    { "question": "UNIQUE business-specific FAQ 1", "answer": "Detailed answer (3-4 sentences)" },
+    { "question": "UNIQUE business-specific FAQ 2", "answer": "Detailed answer (3-4 sentences)" },
+    { "question": "UNIQUE business-specific FAQ 3", "answer": "Detailed answer (3-4 sentences)" },
+    { "question": "UNIQUE business-specific FAQ 4", "answer": "Detailed answer (3-4 sentences)" }
+  ],
+  "bullets": ["Key benefit 1", "Key benefit 2", "Key benefit 3", "Key benefit 4"],
+  "serviceHighlights": ["Service 1", "Service 2", "Service 3"],
+  "localRelevance": "Paragraph about how this business serves the local community and its accessibility (3-5 sentences)",
+  "cta": "Call-to-action text"
+}
+
+CRITICAL Guidelines for place pages:
+- Make content UNIQUE to this specific business - no generic descriptions
+- FAQs must be specific to the business type, location, and services offered
+- If opening hours are provided, mention convenience aspects
+- If services are provided, highlight specific offerings
+- Use the business name naturally in the content
+- Aim for at least 500 words of total content
+- Do NOT use markdown formatting in the JSON values`;
+  }
+
+  // Standard system prompt for other content types
   return `You are an SEO content writer for CutiePawsPedia, a directory of pet services (veterinarians, groomers, pet stores, etc.).
 
 ${localeInstructions[LOCALE]}
@@ -487,10 +614,59 @@ Context:
 Write content that helps pet owners find local pet services in ${data.cityName}.`;
 
     case "place":
-      // Build about-us context if available from scraped content
-      let aboutUsContext = "";
+      // Build comprehensive context from all available data
+      const categories = data.categories as string[];
+      const primaryCategory = categories[0] || "pet-service";
+      const categoryContext = getCategoryContext(primaryCategory);
+
+      let contextSections: string[] = [];
+
+      // Basic info
+      contextSections.push(`Business name: ${data.placeName}`);
+      contextSections.push(`Location: ${data.cityName}, ${data.countryName}`);
+      contextSections.push(`Categories: ${categories.join(", ")}`);
+
+      // Rating info
+      if (data.rating) {
+        contextSections.push(`Rating: ${data.rating}/5${data.reviewCount ? ` (${data.reviewCount} reviews)` : ""}`);
+      }
+
+      // Address
+      if (data.address) {
+        contextSections.push(`Address: ${data.address}`);
+      }
+
+      // Contact info
+      if (data.phone) {
+        contextSections.push(`Phone: ${data.phone}`);
+      }
+      if (data.website) {
+        contextSections.push(`Website: ${data.website}`);
+      }
+
+      // Opening hours
+      if (data.openingHours) {
+        const hours = data.openingHours as Record<string, string>;
+        const daysOpen = Object.entries(hours)
+          .map(([day, time]) => `${day}: ${time}`)
+          .join(", ");
+        contextSections.push(`Opening hours: ${daysOpen}`);
+      }
+
+      // Services provided
+      if (data.servicesProvided && (data.servicesProvided as string[]).length > 0) {
+        contextSections.push(`Services: ${(data.servicesProvided as string[]).join(", ")}`);
+      }
+
+      // Description
+      if (data.description) {
+        contextSections.push(`Description: ${data.description}`);
+      }
+
+      // About us from website scraping
+      let aboutUsSection = "";
       if (data.aboutUs) {
-        aboutUsContext = `\n\nAbout this business (from their website):
+        aboutUsSection = `\n\nAbout this business (from their website):
 ${(data.aboutUs as string).slice(0, 1500)}`;
 
         if (data.aboutUsFacts) {
@@ -500,27 +676,32 @@ ${(data.aboutUs as string).slice(0, 1500)}`;
             awards?: string[];
           };
           if (facts.foundedYear) {
-            aboutUsContext += `\n- Founded: ${facts.foundedYear}`;
+            aboutUsSection += `\n- Founded: ${facts.foundedYear}`;
           }
           if (facts.specializations?.length) {
-            aboutUsContext += `\n- Specializations: ${facts.specializations.join(", ")}`;
+            aboutUsSection += `\n- Specializations: ${facts.specializations.join(", ")}`;
           }
           if (facts.awards?.length) {
-            aboutUsContext += `\n- Awards/Recognition: ${facts.awards.join(", ")}`;
+            aboutUsSection += `\n- Awards/Recognition: ${facts.awards.join(", ")}`;
           }
         }
       }
 
-      return `Generate SEO content for a business listing page: ${data.placeName} in ${data.cityName}, ${data.countryName}.
+      return `Generate comprehensive SEO content for: ${data.placeName} in ${data.cityName}, ${data.countryName}.
 
-Context:
-- Business name: ${data.placeName}
-- Location: ${data.cityName}, ${data.countryName}
-- Categories: ${(data.categories as string[]).join(", ")}
-${data.rating ? `- Rating: ${data.rating}/5` : ""}
-${data.description ? `- Description: ${data.description}` : ""}${aboutUsContext}
+Business Context:
+${contextSections.map(s => `- ${s}`).join("\n")}${aboutUsSection}
 
-${data.aboutUs ? "Use the about-us information to write personalized, unique content that highlights what makes this business special. Include specific details from their website where relevant." : "Write content that helps pet owners learn about this business."}`;
+${categoryContext ? `\n${categoryContext}\n` : ""}
+IMPORTANT INSTRUCTIONS:
+${data.aboutUs ? "- Use the about-us information to write personalized, unique content" : "- Create unique content based on the business type and location"}
+- Generate 4 UNIQUE FAQs specific to THIS business (use business name, location, category)
+- Include sections: "What to Expect", "Services Overview", "Why Choose This Business"
+- Write a localRelevance paragraph about serving ${data.cityName} area
+${data.openingHours ? "- Mention convenient opening hours in the content" : ""}
+${data.servicesProvided ? "- Highlight the specific services offered" : ""}
+- Aim for 500+ words of total content
+- Make all content unique to this specific business`;
 
     case "category":
       return `Generate SEO content for a category page about ${data.categoryName} in ${data.countryName}.
@@ -591,14 +772,19 @@ async function generateAndSaveContent(item: ContentItem): Promise<boolean> {
   try {
     const startTime = Date.now();
 
+    // Use enhanced system prompt for places, standard for others
+    const systemPrompt = getSystemPrompt(item.type);
+    // Use higher token limit for places (more comprehensive content)
+    const maxTokens = item.type === "place" ? 2000 : AI_MAX_TOKENS;
+
     const response = await openai.chat.completions.create({
       model: AI_MODEL,
       messages: [
-        { role: "system", content: getSystemPrompt() },
+        { role: "system", content: systemPrompt },
         { role: "user", content: item.prompt },
       ],
       temperature: AI_TEMPERATURE,
-      max_tokens: AI_MAX_TOKENS,
+      max_tokens: maxTokens,
       response_format: { type: "json_object" },
     });
 

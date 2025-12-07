@@ -177,6 +177,96 @@ export interface GenerateContentResult {
 }
 
 // ============================================================================
+// CATEGORY CONTEXT HELPERS
+// ============================================================================
+
+/**
+ * Get category-specific context for more relevant AI content generation
+ */
+function getCategoryContext(categorySlug: string, locale: ContentLocale): string {
+  const isNl = locale === "nl";
+
+  const categoryContexts: Record<string, { en: string; nl: string }> = {
+    veterinarian: {
+      en: `Category Context for Veterinarian:
+- Common services: General checkups, vaccinations, surgery, dental care, emergency care
+- Pet owner concerns: Costs, wait times, specializations, emergency availability, accepted insurance
+- FAQ topics: Appointment booking, emergency procedures, preventive care, costs, pet types treated`,
+      nl: `Categorie Context voor Dierenarts:
+- Veelvoorkomende diensten: Algemene controles, vaccinaties, chirurgie, tandheelkunde, spoedhulp
+- Zorgen van huisdiereigenaren: Kosten, wachttijden, specialisaties, spoedbeschikbaarheid, geaccepteerde verzekeringen
+- FAQ onderwerpen: Afspraak maken, spoedprocedures, preventieve zorg, kosten, behandelde diersoorten`,
+    },
+    groomer: {
+      en: `Category Context for Groomer:
+- Common services: Bathing, haircuts, nail trimming, ear cleaning, de-shedding treatments
+- Pet owner concerns: Handling methods, breed experience, organic products, pricing
+- FAQ topics: Appointment duration, products used, handling nervous pets, frequency recommendations`,
+      nl: `Categorie Context voor Trimsalon:
+- Veelvoorkomende diensten: Wassen, knippen, nagels knippen, oren schoonmaken, ontviltbehandelingen
+- Zorgen van huisdiereigenaren: Behandelmethodes, ras ervaring, biologische producten, prijzen
+- FAQ onderwerpen: Afspraakduur, gebruikte producten, omgaan met nerveuze dieren, frequentie aanbevelingen`,
+    },
+    "pet-store": {
+      en: `Category Context for Pet Store:
+- Products: Food, toys, accessories, health products, beds, carriers
+- Pet owner concerns: Product quality, brand availability, loyalty programs, delivery options
+- FAQ topics: Return policy, brand availability, pet food advice, product recommendations`,
+      nl: `Categorie Context voor Dierenwinkel:
+- Producten: Voeding, speelgoed, accessoires, gezondheidsproducten, manden, transportboxen
+- Zorgen van huisdiereigenaren: Productkwaliteit, merkbeschikbaarheid, loyaliteitsprogramma's, bezorgopties
+- FAQ onderwerpen: Retourbeleid, merkbeschikbaarheid, voedingsadvies, productaanbevelingen`,
+    },
+    "pet-hotel": {
+      en: `Category Context for Pet Hotel:
+- Services: Overnight stays, daycare, play sessions, special diets, medication administration
+- Pet owner concerns: Staff qualifications, supervision, emergency protocols, webcams
+- FAQ topics: Booking requirements, vaccination requirements, what to bring, daily routine`,
+      nl: `Categorie Context voor Dierenhotel:
+- Diensten: Overnachtingen, dagopvang, speelsessies, speciale diëten, medicatie toediening
+- Zorgen van huisdiereigenaren: Kwalificaties personeel, toezicht, noodprotocollen, webcams
+- FAQ onderwerpen: Boekingsvereisten, vaccinatievereisten, wat mee te nemen, dagelijkse routine`,
+    },
+    "dog-trainer": {
+      en: `Category Context for Dog Trainer:
+- Services: Puppy training, obedience, behavioral issues, agility, private sessions, group classes
+- Pet owner concerns: Training methods (positive reinforcement), experience with specific breeds, success rates
+- FAQ topics: Training duration, methods used, at-home practice, age requirements`,
+      nl: `Categorie Context voor Hondentrainer:
+- Diensten: Puppytraining, gehoorzaamheid, gedragsproblemen, agility, privélessen, groepslessen
+- Zorgen van huisdiereigenaren: Trainingsmethodes (positieve bekrachtiging), ervaring met specifieke rassen, succespercentages
+- FAQ onderwerpen: Trainingsduur, gebruikte methodes, thuisoefeningen, leeftijdsvereisten`,
+    },
+    "animal-shelter": {
+      en: `Category Context for Animal Shelter:
+- Services: Adoption, fostering, lost pet assistance, surrender services, volunteering
+- Pet owner concerns: Adoption process, animal health history, behavioral assessments, fees
+- FAQ topics: Adoption requirements, visiting hours, fostering programs, donation options`,
+      nl: `Categorie Context voor Dierenasiel:
+- Diensten: Adoptie, pleegzorg, hulp bij vermiste dieren, afstand doen, vrijwilligerswerk
+- Zorgen van huisdiereigenaren: Adoptieproces, gezondheidsgeschiedenis, gedragsbeoordelingen, kosten
+- FAQ onderwerpen: Adoptievereisten, bezoekuren, pleegzorgprogramma's, donatiemogelijkheden`,
+    },
+  };
+
+  const context = categoryContexts[categorySlug];
+  if (context) {
+    return isNl ? context.nl : context.en;
+  }
+
+  // Default context for unknown categories
+  return isNl
+    ? `Categorie Context:
+- Schrijf content specifiek voor dit type huisdierdienst
+- Overweeg typische vragen die huisdiereigenaren hebben over deze dienst
+- Vermeld lokale factoren zoals bereikbaarheid en parkeren`
+    : `Category Context:
+- Write content specific to this type of pet service
+- Consider typical questions pet owners have about this service
+- Mention local factors like accessibility and parking`;
+}
+
+// ============================================================================
 // CACHE KEY GENERATION
 // ============================================================================
 
@@ -346,7 +436,7 @@ async function generateViaLLM(
     messages: [
       {
         role: "system",
-        content: getSystemPrompt(locale),
+        content: getSystemPrompt(locale, type),
       },
       {
         role: "user",
@@ -354,7 +444,7 @@ async function generateViaLLM(
       },
     ],
     temperature: AI_TEMPERATURE,
-    max_tokens: AI_MAX_TOKENS,
+    max_tokens: type === "place" ? 1500 : AI_MAX_TOKENS, // More tokens for place pages
     response_format: { type: "json_object" },
   });
 
@@ -376,12 +466,51 @@ async function generateViaLLM(
 /**
  * Get system prompt for content generation
  */
-function getSystemPrompt(locale: ContentLocale): string {
+function getSystemPrompt(locale: ContentLocale, contentType?: AiContentType): string {
   const localeInstructions = {
     nl: "Schrijf in het Nederlands. Gebruik een vriendelijke, professionele toon geschikt voor huisdiereigenaren.",
     en: "Write in English. Use a friendly, professional tone suitable for pet owners.",
     de: "Schreiben Sie auf Deutsch. Verwenden Sie einen freundlichen, professionellen Ton, der für Tierbesitzer geeignet ist.",
   };
+
+  // For place pages, request more comprehensive content
+  if (contentType === "place") {
+    return `You are an SEO content writer for CutiePawsPedia, a directory of pet services (veterinarians, groomers, pet stores, etc.).
+
+${localeInstructions[locale]}
+
+For business profile pages, provide comprehensive, unique content. Always respond with valid JSON matching this structure:
+{
+  "intro": "Engaging introduction paragraph (3-5 sentences) that introduces the business and what makes it special",
+  "metaDescription": "SEO meta description (max 155 characters)",
+  "h1": "H1 heading suggestion",
+  "secondary": "Second paragraph (2-3 sentences) about services or unique qualities",
+  "sections": [
+    { "heading": "What to Expect", "content": "Detailed paragraph about what customers can expect (3-4 sentences)" },
+    { "heading": "Services Overview", "content": "Description of key services offered (3-4 sentences)" },
+    { "heading": "Why Choose This Business", "content": "Unique selling points and benefits (3-4 sentences)" }
+  ],
+  "faqs": [
+    { "question": "Business-specific FAQ 1", "answer": "Detailed answer (2-3 sentences)" },
+    { "question": "Business-specific FAQ 2", "answer": "Detailed answer (2-3 sentences)" },
+    { "question": "Service-related FAQ", "answer": "Detailed answer (2-3 sentences)" },
+    { "question": "Location/accessibility FAQ", "answer": "Detailed answer (2-3 sentences)" }
+  ],
+  "cta": "Call-to-action text",
+  "bullets": ["Key benefit 1", "Key benefit 2", "Key benefit 3", "Key benefit 4"],
+  "serviceHighlights": ["Service 1", "Service 2", "Service 3"],
+  "localRelevance": "Paragraph about location benefits and accessibility (2-3 sentences)"
+}
+
+CRITICAL Guidelines for place pages:
+- Make the content UNIQUE to this specific business - avoid generic phrases
+- FAQs must be specific to this business type, location, and services - NOT generic template questions
+- Include local context (neighborhood, city characteristics, accessibility)
+- Mention specific services when known from the description
+- If about-us content is provided, incorporate unique details from it
+- Aim for at least 400 words of total content
+- Do NOT use markdown formatting in the JSON values`;
+  }
 
   return `You are an SEO content writer for CutiePawsPedia, a directory of pet services (veterinarians, groomers, pet stores, etc.).
 
@@ -477,18 +606,36 @@ ${placeData.aboutUs.slice(0, 1500)}`;
         }
       }
 
-      return `Generate SEO content for a business listing page: ${placeData.placeName} in ${placeData.cityName}, ${placeData.countryName}.
+      // Build category-specific context for better FAQs
+      const primaryCategory = placeData.categories[0] || "";
+      const categoryContext = getCategoryContext(primaryCategory, locale);
 
-Context:
+      return `Generate comprehensive SEO content for a business profile page: ${placeData.placeName} in ${placeData.cityName}, ${placeData.countryName}.
+
+Business Information:
 - Business name: ${placeData.placeName}
 - Location: ${placeData.cityName}, ${placeData.countryName}
 - Categories: ${placeData.categories.join(", ")}
-${placeData.rating ? `- Rating: ${placeData.rating}/5` : ""}
-${placeData.reviewCount ? `- Reviews: ${placeData.reviewCount}` : ""}
-${placeData.address ? `- Address: ${placeData.address}` : ""}
-${placeData.description ? `- Description: ${placeData.description}` : ""}${aboutUsContext}
+${placeData.rating ? `- Rating: ${placeData.rating}/5` : "- Rating: Not yet rated"}
+${placeData.reviewCount ? `- Reviews: ${placeData.reviewCount}` : "- Reviews: None yet"}
+${placeData.address ? `- Full address: ${placeData.address}` : ""}
+${placeData.description ? `- Business description: ${placeData.description}` : ""}${aboutUsContext}
 
-${placeData.aboutUs ? "Use the about-us information to write personalized, unique content that highlights what makes this business special. Include specific details from their website where relevant." : "Write content that helps pet owners learn about this business and decide if it's right for their needs."}`;
+${categoryContext}
+
+IMPORTANT - Content Requirements:
+1. Write a comprehensive, unique intro (3-5 sentences) that specifically describes this business
+2. Include a secondary paragraph about their services or approach
+3. Create 3 content sections with detailed information
+4. Generate 4 UNIQUE FAQs specific to:
+   - This business type (${primaryCategory})
+   - This location (${placeData.cityName})
+   - Common questions pet owners ask about ${primaryCategory}
+   - Local considerations (parking, accessibility, emergency services)
+5. List 4 key benefits/bullet points
+6. Include local relevance paragraph
+
+${placeData.aboutUs ? "Use the about-us information to write personalized content that highlights what makes this business special. Incorporate specific details from their website." : "Write helpful content that assists pet owners in understanding what this business offers and whether it meets their needs. Be specific about the type of services based on the category."}`;
 
     case "combo":
       const comboData = data as ComboData;

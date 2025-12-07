@@ -489,6 +489,205 @@ function mapCategoryToSchemaType(categorySlug: string): string {
 }
 
 /**
+ * Article schema for content pages (E-E-A-T)
+ * Used for blog posts, guides, and editorial content
+ */
+export interface ArticleSchemaData {
+  headline: string;
+  description: string;
+  url: string;
+  datePublished: Date | string;
+  dateModified?: Date | string;
+  author?: {
+    name: string;
+    title?: string;
+    url?: string;
+    isExpert?: boolean;
+    credentials?: string[];
+  };
+  image?: string;
+}
+
+export function articleSchema(data: ArticleSchemaData): object {
+  const datePublished = typeof data.datePublished === "string"
+    ? data.datePublished
+    : data.datePublished.toISOString();
+  const dateModified = data.dateModified
+    ? (typeof data.dateModified === "string"
+        ? data.dateModified
+        : data.dateModified.toISOString())
+    : datePublished;
+
+  const authorSchema: Record<string, unknown> = {
+    "@type": "Person",
+    name: data.author?.name || "CutiePawsPedia Editorial",
+  };
+
+  if (data.author?.title) {
+    authorSchema.jobTitle = data.author.title;
+  }
+  if (data.author?.url) {
+    authorSchema.url = data.author.url;
+  }
+  if (data.author?.isExpert && data.author.credentials) {
+    authorSchema.hasCredential = data.author.credentials.map((cred) => ({
+      "@type": "EducationalOccupationalCredential",
+      credentialCategory: "professional certification",
+      name: cred,
+    }));
+  }
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: data.headline,
+    description: data.description,
+    url: data.url,
+    datePublished: datePublished.split("T")[0],
+    dateModified: dateModified.split("T")[0],
+    author: authorSchema,
+    publisher: {
+      "@type": "Organization",
+      "@id": `${BASE_URL}/#organization`,
+      name: SITE_NAME,
+      logo: {
+        "@type": "ImageObject",
+        url: `${BASE_URL}/logo.png`,
+      },
+    },
+    image: data.image || `${BASE_URL}/og-image.png`,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": data.url,
+    },
+  };
+}
+
+/**
+ * Editorial team schema for AI/editorial content (E-E-A-T)
+ * Shows that content is reviewed by a team of experts
+ */
+export function editorialTeamSchema(): object {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${BASE_URL}/#editorial-team`,
+    name: "CutiePawsPedia Editorial Team",
+    description: "Our team of pet care experts reviews and verifies all content on CutiePawsPedia.",
+    url: `${BASE_URL}/en/about`,
+    parentOrganization: {
+      "@type": "Organization",
+      "@id": `${BASE_URL}/#organization`,
+    },
+    member: [
+      {
+        "@type": "Person",
+        name: "Pet Care Editorial Team",
+        jobTitle: "Content Editors",
+        knowsAbout: [
+          "Pet Care",
+          "Veterinary Services",
+          "Pet Grooming",
+          "Dog Training",
+          "Pet Nutrition",
+        ],
+      },
+    ],
+  };
+}
+
+/**
+ * Person schema for expert reviewers/authors (E-E-A-T)
+ */
+export interface PersonSchemaData {
+  name: string;
+  title?: string;
+  description?: string;
+  image?: string;
+  url?: string;
+  credentials?: string[];
+  expertiseAreas?: string[];
+  yearsExperience?: number;
+  isVerified?: boolean;
+}
+
+export function personSchema(data: PersonSchemaData): object {
+  const schema: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: data.name,
+  };
+
+  if (data.title) {
+    schema.jobTitle = data.title;
+  }
+
+  if (data.description) {
+    schema.description = data.description;
+  }
+
+  if (data.image) {
+    schema.image = data.image;
+  }
+
+  if (data.url) {
+    schema.url = data.url;
+    schema["@id"] = data.url;
+  }
+
+  // Add expertise and credentials for E-E-A-T
+  if (data.expertiseAreas && data.expertiseAreas.length > 0) {
+    schema.knowsAbout = data.expertiseAreas;
+  }
+
+  if (data.credentials && data.credentials.length > 0) {
+    schema.hasCredential = data.credentials.map((cred) => ({
+      "@type": "EducationalOccupationalCredential",
+      credentialCategory: "degree",
+      name: cred,
+    }));
+  }
+
+  if (data.yearsExperience && data.yearsExperience > 0) {
+    schema.hasOccupation = {
+      "@type": "Occupation",
+      name: data.title || "Pet Care Expert",
+      experienceRequirements: {
+        "@type": "OccupationalExperienceRequirements",
+        monthsOfExperience: data.yearsExperience * 12,
+      },
+    };
+  }
+
+  // Link to organization
+  schema.worksFor = {
+    "@type": "Organization",
+    "@id": `${BASE_URL}/#organization`,
+    name: "CutiePawsPedia",
+  };
+
+  return schema;
+}
+
+/**
+ * About page schema with E-E-A-T signals
+ */
+export function aboutPageSchema(): object {
+  return {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "@id": `${BASE_URL}/en/about#about`,
+    name: "About CutiePawsPedia",
+    description: "Learn about CutiePawsPedia, the trusted pet services directory helping pet owners find the best care for their companions.",
+    url: `${BASE_URL}/en/about`,
+    mainEntity: {
+      "@type": "Organization",
+      "@id": `${BASE_URL}/#organization`,
+    },
+  };
+}
+
+/**
  * Helper to render JSON-LD script tag
  */
 export function jsonLdScript(schema: object | object[]): string {

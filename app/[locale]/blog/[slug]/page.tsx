@@ -25,9 +25,10 @@ import {
   type Locale,
 } from "@/db/queries";
 import { getActiveAdForPlacement } from "@/db/queries/ads";
-import { Calendar, Clock, User, ArrowLeft, ArrowRight, Tag } from "lucide-react";
+import { Calendar, Clock, ArrowLeft, ArrowRight, Tag } from "lucide-react";
 import { TableOfContents, extractTocItems, PhotoCredit } from "@/components/blog";
 import { BlogSidebarAd, BetweenContentAd } from "@/components/ads";
+import { EditorialByline } from "@/components/seo";
 
 interface BlogPostPageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -258,13 +259,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </h1>
 
         {/* Meta Info */}
-        <div className="flex flex-wrap items-center gap-6 text-muted-foreground dark:text-cpCream/60">
-          {post.authorName && (
-            <span className="flex items-center gap-2">
-              <User className="w-4 h-4" />
-              {post.authorName}
-            </span>
-          )}
+        <div className="flex flex-wrap items-center gap-6 text-muted-foreground dark:text-cpCream/60 mb-4">
           {post.publishedAt && (
             <span className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
@@ -278,6 +273,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </span>
           )}
         </div>
+
+        {/* Editorial Byline - E-E-A-T Trust Signal */}
+        <EditorialByline
+          updatedAt={post.updatedAt || post.publishedAt || undefined}
+          locale={locale}
+        />
       </header>
 
       {/* Featured Image with Photo Credit */}

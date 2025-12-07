@@ -7,6 +7,7 @@
 
 import { CheckCircle2, Info, TrendingUp, Award, Star } from "lucide-react";
 import type { AiContentResult } from "@/lib/seo";
+import { EditorialByline } from "./AuthorByline";
 
 export type PageIntroVariant =
   | "default"
@@ -36,6 +37,10 @@ interface PageIntroProps {
   note?: string;
   /** Locale for text direction and formatting */
   locale?: string;
+  /** Show editorial byline for E-E-A-T (default: true) */
+  showEditorialByline?: boolean;
+  /** Last updated date for content freshness signal */
+  updatedAt?: Date | string;
 }
 
 const variantStyles: Record<PageIntroVariant, string> = {
@@ -71,6 +76,8 @@ export function PageIntro({
   bulletIcon,
   note,
   locale,
+  showEditorialByline = true,
+  updatedAt,
 }: PageIntroProps) {
   const { intro, secondary, bullets, cta } = content;
 
@@ -127,6 +134,15 @@ export function PageIntro({
           <p className="text-sm font-medium text-cpCoral mt-4">
             {cta}
           </p>
+        )}
+
+        {/* Editorial byline for E-E-A-T trust signals */}
+        {showEditorialByline && (
+          <EditorialByline
+            updatedAt={updatedAt}
+            locale={locale}
+            className="mt-4 pt-3 border-t border-border/50 dark:border-cpAmber/10"
+          />
         )}
       </div>
     </section>

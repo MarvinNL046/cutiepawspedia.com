@@ -17,3 +17,9 @@ export {
   FaqStatic,
   type FaqSectionProps,
 } from "./FaqSection";
+export {
+  AuthorByline,
+  EditorialByline,
+  SourceCitation,
+  type Author,
+} from "./AuthorByline";

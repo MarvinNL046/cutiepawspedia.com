@@ -2,6 +2,7 @@ import { Header, Footer } from "@/components/layout";
 import { JsonLd } from "@/components/seo";
 import { AdVisibilityProvider } from "@/components/ads";
 import { CookieConsentBanner } from "@/components/consent";
+import { ExitIntentPopup } from "@/components/popups";
 import { websiteSchema, organizationSchema } from "@/lib/seo";
 import { getAdVisibilityContext } from "@/lib/ads/visibility";
 
@@ -34,6 +35,8 @@ export default async function LocaleLayout({
       </div>
       {/* GDPR Cookie Consent Banner */}
       <CookieConsentBanner locale={locale} />
+      {/* Exit Intent Popup for newsletter signup */}
+      <ExitIntentPopup locale={locale} />
     </AdVisibilityProvider>
   );
 }

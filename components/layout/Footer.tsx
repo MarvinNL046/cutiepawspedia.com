@@ -49,72 +49,6 @@ export function Footer({ locale }: FooterProps) {
         </div>
       </div>
 
-      {/* Trust & Security Section - E-E-A-T */}
-      <div className="border-b border-border">
-        <div className="container mx-auto max-w-6xl px-4 py-8">
-          <div className="text-center mb-6">
-            <h3 className="text-lg font-semibold text-foreground mb-2">
-              {isNl ? "Vertrouwen & Veiligheid" : "Trust & Security"}
-            </h3>
-            <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-              {isNl
-                ? "Wij zetten ons in voor kwaliteit, veiligheid en transparantie voor alle huisdiereigenaren."
-                : "We're committed to quality, security, and transparency for all pet owners."}
-            </p>
-          </div>
-
-          {/* Trust Features */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="text-center p-3">
-              <BadgeCheck className="w-6 h-6 mx-auto mb-2 text-blue-500" />
-              <p className="text-xs font-medium text-foreground">
-                {isNl ? "Geverifieerde Bedrijven" : "Verified Businesses"}
-              </p>
-            </div>
-            <div className="text-center p-3">
-              <GraduationCap className="w-6 h-6 mx-auto mb-2 text-emerald-500" />
-              <p className="text-xs font-medium text-foreground">
-                {isNl ? "Expert Reviews" : "Expert Reviews"}
-              </p>
-            </div>
-            <div className="text-center p-3">
-              <Users className="w-6 h-6 mx-auto mb-2 text-cpCoral" />
-              <p className="text-xs font-medium text-foreground">
-                {isNl ? "Community Gedreven" : "Community Driven"}
-              </p>
-            </div>
-            <div className="text-center p-3">
-              <Lock className="w-6 h-6 mx-auto mb-2 text-cpAmber" />
-              <p className="text-xs font-medium text-foreground">
-                {isNl ? "Privacy & Veiligheid" : "Privacy & Security"}
-              </p>
-            </div>
-          </div>
-
-          {/* Trust Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 dark:bg-green-900/20 rounded-full border border-green-200 dark:border-green-800">
-              <Shield className="w-4 h-4 text-green-600 dark:text-green-400" />
-              <span className="text-xs font-medium text-green-700 dark:text-green-300">
-                {isNl ? "SSL Beveiligd" : "SSL Secured"}
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/20 rounded-full border border-blue-200 dark:border-blue-800">
-              <Lock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
-                {isNl ? "GDPR Conform" : "GDPR Compliant"}
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 dark:bg-purple-900/20 rounded-full border border-purple-200 dark:border-purple-800">
-              <BadgeCheck className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-              <span className="text-xs font-medium text-purple-700 dark:text-purple-300">
-                {isNl ? "Actief Gemodereerd" : "Actively Moderated"}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div className="container mx-auto max-w-6xl px-4 py-12">
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-5">
           {/* Brand */}
@@ -286,6 +220,48 @@ export function Footer({ locale }: FooterProps) {
             <span className="text-muted-foreground/70 hover:text-cpCoral cursor-pointer transition-colors">
               Facebook
             </span>
+          </div>
+        </div>
+
+        {/* Trust & Security Section - E-E-A-T (Bottom) */}
+        <div className="mt-8 pt-6 border-t border-border">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 mb-4">
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <BadgeCheck className="w-4 h-4 text-blue-500" />
+              <span className="text-xs">{isNl ? "Geverifieerde Bedrijven" : "Verified Businesses"}</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <GraduationCap className="w-4 h-4 text-emerald-500" />
+              <span className="text-xs">{isNl ? "Expert Reviews" : "Expert Reviews"}</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <Users className="w-4 h-4 text-cpCoral" />
+              <span className="text-xs">{isNl ? "Community Gedreven" : "Community Driven"}</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <Lock className="w-4 h-4 text-cpAmber" />
+              <span className="text-xs">{isNl ? "Privacy & Veiligheid" : "Privacy & Security"}</span>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <div className="flex items-center gap-1 px-2 py-1 bg-green-50 dark:bg-green-900/20 rounded-full border border-green-200 dark:border-green-800">
+              <Shield className="w-3 h-3 text-green-600 dark:text-green-400" />
+              <span className="text-[10px] font-medium text-green-700 dark:text-green-300">
+                {isNl ? "SSL Beveiligd" : "SSL Secured"}
+              </span>
+            </div>
+            <div className="flex items-center gap-1 px-2 py-1 bg-blue-50 dark:bg-blue-900/20 rounded-full border border-blue-200 dark:border-blue-800">
+              <Lock className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+              <span className="text-[10px] font-medium text-blue-700 dark:text-blue-300">
+                {isNl ? "GDPR Conform" : "GDPR Compliant"}
+              </span>
+            </div>
+            <div className="flex items-center gap-1 px-2 py-1 bg-purple-50 dark:bg-purple-900/20 rounded-full border border-purple-200 dark:border-purple-800">
+              <BadgeCheck className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+              <span className="text-[10px] font-medium text-purple-700 dark:text-purple-300">
+                {isNl ? "Actief Gemodereerd" : "Actively Moderated"}
+              </span>
+            </div>
           </div>
         </div>
       </div>

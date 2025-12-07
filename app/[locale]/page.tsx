@@ -23,7 +23,7 @@ import {
   getLocalizedCategoryName,
   type ContentLocale,
 } from "@/lib/seo";
-import { Search, Star, CheckCircle, Shield, BadgeCheck, GraduationCap, Users, Lock } from "lucide-react";
+import { Search, Star, CheckCircle } from "lucide-react";
 
 interface HomePageProps {
   params: Promise<{ locale: string }>;
@@ -432,111 +432,6 @@ export default async function HomePage({ params }: HomePageProps) {
                 <div className="text-muted-foreground dark:text-cpCream/70">{stat.label}</div>
               </div>
             ))}
-          </div>
-        </section>
-
-        {/* Trust & Security - E-E-A-T Section */}
-        <section className="container mx-auto max-w-6xl px-4 py-16">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
-              {locale === "nl" ? "Vertrouwen & Veiligheid" : "Trust & Security"}
-            </h2>
-            <p className="text-muted-foreground dark:text-cpCream/70 max-w-2xl mx-auto">
-              {locale === "nl"
-                ? "Wij zetten ons in voor kwaliteit, veiligheid en transparantie voor alle huisdiereigenaren."
-                : "We're committed to quality, security, and transparency for all pet owners."}
-            </p>
-          </div>
-
-          {/* Trust Features Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {[
-              {
-                icon: BadgeCheck,
-                title: locale === "nl" ? "Geverifieerde Bedrijven" : "Verified Businesses",
-                desc: locale === "nl"
-                  ? "Alle premium vermeldingen worden geverifieerd door ons team."
-                  : "All premium listings are verified by our team.",
-                color: "text-blue-500",
-              },
-              {
-                icon: GraduationCap,
-                title: locale === "nl" ? "Experts" : "Expert Reviews",
-                desc: locale === "nl"
-                  ? "Reviews van geverifieerde dierenartsen en dierenprofessionals."
-                  : "Reviews from verified veterinarians and pet professionals.",
-                color: "text-emerald-500",
-              },
-              {
-                icon: Users,
-                title: locale === "nl" ? "Community Gedreven" : "Community Driven",
-                desc: locale === "nl"
-                  ? "Echte reviews van duizenden huisdiereigenaren zoals jij."
-                  : "Real reviews from thousands of pet owners like you.",
-                color: "text-cpCoral",
-              },
-              {
-                icon: Lock,
-                title: locale === "nl" ? "Privacy & Veiligheid" : "Privacy & Security",
-                desc: locale === "nl"
-                  ? "Jouw gegevens worden beveiligd en nooit gedeeld met derden."
-                  : "Your data is secured and never shared with third parties.",
-                color: "text-cpAmber",
-              },
-            ].map((feature) => (
-              <div
-                key={feature.title}
-                className="bg-card dark:bg-cpSurface/50 rounded-2xl p-6 border border-border dark:border-cpAmber/20 shadow-sm text-center"
-              >
-                <div className={`w-12 h-12 mx-auto mb-4 rounded-full bg-card dark:bg-cpCharcoal flex items-center justify-center border border-border dark:border-cpAmber/20 ${feature.color}`}>
-                  <feature.icon className="w-6 h-6" />
-                </div>
-                <h3 className="font-bold text-foreground dark:text-cpCream mb-2">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground dark:text-slate-400">{feature.desc}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Trust Badges & Policies */}
-          <div className="bg-card dark:bg-cpSurface/50 rounded-3xl p-6 md:p-8 border border-border dark:border-cpAmber/20 shadow-sm">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              {/* Trust Badges */}
-              <div className="flex items-center gap-4 flex-wrap justify-center">
-                <div className="flex items-center gap-2 px-4 py-2 bg-green-50 dark:bg-green-900/20 rounded-full border border-green-200 dark:border-green-800">
-                  <Shield className="w-5 h-5 text-green-600 dark:text-green-400" />
-                  <span className="text-sm font-medium text-green-700 dark:text-green-300">
-                    {locale === "nl" ? "SSL Beveiligd" : "SSL Secured"}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 rounded-full border border-blue-200 dark:border-blue-800">
-                  <Lock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                  <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                    {locale === "nl" ? "GDPR Conform" : "GDPR Compliant"}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 px-4 py-2 bg-purple-50 dark:bg-purple-900/20 rounded-full border border-purple-200 dark:border-purple-800">
-                  <BadgeCheck className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                  <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
-                    {locale === "nl" ? "Actief Gemodereerd" : "Actively Moderated"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Policy Links */}
-              <div className="flex items-center gap-4 text-sm">
-                <Link href={`/${locale}/privacy-policy`} className="text-muted-foreground dark:text-cpCream/70 hover:text-cpCoral transition-colors">
-                  {locale === "nl" ? "Privacybeleid" : "Privacy Policy"}
-                </Link>
-                <span className="text-muted-foreground/40">|</span>
-                <Link href={`/${locale}/cookie-policy`} className="text-muted-foreground dark:text-cpCream/70 hover:text-cpCoral transition-colors">
-                  {locale === "nl" ? "Cookiebeleid" : "Cookie Policy"}
-                </Link>
-                <span className="text-muted-foreground/40">|</span>
-                <Link href={`/${locale}/contact`} className="text-muted-foreground dark:text-cpCream/70 hover:text-cpCoral transition-colors">
-                  {locale === "nl" ? "Contact" : "Contact"}
-                </Link>
-              </div>
-            </div>
           </div>
         </section>
 

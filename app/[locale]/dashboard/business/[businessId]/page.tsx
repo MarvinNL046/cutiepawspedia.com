@@ -11,6 +11,7 @@ import {
   getBusinessStats,
 } from "@/db/queries";
 import { getBusinessById } from "@/db/queries/businesses";
+import { getBasicAnalytics } from "@/db/queries/analytics";
 import { DashboardHeader } from "@/components/dashboard";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -55,8 +56,21 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
 
   if (!business) notFound();
 
-  // Get stats
-  const stats = await getBusinessStats(businessIdNum);
+  // Get stats and analytics in parallel
+  const [stats, analytics] = await Promise.all([
+    getBusinessStats(businessIdNum),
+    getBasicAnalytics(businessIdNum),
+  ]);
+
+  // Calculate real percentage change
+  const viewsChange = analytics.lastMonthViews > 0
+    ? Math.round(((analytics.thisMonthViews - analytics.lastMonthViews) / analytics.lastMonthViews) * 100)
+    : 0;
+
+  // Calculate real conversion rate
+  const conversionRate = analytics.thisMonthViews > 0
+    ? Math.round((analytics.thisMonthLeads / analytics.thisMonthViews) * 10000) / 100
+    : 0;
 
   // Get plan features for analytics gating
   const planKey = (business.planKey as PlanKey) || "FREE";
@@ -150,9 +164,11 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
       <DashboardHeader
         title={t.overview}
         description={t.overviewDesc}
+        businessId={businessIdNum}
+        locale={locale}
       />
 
-      <div className="p-6 space-y-6">
+      <div className="flex-1 overflow-auto p-6 space-y-6">
         {/* Business Profile Card */}
         <Card>
           <CardHeader>
@@ -335,10 +351,10 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
                       {t.viewsThisMonth}
                     </div>
                     <div className="text-2xl font-bold text-cpDark">
-                      {stats.totalLeads * 12 || 0}
+                      {analytics.thisMonthViews}
                     </div>
                     <p className="text-xs text-slate-500">
-                      +{Math.floor(Math.random() * 15) + 5}% vs last month
+                      {viewsChange >= 0 ? "+" : ""}{viewsChange}% vs last month
                     </p>
                   </div>
                   <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50">
@@ -347,10 +363,10 @@ export default async function BusinessOverviewPage({ params }: BusinessOverviewP
                       {t.conversionRate}
                     </div>
                     <div className="text-2xl font-bold text-cpDark">
-                      {stats.conversionRate?.toFixed(1) || 0}%
+                      {conversionRate}%
                     </div>
                     <p className="text-xs text-slate-500">
-                      {stats.leadsLast30Days} leads / {stats.totalListings * 100 || 100} views
+                      {analytics.thisMonthLeads} leads / {analytics.thisMonthViews} views
                     </p>
                   </div>
                 </div>

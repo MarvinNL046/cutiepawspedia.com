@@ -11,24 +11,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { SearchBar, CategoryCard, CountryCard, getCategoryIcon } from "@/components/directory";
-import { SectionHeader } from "@/components/layout";
-import { PageIntro } from "@/components/seo";
-import { getCountries, getCategories, getPlaceCount, getCityCount, getCountryCount, getSpotlightPlaces, getCountryByCode } from "@/db/queries";
-import { getCountryCodeForLocale } from "@/lib/geo/localeCountryMap";
+import { SearchBar, CategoryCard, getCategoryIcon } from "@/components/directory";
+import { getCountries, getCategories, getPlaceCount, getCityCount, getLatestPosts, type Locale } from "@/db/queries";
+import { getActiveAdForPlacement } from "@/db/queries/ads";
+import { HomepageFeaturedAd } from "@/components/ads";
 import {
   generateSeoData,
   DEFAULT_SEO_CONFIG,
-  buildHomeUrl,
   buildAlternateUrls,
-  generateHomeContent,
   getLocalizedCategoryName,
   type ContentLocale,
 } from "@/lib/seo";
-import { Search, Shield, Clock, Star, MapPin, CheckCircle, ChevronRight, Sparkles, Heart, Users, Award, Crown } from "lucide-react";
-import { BetweenContentAd, InFeedAd } from "@/components/ads";
+import { Search, Star, CheckCircle } from "lucide-react";
 
 interface HomePageProps {
   params: Promise<{ locale: string }>;
@@ -68,625 +63,378 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
 export default async function HomePage({ params }: HomePageProps) {
   const { locale } = await params;
 
-  // Get the default country for this locale (for geo-targeted spotlight)
-  const countryCode = getCountryCodeForLocale(locale);
-  const localeCountry = await getCountryByCode(countryCode);
-
-  const [countries, categories, totalPlaces, totalCities, localSpotlightPlaces] = await Promise.all([
+  const [countries, categories, totalPlaces, totalCities, latestPosts, homepageSponsorAd] = await Promise.all([
     getCountries(),
     getCategories(),
     getPlaceCount(),
     getCityCount(),
-    // Show ELITE businesses from the user's locale country first
-    getSpotlightPlaces({
-      limit: 6,
-      countryId: localeCountry?.id,
-    }),
+    getLatestPosts(locale as Locale, 2),
+    getActiveAdForPlacement("homepage_featured", locale as "en" | "nl"),
   ]);
 
-  // Fallback: if no ELITE businesses in locale country, show all ELITE businesses
-  const spotlightPlaces = localSpotlightPlaces.length > 0
-    ? localSpotlightPlaces
-    : await getSpotlightPlaces({ limit: 6 });
-
   const displayCategories = categories.length > 0 ? categories : defaultCategories;
-  const displayCountries = countries.length > 0 ? countries : defaultCountries;
-
-  // Generate AI content for intro
-  const content = generateHomeContent({
-    locale: locale as ContentLocale,
-    totalCountries: countries.length || displayCountries.length,
-    totalCities: totalCities || displayCountries.length * 5,
-    totalPlaces: totalPlaces || 100,
-    topCategories: categories.slice(0, 4).map((cat) => ({
-      slug: cat.slug,
-      name: cat.labelKey,
-      count: Math.floor(totalPlaces / categories.length) || 10,
-    })),
-  });
 
   return (
     <>
-      {/* Hero with Search - Modern Design */}
+      {/* Hero with Search - Cozy Theme (Light & Dark) */}
       <section className="relative overflow-hidden min-h-[600px] md:min-h-[700px]">
-        {/* Gradient mesh background */}
-        <div className="absolute inset-0 gradient-mesh-bg" />
+        {/* Background image - Cozy sleeping pets from Unsplash */}
+        <div className="absolute inset-0">
+          <Image
+            src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=2069&auto=format&fit=crop"
+            alt="Cozy sleeping pets"
+            fill
+            className="object-cover"
+            priority
+          />
+          {/* Warm gradient overlay - adapts to theme */}
+          <div className="hero-overlay" />
+        </div>
 
-        {/* Animated gradient blobs */}
-        <div className="gradient-blob gradient-blob-animated w-[500px] h-[500px] bg-cpPink/30 -top-48 -left-48" />
-        <div className="gradient-blob gradient-blob-animated w-[400px] h-[400px] bg-cpAqua/25 top-1/3 -right-32" style={{ animationDelay: '-5s' }} />
-        <div className="gradient-blob gradient-blob-animated w-[300px] h-[300px] bg-cpYellow/20 bottom-0 left-1/4" style={{ animationDelay: '-10s' }} />
-
-        {/* Decorative elements */}
-        <div className="absolute top-20 right-20 w-64 h-64 border-2 border-cpPink/10 rounded-full hidden lg:block" />
-        <div className="absolute bottom-32 left-16 w-32 h-32 border-2 border-cpAqua/10 rounded-full hidden lg:block" />
+        {/* Subtle decorative elements */}
+        <div className="absolute top-20 right-20 w-64 h-64 border-2 border-cpAmber/20 dark:border-cpAmber/10 rounded-full hidden lg:block" />
+        <div className="absolute bottom-32 left-16 w-32 h-32 border-2 border-cpCoral/20 dark:border-cpCoral/10 rounded-full hidden lg:block" />
 
         <div className="relative container mx-auto max-w-6xl px-4 py-20 md:py-32">
           <div className="max-w-3xl mx-auto text-center">
-            {/* Badge with glass effect */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card mb-6 animate-fade-in">
+            {/* Blurred background for better text readability */}
+            <div className="bg-white/80 dark:bg-cpCharcoal/60 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-cpAmber/20 dark:border-cpAmber/10 shadow-lg dark:shadow-none">
+            {/* Badge with cozy glass effect */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cpCoral/10 dark:bg-cpCharcoal/60 backdrop-blur-sm border border-cpCoral/30 dark:border-cpAmber/20 mb-6 animate-fade-in">
               <span className="text-lg">🐾</span>
-              <span className="text-sm font-medium text-cpDark dark:text-white">
+              <span className="text-sm font-medium text-foreground dark:text-cpCream">
                 {locale === "nl" ? "De #1 Huisdierdiensten Gids" : "The #1 Pet Services Directory"}
               </span>
             </div>
 
-            {/* Main heading with gradient text */}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-cpDark dark:text-white mb-6 tracking-tight animate-slide-up">
+            {/* Main heading */}
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground dark:text-cpCream mb-6 tracking-tight animate-slide-up">
               {locale === "nl" ? (
-                <>Vind <span className="gradient-text-pink">Perfecte Zorg</span> voor je Huisdier</>
+                <>Vind <span className="text-cpCoral">Perfecte Zorg</span> voor je Huisdier</>
               ) : (
-                <>Find <span className="gradient-text-pink">Perfect Care</span> for Your Pet</>
+                <>Find <span className="text-cpCoral">Perfect Care</span> for Your Pet</>
               )}
             </h1>
 
             {/* Subtitle */}
-            <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 mb-10 max-w-xl mx-auto animate-slide-up" style={{ animationDelay: '0.1s' }}>
-              {content.secondary || (locale === "nl"
+            <p className="text-lg md:text-xl text-muted-foreground dark:text-cpCream/80 mb-10 max-w-xl mx-auto animate-slide-up" style={{ animationDelay: '0.1s' }}>
+              {locale === "nl"
                 ? "Ontdek vertrouwde dierenpensions, dierenartsen, trimsalons en trainers bij jou in de buurt."
-                : "Discover trusted pet hotels, veterinarians, groomers and trainers in your area.")}
+                : "Discover trusted pet hotels, veterinarians, groomers and trainers in your area."}
             </p>
 
-            {/* Search box with glassmorphism */}
-            <div className="glass-card-strong rounded-2xl p-4 md:p-6 shadow-xl animate-slide-up" style={{ animationDelay: '0.2s' }}>
+            {/* Search box with cozy styling */}
+            <div className="cozy-card rounded-3xl p-4 md:p-6 shadow-xl animate-slide-up" style={{ animationDelay: '0.2s' }}>
               <SearchBar locale={locale} placeholder={locale === "nl" ? "Waar zoek je naar?" : "What are you looking for?"} />
             </div>
 
             {/* Trust indicators */}
             <div className="flex flex-wrap items-center justify-center gap-6 mt-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-              <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-cpCream/70">
                 <span className="w-2 h-2 rounded-full bg-green-500" />
                 <span>{locale === "nl" ? "Gratis te gebruiken" : "Free to use"}</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                <span className="w-2 h-2 rounded-full bg-cpPink" />
+              <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-cpCream/70">
+                <span className="w-2 h-2 rounded-full bg-cpCoral" />
                 <span>217+ {locale === "nl" ? "locaties" : "locations"}</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                <span className="w-2 h-2 rounded-full bg-cpAqua" />
+              <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-cpCream/70">
+                <span className="w-2 h-2 rounded-full bg-cpAmber" />
                 <span>4.8★ {locale === "nl" ? "gemiddelde rating" : "average rating"}</span>
               </div>
             </div>
+            </div>
+            {/* End blurred background wrapper */}
           </div>
         </div>
       </section>
 
-      {/* AI-Generated Intro Content */}
-      <PageIntro content={content} variant="gradient" showBullets={true} />
-
-      {/* Categories */}
-      <section className="container mx-auto max-w-6xl px-4 py-12">
-        <SectionHeader title={locale === "nl" ? "Populaire Categorieën" : "Popular Categories"} />
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {displayCategories.map((category) => (
-            <CategoryCard
-              key={category.slug}
-              href={`/${locale}/search?category=${category.slug}`}
-              icon={getCategoryIcon(category.icon)}
-              label={getLocalizedCategoryName(category.slug, locale as ContentLocale)}
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* Countries - Browse by Country */}
-      <section className="bg-slate-50/50 dark:bg-slate-900/50">
-        <div className="container mx-auto max-w-6xl px-4 py-12">
-          <SectionHeader title={locale === "nl" ? "Zoek per Land" : "Browse by Country"} />
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {displayCountries.map((country) => (
-              <CountryCard
-                key={country.slug || country.code}
-                href={`/${locale}/${country.slug}`}
-                code={country.code}
-                name={country.name}
+      {/* Main Content - Consistent Background (Light/Dark) */}
+      <div className="bg-background dark:bg-cpCharcoal">
+        {/* Categories */}
+        <section className="container mx-auto max-w-6xl px-4 py-16">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
+              {locale === "nl" ? "Ontdek Categorieën" : "Explore Categories"}
+            </h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {displayCategories.map((category) => (
+              <CategoryCard
+                key={category.slug}
+                href={`/${locale}/search?category=${category.slug}`}
+                icon={getCategoryIcon(category.icon)}
+                label={getLocalizedCategoryName(category.slug, locale as ContentLocale)}
               />
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* How It Works - Numbered Steps */}
-      <section className="relative py-20 overflow-hidden">
-        <div className="absolute inset-0 gradient-mesh-bg opacity-50" />
-        <div className="relative container mx-auto max-w-6xl px-4">
-          <div className="text-center mb-16">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-cpPink/10 text-cpPink text-sm font-medium mb-4">
-              {locale === "nl" ? "Eenvoudig & Snel" : "Simple & Fast"}
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-cpDark dark:text-white mb-4">
-              {locale === "nl" ? "Hoe Het Werkt" : "How It Works"}
+        {/* Homepage Featured Sponsor Ad */}
+        {homepageSponsorAd && (
+          <section className="container mx-auto max-w-6xl px-4 py-8">
+            <HomepageFeaturedAd sponsorAd={homepageSponsorAd} />
+          </section>
+        )}
+
+        {/* Countries - Browse by Country */}
+        <section className="container mx-auto max-w-6xl px-4 py-16">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
+              {locale === "nl" ? "Zoek per Land" : "Browse by Country"}
             </h2>
-            <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              {locale === "nl"
-                ? "Vind de perfecte zorg voor je huisdier in slechts een paar stappen"
-                : "Find the perfect care for your pet in just a few simple steps"}
-            </p>
           </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {countries.map((country) => (
+              <Link
+                key={country.slug || country.code}
+                href={`/${locale}/${country.slug}`}
+                className="bg-card dark:bg-cpSurface/50 rounded-2xl p-4 border border-border dark:border-cpAmber/20 hover:border-cpCoral/40 transition-all text-center group shadow-sm hover:shadow-md"
+              >
+                <span className="text-3xl mb-2 block">{getFlagEmoji(country.code)}</span>
+                <span className="text-foreground dark:text-cpCream font-medium group-hover:text-cpCoral transition-colors">{country.name}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
 
-          <div className="grid md:grid-cols-4 gap-8">
+        {/* Recommended Services */}
+        <section className="container mx-auto max-w-6xl px-4 py-16">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
+              {locale === "nl" ? "Aanbevolen Diensten" : "Recommended Services"}
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
             {[
-              {
-                step: 1,
-                icon: Search,
-                title: locale === "nl" ? "Zoek" : "Search",
-                description: locale === "nl"
-                  ? "Voer je locatie en het type service in dat je zoekt"
-                  : "Enter your location and the type of service you need",
-              },
-              {
-                step: 2,
-                icon: Star,
-                title: locale === "nl" ? "Vergelijk" : "Compare",
-                description: locale === "nl"
-                  ? "Bekijk beoordelingen, prijzen en diensten van verschillende aanbieders"
-                  : "Review ratings, prices, and services from different providers",
-              },
-              {
-                step: 3,
-                icon: CheckCircle,
-                title: locale === "nl" ? "Kies" : "Choose",
-                description: locale === "nl"
-                  ? "Selecteer de beste optie op basis van jouw behoeften"
-                  : "Select the best option based on your needs",
-              },
-              {
-                step: 4,
-                icon: Heart,
-                title: locale === "nl" ? "Geniet" : "Enjoy",
-                description: locale === "nl"
-                  ? "Geef je huisdier de beste zorg die het verdient"
-                  : "Give your pet the best care they deserve",
-              },
-            ].map((item, index) => (
-              <div key={item.step} className="relative">
-                {/* Connector line */}
-                {index < 3 && (
-                  <div className="hidden md:block absolute top-8 left-[60%] w-[80%] h-0.5 bg-gradient-to-r from-cpPink/30 to-cpAqua/30" />
-                )}
-                <div className="relative bg-white dark:bg-slate-800/80 rounded-2xl p-6 text-center hover:shadow-lg hover:shadow-cpPink/10 transition-all duration-300 hover:-translate-y-1 border border-slate-100 dark:border-slate-700/50">
-                  {/* Step number */}
-                  <div className="number-badge mx-auto mb-4">{item.step}</div>
-                  {/* Icon */}
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-cpPink/10 to-cpAqua/10 mb-4">
-                    <item.icon className="w-7 h-7 text-cpPink" />
-                  </div>
-                  <h3 className="text-lg font-bold text-cpDark dark:text-white mb-2">{item.title}</h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">{item.description}</p>
+              { icon: "🩺", title: locale === "nl" ? "Dierenarts" : "Vet", desc: locale === "nl" ? "Dierenartsen klaarstaan voor je vrienden." : "Veterinarians ready for your friends." },
+              { icon: "✂️", title: locale === "nl" ? "Trimmer" : "Groomer", desc: locale === "nl" ? "Trimsalons aanstaand aan in trimmercentrees." : "Grooming salons in grooming centers." },
+              { icon: "🏠", title: locale === "nl" ? "Oppas" : "Sitter", desc: locale === "nl" ? "Oppas op dierenwinter met eerst eertoilvloren." : "Pet sitters with first priority." },
+            ].map((service) => (
+              <div key={service.title} className="bg-card dark:bg-cpSurface/50 rounded-3xl p-6 text-center border border-border dark:border-cpAmber/20 shadow-sm hover:shadow-lg transition-all">
+                <div className="category-circle mx-auto mb-4">
+                  <span className="text-3xl">{service.icon}</span>
                 </div>
+                <h3 className="text-lg font-bold text-foreground dark:text-cpCream mb-2">{service.title}</h3>
+                <p className="text-sm text-muted-foreground dark:text-slate-400 mb-4">{service.desc}</p>
+                <button className="btn-coral w-full py-2.5 rounded-xl text-sm font-medium">
+                  {locale === "nl" ? "Lees meer" : "Learn more"}
+                </button>
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ELITE Spotlight - Premium Visibility */}
-      {spotlightPlaces.length > 0 && (
-        <section className="py-20 bg-gradient-to-b from-white to-purple-50/30 dark:from-slate-900 dark:to-purple-900/10">
-          <div className="container mx-auto max-w-6xl px-4">
-            <div className="text-center mb-12">
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/10 text-purple-600 dark:text-purple-400 text-sm font-medium mb-4">
-                <Crown className="w-4 h-4" />
-                {locale === "nl" ? "Premium Partners" : "Premium Partners"}
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold text-cpDark dark:text-white mb-4">
-                {locale === "nl" ? "Uitgelichte Elite Bedrijven" : "Featured Elite Businesses"}
-              </h2>
-              <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-                {locale === "nl"
-                  ? "Ontdek onze best beoordeelde premium partners met geverifieerde kwaliteitsservice"
-                  : "Discover our top-rated premium partners with verified quality service"}
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {spotlightPlaces.map((place) => (
-                <Link
-                  key={place.id}
-                  href={`/${locale}/${place.countrySlug}/${place.citySlug}/${place.categorySlug}/${place.slug}`}
-                  className="group block"
-                >
-                  <div className="relative rounded-2xl overflow-hidden bg-white dark:bg-slate-800/80 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 border-purple-200/50 dark:border-purple-700/30">
-                    {/* Premium gradient header */}
-                    <div className="relative h-32 bg-gradient-to-br from-purple-500 via-purple-600 to-purple-700">
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.2),transparent_50%)]" />
-                      {/* ELITE Badge */}
-                      <div className="absolute top-3 left-3">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 text-purple-600 text-xs font-bold shadow-sm">
-                          <Crown className="w-3 h-3" />
-                          ELITE
-                        </span>
-                      </div>
-                      {/* Verified Badge */}
-                      <div className="absolute top-3 right-3">
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/90 text-white text-xs font-medium">
-                          <Shield className="w-3 h-3" />
-                          {locale === "nl" ? "Geverifieerd" : "Verified"}
-                        </span>
-                      </div>
-                      {/* Rating */}
-                      {place.avgRating && (
-                        <div className="absolute bottom-3 right-3">
-                          <span className="px-2.5 py-1 rounded-full bg-cpYellow text-xs font-bold text-cpDark flex items-center gap-1 shadow-sm">
-                            <Star className="w-3 h-3 fill-current" />
-                            {parseFloat(place.avgRating).toFixed(1)}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-5">
-                      <h3 className="font-bold text-cpDark dark:text-white group-hover:text-purple-600 transition-colors mb-2">
-                        {place.name}
-                      </h3>
-                      {place.description && (
-                        <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-3">
-                          {place.description}
-                        </p>
-                      )}
-                      <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                        <MapPin className="w-3.5 h-3.5" />
-                        {place.cityName}
-                        {place.reviewCount > 0 && (
-                          <>
-                            <span className="text-slate-300 dark:text-slate-600">•</span>
-                            <span>{place.reviewCount} {locale === "nl" ? "reviews" : "reviews"}</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
         </section>
-      )}
 
-      {/* Ad: Between Content (for non-logged-in users) */}
-      <div className="container mx-auto max-w-6xl px-4">
-        <BetweenContentAd className="my-8" />
-      </div>
-
-      {/* Why CutiePawsPedia - Features */}
-      <section className="py-20 bg-slate-50/50 dark:bg-slate-900/50">
-        <div className="container mx-auto max-w-6xl px-4">
-          <div className="text-center mb-16">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-cpAqua/10 text-cpAqua text-sm font-medium mb-4">
-              {locale === "nl" ? "Waarom Wij" : "Why Us"}
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-cpDark dark:text-white mb-4">
-              {locale === "nl" ? "Waarom CutiePawsPedia?" : "Why CutiePawsPedia?"}
+        {/* How It Works */}
+        <section className="container mx-auto max-w-6xl px-4 py-16">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
+              {locale === "nl" ? "Hoe werkt het?" : "How It Works"}
             </h2>
-            <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              {locale === "nl"
-                ? "We maken het vinden van betrouwbare dierenzorg eenvoudig en stressvrij"
-                : "We make finding reliable pet care simple and stress-free"}
-            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              {
-                icon: Shield,
-                title: locale === "nl" ? "Geverifieerde Reviews" : "Verified Reviews",
-                description: locale === "nl"
-                  ? "Echte beoordelingen van echte huisdiereigenaren. Geen nep reviews, alleen eerlijke ervaringen."
-                  : "Real reviews from real pet owners. No fake reviews, just honest experiences.",
-                color: "pink",
-              },
-              {
-                icon: Clock,
-                title: locale === "nl" ? "Actuele Informatie" : "Up-to-Date Info",
-                description: locale === "nl"
-                  ? "Openingstijden, prijzen en contactgegevens worden regelmatig bijgewerkt en geverifieerd."
-                  : "Opening hours, prices, and contact details are regularly updated and verified.",
-                color: "aqua",
-              },
-              {
-                icon: MapPin,
-                title: locale === "nl" ? "Lokale Expertise" : "Local Expertise",
-                description: locale === "nl"
-                  ? "Vind services bij jou in de buurt met gedetailleerde locatie-informatie en routebeschrijvingen."
-                  : "Find services near you with detailed location info and directions.",
-                color: "yellow",
-              },
-              {
-                icon: Sparkles,
-                title: locale === "nl" ? "Slimme Filters" : "Smart Filters",
-                description: locale === "nl"
-                  ? "Filter op categorie, rating, prijs en meer om precies te vinden wat je zoekt."
-                  : "Filter by category, rating, price, and more to find exactly what you need.",
-                color: "pink",
-              },
-              {
-                icon: Users,
-                title: locale === "nl" ? "Community Gedreven" : "Community Driven",
-                description: locale === "nl"
-                  ? "Een groeiende gemeenschap van huisdiereigenaren die hun ervaringen delen."
-                  : "A growing community of pet owners sharing their experiences.",
-                color: "aqua",
-              },
-              {
-                icon: Award,
-                title: locale === "nl" ? "Kwaliteitsgarantie" : "Quality Guarantee",
-                description: locale === "nl"
-                  ? "We werken alleen samen met bedrijven die voldoen aan onze kwaliteitsstandaarden."
-                  : "We only partner with businesses that meet our quality standards.",
-                color: "yellow",
-              },
-            ].map((feature) => (
-              <div
-                key={feature.title}
-                className="feature-card group"
-              >
-                <div className={`icon-badge icon-badge-${feature.color} mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                  <feature.icon className={`w-6 h-6 ${
-                    feature.color === 'pink' ? 'text-cpPink' :
-                    feature.color === 'aqua' ? 'text-cpAqua' : 'text-cpYellow'
-                  }`} />
+              { step: 1, icon: Search, title: locale === "nl" ? "Zoek" : "Search", desc: locale === "nl" ? "Zoek naar huisdierdiensten bij jou in de buurt." : "Search for nearby pet services in your area." },
+              { step: 2, icon: Star, title: locale === "nl" ? "Vergelijk" : "Compare", desc: locale === "nl" ? "Vergelijk beoordelingen en reviews van andere baasjes." : "Compare ratings and reviews from pet owners." },
+              { step: 3, icon: CheckCircle, title: locale === "nl" ? "Boek" : "Book", desc: locale === "nl" ? "Boek eenvoudig een afspraak met je favoriete dienst." : "Book your appointment with ease." },
+            ].map((item) => (
+              <div key={item.step} className="text-center">
+                <div className="category-circle mx-auto mb-4">
+                  <item.icon className="w-8 h-8 text-cpAmber" />
                 </div>
-                <h3 className="text-lg font-bold text-cpDark dark:text-white mb-2">{feature.title}</h3>
-                <p className="text-slate-600 dark:text-slate-400 text-sm">{feature.description}</p>
+                <h3 className="text-lg font-bold text-foreground dark:text-cpCream mb-2 italic">{item.step}. {item.title}</h3>
+                <p className="text-sm text-muted-foreground dark:text-slate-400">{item.desc}</p>
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Featured Places */}
-      <section className="py-20">
-        <div className="container mx-auto max-w-6xl px-4">
-          <div className="text-center mb-12">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-cpYellow/10 text-cpYellow text-sm font-medium mb-4">
-              {locale === "nl" ? "Aanbevolen" : "Featured"}
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-cpDark dark:text-white mb-4">
+        {/* Tips & Advice - from Blog */}
+        <section className="container mx-auto max-w-6xl px-4 py-16">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
+              {locale === "nl" ? "Laatste Tips & Advies" : "Latest Tips & Advice"}
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            {latestPosts.length > 0 ? (
+              latestPosts.map((post) => (
+                <Link key={post.id} href={`/${locale}/blog/${post.slug}`}>
+                  <article className="group bg-card dark:bg-cpSurface/50 rounded-3xl overflow-hidden border border-border dark:border-cpAmber/20 shadow-sm hover:shadow-lg transition-all h-full">
+                    <div className="relative h-48">
+                      {post.featuredImage ? (
+                        <Image src={post.featuredImage} alt={post.featuredImageAlt || post.title} fill className="object-cover" />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-cpCoral/10 to-cpAmber/10 dark:from-cpCoral/20 dark:to-cpAmber/20">
+                          <span className="text-5xl opacity-50">📰</span>
+                        </div>
+                      )}
+                      {post.categoryName && (
+                        <span className="absolute top-3 left-3 px-3 py-1 bg-cpCoral/90 text-white text-xs font-medium rounded-full">
+                          {post.categoryName}
+                        </span>
+                      )}
+                    </div>
+                    <div className="p-5">
+                      <h3 className="font-bold text-foreground dark:text-cpCream mb-2 group-hover:text-cpCoral transition-colors">{post.title}</h3>
+                      {post.excerpt && (
+                        <p className="text-sm text-muted-foreground dark:text-slate-400 mb-3 line-clamp-2">{post.excerpt}</p>
+                      )}
+                      <span className="text-cpCoral text-sm font-medium">{locale === "nl" ? "Lees meer →" : "Read more →"}</span>
+                    </div>
+                  </article>
+                </Link>
+              ))
+            ) : (
+              // Fallback to placeholder content if no blog posts
+              [
+                { img: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=250&fit=crop", title: locale === "nl" ? "5 Tips voor een gezonde pup" : "5 Tips for a healthy puppy", desc: locale === "nl" ? "Ontdek hoe je je puppy gezond en gelukkig houdt met deze praktische tips." : "5 Tips for a healthy puppy can help your furry friend thrive." },
+                { img: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=400&h=250&fit=crop", title: locale === "nl" ? "Hoe kies je de beste trimmer?" : "How to choose the best groomer?", desc: locale === "nl" ? "Vergelijk reviews en beoordelingen om de perfecte trimmer te vinden." : "How to choose the best groomer? Compare reviews and ratings..." },
+              ].map((tip) => (
+                <article key={tip.title} className="group bg-card dark:bg-cpSurface/50 rounded-3xl overflow-hidden border border-border dark:border-cpAmber/20 shadow-sm hover:shadow-lg transition-all">
+                  <div className="relative h-48">
+                    <Image src={tip.img} alt={tip.title} fill className="object-cover" />
+                  </div>
+                  <div className="p-5">
+                    <h3 className="font-bold text-foreground dark:text-cpCream mb-2">{tip.title}</h3>
+                    <p className="text-sm text-muted-foreground dark:text-slate-400 mb-3">{tip.desc}</p>
+                    <span className="text-cpCoral text-sm font-medium">{locale === "nl" ? "Lees meer →" : "Read more →"}</span>
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+          {latestPosts.length > 0 && (
+            <div className="text-center mt-8">
+              <Link
+                href={`/${locale}/blog`}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-cpCoral/10 dark:bg-cpCoral/20 text-cpCoral rounded-2xl font-medium hover:bg-cpCoral/20 dark:hover:bg-cpCoral/30 transition-colors"
+              >
+                {locale === "nl" ? "Bekijk alle artikelen" : "View all articles"}
+                <span>→</span>
+              </Link>
+            </div>
+          )}
+        </section>
+
+        {/* Testimonials */}
+        <section className="container mx-auto max-w-6xl px-4 py-16">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
+              {locale === "nl" ? "Wat baasjes zeggen" : "What owners say"}
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            {testimonials.slice(0, 2).map((testimonial, index) => (
+              <div key={index} className="bg-card dark:bg-cpSurface/50 rounded-3xl p-6 border border-border dark:border-cpAmber/20 shadow-sm">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cpCoral to-cpAmber flex items-center justify-center text-white dark:text-cpCharcoal font-bold">
+                    {testimonial.name.charAt(0)}
+                  </div>
+                  <div className="flex gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-cpAmber text-cpAmber" />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-muted-foreground dark:text-cpCream/80 mb-4">"{testimonial.quote[locale as 'en' | 'nl']}"</p>
+                <span className="text-cpCoral text-sm font-medium">{locale === "nl" ? "Lees meer →" : "Read more →"}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Featured Places */}
+        <section className="container mx-auto max-w-6xl px-4 py-16">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
               {locale === "nl" ? "Populaire Locaties" : "Popular Places"}
             </h2>
-            <Link
-              href={`/${locale}/search`}
-              className="inline-flex items-center gap-2 text-cpPink font-medium hover:gap-3 transition-all"
-            >
-              {locale === "nl" ? "Bekijk alles" : "View all"}
-              <ChevronRight className="w-4 h-4" />
-            </Link>
           </div>
-
           <div className="grid md:grid-cols-3 gap-6">
-            {featuredPlaces.map((place, index) => (
-              <Link
-                key={place.name}
-                href={`/${locale}/${place.href}`}
-                className="group block"
-              >
-                <div className="relative rounded-2xl overflow-hidden bg-white dark:bg-slate-800/80 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-slate-100 dark:border-slate-700/50">
-                  {/* Image placeholder with gradient */}
-                  <div className="relative h-48 bg-gradient-to-br from-cpPink/20 via-cpYellow/10 to-cpAqua/20">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-6xl">{place.emoji}</span>
-                    </div>
-                    {/* Badge */}
-                    <div className="absolute top-3 left-3">
-                      <span className="px-2 py-1 rounded-full bg-white/90 dark:bg-slate-800/90 text-xs font-medium text-cpDark">
-                        {place.category}
-                      </span>
-                    </div>
-                    {/* Rating */}
-                    <div className="absolute top-3 right-3">
-                      <span className="px-2 py-1 rounded-full bg-cpYellow/90 text-xs font-bold text-cpDark flex items-center gap-1">
-                        <Star className="w-3 h-3 fill-current" />
+            {featuredPlaces.map((place) => (
+              <Link key={place.name} href={`/${locale}/${place.href}`} className="group">
+                <div className="bg-card dark:bg-cpSurface/50 rounded-3xl overflow-hidden border border-border dark:border-cpAmber/20 hover:border-cpCoral/40 transition-all shadow-sm hover:shadow-lg">
+                  <div className="h-40 bg-gradient-to-br from-cpCoral/10 dark:from-cpCoral/20 to-cpAmber/5 dark:to-cpAmber/10 flex items-center justify-center">
+                    <span className="text-5xl">{place.emoji}</span>
+                  </div>
+                  <div className="p-5">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-cpAmber font-medium">{place.category}</span>
+                      <span className="flex items-center gap-1 text-cpAmber text-sm">
+                        <Star className="w-3 h-3 fill-cpAmber" />
                         {place.rating}
                       </span>
                     </div>
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-cpDark dark:text-white group-hover:text-cpPink transition-colors mb-1">
-                      {place.name}
-                    </h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                      <MapPin className="w-3 h-3" />
-                      {place.location}
-                    </p>
+                    <h3 className="font-bold text-foreground dark:text-cpCream group-hover:text-cpCoral transition-colors">{place.name}</h3>
+                    <p className="text-sm text-muted-foreground dark:text-slate-400">{place.location}</p>
                   </div>
                 </div>
               </Link>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Testimonials */}
-      <section className="relative py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-cpDark via-slate-900 to-cpDark" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,127,161,0.1),transparent_70%)]" />
-
-        <div className="relative container mx-auto max-w-6xl px-4">
-          <div className="text-center mb-16">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 text-white/90 text-sm font-medium mb-4">
-              {locale === "nl" ? "Wat Mensen Zeggen" : "What People Say"}
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              {locale === "nl" ? "Tevreden Huisdiereigenaren" : "Happy Pet Owners"}
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((testimonial, index) => (
-              <div
-                key={index}
-                className="relative bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-cpPink/30 transition-all duration-300"
-              >
-                {/* Quote icon */}
-                <div className="text-4xl text-cpPink/30 mb-4">"</div>
-                <p className="text-white/80 mb-6">{testimonial.quote[locale as 'en' | 'nl']}</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cpPink to-cpAqua flex items-center justify-center text-white font-bold">
-                    {testimonial.name.charAt(0)}
-                  </div>
-                  <div>
-                    <div className="text-white font-medium">{testimonial.name}</div>
-                    <div className="text-white/50 text-sm">{testimonial.pet}</div>
-                  </div>
-                </div>
-                {/* Stars */}
-                <div className="flex gap-1 mt-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-cpYellow text-cpYellow" />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pet Care Tips Preview */}
-      <section className="py-20 bg-slate-50/50 dark:bg-slate-900/50">
-        <div className="container mx-auto max-w-6xl px-4">
-          <div className="text-center mb-12">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-cpPink/10 text-cpPink text-sm font-medium mb-4">
-              {locale === "nl" ? "Blog & Tips" : "Blog & Tips"}
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-cpDark dark:text-white">
-              {locale === "nl" ? "Handige Tips voor je Huisdier" : "Helpful Pet Care Tips"}
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {petTips.map((tip, index) => (
-              <article
-                key={index}
-                className="group bg-white dark:bg-slate-800/80 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-slate-100 dark:border-slate-700/50"
-              >
-                {/* Image placeholder */}
-                <div className={`h-40 bg-gradient-to-br ${tip.gradient} flex items-center justify-center`}>
-                  <span className="text-5xl">{tip.emoji}</span>
-                </div>
-                <div className="p-5">
-                  <span className="text-xs font-medium text-cpPink">{tip.category[locale as 'en' | 'nl']}</span>
-                  <h3 className="font-bold text-cpDark dark:text-white mt-1 mb-2 group-hover:text-cpPink transition-colors">
-                    {tip.title[locale as 'en' | 'nl']}
-                  </h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">{tip.excerpt[locale as 'en' | 'nl']}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="py-20">
-        <div className="container mx-auto max-w-4xl px-4">
-          <div className="text-center mb-16">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-cpAqua/10 text-cpAqua text-sm font-medium mb-4">
-              FAQ
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-cpDark dark:text-white mb-4">
+        {/* FAQ */}
+        <section className="container mx-auto max-w-4xl px-4 py-16">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
               {locale === "nl" ? "Veelgestelde Vragen" : "Frequently Asked Questions"}
             </h2>
           </div>
-
           <div className="space-y-4">
             {faqs.map((faq, index) => (
-              <details
-                key={index}
-                className="group bg-white dark:bg-slate-800/80 rounded-2xl shadow-sm hover:shadow-md transition-all border border-slate-100 dark:border-slate-700/50"
-              >
-                <summary className="flex items-center justify-between cursor-pointer p-6 font-semibold text-cpDark dark:text-white">
+              <details key={index} className="group bg-card dark:bg-cpSurface/50 rounded-2xl border border-border dark:border-cpAmber/20 shadow-sm">
+                <summary className="flex items-center justify-between cursor-pointer p-5 font-medium text-foreground dark:text-cpCream">
                   {faq.question[locale as 'en' | 'nl']}
-                  <ChevronRight className="w-5 h-5 text-cpPink group-open:rotate-90 transition-transform" />
+                  <span className="text-cpCoral dark:text-cpAmber group-open:rotate-90 transition-transform">→</span>
                 </summary>
-                <div className="px-6 pb-6 text-slate-600 dark:text-slate-400">
-                  {faq.answer[locale as 'en' | 'nl']}
-                </div>
+                <div className="px-5 pb-5 text-muted-foreground dark:text-slate-400">{faq.answer[locale as 'en' | 'nl']}</div>
               </details>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Ad: Between Content (for non-logged-in users) */}
-      <div className="container mx-auto max-w-6xl px-4">
-        <BetweenContentAd className="my-8" />
-      </div>
-
-      {/* Stats - Modern Card Design */}
-      <section className="relative py-20 overflow-hidden">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-cpDark via-slate-900 to-cpDark" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,127,161,0.15),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(41,160,177,0.1),transparent_50%)]" />
-
-        <div className="relative container mx-auto max-w-6xl px-4">
-          {/* Section header */}
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+        {/* Stats */}
+        <section className="container mx-auto max-w-6xl px-4 py-16">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
               {locale === "nl" ? "Vertrouwd door duizenden" : "Trusted by Thousands"}
             </h2>
-            <p className="text-slate-400 max-w-xl mx-auto">
-              {locale === "nl"
-                ? "Sluit je aan bij de groeiende gemeenschap van huisdiereigenaren die de beste zorg vinden"
-                : "Join the growing community of pet owners finding the best care"}
-            </p>
           </div>
-
-          <div className="grid gap-6 md:grid-cols-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { value: "10,000+", label: locale === "nl" ? "Geregistreerde Bedrijven" : "Listed Businesses", color: "pink" },
-              { value: "50+", label: locale === "nl" ? "Landen" : "Countries", color: "aqua" },
-              { value: "100,000+", label: locale === "nl" ? "Tevreden Eigenaren" : "Happy Pet Owners", color: "yellow" },
-              { value: "4.8", label: locale === "nl" ? "Gemiddelde Rating" : "Average Rating", color: "pink" },
-            ].map((stat, index) => (
-              <div
-                key={stat.label}
-                className={`stat-card stat-card-${stat.color} rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1`}
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <div className={`text-4xl md:text-5xl font-bold mb-2 ${
-                  stat.color === 'pink' ? 'text-cpPink' :
-                  stat.color === 'aqua' ? 'text-cpAqua' : 'text-cpYellow'
-                }`}>
+              { value: totalPlaces.toLocaleString() || "10,000+", label: locale === "nl" ? "Bedrijven" : "Businesses" },
+              { value: countries.length.toString() || "50+", label: locale === "nl" ? "Landen" : "Countries" },
+              { value: totalCities.toLocaleString() || "500+", label: locale === "nl" ? "Steden" : "Cities" },
+              { value: "4.8", label: locale === "nl" ? "Gem. Rating" : "Avg Rating" },
+            ].map((stat, i) => (
+              <div key={stat.label} className="bg-card dark:bg-cpSurface/50 rounded-2xl p-6 text-center border border-border dark:border-cpAmber/20 shadow-sm">
+                <div className={`text-3xl md:text-4xl font-bold mb-2 ${i % 2 === 0 ? 'text-cpCoral' : 'text-cpAmber'}`}>
                   {stat.value}
                 </div>
-                <div className="text-slate-300 font-medium">{stat.label}</div>
+                <div className="text-muted-foreground dark:text-cpCream/70">{stat.label}</div>
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* CTA - Modern Gradient Design */}
-      <section className="container mx-auto max-w-6xl px-4 py-20">
-        <div className="relative overflow-hidden rounded-3xl">
-          {/* Multi-layer gradient background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-cpPink via-cpPink/90 to-cpAqua" />
+      </div>
+      {/* End of Main Content wrapper */}
+
+      {/* CTA - Coral gradient card */}
+      <section className="bg-secondary dark:bg-cpCharcoal">
+        <div className="container mx-auto max-w-6xl px-4 py-20">
+        <div className="relative overflow-hidden rounded-3xl shadow-xl">
+          {/* Multi-layer gradient background - warm coral to amber */}
+          <div className="absolute inset-0 bg-gradient-to-br from-cpCoral via-cpCoral/90 to-cpAmber" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.2),transparent_50%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(41,160,177,0.3),transparent_50%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,209,102,0.3),transparent_50%)]" />
 
           {/* Decorative elements */}
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
-          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-cpYellow/20 rounded-full blur-2xl" />
+          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-cpAmber/30 rounded-full blur-2xl" />
 
           {/* Decorative circles */}
           <div className="absolute top-8 right-16 w-20 h-20 border-2 border-white/20 rounded-full hidden md:block" />
@@ -726,7 +474,7 @@ export default async function HomePage({ params }: HomePageProps) {
 
               <Button
                 size="lg"
-                className="bg-white text-cpPink hover:bg-white/95 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 px-8 py-6 text-lg font-semibold rounded-xl"
+                className="bg-white dark:bg-cpCharcoal text-cpCoral dark:text-cpCream hover:bg-white/90 dark:hover:bg-cpCharcoal/90 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 px-8 py-6 text-lg font-semibold rounded-2xl border border-white/20 dark:border-cpAmber/20"
                 asChild
               >
                 <Link href={`/${locale}/for-businesses`}>
@@ -736,9 +484,19 @@ export default async function HomePage({ params }: HomePageProps) {
             </div>
           </div>
         </div>
+        </div>
       </section>
     </>
   );
+}
+
+// Helper function to get flag emoji from country code
+function getFlagEmoji(countryCode: string): string {
+  const codePoints = countryCode
+    .toUpperCase()
+    .split('')
+    .map(char => 127397 + char.charCodeAt(0));
+  return String.fromCodePoint(...codePoints);
 }
 
 const defaultCategories = [
@@ -748,17 +506,6 @@ const defaultCategories = [
   { slug: "training", icon: "training", labelKey: "Training" },
   { slug: "pet-shops", icon: "shop", labelKey: "Pet Shops" },
   { slug: "dog-walking", icon: "walking", labelKey: "Dog Walking" },
-];
-
-const defaultCountries = [
-  { slug: "netherlands", code: "NL", name: "Netherlands" },
-  { slug: "belgium", code: "BE", name: "Belgium" },
-  { slug: "germany", code: "DE", name: "Germany" },
-  { slug: "france", code: "FR", name: "France" },
-  { slug: "united-kingdom", code: "GB", name: "United Kingdom" },
-  { slug: "spain", code: "ES", name: "Spain" },
-  { slug: "italy", code: "IT", name: "Italy" },
-  { slug: "united-states", code: "US", name: "United States" },
 ];
 
 // Featured places data
@@ -786,6 +533,45 @@ const featuredPlaces = [
     category: "Grooming",
     rating: "4.7",
     emoji: "✂️",
+  },
+];
+
+// FAQ data
+const faqs = [
+  {
+    question: { en: "Is CutiePawsPedia free to use?", nl: "Is CutiePawsPedia gratis te gebruiken?" },
+    answer: {
+      en: "Yes! CutiePawsPedia is completely free for pet owners. You can search, compare, and read reviews of pet services without any cost. Business owners can also list their services for free, with optional premium features available.",
+      nl: "Ja! CutiePawsPedia is volledig gratis voor huisdiereigenaren. Je kunt zoeken, vergelijken en reviews lezen van huisdierdiensten zonder kosten. Bedrijfseigenaren kunnen ook gratis hun diensten vermelden, met optionele premium functies beschikbaar."
+    },
+  },
+  {
+    question: { en: "How do you verify the businesses listed?", nl: "Hoe verifiëren jullie de vermelde bedrijven?" },
+    answer: {
+      en: "We verify business information through multiple sources including official registrations, customer reviews, and periodic checks. Our community also helps flag any inaccurate information, which we investigate promptly.",
+      nl: "We verifiëren bedrijfsinformatie via meerdere bronnen, waaronder officiële registraties, klantreviews en periodieke controles. Onze community helpt ook bij het signaleren van onjuiste informatie, die we snel onderzoeken."
+    },
+  },
+  {
+    question: { en: "Can I leave a review for a business?", nl: "Kan ik een review achterlaten voor een bedrijf?" },
+    answer: {
+      en: "Absolutely! We encourage honest reviews from pet owners who have used the services. Simply visit the business page and click on 'Write a Review'. Your feedback helps other pet owners make informed decisions.",
+      nl: "Absoluut! We moedigen eerlijke reviews aan van huisdiereigenaren die de diensten hebben gebruikt. Bezoek gewoon de bedrijfspagina en klik op 'Schrijf een Review'. Jouw feedback helpt andere huisdiereigenaren weloverwogen beslissingen te nemen."
+    },
+  },
+  {
+    question: { en: "How do I list my pet business on CutiePawsPedia?", nl: "Hoe kan ik mijn huisdierenbedrijf op CutiePawsPedia vermelden?" },
+    answer: {
+      en: "Listing your business is easy! Click on 'List Your Business' in the navigation, fill out your business details, and submit for review. Once approved, your business will be visible to thousands of pet owners searching for services.",
+      nl: "Je bedrijf vermelden is eenvoudig! Klik op 'Vermeld je Bedrijf' in de navigatie, vul je bedrijfsgegevens in en dien in voor review. Na goedkeuring is je bedrijf zichtbaar voor duizenden huisdiereigenaren die op zoek zijn naar diensten."
+    },
+  },
+  {
+    question: { en: "What countries does CutiePawsPedia cover?", nl: "Welke landen bestrijkt CutiePawsPedia?" },
+    answer: {
+      en: "We currently cover pet services across Europe and North America, including the Netherlands, Belgium, Germany, France, UK, Spain, Italy, and the United States. We're constantly expanding to new regions!",
+      nl: "We bestrijken momenteel huisdierdiensten in heel Europa en Noord-Amerika, waaronder Nederland, België, Duitsland, Frankrijk, VK, Spanje, Italië en de Verenigde Staten. We breiden constant uit naar nieuwe regio's!"
+    },
   },
 ];
 
@@ -817,90 +603,3 @@ const testimonials = [
   },
 ];
 
-// Pet care tips data
-const petTips = [
-  {
-    emoji: "🐕",
-    gradient: "from-cpPink/30 to-cpYellow/20",
-    category: { en: "Dog Care", nl: "Hondenzorg" },
-    title: { en: "5 Signs Your Dog Needs More Exercise", nl: "5 Signalen dat je Hond Meer Beweging Nodig Heeft" },
-    excerpt: {
-      en: "Is your furry friend getting enough physical activity? Look out for these telltale signs that indicate your dog might need more walks and playtime.",
-      nl: "Krijgt je harige vriend genoeg lichaamsbeweging? Let op deze veelzeggende tekenen die aangeven dat je hond misschien meer wandelingen en speeltijd nodig heeft.",
-    },
-  },
-  {
-    emoji: "🐱",
-    gradient: "from-cpAqua/30 to-cpPink/20",
-    category: { en: "Cat Health", nl: "Kattengezondheid" },
-    title: { en: "Understanding Your Cat's Body Language", nl: "De Lichaamstaal van je Kat Begrijpen" },
-    excerpt: {
-      en: "Cats communicate in subtle ways. Learn to read their tail positions, ear movements, and vocalizations to better understand what they're telling you.",
-      nl: "Katten communiceren op subtiele manieren. Leer hun staartposities, oorbewegingen en vocalisaties te lezen om beter te begrijpen wat ze je vertellen.",
-    },
-  },
-  {
-    emoji: "🦴",
-    gradient: "from-cpYellow/30 to-cpAqua/20",
-    category: { en: "Nutrition", nl: "Voeding" },
-    title: { en: "The Ultimate Guide to Pet Nutrition", nl: "De Ultieme Gids voor Huisdiervoeding" },
-    excerpt: {
-      en: "What you feed your pet matters. Discover the best dietary practices to keep your furry companion healthy, happy, and full of energy.",
-      nl: "Wat je je huisdier voert is belangrijk. Ontdek de beste voedingspraktijken om je harige metgezel gezond, blij en vol energie te houden.",
-    },
-  },
-];
-
-// FAQ data
-const faqs = [
-  {
-    question: {
-      en: "Is CutiePawsPedia free to use?",
-      nl: "Is CutiePawsPedia gratis te gebruiken?",
-    },
-    answer: {
-      en: "Yes! CutiePawsPedia is completely free for pet owners. You can search, compare, and read reviews of pet services without any cost. Business owners can also list their services for free, with optional premium features available.",
-      nl: "Ja! CutiePawsPedia is volledig gratis voor huisdiereigenaren. Je kunt zoeken, vergelijken en reviews lezen van huisdierdiensten zonder kosten. Bedrijfseigenaren kunnen ook gratis hun diensten vermelden, met optionele premium functies beschikbaar.",
-    },
-  },
-  {
-    question: {
-      en: "How do you verify the businesses listed?",
-      nl: "Hoe verifiëren jullie de vermelde bedrijven?",
-    },
-    answer: {
-      en: "We verify business information through multiple sources including official registrations, customer reviews, and periodic checks. Our community also helps flag any inaccurate information, which we investigate promptly.",
-      nl: "We verifiëren bedrijfsinformatie via meerdere bronnen, waaronder officiële registraties, klantreviews en periodieke controles. Onze community helpt ook bij het signaleren van onjuiste informatie, die we snel onderzoeken.",
-    },
-  },
-  {
-    question: {
-      en: "Can I leave a review for a business?",
-      nl: "Kan ik een review achterlaten voor een bedrijf?",
-    },
-    answer: {
-      en: "Absolutely! We encourage honest reviews from pet owners who have used the services. Simply visit the business page and click on 'Write a Review'. Your feedback helps other pet owners make informed decisions.",
-      nl: "Absoluut! We moedigen eerlijke reviews aan van huisdiereigenaren die de diensten hebben gebruikt. Bezoek gewoon de bedrijfspagina en klik op 'Schrijf een Review'. Jouw feedback helpt andere huisdiereigenaren weloverwogen beslissingen te nemen.",
-    },
-  },
-  {
-    question: {
-      en: "How do I list my pet business on CutiePawsPedia?",
-      nl: "Hoe kan ik mijn huisdierenbedrijf op CutiePawsPedia vermelden?",
-    },
-    answer: {
-      en: "Listing your business is easy! Click on 'List Your Business' in the navigation, fill out your business details, and submit for review. Once approved, your business will be visible to thousands of pet owners searching for services.",
-      nl: "Je bedrijf vermelden is eenvoudig! Klik op 'Vermeld je Bedrijf' in de navigatie, vul je bedrijfsgegevens in en dien in voor review. Na goedkeuring is je bedrijf zichtbaar voor duizenden huisdiereigenaren die op zoek zijn naar diensten.",
-    },
-  },
-  {
-    question: {
-      en: "What countries does CutiePawsPedia cover?",
-      nl: "Welke landen bestrijkt CutiePawsPedia?",
-    },
-    answer: {
-      en: "We currently cover pet services across Europe and North America, including the Netherlands, Belgium, Germany, France, UK, Spain, Italy, and the United States. We're constantly expanding to new regions!",
-      nl: "We bestrijken momenteel huisdierdiensten in heel Europa en Noord-Amerika, waaronder Nederland, België, Duitsland, Frankrijk, VK, Spanje, Italië en de Verenigde Staten. We breiden constant uit naar nieuwe regio's!",
-    },
-  },
-];

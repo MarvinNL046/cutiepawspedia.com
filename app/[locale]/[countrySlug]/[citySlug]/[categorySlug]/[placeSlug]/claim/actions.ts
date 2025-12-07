@@ -1,15 +1,15 @@
 "use server";
 
+import { stackServerApp } from "@/lib/auth/stack";
+import { getUserByStackAuthId } from "@/db/queries/users";
 import { createClaim, canClaimPlace } from "@/db/queries/claims";
 import { getPlaceById } from "@/db/queries/listings";
-import { getUserById } from "@/db/queries/users";
 import { sendNewClaimNotification } from "@/lib/email/resend";
 import { claimsRateLimiter } from "@/lib/rateLimit";
 import { logAuditEvent } from "@/db/queries/auditLogs";
 
 interface CreateClaimInput {
   placeId: number;
-  userId: number;
   businessName: string;
   website?: string;
   contactEmail: string;
@@ -28,16 +28,27 @@ export async function createPlaceClaimAction(
   input: CreateClaimInput
 ): Promise<CreateClaimResult> {
   try {
+    // Auth check - get user from session, not from client input
+    const stackUser = await stackServerApp?.getUser();
+    if (!stackUser) {
+      return { success: false, error: "Please sign in to submit a claim" };
+    }
+
+    const user = await getUserByStackAuthId(stackUser.id);
+    if (!user) {
+      return { success: false, error: "User not found" };
+    }
+
     // Validate input
-    if (!input.placeId || !input.userId) {
+    if (!input.placeId) {
       return { success: false, error: "Missing required fields" };
     }
 
     // Rate limiting: max 3 claims per day per user
-    const rateLimitResult = await claimsRateLimiter(input.userId.toString());
+    const rateLimitResult = await claimsRateLimiter(user.id.toString());
     if (!rateLimitResult.allowed) {
       console.warn(
-        `Rate limit exceeded for claims - userId: ${input.userId}`
+        `Rate limit exceeded for claims - userId: ${user.id}`
       );
       return {
         success: false,
@@ -63,18 +74,11 @@ export async function createPlaceClaimAction(
       return { success: false, error: canClaim.reason || "This place cannot be claimed" };
     }
 
-    // Get place and user info for the notification email
-    const [place, user] = await Promise.all([
-      getPlaceById(input.placeId),
-      getUserById(input.userId),
-    ]);
+    // Get place info for the notification email
+    const place = await getPlaceById(input.placeId);
 
     if (!place) {
       return { success: false, error: "Place not found" };
-    }
-
-    if (!user) {
-      return { success: false, error: "User not found" };
     }
 
     // Build the notes field with all claim details
@@ -91,14 +95,14 @@ export async function createPlaceClaimAction(
     // Create the claim
     const claim = await createClaim({
       placeId: input.placeId,
-      userId: input.userId,
+      userId: user.id,
       businessRole: input.businessRole,
       notes: JSON.stringify(notesData),
     });
 
     // Log CLAIM_CREATED audit event
     logAuditEvent({
-      actorUserId: input.userId,
+      actorUserId: user.id,
       actorRole: "public",
       eventType: "CLAIM_CREATED",
       targetType: "claim",

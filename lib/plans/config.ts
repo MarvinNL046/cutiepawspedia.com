@@ -172,7 +172,7 @@ export const PLAN_CONFIG: Record<PlanKey, PlanDefinition> = {
       badgeColor: "amber",
       hasVerifiedBadge: false,
       hasHomepageSpotlight: false,
-      maxLocations: 1,
+      maxLocations: 5, // Multi-location for franchises
       hasPrioritySupport: false,
       hasApiAccess: false,
     },

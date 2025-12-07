@@ -217,3 +217,160 @@ export function BetweenContentAd({ slotId, className = "", testMode }: SimpleAdP
     </div>
   );
 }
+
+// ============================================================================
+// Sponsor Ad Components - For paying business customers
+// ============================================================================
+
+export interface SponsorAdData {
+  id: string;
+  businessName: string;
+  businessSlug: string;
+  imageUrl: string;
+  headline: string;
+  description?: string;
+  ctaText?: string;
+  locale: string;
+}
+
+interface SponsorAdProps {
+  ad: SponsorAdData;
+  variant?: "sidebar" | "inline" | "compact";
+  className?: string;
+}
+
+/**
+ * Sponsor Ad - Premium placement for paying business customers
+ * Always shown regardless of ad-free membership (they paid for it!)
+ */
+export function SponsorAd({ ad, variant = "sidebar", className = "" }: SponsorAdProps) {
+  const Link = require("next/link").default;
+  const Image = require("next/image").default;
+
+  if (variant === "sidebar") {
+    return (
+      <Link
+        href={`/${ad.locale}/${ad.businessSlug}`}
+        className={`block bg-gradient-to-br from-cpPink/5 to-cpCoral/5 dark:from-cpPink/10 dark:to-cpCoral/10 rounded-xl border border-cpPink/20 overflow-hidden hover:border-cpPink/40 transition-all group ${className}`}
+      >
+        <div className="relative aspect-[4/3] w-full">
+          <Image
+            src={ad.imageUrl}
+            alt={ad.businessName}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+          <div className="absolute top-2 right-2 bg-cpPink/90 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+            Sponsor
+          </div>
+        </div>
+        <div className="p-4">
+          <h4 className="font-semibold text-foreground dark:text-cpCream group-hover:text-cpPink transition-colors">
+            {ad.headline}
+          </h4>
+          {ad.description && (
+            <p className="text-sm text-muted-foreground dark:text-cpCream/70 mt-1 line-clamp-2">
+              {ad.description}
+            </p>
+          )}
+          <span className="inline-flex items-center gap-1 text-cpPink text-sm font-medium mt-3">
+            {ad.ctaText || "Learn more"} →
+          </span>
+        </div>
+      </Link>
+    );
+  }
+
+  if (variant === "inline") {
+    return (
+      <Link
+        href={`/${ad.locale}/${ad.businessSlug}`}
+        className={`flex gap-4 bg-gradient-to-r from-cpPink/5 to-cpCoral/5 dark:from-cpPink/10 dark:to-cpCoral/10 rounded-xl border border-cpPink/20 p-4 my-6 hover:border-cpPink/40 transition-all group ${className}`}
+      >
+        <div className="relative w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden">
+          <Image
+            src={ad.imageUrl}
+            alt={ad.businessName}
+            fill
+            className="object-cover"
+          />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="bg-cpPink/90 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+              Sponsor
+            </span>
+          </div>
+          <h4 className="font-semibold text-foreground dark:text-cpCream group-hover:text-cpPink transition-colors">
+            {ad.headline}
+          </h4>
+          {ad.description && (
+            <p className="text-sm text-muted-foreground dark:text-cpCream/70 line-clamp-1 mt-1">
+              {ad.description}
+            </p>
+          )}
+        </div>
+      </Link>
+    );
+  }
+
+  // Compact variant
+  return (
+    <Link
+      href={`/${ad.locale}/${ad.businessSlug}`}
+      className={`flex items-center gap-3 bg-gradient-to-r from-cpPink/5 to-cpCoral/5 dark:from-cpPink/10 dark:to-cpCoral/10 rounded-lg border border-cpPink/20 p-3 hover:border-cpPink/40 transition-all group ${className}`}
+    >
+      <div className="relative w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden">
+        <Image
+          src={ad.imageUrl}
+          alt={ad.businessName}
+          fill
+          className="object-cover"
+        />
+      </div>
+      <div className="flex-1 min-w-0">
+        <span className="text-[10px] bg-cpPink/90 text-white px-1.5 py-0.5 rounded-full font-medium">
+          Sponsor
+        </span>
+        <h5 className="font-medium text-sm text-foreground dark:text-cpCream group-hover:text-cpPink transition-colors truncate">
+          {ad.headline}
+        </h5>
+      </div>
+    </Link>
+  );
+}
+
+/**
+ * Smart Ad Slot - Shows sponsor ad if available, otherwise falls back to AdSense
+ * For logged-in users: shows sponsor ads only (no AdSense)
+ */
+interface SmartAdSlotProps {
+  type: AdSlotType;
+  sponsorAd?: SponsorAdData | null;
+  slotId?: string;
+  className?: string;
+  testMode?: boolean;
+}
+
+export function SmartAdSlot({ type, sponsorAd, slotId, className = "", testMode }: SmartAdSlotProps) {
+  const { showAds, adsEnabled } = useAdVisibility();
+
+  // Priority 1: Always show sponsor ads (they paid for it)
+  if (sponsorAd) {
+    const variantMap: Record<AdSlotType, "sidebar" | "inline" | "compact"> = {
+      sidebar: "sidebar",
+      "in-feed": "inline",
+      detail: "inline",
+      "sticky-bottom": "compact",
+      header: "compact",
+      "between-content": "inline",
+    };
+    return <SponsorAd ad={sponsorAd} variant={variantMap[type]} className={className} />;
+  }
+
+  // Priority 2: Show AdSense for non-logged-in users
+  if (!adsEnabled && !testMode) return null;
+  if (!showAds && !testMode) return null;
+
+  return <AdSlot type={type} slotId={slotId} className={className} testMode={testMode} />;
+}

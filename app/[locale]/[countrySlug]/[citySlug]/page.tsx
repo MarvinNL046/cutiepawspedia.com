@@ -9,6 +9,7 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { getCityBySlugAndCountry, getCategories, getTopRatedPlacesByCity, getPlaceCountByCity } from "@/db/queries";
 import {
@@ -20,7 +21,7 @@ import {
 import { generateContent } from "@/lib/ai/generateContent";
 import { extractFaqsFromAiContent, generateDefaultFaqs } from "@/lib/ai/faq";
 import { getInternalLinksForPage } from "@/lib/internalLinks";
-import { PlaceCard, CategoryCard, getCategoryIcon } from "@/components/directory";
+import { PlaceCard, CategoryCard, getCategoryIcon, CityPlacesSection } from "@/components/directory";
 import { PageHeader, SectionHeader } from "@/components/layout";
 import { PageIntro, JsonLd, FaqStatic, InternalLinksSection } from "@/components/seo";
 import { MapPin, Star } from "lucide-react";
@@ -55,7 +56,13 @@ export default async function CityPage({ params }: CityPageProps) {
     getCategories(),
   ]);
 
-  const topPlaces = city ? await getTopRatedPlacesByCity(city.id, 6) : [];
+  // SEO Redirect: If city has a province, redirect to province-aware URL
+  const province = Array.isArray(city?.province) ? city.province[0] : city?.province;
+  if (province?.slug) {
+    redirect(`/${locale}/${countrySlug}/p/${province.slug}/${citySlug}`);
+  }
+
+  const topPlaces = city ? await getTopRatedPlacesByCity(city.id, 12) : [];
   const totalPlaces = city ? await getPlaceCountByCity(city.id) : 0;
   const cityName = city?.name || citySlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   const country = Array.isArray(city?.country) ? city.country[0] : city?.country;
@@ -135,24 +142,18 @@ export default async function CityPage({ params }: CityPageProps) {
         <BetweenContentAd />
       </section>
 
-      {topPlaces.length > 0 && (
+      {topPlaces.length > 0 && city && (
         <section className="bg-slate-50/50">
           <div className="container mx-auto max-w-6xl px-4 py-12">
-            <SectionHeader
-              title={locale === "nl" ? `Hoogst Beoordeeld in ${cityName}` : `Top Rated in ${cityName}`}
-              icon={<Star className="h-5 w-5 text-cpYellow fill-cpYellow" />}
+            <CityPlacesSection
+              initialPlaces={topPlaces}
+              cityId={city.id}
+              totalPlaces={totalPlaces}
+              locale={locale}
+              countrySlug={countrySlug}
+              citySlug={citySlug}
+              title={locale === "nl" ? `Alle locaties in ${cityName}` : `All locations in ${cityName}`}
             />
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {topPlaces.map((place) => (
-                <PlaceCard
-                  key={place.id}
-                  place={place}
-                  locale={locale}
-                  countrySlug={countrySlug}
-                  citySlug={citySlug}
-                />
-              ))}
-            </div>
           </div>
         </section>
       )}

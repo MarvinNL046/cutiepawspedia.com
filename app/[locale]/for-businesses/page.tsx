@@ -458,15 +458,30 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
                         </li>
                       )}
 
-                      {/* ELITE-exclusive: Multi-location */}
-                      {plan.features.maxLocations === 0 && (
-                        <li className="flex items-center gap-2">
-                          <Building2 className="h-4 w-4 text-purple-500" />
-                          <span className="text-slate-700 dark:text-slate-200 font-medium">
-                            {isNl ? "Onbeperkt locaties" : "Unlimited locations"}
-                          </span>
-                        </li>
-                      )}
+                      {/* Locations */}
+                      <li className="flex items-center gap-2">
+                        <Building2 className={`h-4 w-4 ${
+                          plan.features.maxLocations === 0
+                            ? "text-purple-500"
+                            : plan.features.maxLocations > 1
+                              ? "text-cpPink"
+                              : "text-slate-400"
+                        }`} />
+                        <span className={`${
+                          plan.features.maxLocations === 0
+                            ? "text-slate-700 dark:text-slate-200 font-medium"
+                            : plan.features.maxLocations > 1
+                              ? "text-slate-700 dark:text-slate-200 font-medium"
+                              : "text-slate-600 dark:text-slate-400"
+                        }`}>
+                          {plan.features.maxLocations === 0
+                            ? (isNl ? "Onbeperkt locaties" : "Unlimited locations")
+                            : plan.features.maxLocations === 1
+                              ? (isNl ? "1 locatie" : "1 location")
+                              : (isNl ? `${plan.features.maxLocations} locaties` : `${plan.features.maxLocations} locations`)
+                          }
+                        </span>
+                      </li>
 
                       {/* Analytics */}
                       <li className="flex items-center gap-2">

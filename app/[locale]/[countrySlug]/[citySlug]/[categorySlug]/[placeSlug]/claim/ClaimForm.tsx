@@ -13,7 +13,6 @@ import { createPlaceClaimAction } from "./actions";
 interface ClaimFormProps {
   placeId: number;
   placeName: string;
-  userId: number;
   userEmail: string;
   locale: string;
   returnUrl: string;
@@ -88,7 +87,6 @@ const labels = {
 export function ClaimForm({
   placeId,
   placeName,
-  userId,
   userEmail,
   locale,
   returnUrl,
@@ -142,7 +140,6 @@ export function ClaimForm({
     try {
       const result = await createPlaceClaimAction({
         placeId,
-        userId,
         businessName: formData.businessName,
         website: formData.website || undefined,
         contactEmail: formData.contactEmail,

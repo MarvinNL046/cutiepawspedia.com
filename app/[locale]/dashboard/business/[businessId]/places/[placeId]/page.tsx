@@ -186,7 +186,12 @@ export default async function PlaceDetailPage({ params }: PlaceDetailPageProps) 
 
   return (
     <>
-      <DashboardHeader title={place.name} description={t.description} />
+      <DashboardHeader
+        title={place.name}
+        description={t.description}
+        businessId={businessIdNum}
+        locale={locale}
+      />
 
       {/* Action buttons below header */}
       <div className="px-6 py-3 border-b bg-slate-50 flex items-center gap-3">
@@ -204,7 +209,7 @@ export default async function PlaceDetailPage({ params }: PlaceDetailPageProps) 
         </Button>
       </div>
 
-      <div className="p-6 space-y-6">
+      <div className="flex-1 overflow-auto p-6 space-y-6">
         {/* Overview Card */}
         <Card>
           <CardHeader>

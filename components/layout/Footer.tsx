@@ -169,6 +169,11 @@ export function Footer({ locale }: FooterProps) {
                 </Link>
               </li>
               <li>
+                <Link href={`/${locale}/blog`} className="hover:text-cpPink transition-colors">
+                  📝 Blog
+                </Link>
+              </li>
+              <li>
                 <Link href={`/${locale}/for-businesses`} className="hover:text-cpPink transition-colors">
                   💼 {isNl ? "Voor Bedrijven" : "For Businesses"}
                 </Link>

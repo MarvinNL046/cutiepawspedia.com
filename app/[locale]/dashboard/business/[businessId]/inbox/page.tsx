@@ -18,6 +18,7 @@ import {
   MapPin,
   ChevronRight,
 } from "lucide-react";
+import { DashboardHeader } from "@/components/dashboard";
 
 interface InboxPageProps {
   params: Promise<{ locale: string; businessId: string }>;
@@ -115,22 +116,17 @@ export default async function InboxPage({ params, searchParams }: InboxPageProps
   ];
 
   return (
-    <div className="p-6">
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-cpDark">{t.inbox}</h1>
-            {unreadCount > 0 && (
-              <p className="text-slate-500 mt-1">
-                {unreadCount} {t.unread}
-              </p>
-            )}
-          </div>
-        </div>
+    <>
+      <DashboardHeader
+        title={t.inbox}
+        description={unreadCount > 0 ? `${unreadCount} ${t.unread}` : undefined}
+        businessId={businessIdNum}
+        locale={locale}
+      />
 
+      <div className="flex-1 overflow-auto p-6">
         {/* Status Tabs */}
-        <div className="flex gap-2 mt-4">
+        <div className="flex gap-2 mb-6">
           {statusTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = status === tab.key;
@@ -151,9 +147,8 @@ export default async function InboxPage({ params, searchParams }: InboxPageProps
             );
           })}
         </div>
-      </div>
 
-      {/* Threads List */}
+        {/* Threads List */}
       {threads.length === 0 ? (
         <div className="bg-white rounded-xl border p-12 text-center">
           <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -236,6 +231,7 @@ export default async function InboxPage({ params, searchParams }: InboxPageProps
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

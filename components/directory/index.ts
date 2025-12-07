@@ -1,8 +1,10 @@
 export { SearchBar } from "./SearchBar";
 export { PlaceCard } from "./PlaceCard";
 export { SearchResultsClient } from "./SearchResultsClient";
+export { CityPlacesSection } from "./CityPlacesSection";
 export { CategoryCard, getCategoryIcon } from "./CategoryCard";
 export { CountryCard, getCountryFlag } from "./CountryCard";
+export { ProvinceCard } from "./ProvinceCard";
 export { CityCard } from "./CityCard";
 export { MapWidget } from "./MapWidget";
 export { MapWidgetLazy } from "./MapWidgetLazy";

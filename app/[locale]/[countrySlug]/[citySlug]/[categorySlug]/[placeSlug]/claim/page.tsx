@@ -170,7 +170,6 @@ export default async function ClaimPage({ params }: ClaimPageProps) {
           <ClaimForm
             placeId={place.id}
             placeName={place.name}
-            userId={dbUser.id}
             userEmail={dbUser.email}
             locale={locale}
             returnUrl={`/${locale}/${countrySlug}/${citySlug}/${categorySlug}/${placeSlug}`}

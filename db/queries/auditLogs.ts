@@ -37,13 +37,26 @@ export type AuditEventType =
   | "CLAIM_REJECTED"
   // Business events
   | "BUSINESS_CREATED"
+  | "BUSINESS_CREATED_VIA_WEBHOOK"
   | "BUSINESS_STATUS_CHANGED"
   // Review events
   | "REVIEW_CREATED"
   | "REVIEW_APPROVED"
   | "REVIEW_REJECTED"
   | "REVIEW_FLAGGED"
-  | "REVIEW_REPLY_CREATED";
+  | "REVIEW_REPLY_CREATED"
+  // Subscription events
+  | "SUBSCRIPTION_CREATED"
+  | "SUBSCRIPTION_UPDATED"
+  | "SUBSCRIPTION_CANCELLED"
+  | "SUBSCRIPTION_PAYMENT_SUCCESS"
+  | "SUBSCRIPTION_PAYMENT_FAILED"
+  // Ad campaign events
+  | "AD_CAMPAIGN_ACTIVATED"
+  | "AD_CAMPAIGN_PAUSED"
+  | "AD_CAMPAIGN_COMPLETED"
+  // Admin actions
+  | "ADMIN_ACTION";
 
 export type AuditActorRole = "admin" | "business" | "system" | "public";
 
@@ -54,7 +67,8 @@ export type AuditTargetType =
   | "claim"
   | "payment"
   | "user"
-  | "review";
+  | "review"
+  | "ad_campaign";
 
 // ============================================================================
 // LOG AUDIT EVENT

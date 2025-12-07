@@ -327,3 +327,174 @@ export async function getBusinessWeeklyStats(businessId: number): Promise<{
       : null,
   };
 }
+
+// ============================================================================
+// IN-APP BUSINESS NOTIFICATIONS QUERIES
+// ============================================================================
+
+import { desc, and, sql } from "drizzle-orm";
+import { businessNotifications } from "../schema";
+
+export type BusinessNotificationRow = typeof businessNotifications.$inferSelect;
+export type BusinessNotificationInsert = typeof businessNotifications.$inferInsert;
+
+// Notification type for frontend
+export type InAppNotificationType =
+  | "new_review"
+  | "new_lead"
+  | "review_reply"
+  | "listing_view"
+  | "claim_approved"
+  | "claim_rejected"
+  | "plan_upgraded"
+  | "plan_expiring"
+  | "weekly_summary"
+  | "system";
+
+/**
+ * Get notifications for a business
+ * Returns most recent notifications, with unread count
+ */
+export async function getBusinessNotifications(
+  businessId: number,
+  options: { limit?: number; includeRead?: boolean } = {}
+): Promise<{ notifications: BusinessNotificationRow[]; unreadCount: number }> {
+  if (!db) return { notifications: [], unreadCount: 0 };
+
+  const { limit = 20, includeRead = true } = options;
+
+  // Get notifications
+  const query = db
+    .select()
+    .from(businessNotifications)
+    .where(
+      includeRead
+        ? eq(businessNotifications.businessId, businessId)
+        : and(
+            eq(businessNotifications.businessId, businessId),
+            eq(businessNotifications.isRead, false)
+          )
+    )
+    .orderBy(desc(businessNotifications.createdAt))
+    .limit(limit);
+
+  const notifications = await query;
+
+  // Get unread count
+  const [countResult] = await db
+    .select({ count: sql<number>`COUNT(*)` })
+    .from(businessNotifications)
+    .where(
+      and(
+        eq(businessNotifications.businessId, businessId),
+        eq(businessNotifications.isRead, false)
+      )
+    );
+
+  return {
+    notifications,
+    unreadCount: Number(countResult?.count ?? 0),
+  };
+}
+
+/**
+ * Mark a notification as read
+ */
+export async function markNotificationAsRead(
+  notificationId: number,
+  businessId: number
+): Promise<boolean> {
+  if (!db) return false;
+
+  const result = await db
+    .update(businessNotifications)
+    .set({
+      isRead: true,
+      readAt: new Date(),
+    })
+    .where(
+      and(
+        eq(businessNotifications.id, notificationId),
+        eq(businessNotifications.businessId, businessId)
+      )
+    )
+    .returning({ id: businessNotifications.id });
+
+  return result.length > 0;
+}
+
+/**
+ * Mark all notifications as read for a business
+ */
+export async function markAllNotificationsAsRead(
+  businessId: number
+): Promise<number> {
+  if (!db) return 0;
+
+  const result = await db
+    .update(businessNotifications)
+    .set({
+      isRead: true,
+      readAt: new Date(),
+    })
+    .where(
+      and(
+        eq(businessNotifications.businessId, businessId),
+        eq(businessNotifications.isRead, false)
+      )
+    )
+    .returning({ id: businessNotifications.id });
+
+  return result.length;
+}
+
+/**
+ * Create a new notification for a business
+ */
+export async function createBusinessNotification(
+  data: Omit<BusinessNotificationInsert, "id" | "createdAt" | "isRead" | "readAt">
+): Promise<BusinessNotificationRow | null> {
+  if (!db) return null;
+
+  try {
+    const [notification] = await db
+      .insert(businessNotifications)
+      .values({
+        ...data,
+        isRead: false,
+      })
+      .returning();
+
+    return notification;
+  } catch (error) {
+    console.error("Failed to create business notification:", error);
+    return null;
+  }
+}
+
+/**
+ * Delete old read notifications (cleanup)
+ * Keeps notifications for the last 30 days
+ */
+export async function cleanupOldNotifications(
+  daysToKeep: number = 30
+): Promise<number> {
+  if (!db) return 0;
+
+  const { gte, lt } = await import("drizzle-orm");
+
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
+
+  const result = await db
+    .delete(businessNotifications)
+    .where(
+      and(
+        eq(businessNotifications.isRead, true),
+        lt(businessNotifications.createdAt, cutoffDate)
+      )
+    )
+    .returning({ id: businessNotifications.id });
+
+  return result.length;
+}

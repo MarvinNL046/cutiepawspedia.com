@@ -13,7 +13,23 @@ export {
   DetailAd,
   StickyBottomAd,
   BetweenContentAd,
+  SponsorAd,
+  SmartAdSlot,
+  type SponsorAdData,
 } from "./AdSlot";
+
+// Sponsor ad with tracking
+export {
+  SponsorAdWithTracking,
+  type SponsorAdData as TrackedSponsorAdData,
+  type AdPlacement,
+} from "./SponsorAdWithTracking";
+
+// Blog-specific ad components
+export { BlogSidebarAd, BlogInlineAd } from "./BlogSidebarAd";
+
+// Search and directory ad components
+export { SearchAd, DirectorySidebarAd, HomepageFeaturedAd } from "./SearchAd";
 
 // Visibility context
 export {

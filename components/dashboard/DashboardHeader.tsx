@@ -1,36 +1,42 @@
 "use client";
 
 import { useAuth } from "@/lib/auth/use-auth";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bell, User } from "lucide-react";
+import { User } from "lucide-react";
+import { NotificationDropdown } from "./NotificationDropdown";
 
 interface DashboardHeaderProps {
   title: string;
   description?: string;
+  businessId?: number;
+  locale?: string;
 }
 
-export function DashboardHeader({ title, description }: DashboardHeaderProps) {
+export function DashboardHeader({
+  title,
+  description,
+  businessId,
+  locale = "en",
+}: DashboardHeaderProps) {
   const user = useAuth();
 
   return (
-    <header className="h-16 border-b bg-white flex items-center justify-between px-6">
-      <div>
-        <h1 className="text-xl font-semibold text-cpDark">{title}</h1>
+    <header className="h-14 lg:h-16 border-b bg-white flex items-center justify-between px-4 lg:px-6 flex-shrink-0">
+      <div className="min-w-0 flex-1">
+        <h1 className="text-lg lg:text-xl font-semibold text-cpDark truncate">{title}</h1>
         {description && (
-          <p className="text-sm text-slate-500">{description}</p>
+          <p className="text-xs lg:text-sm text-slate-500 truncate hidden sm:block">{description}</p>
         )}
       </div>
 
-      <div className="flex items-center gap-4">
-        {/* Notifications (placeholder) */}
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5 text-slate-500" />
-          <span className="absolute top-1 right-1 h-2 w-2 bg-cpPink rounded-full" />
-        </Button>
+      <div className="flex items-center gap-2 lg:gap-4 flex-shrink-0">
+        {/* Notifications */}
+        {businessId && (
+          <NotificationDropdown businessId={businessId} locale={locale} />
+        )}
 
-        {/* User info */}
-        <div className="flex items-center gap-3">
+        {/* User info - hidden on mobile, shown on md+ */}
+        <div className="hidden md:flex items-center gap-3">
           <div className="text-right">
             <p className="text-sm font-medium text-cpDark">
               {user?.displayName || user?.primaryEmail?.split("@")[0] || "User"}
@@ -42,6 +48,11 @@ export function DashboardHeader({ title, description }: DashboardHeaderProps) {
           <div className="h-9 w-9 rounded-full bg-cpAqua/20 flex items-center justify-center">
             <User className="h-5 w-5 text-cpAqua" />
           </div>
+        </div>
+
+        {/* Mobile avatar only */}
+        <div className="md:hidden h-8 w-8 rounded-full bg-cpAqua/20 flex items-center justify-center">
+          <User className="h-4 w-4 text-cpAqua" />
         </div>
       </div>
     </header>

@@ -15,12 +15,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { searchPlaces, getCategories, getCountries } from "@/db/queries";
+import { getActiveAdForPlacement } from "@/db/queries/ads";
 import { getSearchMetadata, getLocalizedCategoryName, type ContentLocale } from "@/lib/seo";
 import { PlaceCard, MapWidgetLazy as MapWidget, type MapMarker, SearchResultsClient } from "@/components/directory";
 import { SearchBar } from "@/components/directory";
 import { SearchTracker } from "@/components/analytics";
 import { ChevronRight, Search, MapPin, Map, LayoutGrid } from "lucide-react";
-import { BetweenContentAd, SidebarAd } from "@/components/ads";
+import { BetweenContentAd, SearchAd } from "@/components/ads";
 
 interface SearchPageProps {
   params: Promise<{ locale: string }>;
@@ -264,8 +265,12 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
   const page = parseInt(pageStr || "1", 10) || 1;
   const showMap = mapView === "true";
 
-  // Fetch filter options
-  const [categories, countries] = await Promise.all([getCategories(), getCountries()]);
+  // Fetch filter options and sponsor ad
+  const [categories, countries, searchAd] = await Promise.all([
+    getCategories(),
+    getCountries(),
+    getActiveAdForPlacement("search_results", locale as "en" | "nl"),
+  ]);
 
   // Build search summary
   const searchSummary = [];
@@ -449,6 +454,9 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
 
       {/* Search Results */}
       <section className="container mx-auto max-w-6xl px-4 py-8">
+        {/* Sponsor Ad - High intent placement */}
+        <SearchAd sponsorAd={searchAd} className="mb-6" />
+
         <Suspense fallback={<SearchSkeleton />}>
           <SearchResults
             locale={locale}

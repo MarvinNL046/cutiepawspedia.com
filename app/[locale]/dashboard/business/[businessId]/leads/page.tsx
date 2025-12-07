@@ -151,9 +151,11 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
       <DashboardHeader
         title={t.title}
         description={`${t.description} (${total})`}
+        businessId={businessIdNum}
+        locale={locale}
       />
 
-      <div className="p-6 space-y-6">
+      <div className="flex-1 overflow-auto p-6 space-y-6">
         {/* Status Filters */}
         <div className="flex flex-wrap gap-2">
           {statusFilters.map((filter) => {
@@ -191,111 +193,191 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
             </CardContent>
           </Card>
         ) : (
-          // Leads table
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t.date}</TableHead>
-                    <TableHead>{t.place}</TableHead>
-                    <TableHead>{t.contact}</TableHead>
-                    <TableHead>{t.message}</TableHead>
-                    <TableHead>{t.status}</TableHead>
-                    <TableHead className="text-right">{t.actions}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {leads.map((lead) => (
-                    <TableRow key={lead.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-1 text-sm text-slate-600">
-                          <Calendar className="h-3 w-3" />
-                          {new Date(lead.createdAt).toLocaleDateString(locale, {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </div>
-                        {lead.viewedAt && (
-                          <div className="text-xs text-slate-400 mt-1">
-                            Viewed: {new Date(lead.viewedAt).toLocaleDateString()}
-                          </div>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Building2 className="h-4 w-4 text-cpAqua" />
-                          <div>
-                            <div className="font-medium text-cpDark">{lead.placeName}</div>
-                            <div className="text-xs text-slate-500">{lead.cityName}</div>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="space-y-1">
-                          <div className="font-medium text-cpDark">
-                            {lead.name}
-                          </div>
-                          <a
-                            href={`mailto:${lead.email}`}
-                            className="flex items-center gap-1 text-sm text-cpPink hover:underline"
-                          >
-                            <Mail className="h-3 w-3" />
-                            {lead.email}
+          <>
+            {/* Mobile Card Layout */}
+            <div className="md:hidden space-y-4">
+              {leads.map((lead) => (
+                <Card key={lead.id}>
+                  <CardContent className="p-4 space-y-3">
+                    {/* Header: Status + Date */}
+                    <div className="flex items-center justify-between">
+                      <LeadStatusDropdown
+                        leadId={lead.id}
+                        businessId={businessIdNum}
+                        currentStatus={lead.status as LeadStatus}
+                        locale={locale}
+                      />
+                      <div className="flex items-center gap-1 text-xs text-slate-500">
+                        <Calendar className="h-3 w-3" />
+                        {new Date(lead.createdAt).toLocaleDateString(locale, {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Place */}
+                    <div className="flex items-center gap-2 text-sm">
+                      <Building2 className="h-4 w-4 text-cpAqua flex-shrink-0" />
+                      <span className="font-medium text-cpDark truncate">{lead.placeName}</span>
+                      <span className="text-slate-400">·</span>
+                      <span className="text-slate-500 truncate">{lead.cityName}</span>
+                    </div>
+
+                    {/* Contact Info */}
+                    <div className="bg-slate-50 rounded-lg p-3 space-y-2">
+                      <div className="font-medium text-cpDark">{lead.name}</div>
+                      <a
+                        href={`mailto:${lead.email}`}
+                        className="flex items-center gap-2 text-sm text-cpPink hover:underline"
+                      >
+                        <Mail className="h-4 w-4" />
+                        <span className="truncate">{lead.email}</span>
+                      </a>
+                      {lead.phone && (
+                        <a
+                          href={`tel:${lead.phone}`}
+                          className="flex items-center gap-2 text-sm text-slate-600 hover:text-cpPink"
+                        >
+                          <Phone className="h-4 w-4" />
+                          {lead.phone}
+                        </a>
+                      )}
+                    </div>
+
+                    {/* Message */}
+                    {lead.message && (
+                      <p className="text-sm text-slate-600 line-clamp-2">{lead.message}</p>
+                    )}
+
+                    {/* Actions */}
+                    <div className="flex gap-2 pt-2">
+                      <Button size="sm" className="flex-1 bg-cpPink hover:bg-cpPink/90" asChild>
+                        <a href={`mailto:${lead.email}`}>
+                          <Mail className="h-4 w-4 mr-2" />
+                          {t.reply}
+                        </a>
+                      </Button>
+                      {lead.phone && (
+                        <Button size="sm" variant="outline" className="flex-1" asChild>
+                          <a href={`tel:${lead.phone}`}>
+                            <Phone className="h-4 w-4 mr-2" />
+                            {t.call}
                           </a>
-                          {lead.phone && (
-                            <a
-                              href={`tel:${lead.phone}`}
-                              className="flex items-center gap-1 text-sm text-slate-600 hover:text-cpPink"
-                            >
-                              <Phone className="h-3 w-3" />
-                              {lead.phone}
-                            </a>
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Desktop Table Layout */}
+            <Card className="hidden md:block">
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>{t.date}</TableHead>
+                      <TableHead>{t.place}</TableHead>
+                      <TableHead>{t.contact}</TableHead>
+                      <TableHead>{t.message}</TableHead>
+                      <TableHead>{t.status}</TableHead>
+                      <TableHead className="text-right">{t.actions}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {leads.map((lead) => (
+                      <TableRow key={lead.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-1 text-sm text-slate-600">
+                            <Calendar className="h-3 w-3" />
+                            {new Date(lead.createdAt).toLocaleDateString(locale, {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            })}
+                          </div>
+                          {lead.viewedAt && (
+                            <div className="text-xs text-slate-400 mt-1">
+                              Viewed: {new Date(lead.viewedAt).toLocaleDateString()}
+                            </div>
                           )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {lead.message ? (
-                          <p className="text-sm truncate max-w-[200px] text-slate-600" title={lead.message}>
-                            {lead.message}
-                          </p>
-                        ) : (
-                          <span className="text-slate-400 text-sm italic">No message</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <LeadStatusDropdown
-                          leadId={lead.id}
-                          businessId={businessIdNum}
-                          currentStatus={lead.status as LeadStatus}
-                          locale={locale}
-                        />
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button size="sm" className="bg-cpPink hover:bg-cpPink/90" asChild>
-                            <a href={`mailto:${lead.email}`}>
-                              <Mail className="h-4 w-4 mr-1" />
-                              {t.reply}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Building2 className="h-4 w-4 text-cpAqua" />
+                            <div>
+                              <div className="font-medium text-cpDark">{lead.placeName}</div>
+                              <div className="text-xs text-slate-500">{lead.cityName}</div>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            <div className="font-medium text-cpDark">
+                              {lead.name}
+                            </div>
+                            <a
+                              href={`mailto:${lead.email}`}
+                              className="flex items-center gap-1 text-sm text-cpPink hover:underline"
+                            >
+                              <Mail className="h-3 w-3" />
+                              {lead.email}
                             </a>
-                          </Button>
-                          {lead.phone && (
-                            <Button size="sm" variant="outline" asChild>
-                              <a href={`tel:${lead.phone}`}>
-                                <Phone className="h-4 w-4 mr-1" />
-                                {t.call}
+                            {lead.phone && (
+                              <a
+                                href={`tel:${lead.phone}`}
+                                className="flex items-center gap-1 text-sm text-slate-600 hover:text-cpPink"
+                              >
+                                <Phone className="h-3 w-3" />
+                                {lead.phone}
+                              </a>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {lead.message ? (
+                            <p className="text-sm truncate max-w-[200px] text-slate-600" title={lead.message}>
+                              {lead.message}
+                            </p>
+                          ) : (
+                            <span className="text-slate-400 text-sm italic">No message</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <LeadStatusDropdown
+                            leadId={lead.id}
+                            businessId={businessIdNum}
+                            currentStatus={lead.status as LeadStatus}
+                            locale={locale}
+                          />
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Button size="sm" className="bg-cpPink hover:bg-cpPink/90" asChild>
+                              <a href={`mailto:${lead.email}`}>
+                                <Mail className="h-4 w-4 mr-1" />
+                                {t.reply}
                               </a>
                             </Button>
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                            {lead.phone && (
+                              <Button size="sm" variant="outline" asChild>
+                                <a href={`tel:${lead.phone}`}>
+                                  <Phone className="h-4 w-4 mr-1" />
+                                  {t.call}
+                                </a>
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </>
         )}
       </div>
     </>

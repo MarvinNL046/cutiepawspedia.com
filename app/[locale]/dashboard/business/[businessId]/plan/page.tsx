@@ -28,6 +28,7 @@ import {
   Info,
   ExternalLink,
   Star,
+  Building2,
 } from "lucide-react";
 import {
   getActivePlans,
@@ -127,6 +128,7 @@ export default async function PlanPage({ params }: PlanPageProps) {
         advancedAnalytics: "Advanced analytics",
         socialLinks: "Social media links",
         reviews: "Customer reviews",
+        locations: "Locations",
       },
       priorityLabels: {
         standard: "Standard",
@@ -166,6 +168,7 @@ export default async function PlanPage({ params }: PlanPageProps) {
         advancedAnalytics: "Geavanceerde statistieken",
         socialLinks: "Social media links",
         reviews: "Klantbeoordelingen",
+        locations: "Locaties",
       },
       priorityLabels: {
         standard: "Standaard",
@@ -205,6 +208,7 @@ export default async function PlanPage({ params }: PlanPageProps) {
         advancedAnalytics: "Erweiterte Analysen",
         socialLinks: "Social-Media-Links",
         reviews: "Kundenbewertungen",
+        locations: "Standorte",
       },
       priorityLabels: {
         standard: "Standard",
@@ -237,9 +241,11 @@ export default async function PlanPage({ params }: PlanPageProps) {
       <DashboardHeader
         title={t.title}
         description={t.description}
+        businessId={businessIdNum}
+        locale={locale}
       />
 
-      <div className="p-6 space-y-6">
+      <div className="flex-1 overflow-auto p-6 space-y-6">
         {/* Stripe Secure Payments Info */}
         <Alert className="bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800">
           <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -387,6 +393,28 @@ export default async function PlanPage({ params }: PlanPageProps) {
                   </p>
                 </div>
               </div>
+
+              {/* Locations */}
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-white dark:bg-slate-800 border">
+                <Building2 className={`h-5 w-5 ${
+                  currentPlan.features.maxLocations === 0
+                    ? "text-purple-500"
+                    : currentPlan.features.maxLocations > 1
+                      ? "text-cpPink"
+                      : "text-slate-400"
+                }`} />
+                <div>
+                  <p className="text-sm font-medium text-cpDark dark:text-white">
+                    {t.featureLabels.locations}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {currentPlan.features.maxLocations === 0
+                      ? t.unlimited
+                      : currentPlan.features.maxLocations
+                    }
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Manage Subscription Button - only show if has active subscription */}
@@ -513,6 +541,30 @@ export default async function PlanPage({ params }: PlanPageProps) {
                           <span className="font-medium">{t.featureLabels.featuredStyling}</span>
                         </li>
                       )}
+                      {/* Locations */}
+                      <li className="flex items-center gap-2">
+                        <Building2 className={`h-4 w-4 ${
+                          plan.features.maxLocations === 0
+                            ? "text-purple-500"
+                            : plan.features.maxLocations > 1
+                              ? "text-cpPink"
+                              : "text-slate-400"
+                        }`} />
+                        <span className={
+                          plan.features.maxLocations === 0
+                            ? "font-medium text-purple-600"
+                            : plan.features.maxLocations > 1
+                              ? "font-medium"
+                              : "text-slate-500"
+                        }>
+                          {plan.features.maxLocations === 0
+                            ? (isNl ? "Onbeperkt locaties" : "Unlimited locations")
+                            : plan.features.maxLocations === 1
+                              ? (isNl ? "1 locatie" : "1 location")
+                              : (isNl ? `${plan.features.maxLocations} locaties` : `${plan.features.maxLocations} locations`)
+                          }
+                        </span>
+                      </li>
                     </ul>
 
                     {/* CTA Button */}

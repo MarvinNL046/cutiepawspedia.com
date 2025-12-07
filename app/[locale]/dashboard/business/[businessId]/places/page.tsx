@@ -28,7 +28,10 @@ import {
   CheckCircle,
   Crown,
   Search,
+  Plus,
+  Sparkles,
 } from "lucide-react";
+import { type PlanKey, getPlanFeatures } from "@/lib/plans/config";
 
 interface PlacesPageProps {
   params: Promise<{ locale: string; businessId: string }>;
@@ -58,6 +61,13 @@ export default async function PlacesPage({ params }: PlacesPageProps) {
   // Get listings
   const { listings, total } = await getBusinessListings(businessIdNum, { limit: 100 });
 
+  // Get plan features to check location limits
+  const planKey = (business.planKey || "FREE") as PlanKey;
+  const planFeatures = getPlanFeatures(planKey);
+  const maxLocations = planFeatures.maxLocations;
+  const isUnlimited = maxLocations === 0;
+  const canAddMore = isUnlimited || total < maxLocations;
+
   const labels = {
     en: {
       title: "My Places",
@@ -77,6 +87,10 @@ export default async function PlacesPage({ params }: PlacesPageProps) {
       verified: "Verified",
       premium: "Premium",
       noRating: "No reviews",
+      addLocation: "Add Location",
+      upgradeToAdd: "Upgrade to Add More",
+      locationLimit: `You've reached your ${planKey} plan limit of ${maxLocations} location`,
+      unlimitedLocations: "Add unlimited locations with ELITE",
     },
     nl: {
       title: "Mijn Locaties",
@@ -96,6 +110,10 @@ export default async function PlacesPage({ params }: PlacesPageProps) {
       verified: "Geverifieerd",
       premium: "Premium",
       noRating: "Geen reviews",
+      addLocation: "Locatie Toevoegen",
+      upgradeToAdd: "Upgrade voor Meer",
+      locationLimit: `Je hebt de limiet van ${maxLocations} locatie voor je ${planKey} plan bereikt`,
+      unlimitedLocations: "Voeg onbeperkt locaties toe met ELITE",
     },
     de: {
       title: "Meine Standorte",
@@ -115,6 +133,10 @@ export default async function PlacesPage({ params }: PlacesPageProps) {
       verified: "Verifiziert",
       premium: "Premium",
       noRating: "Keine Bewertungen",
+      addLocation: "Standort Hinzufügen",
+      upgradeToAdd: "Upgrade für Mehr",
+      locationLimit: `Sie haben das Limit von ${maxLocations} Standort für Ihren ${planKey} Plan erreicht`,
+      unlimitedLocations: "Fügen Sie unbegrenzt Standorte mit ELITE hinzu",
     },
   };
 
@@ -125,9 +147,11 @@ export default async function PlacesPage({ params }: PlacesPageProps) {
       <DashboardHeader
         title={t.title}
         description={`${t.description} (${total})`}
+        businessId={businessIdNum}
+        locale={locale}
       />
 
-      <div className="p-6">
+      <div className="flex-1 overflow-auto p-6">
         {listings.length === 0 ? (
           // Empty state
           <Card className="max-w-md mx-auto mt-12">
@@ -146,101 +170,201 @@ export default async function PlacesPage({ params }: PlacesPageProps) {
             </CardContent>
           </Card>
         ) : (
-          // Places table
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t.name}</TableHead>
-                    <TableHead>{t.location}</TableHead>
-                    <TableHead>{t.category}</TableHead>
-                    <TableHead>{t.rating}</TableHead>
-                    <TableHead>{t.leads}</TableHead>
-                    <TableHead>{t.status}</TableHead>
-                    <TableHead className="text-right">{t.actions}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {listings.map((place) => (
-                    <TableRow key={place.id}>
-                      <TableCell>
-                        <div className="font-medium text-cpDark">{place.name}</div>
-                        <div className="text-sm text-slate-500">{place.slug}</div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1 text-sm text-slate-600">
-                          <MapPin className="h-3 w-3" />
-                          {place.cityName}, {place.countryName}
+          <>
+            {/* Mobile Card Layout */}
+            <div className="md:hidden space-y-4">
+              {listings.map((place) => (
+                <Card key={place.id}>
+                  <CardContent className="p-4 space-y-3">
+                    {/* Header: Name + Status */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-medium text-cpDark truncate">{place.name}</h3>
+                        <div className="flex items-center gap-1 text-sm text-slate-500 mt-0.5">
+                          <MapPin className="h-3 w-3 flex-shrink-0" />
+                          <span className="truncate">{place.cityName}, {place.countryName}</span>
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        {place.categoryName ? (
-                          <Badge variant="secondary">{place.categoryName}</Badge>
-                        ) : (
-                          <span className="text-slate-400">-</span>
+                      </div>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        {place.isVerified && (
+                          <Badge className="bg-cpAqua/20 text-cpAqua border-cpAqua text-xs">
+                            <CheckCircle className="h-3 w-3" />
+                          </Badge>
                         )}
-                      </TableCell>
-                      <TableCell>
-                        {place.avgRating && place.avgRating > 0 ? (
-                          <div className="flex items-center gap-1">
-                            <Star className="h-4 w-4 fill-cpYellow text-cpYellow" />
-                            <span className="font-medium">{place.avgRating.toFixed(1)}</span>
-                            <span className="text-slate-500 text-sm">({place.reviewCount})</span>
+                        {place.isPremium && (
+                          <Badge className="bg-cpYellow/20 text-cpYellow border-cpYellow text-xs">
+                            <Crown className="h-3 w-3" />
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Stats Row */}
+                    <div className="flex items-center gap-4 text-sm">
+                      {place.categoryName && (
+                        <Badge variant="secondary" className="text-xs">{place.categoryName}</Badge>
+                      )}
+                      {place.avgRating && place.avgRating > 0 ? (
+                        <div className="flex items-center gap-1">
+                          <Star className="h-3.5 w-3.5 fill-cpYellow text-cpYellow" />
+                          <span className="font-medium">{place.avgRating.toFixed(1)}</span>
+                          <span className="text-slate-400">({place.reviewCount})</span>
+                        </div>
+                      ) : (
+                        <span className="text-slate-400 text-xs">{t.noRating}</span>
+                      )}
+                      <div className="flex items-center gap-1 text-slate-600">
+                        <MessageSquare className="h-3.5 w-3.5 text-cpPink" />
+                        <span>{place.leadCount}</span>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex gap-2 pt-1">
+                      <Button size="sm" className="flex-1 bg-cpPink hover:bg-cpPink/90" asChild>
+                        <Link href={`/${locale}/dashboard/business/${businessId}/places/${place.id}`}>
+                          {t.manage}
+                        </Link>
+                      </Button>
+                      <Button size="sm" variant="outline" asChild>
+                        <Link
+                          href={`/${locale}/${place.countryName?.toLowerCase().replace(/\s+/g, "-") || "unknown"}/${place.cityName?.toLowerCase().replace(/\s+/g, "-") || "unknown"}/${place.categoryName || "business"}/${place.slug}`}
+                          target="_blank"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Add Location / Upgrade Banner */}
+            <div className="mb-4 flex items-center justify-between">
+              <div className="text-sm text-slate-600">
+                {isUnlimited ? (
+                  <span>{total} {total === 1 ? "location" : "locations"}</span>
+                ) : (
+                  <span>{total} / {maxLocations} {maxLocations === 1 ? "location" : "locations"}</span>
+                )}
+              </div>
+              {canAddMore ? (
+                <Button asChild className="bg-cpPink hover:bg-cpPink/90">
+                  <Link href={`/${locale}`}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    {t.addLocation}
+                  </Link>
+                </Button>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-amber-600">{t.locationLimit}</span>
+                  <Button asChild className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700">
+                    <Link href={`/${locale}/dashboard/business/${businessId}/plan`}>
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      {t.upgradeToAdd}
+                    </Link>
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Desktop Table Layout */}
+            <Card className="hidden md:block">
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>{t.name}</TableHead>
+                      <TableHead>{t.location}</TableHead>
+                      <TableHead>{t.category}</TableHead>
+                      <TableHead>{t.rating}</TableHead>
+                      <TableHead>{t.leads}</TableHead>
+                      <TableHead>{t.status}</TableHead>
+                      <TableHead className="text-right">{t.actions}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {listings.map((place) => (
+                      <TableRow key={place.id}>
+                        <TableCell>
+                          <div className="font-medium text-cpDark">{place.name}</div>
+                          <div className="text-sm text-slate-500">{place.slug}</div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1 text-sm text-slate-600">
+                            <MapPin className="h-3 w-3" />
+                            {place.cityName}, {place.countryName}
                           </div>
-                        ) : (
-                          <span className="text-slate-400 text-sm">{t.noRating}</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          <MessageSquare className="h-4 w-4 text-cpPink" />
-                          <span className="font-medium">{place.leadCount}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          {place.isVerified && (
-                            <Badge className="bg-cpAqua/20 text-cpAqua border-cpAqua gap-1">
-                              <CheckCircle className="h-3 w-3" />
-                              {t.verified}
-                            </Badge>
-                          )}
-                          {place.isPremium && (
-                            <Badge className="bg-cpYellow/20 text-cpYellow border-cpYellow gap-1">
-                              <Crown className="h-3 w-3" />
-                              {t.premium}
-                            </Badge>
-                          )}
-                          {!place.isVerified && !place.isPremium && (
+                        </TableCell>
+                        <TableCell>
+                          {place.categoryName ? (
+                            <Badge variant="secondary">{place.categoryName}</Badge>
+                          ) : (
                             <span className="text-slate-400">-</span>
                           )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button size="sm" variant="default" asChild className="bg-cpPink hover:bg-cpPink/90">
-                            <Link href={`/${locale}/dashboard/business/${businessId}/places/${place.id}`}>
-                              {t.manage}
-                            </Link>
-                          </Button>
-                          <Button size="sm" variant="outline" asChild>
-                            <Link
-                              href={`/${locale}/${place.countryName?.toLowerCase().replace(/\s+/g, "-") || "unknown"}/${place.cityName?.toLowerCase().replace(/\s+/g, "-") || "unknown"}/${place.categoryName || "business"}/${place.slug}`}
-                              target="_blank"
-                            >
-                              {t.view}
-                              <ExternalLink className="h-3 w-3 ml-1" />
-                            </Link>
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                        </TableCell>
+                        <TableCell>
+                          {place.avgRating && place.avgRating > 0 ? (
+                            <div className="flex items-center gap-1">
+                              <Star className="h-4 w-4 fill-cpYellow text-cpYellow" />
+                              <span className="font-medium">{place.avgRating.toFixed(1)}</span>
+                              <span className="text-slate-500 text-sm">({place.reviewCount})</span>
+                            </div>
+                          ) : (
+                            <span className="text-slate-400 text-sm">{t.noRating}</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            <MessageSquare className="h-4 w-4 text-cpPink" />
+                            <span className="font-medium">{place.leadCount}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            {place.isVerified && (
+                              <Badge className="bg-cpAqua/20 text-cpAqua border-cpAqua gap-1">
+                                <CheckCircle className="h-3 w-3" />
+                                {t.verified}
+                              </Badge>
+                            )}
+                            {place.isPremium && (
+                              <Badge className="bg-cpYellow/20 text-cpYellow border-cpYellow gap-1">
+                                <Crown className="h-3 w-3" />
+                                {t.premium}
+                              </Badge>
+                            )}
+                            {!place.isVerified && !place.isPremium && (
+                              <span className="text-slate-400">-</span>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Button size="sm" variant="default" asChild className="bg-cpPink hover:bg-cpPink/90">
+                              <Link href={`/${locale}/dashboard/business/${businessId}/places/${place.id}`}>
+                                {t.manage}
+                              </Link>
+                            </Button>
+                            <Button size="sm" variant="outline" asChild>
+                              <Link
+                                href={`/${locale}/${place.countryName?.toLowerCase().replace(/\s+/g, "-") || "unknown"}/${place.cityName?.toLowerCase().replace(/\s+/g, "-") || "unknown"}/${place.categoryName || "business"}/${place.slug}`}
+                                target="_blank"
+                              >
+                                {t.view}
+                                <ExternalLink className="h-3 w-3 ml-1" />
+                              </Link>
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </>
         )}
       </div>
     </>

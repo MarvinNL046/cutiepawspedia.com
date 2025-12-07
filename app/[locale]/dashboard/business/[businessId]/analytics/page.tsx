@@ -66,9 +66,14 @@ export default async function AnalyticsPage({ params }: AnalyticsPageProps) {
 
   return (
     <>
-      <DashboardHeader title={t.title} description={t.description} />
+      <DashboardHeader
+        title={t.title}
+        description={t.description}
+        businessId={businessIdNum}
+        locale={locale}
+      />
 
-      <div className="p-6">
+      <div className="flex-1 overflow-auto p-6">
         <AnalyticsDashboard
           businessId={businessIdNum}
           planKey={planKey}

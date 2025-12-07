@@ -183,74 +183,146 @@ export function BusinessReviewsTable({ reviews, businessId }: BusinessReviewsTab
 
   return (
     <>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Place</TableHead>
-            <TableHead>Customer</TableHead>
-            <TableHead>Rating</TableHead>
-            <TableHead>Review</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {localReviews.map((review) => (
-            <TableRow key={review.id}>
-              <TableCell className="font-medium">
-                {getRelation(review.place)?.name || "Unknown"}
-              </TableCell>
-              <TableCell>
-                <div className="text-sm">{getRelation(review.user)?.name || "Anonymous"}</div>
-              </TableCell>
-              <TableCell>{renderStars(review.rating)}</TableCell>
-              <TableCell className="max-w-[200px]">
-                {review.title && (
-                  <p className="font-medium text-sm truncate">{review.title}</p>
-                )}
-                <p className="text-sm text-muted-foreground truncate">
-                  {review.body}
+      {/* Mobile Card Layout */}
+      <div className="md:hidden space-y-4">
+        {localReviews.map((review) => (
+          <div key={review.id} className="border rounded-lg p-4 space-y-3">
+            {/* Header: Place + Status */}
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <p className="font-medium text-sm truncate">
+                  {getRelation(review.place)?.name || "Unknown"}
                 </p>
-                {review.replies.length > 0 && (
-                  <div className="flex items-center gap-1 mt-1 text-xs text-blue-600">
-                    <MessageSquare className="h-3 w-3" />
-                    <span>Replied</span>
-                  </div>
-                )}
-              </TableCell>
-              <TableCell>{getStatusBadge(review.status)}</TableCell>
-              <TableCell className="text-xs text-muted-foreground">
-                {formatDistanceToNow(new Date(review.createdAt), { addSuffix: true })}
-              </TableCell>
-              <TableCell className="text-right">
-                <div className="flex justify-end gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setSelectedReview(review);
-                      setIsDetailOpen(true);
-                    }}
-                  >
-                    View
-                  </Button>
-                  {review.status === "published" && review.replies.length === 0 && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => openReplyDialog(review)}
-                    >
-                      <MessageSquare className="h-4 w-4 mr-1" />
-                      Reply
-                    </Button>
-                  )}
-                </div>
-              </TableCell>
+                <p className="text-xs text-muted-foreground">
+                  {getRelation(review.user)?.name || "Anonymous"} · {formatDistanceToNow(new Date(review.createdAt), { addSuffix: true })}
+                </p>
+              </div>
+              {getStatusBadge(review.status)}
+            </div>
+
+            {/* Rating */}
+            <div className="flex items-center gap-2">
+              {renderStars(review.rating)}
+              <span className="text-sm font-medium">{review.rating}/5</span>
+            </div>
+
+            {/* Review Content */}
+            <div className="space-y-1">
+              {review.title && (
+                <p className="font-medium text-sm">{review.title}</p>
+              )}
+              <p className="text-sm text-muted-foreground line-clamp-2">
+                {review.body}
+              </p>
+            </div>
+
+            {/* Replied indicator */}
+            {review.replies.length > 0 && (
+              <div className="flex items-center gap-1 text-xs text-blue-600">
+                <MessageSquare className="h-3 w-3" />
+                <span>Replied</span>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex gap-2 pt-1">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                onClick={() => {
+                  setSelectedReview(review);
+                  setIsDetailOpen(true);
+                }}
+              >
+                View
+              </Button>
+              {review.status === "published" && review.replies.length === 0 && (
+                <Button
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => openReplyDialog(review)}
+                >
+                  <MessageSquare className="h-4 w-4 mr-1" />
+                  Reply
+                </Button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Table Layout */}
+      <div className="hidden md:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Place</TableHead>
+              <TableHead>Customer</TableHead>
+              <TableHead>Rating</TableHead>
+              <TableHead>Review</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {localReviews.map((review) => (
+              <TableRow key={review.id}>
+                <TableCell className="font-medium">
+                  {getRelation(review.place)?.name || "Unknown"}
+                </TableCell>
+                <TableCell>
+                  <div className="text-sm">{getRelation(review.user)?.name || "Anonymous"}</div>
+                </TableCell>
+                <TableCell>{renderStars(review.rating)}</TableCell>
+                <TableCell className="max-w-[200px]">
+                  {review.title && (
+                    <p className="font-medium text-sm truncate">{review.title}</p>
+                  )}
+                  <p className="text-sm text-muted-foreground truncate">
+                    {review.body}
+                  </p>
+                  {review.replies.length > 0 && (
+                    <div className="flex items-center gap-1 mt-1 text-xs text-blue-600">
+                      <MessageSquare className="h-3 w-3" />
+                      <span>Replied</span>
+                    </div>
+                  )}
+                </TableCell>
+                <TableCell>{getStatusBadge(review.status)}</TableCell>
+                <TableCell className="text-xs text-muted-foreground">
+                  {formatDistanceToNow(new Date(review.createdAt), { addSuffix: true })}
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedReview(review);
+                        setIsDetailOpen(true);
+                      }}
+                    >
+                      View
+                    </Button>
+                    {review.status === "published" && review.replies.length === 0 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openReplyDialog(review)}
+                      >
+                        <MessageSquare className="h-4 w-4 mr-1" />
+                        Reply
+                      </Button>
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
       {/* Detail Dialog */}
       <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>

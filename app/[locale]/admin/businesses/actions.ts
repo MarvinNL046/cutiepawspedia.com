@@ -13,6 +13,56 @@ export type AdminActionResult = {
 };
 
 /**
+ * Admin action to toggle verified status for a place
+ */
+export async function togglePlaceVerifiedAction(
+  placeId: number,
+  isVerified: boolean
+): Promise<AdminActionResult> {
+  try {
+    const adminResult = await getAdminUser();
+    if (!adminResult.authorized || !adminResult.user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    if (!db) {
+      return { success: false, error: "Database not available" };
+    }
+
+    await db
+      .update(places)
+      .set({
+        isVerified,
+        updatedAt: new Date(),
+      })
+      .where(eq(places.id, placeId));
+
+    // Log VERIFY_TOGGLE_ADMIN audit event
+    logAuditEvent({
+      actorUserId: adminResult.user.id,
+      actorRole: "admin",
+      eventType: "ADMIN_ACTION",
+      targetType: "place",
+      targetId: placeId,
+      metadata: {
+        action: isVerified ? "verified" : "unverified",
+      },
+    });
+
+    revalidatePath("/admin/businesses");
+    revalidatePath("/admin");
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error toggling verified:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to toggle verified",
+    };
+  }
+}
+
+/**
  * Admin action to toggle premium status for a place
  */
 export async function togglePlacePremiumAction(

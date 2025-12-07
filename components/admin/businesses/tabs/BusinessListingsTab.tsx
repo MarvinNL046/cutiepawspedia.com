@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Loader2, MoreHorizontal, Eye, MapPin, Star, Crown, CheckCircle, CrownIcon } from "lucide-react";
 import Link from "next/link";
-import { togglePlacePremiumAction } from "@/app/[locale]/admin/businesses/actions";
+import { togglePlacePremiumAction, togglePlaceVerifiedAction } from "@/app/[locale]/admin/businesses/actions";
 import { useRouter } from "next/navigation";
 
 interface Listing {
@@ -54,8 +54,31 @@ export function BusinessListingsTab({
   const [total, setTotal] = useState(initialTotal);
   const [isLoading, setIsLoading] = useState(false);
   const [togglingPremium, setTogglingPremium] = useState<number | null>(null);
+  const [togglingVerified, setTogglingVerified] = useState<number | null>(null);
   const [page, setPage] = useState(0);
   const pageSize = 10;
+
+  const handleToggleVerified = async (listingId: number, currentVerified: boolean) => {
+    setTogglingVerified(listingId);
+    try {
+      const result = await togglePlaceVerifiedAction(listingId, !currentVerified);
+      if (result.success) {
+        setListings((prev) =>
+          prev.map((l) =>
+            l.id === listingId ? { ...l, isVerified: !currentVerified } : l
+          )
+        );
+        router.refresh();
+      } else {
+        alert(result.error || "Failed to toggle verified status");
+      }
+    } catch (error) {
+      console.error("Error toggling verified:", error);
+      alert("Failed to toggle verified status");
+    } finally {
+      setTogglingVerified(null);
+    }
+  };
 
   const handleTogglePremium = async (listingId: number, currentPremium: boolean) => {
     setTogglingPremium(listingId);
@@ -242,6 +265,28 @@ export function BusinessListingsTab({
                             </Link>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => handleToggleVerified(listing.id, listing.isVerified)}
+                            disabled={togglingVerified === listing.id}
+                            className={listing.isVerified ? "text-red-600" : "text-green-600"}
+                          >
+                            {togglingVerified === listing.id ? (
+                              <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                Processing...
+                              </>
+                            ) : listing.isVerified ? (
+                              <>
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Remove Verified
+                              </>
+                            ) : (
+                              <>
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Verify Listing
+                              </>
+                            )}
+                          </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleTogglePremium(listing.id, listing.isPremium)}
                             disabled={togglingPremium === listing.id}

@@ -103,6 +103,7 @@ export async function getPlaceBySlugAndCity(placeSlug: string, cityId: number) {
       city: {
         with: {
           country: true,
+          province: true,
         },
       },
       placeCategories: {

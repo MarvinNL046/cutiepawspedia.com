@@ -10,17 +10,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { getCountryBySlug, getCitiesByCountrySlug, getCategories, getPlaceCount } from "@/db/queries";
+import { getCountryBySlug, getCitiesByCountrySlug, getProvincesByCountrySlug, getCategories, getPlaceCount } from "@/db/queries";
 import {
   getCountryMetadata,
   getLocalizedCategoryName,
   type ContentLocale,
 } from "@/lib/seo";
 import { generateContent } from "@/lib/ai/generateContent";
-import { CityCard, CategoryCard, getCategoryIcon, getCountryFlag } from "@/components/directory";
+import { CityCard, ProvinceCard, CategoryCard, getCategoryIcon, getCountryFlag } from "@/components/directory";
 import { PageHeader, SectionHeader } from "@/components/layout";
 import { PageIntro } from "@/components/seo";
-import { MapPin } from "lucide-react";
+import { MapPin, Map } from "lucide-react";
 
 interface CountryPageProps {
   params: Promise<{ locale: string; countrySlug: string }>;
@@ -48,9 +48,10 @@ export async function generateMetadata({ params }: CountryPageProps): Promise<Me
 export default async function CountryPage({ params }: CountryPageProps) {
   const { locale, countrySlug } = await params;
 
-  const [country, cities, categories, totalPlaces] = await Promise.all([
+  const [country, cities, provinces, categories, totalPlaces] = await Promise.all([
     getCountryBySlug(countrySlug),
     getCitiesByCountrySlug(countrySlug),
+    getProvincesByCountrySlug(countrySlug),
     getCategories(),
     getPlaceCount(),
   ]);
@@ -93,6 +94,29 @@ export default async function CountryPage({ params }: CountryPageProps) {
       {/* AI-Generated Intro Content */}
       <PageIntro content={content} variant="aqua" showBullets={false} />
 
+      {/* Provinces Section (if available) */}
+      {provinces.length > 0 && (
+        <section className="container mx-auto max-w-6xl px-4 py-12">
+          <SectionHeader
+            title={locale === "nl" ? `Provincies in ${countryName}` : `Provinces in ${countryName}`}
+            icon={<Map className="h-5 w-5 text-cpAqua" />}
+          />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {provinces.map((province) => (
+              <ProvinceCard
+                key={province.id}
+                href={`/${locale}/${countrySlug}/p/${province.slug}`}
+                name={province.name}
+                code={province.code}
+                cityCount={province.cityCount}
+                placeCount={province.placeCount}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Cities Section */}
       <section className="container mx-auto max-w-6xl px-4 py-12">
         <SectionHeader
           title={locale === "nl" ? `Steden in ${countryName}` : `Cities in ${countryName}`}

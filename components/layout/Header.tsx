@@ -52,6 +52,12 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
                 Home
               </Link>
               <Link
+                href={`/${locale}/blog`}
+                className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors"
+              >
+                Blog
+              </Link>
+              <Link
                 href={`/${locale}/about`}
                 className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors"
               >
@@ -83,6 +89,12 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
                 className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors"
               >
                 Search
+              </Link>
+              <Link
+                href={`/${locale}/blog`}
+                className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors"
+              >
+                Blog
               </Link>
             </>
           )}
@@ -193,6 +205,13 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
                   Home
                 </Link>
                 <Link
+                  href={`/${locale}/blog`}
+                  className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors py-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Blog
+                </Link>
+                <Link
                   href={`/${locale}/about`}
                   className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
@@ -229,6 +248,13 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Search
+                </Link>
+                <Link
+                  href={`/${locale}/blog`}
+                  className="text-sm font-medium text-muted-foreground hover:text-cpPink transition-colors py-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Blog
                 </Link>
               </>
             )}

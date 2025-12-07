@@ -9,7 +9,7 @@
  */
 
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -72,6 +72,13 @@ export default async function PlacePage({ params }: PlacePageProps) {
   const place = await getPlaceBySlug(placeSlug, citySlug, countrySlug);
 
   if (!place) notFound();
+
+  // SEO Redirect: If city has a province, redirect to province-aware URL
+  const city = Array.isArray(place.city) ? place.city[0] : place.city;
+  const province = city?.province ? (Array.isArray(city.province) ? city.province[0] : city.province) : null;
+  if (province?.slug) {
+    redirect(`/${locale}/${countrySlug}/p/${province.slug}/${citySlug}/${categorySlug}/${placeSlug}`);
+  }
 
   const cityName = getCityName(place, citySlug);
   const countryName = getCountryName(place, countrySlug);
@@ -487,7 +494,9 @@ export default async function PlacePage({ params }: PlacePageProps) {
                     <MapPin className="h-5 w-5 text-cpPink shrink-0 mt-0.5" />
                     <div>
                       <p className="text-slate-600">{place.address}</p>
-                      {place.postalCode && <p className="text-slate-500 text-sm">{place.postalCode}</p>}
+                      <p className="text-slate-500 text-sm">
+                        {[place.postalCode, cityName].filter(Boolean).join(" ")}
+                      </p>
                     </div>
                   </div>
                 )}

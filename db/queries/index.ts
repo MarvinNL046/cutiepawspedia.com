@@ -18,6 +18,8 @@ export * from "./userProfiles";
 export * from "./badges";
 export * from "./karma";
 export * from "./messaging";
+export * from "./blog";
+export * from "./ads";
 
 // Admin queries are exported separately from "@/db/queries/admin"
 // to avoid naming conflicts with getCityById, getCountryById, etc.

@@ -196,9 +196,11 @@ export default async function CreditsPage({ params }: CreditsPageProps) {
       <DashboardHeader
         title={t.title}
         description={t.description}
+        businessId={businessIdNum}
+        locale={locale}
       />
 
-      <div className="p-6 space-y-6">
+      <div className="flex-1 overflow-auto p-6 space-y-6">
         {/* Stripe Coming Soon Alert */}
         <Alert>
           <Info className="h-4 w-4" />
@@ -279,44 +281,17 @@ export default async function CreditsPage({ params }: CreditsPageProps) {
                 <p className="text-slate-600">{t.noTransactionsDesc}</p>
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t.date}</TableHead>
-                    <TableHead>{t.type}</TableHead>
-                    <TableHead>{t.description_col}</TableHead>
-                    <TableHead className="text-right">{t.amount}</TableHead>
-                    <TableHead className="text-right">{t.balance}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              <>
+                {/* Mobile Card Layout */}
+                <div className="md:hidden space-y-3">
                   {transactions.map((tx) => (
-                    <TableRow key={tx.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-1 text-sm text-slate-600">
-                          <Calendar className="h-3 w-3" />
-                          {new Date(tx.createdAt).toLocaleDateString(locale, {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </div>
-                      </TableCell>
-                      <TableCell>
+                    <div key={tx.id} className="border rounded-lg p-3 space-y-2">
+                      {/* Header: Type + Amount */}
+                      <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           {getTypeIcon(tx.type)}
                           {getTypeBadge(tx.type)}
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm text-slate-600">
-                          {tx.description || "-"}
-                        </span>
-                        {tx.placeName && (
-                          <div className="text-xs text-slate-400">{tx.placeName}</div>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
                         <span
                           className={`font-medium ${
                             tx.amountCents >= 0 ? "text-green-600" : "text-red-600"
@@ -325,16 +300,93 @@ export default async function CreditsPage({ params }: CreditsPageProps) {
                           {tx.amountCents >= 0 ? "+" : ""}
                           {formatCurrency(tx.amountCents)}
                         </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <span className="text-slate-600">
-                          {formatCurrency(tx.balanceAfterCents)}
-                        </span>
-                      </TableCell>
-                    </TableRow>
+                      </div>
+
+                      {/* Description */}
+                      {(tx.description || tx.placeName) && (
+                        <div className="text-sm">
+                          <span className="text-slate-600">{tx.description || "-"}</span>
+                          {tx.placeName && (
+                            <span className="text-slate-400 ml-1">· {tx.placeName}</span>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Footer: Date + Balance */}
+                      <div className="flex items-center justify-between text-xs text-slate-500">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {new Date(tx.createdAt).toLocaleDateString(locale, {
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </div>
+                        <span>{t.balance}: {formatCurrency(tx.balanceAfterCents)}</span>
+                      </div>
+                    </div>
                   ))}
-                </TableBody>
-              </Table>
+                </div>
+
+                {/* Desktop Table Layout */}
+                <div className="hidden md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>{t.date}</TableHead>
+                        <TableHead>{t.type}</TableHead>
+                        <TableHead>{t.description_col}</TableHead>
+                        <TableHead className="text-right">{t.amount}</TableHead>
+                        <TableHead className="text-right">{t.balance}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {transactions.map((tx) => (
+                        <TableRow key={tx.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-1 text-sm text-slate-600">
+                              <Calendar className="h-3 w-3" />
+                              {new Date(tx.createdAt).toLocaleDateString(locale, {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              })}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {getTypeIcon(tx.type)}
+                              {getTypeBadge(tx.type)}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm text-slate-600">
+                              {tx.description || "-"}
+                            </span>
+                            {tx.placeName && (
+                              <div className="text-xs text-slate-400">{tx.placeName}</div>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <span
+                              className={`font-medium ${
+                                tx.amountCents >= 0 ? "text-green-600" : "text-red-600"
+                              }`}
+                            >
+                              {tx.amountCents >= 0 ? "+" : ""}
+                              {formatCurrency(tx.amountCents)}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <span className="text-slate-600">
+                              {formatCurrency(tx.balanceAfterCents)}
+                            </span>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>

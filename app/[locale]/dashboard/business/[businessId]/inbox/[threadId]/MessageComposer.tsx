@@ -10,7 +10,6 @@ import { sendMessageAction } from "./actions";
 interface MessageComposerProps {
   threadId: number;
   businessId: number;
-  senderUserId: number;
   locale: string;
   placeholder: string;
   sendLabel: string;
@@ -19,7 +18,6 @@ interface MessageComposerProps {
 export function MessageComposer({
   threadId,
   businessId,
-  senderUserId,
   locale,
   placeholder,
   sendLabel,
@@ -36,7 +34,6 @@ export function MessageComposer({
     const formData = new FormData();
     formData.append("threadId", String(threadId));
     formData.append("businessId", String(businessId));
-    formData.append("senderUserId", String(senderUserId));
     formData.append("body", message.trim());
     formData.append("locale", locale);
 

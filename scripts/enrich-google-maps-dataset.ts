@@ -272,7 +272,19 @@ async function main() {
     process.exit(1);
   }
 
-  // Get places that need enrichment (Amsterdam for testing)
+  // Parse CLI args
+  const args = process.argv.slice(2);
+  const limitArg = args.find(a => a.startsWith("--limit="));
+  const limit = limitArg ? parseInt(limitArg.split("=")[1], 10) : 50;
+  const cityArg = args.find(a => a.startsWith("--city="));
+  const cityFilter = cityArg ? cityArg.split("=")[1] : null;
+
+  console.log(`📍 City: ${cityFilter || "All"}`);
+  console.log(`📊 Limit: ${limit}\n`);
+
+  // Get places that need opening hours enrichment
+  const cityCondition = cityFilter ? sql`AND c.name = ${cityFilter}` : sql``;
+
   const places = await sql`
     SELECT
       p.id, p.name, p.address,
@@ -281,13 +293,10 @@ async function main() {
     FROM places p
     LEFT JOIN cities c ON p.city_id = c.id
     LEFT JOIN countries co ON c.country_id = co.id
-    WHERE c.name = 'Amsterdam'
-      AND (
-        p.opening_hours IS NULL
-        OR (p.scraped_content->>'ratingConfidence')::int < 98
-      )
+    WHERE p.opening_hours IS NULL
+    ${cityCondition}
     ORDER BY p.id
-    LIMIT 5
+    LIMIT ${limit}
   ` as Place[];
 
   console.log(`📊 Found ${places.length} places to enrich\n`);

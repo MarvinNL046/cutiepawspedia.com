@@ -1,9 +1,10 @@
 import { redirect, notFound } from "next/navigation";
-import { stackServerApp } from "@/stack";
-import { getUserByStackAuthId } from "@/db/queries/users";
+import { stackServerApp } from "@/lib/auth/stack";
+import { getUserByStackAuthId, getBusinessByIdForUser } from "@/db/queries";
 import { getBusinessById } from "@/db/queries/businesses";
 import { getReviewsForBusiness } from "@/db/queries/reviews";
 import { BusinessReviewsTable } from "./BusinessReviewsTable";
+import { DashboardHeader } from "@/components/dashboard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MessageSquare, Star } from "lucide-react";
 
@@ -32,14 +33,16 @@ export default async function BusinessReviewsPage({ params }: PageProps) {
     redirect(`/${locale}/handler/sign-in`);
   }
 
-  const business = await getBusinessById(businessIdNum);
-  if (!business) {
-    notFound();
+  // Get business with ownership check (admin bypass)
+  let business;
+  if (user.role === "admin") {
+    business = await getBusinessById(businessIdNum);
+  } else {
+    business = await getBusinessByIdForUser({ businessId: businessIdNum, userId: user.id });
   }
 
-  // Verify user owns this business
-  if (business.userId !== user.id) {
-    redirect(`/${locale}/dashboard`);
+  if (!business) {
+    notFound();
   }
 
   // Fetch reviews for this business
@@ -54,33 +57,75 @@ export default async function BusinessReviewsPage({ params }: PageProps) {
     (r) => r.replies && r.replies.length === 0 && r.status === "published"
   ).length;
 
+  const labels = {
+    en: {
+      title: "Reviews",
+      description: "View and respond to customer reviews",
+      totalReviews: "Total Reviews",
+      acrossPlaces: "Across all your places",
+      avgRating: "Average Rating",
+      outOf5: "Out of 5 stars",
+      needsResponse: "Needs Response",
+      noReply: "Reviews without a reply",
+      customerReviews: "Customer Reviews",
+      viewRespond: "View all reviews and respond to your customers",
+    },
+    nl: {
+      title: "Reviews",
+      description: "Bekijk en reageer op klantbeoordelingen",
+      totalReviews: "Totaal Reviews",
+      acrossPlaces: "Over al je locaties",
+      avgRating: "Gemiddelde Beoordeling",
+      outOf5: "Van de 5 sterren",
+      needsResponse: "Reactie Nodig",
+      noReply: "Reviews zonder reactie",
+      customerReviews: "Klantbeoordelingen",
+      viewRespond: "Bekijk alle reviews en reageer op je klanten",
+    },
+    de: {
+      title: "Bewertungen",
+      description: "Kundenbewertungen anzeigen und beantworten",
+      totalReviews: "Gesamte Bewertungen",
+      acrossPlaces: "Über alle Standorte",
+      avgRating: "Durchschnittsbewertung",
+      outOf5: "Von 5 Sternen",
+      needsResponse: "Antwort erforderlich",
+      noReply: "Bewertungen ohne Antwort",
+      customerReviews: "Kundenbewertungen",
+      viewRespond: "Alle Bewertungen anzeigen und antworten",
+    },
+  };
+  const t = labels[locale as keyof typeof labels] || labels.en;
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Reviews</h1>
-        <p className="text-muted-foreground">
-          View and respond to customer reviews
-        </p>
-      </div>
+    <>
+      <DashboardHeader
+        title={t.title}
+        description={t.description}
+        businessId={businessIdNum}
+        locale={locale}
+      />
+
+      <div className="flex-1 overflow-auto p-6 space-y-6">
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Reviews</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.totalReviews}</CardTitle>
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalReviews}</div>
             <p className="text-xs text-muted-foreground">
-              Across all your places
+              {t.acrossPlaces}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.avgRating}</CardTitle>
             <Star className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
@@ -88,20 +133,20 @@ export default async function BusinessReviewsPage({ params }: PageProps) {
               {avgRating > 0 ? avgRating.toFixed(1) : "-"}
             </div>
             <p className="text-xs text-muted-foreground">
-              Out of 5 stars
+              {t.outOf5}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Needs Response</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.needsResponse}</CardTitle>
             <MessageSquare className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{pendingReplies}</div>
             <p className="text-xs text-muted-foreground">
-              Reviews without a reply
+              {t.noReply}
             </p>
           </CardContent>
         </Card>
@@ -110,9 +155,9 @@ export default async function BusinessReviewsPage({ params }: PageProps) {
       {/* Reviews Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Customer Reviews</CardTitle>
+          <CardTitle>{t.customerReviews}</CardTitle>
           <CardDescription>
-            View all reviews and respond to your customers
+            {t.viewRespond}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -122,6 +167,7 @@ export default async function BusinessReviewsPage({ params }: PageProps) {
           />
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </>
   );
 }

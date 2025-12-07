@@ -9,6 +9,7 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getCityBySlugAndCountry, getCategoryBySlug, getPlacesByCitySlugAndCategorySlug } from "@/db/queries";
@@ -21,7 +22,8 @@ import { CategoryAffiliateBlockLazy as CategoryAffiliateBlock } from "@/componen
 import { PageHeader, SectionHeader } from "@/components/layout";
 import { PageIntro, FaqStatic, InternalLinksSection } from "@/components/seo";
 import { Filter, SlidersHorizontal } from "lucide-react";
-import { InFeedAd } from "@/components/ads";
+import { InFeedAd, DirectorySidebarAd } from "@/components/ads";
+import { getActiveAdForPlacement } from "@/db/queries/ads";
 
 interface CategoryPageProps {
   params: Promise<{ locale: string; countrySlug: string; citySlug: string; categorySlug: string }>;
@@ -50,11 +52,18 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { locale, countrySlug, citySlug, categorySlug } = await params;
 
-  const [city, category, places] = await Promise.all([
+  const [city, category, places, directorySponsorAd] = await Promise.all([
     getCityBySlugAndCountry(citySlug, countrySlug),
     getCategoryBySlug(categorySlug),
     getPlacesByCitySlugAndCategorySlug(citySlug, countrySlug, categorySlug, { limit: 50, premiumFirst: true }),
+    getActiveAdForPlacement("directory_sidebar", locale as "en" | "nl"),
   ]);
+
+  // SEO Redirect: If city has a province, redirect to province-aware URL
+  const province = Array.isArray(city?.province) ? city.province[0] : city?.province;
+  if (province?.slug) {
+    redirect(`/${locale}/${countrySlug}/p/${province.slug}/${citySlug}/${categorySlug}`);
+  }
 
   const cityName = city?.name || citySlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   const country = Array.isArray(city?.country) ? city.country[0] : city?.country;
@@ -134,6 +143,13 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           </div>
         </div>
       </section>
+
+      {/* Sponsor Ad - Featured placement before listings */}
+      {directorySponsorAd && (
+        <section className="container mx-auto max-w-6xl px-4 pt-6">
+          <DirectorySidebarAd sponsorAd={directorySponsorAd} />
+        </section>
+      )}
 
       {/* Places Grid */}
       <section className="container mx-auto max-w-6xl px-4 py-8">

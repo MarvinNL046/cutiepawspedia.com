@@ -121,6 +121,34 @@ export const countries = pgTable("countries", {
   name: varchar("name", { length: 255 }).notNull(),
 });
 
+// Provinces/States/Regions table - administrative divisions between country and city
+export const provinces = pgTable(
+  "provinces",
+  {
+    id: serial("id").primaryKey(),
+    countryId: integer("country_id")
+      .notNull()
+      .references(() => countries.id, { onDelete: "cascade" }),
+    slug: varchar("slug", { length: 255 }).notNull(), // e.g., "noord-holland", "california"
+    name: varchar("name", { length: 255 }).notNull(), // e.g., "Noord-Holland", "California"
+    code: varchar("code", { length: 10 }), // e.g., "NH", "CA", "BY" (optional ISO 3166-2)
+    // Center point for map display
+    lat: decimal("lat", { precision: 10, scale: 7 }),
+    lng: decimal("lng", { precision: 10, scale: 7 }),
+    // SEO metadata
+    description: text("description"), // For SEO meta description
+    // Statistics (denormalized for performance)
+    cityCount: integer("city_count").default(0).notNull(),
+    placeCount: integer("place_count").default(0).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("provinces_country_id_idx").on(table.countryId),
+    index("provinces_slug_country_idx").on(table.slug, table.countryId),
+  ]
+);
+
 // Cities table
 export const cities = pgTable(
   "cities",
@@ -129,12 +157,17 @@ export const cities = pgTable(
     countryId: integer("country_id")
       .notNull()
       .references(() => countries.id, { onDelete: "cascade" }),
+    provinceId: integer("province_id")
+      .references(() => provinces.id, { onDelete: "set null" }), // Optional: not all cities have province yet
     slug: varchar("slug", { length: 255 }).notNull(),
     name: varchar("name", { length: 255 }).notNull(),
     lat: decimal("lat", { precision: 10, scale: 7 }),
     lng: decimal("lng", { precision: 10, scale: 7 }),
   },
-  (table) => [index("cities_country_id_idx").on(table.countryId)]
+  (table) => [
+    index("cities_country_id_idx").on(table.countryId),
+    index("cities_province_id_idx").on(table.provinceId),
+  ]
 );
 
 // ============================================================================
@@ -606,6 +639,15 @@ export const creditTransactions = pgTable("credit_transactions", {
 // ============================================================================
 
 export const countriesRelations = relations(countries, ({ many }) => ({
+  provinces: many(provinces),
+  cities: many(cities),
+}));
+
+export const provincesRelations = relations(provinces, ({ one, many }) => ({
+  country: one(countries, {
+    fields: [provinces.countryId],
+    references: [countries.id],
+  }),
   cities: many(cities),
 }));
 
@@ -613,6 +655,10 @@ export const citiesRelations = relations(cities, ({ one, many }) => ({
   country: one(countries, {
     fields: [cities.countryId],
     references: [countries.id],
+  }),
+  province: one(provinces, {
+    fields: [cities.provinceId],
+    references: [provinces.id],
   }),
   places: many(places),
 }));
@@ -1027,6 +1073,76 @@ export const notificationLogsRelations = relations(notificationLogs, ({ one }) =
   business: one(businesses, {
     fields: [notificationLogs.businessId],
     references: [businesses.id],
+  }),
+}));
+
+// ============================================================================
+// IN-APP NOTIFICATIONS (Business Dashboard Bell)
+// ============================================================================
+
+// Notification type enum for in-app notifications
+export const inAppNotificationTypeEnum = pgEnum("in_app_notification_type", [
+  "new_review",      // New review on a place
+  "new_lead",        // New lead/inquiry
+  "review_reply",    // Business replied to review
+  "listing_view",    // Milestone: listing viewed X times
+  "claim_approved",  // Claim approved
+  "claim_rejected",  // Claim rejected
+  "plan_upgraded",   // Plan upgraded
+  "plan_expiring",   // Plan about to expire
+  "weekly_summary",  // Weekly performance summary
+  "system",          // System notifications
+]);
+
+// Business notifications table - in-app notifications for the bell dropdown
+export const businessNotifications = pgTable(
+  "business_notifications",
+  {
+    id: serial("id").primaryKey(),
+    businessId: integer("business_id")
+      .notNull()
+      .references(() => businesses.id, { onDelete: "cascade" }),
+    // Notification content
+    type: inAppNotificationTypeEnum("type").notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    message: text("message").notNull(),
+    // Related entity (optional)
+    relatedPlaceId: integer("related_place_id").references(() => places.id, { onDelete: "set null" }),
+    relatedReviewId: integer("related_review_id").references(() => reviews.id, { onDelete: "set null" }),
+    relatedLeadId: integer("related_lead_id").references(() => leads.id, { onDelete: "set null" }),
+    // Link to navigate to when clicked
+    actionUrl: varchar("action_url", { length: 500 }),
+    // Status
+    isRead: boolean("is_read").default(false).notNull(),
+    readAt: timestamp("read_at"),
+    // Timestamps
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("business_notifications_business_id_idx").on(table.businessId),
+    index("business_notifications_is_read_idx").on(table.isRead),
+    index("business_notifications_created_at_idx").on(table.createdAt),
+    index("business_notifications_type_idx").on(table.type),
+  ]
+);
+
+// Business notifications relations
+export const businessNotificationsRelations = relations(businessNotifications, ({ one }) => ({
+  business: one(businesses, {
+    fields: [businessNotifications.businessId],
+    references: [businesses.id],
+  }),
+  place: one(places, {
+    fields: [businessNotifications.relatedPlaceId],
+    references: [places.id],
+  }),
+  review: one(reviews, {
+    fields: [businessNotifications.relatedReviewId],
+    references: [reviews.id],
+  }),
+  lead: one(leads, {
+    fields: [businessNotifications.relatedLeadId],
+    references: [leads.id],
   }),
 }));
 

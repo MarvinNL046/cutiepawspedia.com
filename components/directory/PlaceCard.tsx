@@ -34,11 +34,12 @@ interface PlaceCardProps {
   locale: string;
   countrySlug: string;
   citySlug: string;
+  provinceSlug?: string; // Optional: for province-aware URLs
   categorySlug?: string;
   variant?: "default" | "compact" | "featured";
 }
 
-export function PlaceCard({ place, locale, countrySlug, citySlug, categorySlug, variant = "default" }: PlaceCardProps) {
+export function PlaceCard({ place, locale, countrySlug, citySlug, provinceSlug, categorySlug, variant = "default" }: PlaceCardProps) {
   // Extract categories array safely from Drizzle relation type
   const categoriesArray = (() => {
     const cats = place.placeCategories;
@@ -48,9 +49,14 @@ export function PlaceCard({ place, locale, countrySlug, citySlug, categorySlug, 
 
   const firstCategorySlug = categoriesArray[0]?.category?.slug || "all";
 
+  // Build URL with or without province prefix
+  const cityPath = provinceSlug
+    ? `/${locale}/${countrySlug}/p/${provinceSlug}/${citySlug}`
+    : `/${locale}/${countrySlug}/${citySlug}`;
+
   const href = categorySlug
-    ? `/${locale}/${countrySlug}/${citySlug}/${categorySlug}/${place.slug}`
-    : `/${locale}/${countrySlug}/${citySlug}/${firstCategorySlug}/${place.slug}`;
+    ? `${cityPath}/${categorySlug}/${place.slug}`
+    : `${cityPath}/${firstCategorySlug}/${place.slug}`;
 
   // Use plan-based featured styling (falls back to isPremium for backwards compatibility)
   const isFeatured = place.hasFeaturedStyling ?? place.isPremium;
@@ -116,12 +122,12 @@ export function PlaceCard({ place, locale, countrySlug, citySlug, categorySlug, 
                 )}
               </div>
             </div>
-            {/* Rating */}
-            {place.avgRating && Number(place.avgRating) > 0 && (
+            {/* Rating - only show if there are actual reviews */}
+            {place.avgRating && Number(place.avgRating) > 0 && place.reviewCount > 0 && (
               <div className="flex items-center gap-1 text-sm shrink-0">
                 <Star className="h-4 w-4 fill-cpYellow text-cpYellow" />
                 <span className="font-medium text-cpDark dark:text-white">{Number(place.avgRating).toFixed(1)}</span>
-                <span className="text-slate-400 dark:text-slate-500">({place.reviewCount})</span>
+                <span className="text-slate-400 dark:text-slate-500">({place.reviewCount.toLocaleString()})</span>
               </div>
             )}
           </div>

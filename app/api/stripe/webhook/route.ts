@@ -6,8 +6,10 @@ import { businesses } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { addCredits } from "@/db/queries/credits";
 import { logAuditEvent } from "@/db/queries/auditLogs";
+import { activateCampaign } from "@/db/queries/ads";
 import { type PlanKey, type PlanStatus } from "@/lib/plans/config";
 import { createBusiness } from "@/app/api/onboarding/business/route";
+import { syncPremiumStatusForBusiness } from "@/lib/plans/syncPremiumStatus";
 
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -246,6 +248,48 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       throw error;
     }
   }
+
+  // Handle ad campaign purchase
+  if (type === "ad_campaign") {
+    const { campaignId, durationDays, amountCents } = metadata;
+    if (!businessId || !campaignId || !durationDays || !amountCents) {
+      console.error("Missing required metadata for ad campaign:", metadata);
+      return;
+    }
+
+    try {
+      // Activate the campaign
+      const campaign = await activateCampaign(
+        parseInt(campaignId, 10),
+        {
+          paymentIntentId: session.payment_intent as string,
+          checkoutSessionId: session.id,
+          amountPaidCents: parseInt(amountCents, 10),
+        },
+        parseInt(durationDays, 10)
+      );
+
+      logAuditEvent({
+        actorBusinessId: parseInt(businessId, 10),
+        actorRole: "system",
+        eventType: "AD_CAMPAIGN_ACTIVATED",
+        targetType: "ad_campaign",
+        targetId: campaign.id,
+        metadata: {
+          campaignId: campaign.id,
+          amountPaidCents: parseInt(amountCents, 10),
+          durationDays: parseInt(durationDays, 10),
+          stripePaymentIntentId: session.payment_intent,
+          stripeSessionId: session.id,
+        },
+      });
+
+      console.log(`Activated ad campaign ${campaignId} for business ${businessId}`);
+    } catch (error) {
+      console.error("Failed to activate ad campaign:", error);
+      throw error;
+    }
+  }
 }
 
 /**
@@ -283,6 +327,10 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
       })
       .where(eq(businesses.id, parseInt(businessId, 10)));
 
+    // Sync premium status based on plan
+    const premiumResult = await syncPremiumStatusForBusiness(parseInt(businessId, 10));
+    console.log(`[syncPremiumStatus] Subscription created: ${premiumResult.placesUpdated} places updated, isPremium=${premiumResult.isPremium}`);
+
     // Log audit event
     logAuditEvent({
       actorBusinessId: parseInt(businessId, 10),
@@ -294,6 +342,8 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
         planKey,
         subscriptionId: subscription.id,
         status: subscription.status,
+        premiumSynced: premiumResult.success,
+        isPremium: premiumResult.isPremium,
       },
     });
 
@@ -370,10 +420,11 @@ async function updateBusinessSubscription(
     }
 
     // Update business
+    const effectivePlanKey = subscription.status === "canceled" ? "FREE" : planKey;
     await db
       .update(businesses)
       .set({
-        planKey: subscription.status === "canceled" ? "FREE" : planKey,
+        planKey: effectivePlanKey,
         planStatus,
         planValidUntil: new Date(subscription.current_period_end * 1000),
         trialEndsAt: subscription.trial_end
@@ -381,6 +432,10 @@ async function updateBusinessSubscription(
           : null,
       })
       .where(eq(businesses.id, businessId));
+
+    // Sync premium status based on new plan
+    const premiumResult = await syncPremiumStatusForBusiness(businessId);
+    console.log(`[syncPremiumStatus] Subscription updated: ${premiumResult.placesUpdated} places updated, isPremium=${premiumResult.isPremium}`);
 
     // Log audit event
     logAuditEvent({
@@ -390,14 +445,16 @@ async function updateBusinessSubscription(
       targetType: "business",
       targetId: businessId,
       metadata: {
-        planKey,
+        planKey: effectivePlanKey,
         planStatus,
         subscriptionStatus: subscription.status,
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
+        premiumSynced: premiumResult.success,
+        isPremium: premiumResult.isPremium,
       },
     });
 
-    console.log(`Subscription updated for business ${businessId}: ${planKey} (${planStatus})`);
+    console.log(`Subscription updated for business ${businessId}: ${effectivePlanKey} (${planStatus})`);
   } catch (error) {
     console.error("Failed to update business subscription:", error);
     throw error;
@@ -440,6 +497,10 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
       })
       .where(eq(businesses.id, targetBusinessId));
 
+    // Remove premium status (FREE plan doesn't grant premium)
+    const premiumResult = await syncPremiumStatusForBusiness(targetBusinessId);
+    console.log(`[syncPremiumStatus] Subscription cancelled: ${premiumResult.placesUpdated} places updated, isPremium=${premiumResult.isPremium}`);
+
     // Log audit event
     logAuditEvent({
       actorBusinessId: targetBusinessId,
@@ -450,6 +511,8 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
       metadata: {
         previousSubscriptionId: subscription.id,
         cancelReason: subscription.cancellation_details?.reason || "unknown",
+        premiumSynced: premiumResult.success,
+        isPremium: premiumResult.isPremium,
       },
     });
 

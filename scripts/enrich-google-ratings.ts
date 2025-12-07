@@ -30,6 +30,7 @@ interface EnrichmentResult {
   rating?: number;
   reviewCount?: number;
   phone?: string;
+  website?: string;
   openingHours?: Record<string, string>;
 }
 
@@ -191,6 +192,29 @@ function parseGoogleHtml(html: string): EnrichmentResult | null {
     }
   }
 
+  // Website URL
+  const websitePatterns = [
+    /"url"[:\s]*"(https?:\/\/[^"]+)"/i,
+    /data-website="(https?:\/\/[^"]+)"/i,
+    /href="(https?:\/\/(?:www\.)?[a-z0-9][a-z0-9-]*\.[a-z]{2,}[^"]*)"[^>]*>(?:Website|Bezoek|Site)/i,
+  ];
+
+  for (const pattern of websitePatterns) {
+    const match = html.match(pattern);
+    if (match) {
+      const url = match[1].trim();
+      // Exclude Google/social media URLs
+      if (!url.includes("google.") &&
+          !url.includes("facebook.") &&
+          !url.includes("instagram.") &&
+          !url.includes("twitter.") &&
+          !url.includes("youtube.")) {
+        result.website = url;
+        break;
+      }
+    }
+  }
+
   // Opening hours (Schema.org)
   const schemaMatch = html.match(/"openingHoursSpecification"[:\s]*(\[[^\]]+\])/i);
   if (schemaMatch) {
@@ -274,6 +298,7 @@ async function updatePlace(placeId: number, data: EnrichmentResult): Promise<boo
         avg_rating = ${data.rating!},
         review_count = ${data.reviewCount || 0},
         phone = COALESCE(${data.phone || null}, phone),
+        website = COALESCE(${data.website || null}, website),
         opening_hours = COALESCE(${data.openingHours ? JSON.stringify(data.openingHours) : null}::jsonb, opening_hours),
         scraped_content = COALESCE(scraped_content, '{}'::jsonb) || ${JSON.stringify(scrapedContent)}::jsonb,
         data_quality_flags = (
@@ -342,6 +367,7 @@ async function main() {
     if (data?.rating) {
       console.log(`   ⭐ ${data.rating.toFixed(1)}/5 (${data.reviewCount || 0} reviews)`);
       if (data.phone) console.log(`   📞 ${data.phone}`);
+      if (data.website) console.log(`   🌐 ${data.website}`);
       if (data.openingHours) {
         console.log(`   🕐 ${Object.keys(data.openingHours).length} days`);
         stats.withHours++;

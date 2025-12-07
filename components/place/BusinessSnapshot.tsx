@@ -45,12 +45,12 @@ export function BusinessSnapshot({ place, locale = "en" }: BusinessSnapshotProps
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
-        {/* Rating Section */}
+        {/* Rating Section - only show rating if there are actual reviews */}
         <div className="space-y-1">
           <p className="text-xs font-medium uppercase text-slate-400 tracking-wide">
             {locale === "nl" ? "Beoordeling" : "Rating"}
           </p>
-          {rating.hasRating ? (
+          {rating.hasRating && place.reviewCount && place.reviewCount > 0 ? (
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
@@ -67,18 +67,16 @@ export function BusinessSnapshot({ place, locale = "en" }: BusinessSnapshotProps
               <span className="text-lg font-semibold text-slate-900">
                 {rating.display}
               </span>
-              {place.reviewCount && place.reviewCount > 0 && (
-                <span className="text-sm text-slate-500">
-                  ({place.reviewCount})
-                </span>
-              )}
+              <span className="text-sm text-slate-500">
+                ({place.reviewCount.toLocaleString()})
+              </span>
             </div>
           ) : (
             <p className="text-sm text-slate-500">
               {locale === "nl" ? "Nog geen beoordeling" : "No rating yet"}
             </p>
           )}
-          {ratingSource && (
+          {rating.hasRating && place.reviewCount && place.reviewCount > 0 && ratingSource && (
             <p className="text-xs text-slate-400 flex items-center gap-1">
               {ratingSource.icon === "google" && <Globe className="h-3 w-3" />}
               {locale === "nl" ? "Bron" : "Source"}: {ratingSource.source}

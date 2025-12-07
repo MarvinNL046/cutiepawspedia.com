@@ -68,12 +68,12 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 overflow-hidden">
       {/* Sidebar */}
       <DashboardSidebar locale={locale} />
 
       {/* Main Content */}
-      <div className="pl-64">
+      <div className="pl-64 h-screen overflow-hidden">
         {children}
       </div>
     </div>

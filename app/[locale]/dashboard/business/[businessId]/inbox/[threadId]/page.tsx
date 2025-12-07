@@ -271,7 +271,6 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
         <MessageComposer
           threadId={threadIdNum}
           businessId={businessIdNum}
-          senderUserId={dbUser.id}
           locale={locale}
           placeholder={t.writeMessage}
           sendLabel={t.send}

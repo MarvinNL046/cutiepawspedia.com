@@ -11,6 +11,13 @@
   --color-cpAqua: #29A0B1;
   --color-cpDark: #1F2937;
 
+  /* Brand Colors - Cozy Dark Theme */
+  --color-cpCoral: #FF8C73;
+  --color-cpAmber: #FFD166;
+  --color-cpCream: #F5F5DC;
+  --color-cpCharcoal: #1F2024;
+  --color-cpSurface: #2C2E3A;
+
   /* Background/Foreground */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -53,118 +60,125 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* Light Mode Variables */
+/* Light Mode Variables - Cozy Light Theme "Sunny Morning" */
 :root {
   --radius: 0.625rem;
 
-  /* Background and Text */
-  --background: #f8fafc;
-  --foreground: #1f2937;
+  /* Background and Text - Warm Cream tones */
+  --background: #FDFBF7;
+  --foreground: #2D2A26;
 
-  /* Card */
-  --card: #ffffff;
-  --card-foreground: #1f2937;
+  /* Card - Pure white with warm shadow */
+  --card: #FFFFFF;
+  --card-foreground: #2D2A26;
 
   /* Popover */
-  --popover: #ffffff;
-  --popover-foreground: #1f2937;
+  --popover: #FFFFFF;
+  --popover-foreground: #2D2A26;
 
-  /* Primary */
-  --primary: #1f2937;
-  --primary-foreground: #f8fafc;
+  /* Primary - Coral for CTAs */
+  --primary: #FF8C73;
+  --primary-foreground: #FFFFFF;
 
-  /* Secondary */
-  --secondary: #f1f5f9;
-  --secondary-foreground: #1f2937;
+  /* Secondary - Light beige surface */
+  --secondary: #F5F2EB;
+  --secondary-foreground: #2D2A26;
 
-  /* Muted */
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
+  /* Muted - Warm gray */
+  --muted: #F5F2EB;
+  --muted-foreground: #7A7570;
 
-  /* Accent */
-  --accent: #f1f5f9;
-  --accent-foreground: #1f2937;
+  /* Accent - Amber/Gold */
+  --accent: #FFD166;
+  --accent-foreground: #2D2A26;
 
   /* Destructive */
   --destructive: #ef4444;
 
-  /* Border and Input */
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #94a3b8;
+  /* Border and Input - Soft warm borders */
+  --border: #E8E4DD;
+  --input: #E8E4DD;
+  --ring: #FF8C73;
 
-  /* Chart colors */
-  --chart-1: #FF7FA1;
-  --chart-2: #29A0B1;
-  --chart-3: #FFD166;
-  --chart-4: #8b5cf6;
-  --chart-5: #f97316;
+  /* Chart colors - Cozy warm palette */
+  --chart-1: #FF8C73;
+  --chart-2: #FFD166;
+  --chart-3: #29A0B1;
+  --chart-4: #a78bfa;
+  --chart-5: #fb923c;
 
-  /* Sidebar */
-  --sidebar: #f8fafc;
-  --sidebar-foreground: #1f2937;
-  --sidebar-primary: #1f2937;
-  --sidebar-primary-foreground: #f8fafc;
-  --sidebar-accent: #f1f5f9;
-  --sidebar-accent-foreground: #1f2937;
-  --sidebar-border: #e2e8f0;
-  --sidebar-ring: #94a3b8;
+  /* Sidebar - Cozy light */
+  --sidebar: #FDFBF7;
+  --sidebar-foreground: #2D2A26;
+  --sidebar-primary: #FF8C73;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #F5F2EB;
+  --sidebar-accent-foreground: #2D2A26;
+  --sidebar-border: #E8E4DD;
+  --sidebar-ring: #FF8C73;
+
+  /* Cozy Light Theme specific colors */
+  --cpLight-bg: #FDFBF7;
+  --cpLight-surface: #FFFFFF;
+  --cpLight-surface-alt: #F5F2EB;
+  --cpLight-text: #2D2A26;
+  --cpLight-text-muted: #7A7570;
 }
 
-/* Dark Mode Variables */
+/* Dark Mode Variables - Cozy Dark Theme */
 .dark {
-  /* Background and Text */
-  --background: #0f172a;
-  --foreground: #f1f5f9;
+  /* Background and Text - Warm Charcoal */
+  --background: #1F2024;
+  --foreground: #F5F5DC;
 
-  /* Card */
-  --card: #1e293b;
-  --card-foreground: #f1f5f9;
+  /* Card - Elevated Surface */
+  --card: #2C2E3A;
+  --card-foreground: #F5F5DC;
 
   /* Popover */
-  --popover: #1e293b;
-  --popover-foreground: #f1f5f9;
+  --popover: #2C2E3A;
+  --popover-foreground: #F5F5DC;
 
-  /* Primary - cpPink in dark mode */
-  --primary: #f1f5f9;
-  --primary-foreground: #1e293b;
+  /* Primary - Warm Coral for CTAs */
+  --primary: #FF8C73;
+  --primary-foreground: #1F2024;
 
-  /* Secondary */
-  --secondary: #334155;
-  --secondary-foreground: #f1f5f9;
+  /* Secondary - Darker surface */
+  --secondary: #3A3D4A;
+  --secondary-foreground: #F5F5DC;
 
   /* Muted */
-  --muted: #334155;
-  --muted-foreground: #94a3b8;
+  --muted: #3A3D4A;
+  --muted-foreground: #A0A0B0;
 
-  /* Accent */
-  --accent: #334155;
-  --accent-foreground: #f1f5f9;
+  /* Accent - Amber/Gold */
+  --accent: #FFD166;
+  --accent-foreground: #1F2024;
 
   /* Destructive */
   --destructive: #f87171;
 
   /* Border and Input */
-  --border: #334155;
-  --input: #334155;
-  --ring: #64748b;
+  --border: #3A3D4A;
+  --input: #3A3D4A;
+  --ring: #FF8C73;
 
-  /* Chart colors - brighter for dark mode */
-  --chart-1: #FF8FAE;
-  --chart-2: #3DB3C2;
-  --chart-3: #FFD980;
+  /* Chart colors - Cozy warm palette */
+  --chart-1: #FF8C73;
+  --chart-2: #FFD166;
+  --chart-3: #29A0B1;
   --chart-4: #a78bfa;
   --chart-5: #fb923c;
 
-  /* Sidebar */
-  --sidebar: #1e293b;
-  --sidebar-foreground: #f1f5f9;
-  --sidebar-primary: #FF7FA1;
-  --sidebar-primary-foreground: #1e293b;
-  --sidebar-accent: #334155;
-  --sidebar-accent-foreground: #f1f5f9;
-  --sidebar-border: #334155;
-  --sidebar-ring: #64748b;
+  /* Sidebar - Cozy dark */
+  --sidebar: #2C2E3A;
+  --sidebar-foreground: #F5F5DC;
+  --sidebar-primary: #FF8C73;
+  --sidebar-primary-foreground: #1F2024;
+  --sidebar-accent: #3A3D4A;
+  --sidebar-accent-foreground: #F5F5DC;
+  --sidebar-border: #3A3D4A;
+  --sidebar-ring: #FF8C73;
 }
 
 @layer base {
@@ -549,16 +563,16 @@
   }
 }
 
-/* Dark mode overrides for brand-specific elements */
+/* Dark mode overrides for brand-specific elements - Cozy Theme */
 @layer utilities {
   /* Ensure brand colors remain vibrant in dark mode */
   .dark .text-cpDark {
-    color: #f1f5f9;
+    color: #F5F5DC;
   }
 
-  /* Gradient backgrounds for dark mode */
+  /* Gradient backgrounds for dark mode - Cozy warm colors */
   .dark .from-cpPink\/20 {
-    --tw-gradient-from: rgb(255 127 161 / 0.15);
+    --tw-gradient-from: rgb(255 140 115 / 0.15);
   }
   .dark .from-cpYellow\/20 {
     --tw-gradient-from: rgb(255 209 102 / 0.15);
@@ -567,7 +581,7 @@
     --tw-gradient-from: rgb(41 160 177 / 0.15);
   }
   .dark .to-cpPink\/10 {
-    --tw-gradient-to: rgb(255 127 161 / 0.1);
+    --tw-gradient-to: rgb(255 140 115 / 0.1);
   }
   .dark .to-cpYellow\/10 {
     --tw-gradient-to: rgb(255 209 102 / 0.1);
@@ -579,45 +593,229 @@
     --tw-gradient-via: rgb(255 209 102 / 0.1);
   }
 
-  /* Slate backgrounds for dark mode */
+  /* Slate backgrounds for dark mode - Cozy charcoal */
   .dark .bg-slate-50 {
-    background-color: #1e293b;
+    background-color: #2C2E3A;
   }
   .dark .bg-slate-50\/50 {
-    background-color: rgb(30 41 59 / 0.5);
+    background-color: rgb(44 46 58 / 0.5);
   }
   .dark .bg-slate-100 {
-    background-color: #334155;
+    background-color: #3A3D4A;
   }
 
-  /* Text colors for dark mode */
+  /* Text colors for dark mode - Cream based */
   .dark .text-slate-600 {
-    color: #94a3b8;
+    color: #A0A0B0;
   }
   .dark .text-slate-500 {
-    color: #94a3b8;
+    color: #A0A0B0;
   }
   .dark .text-slate-400 {
-    color: #64748b;
+    color: #8A8A98;
   }
   .dark .text-slate-300 {
-    color: #94a3b8;
+    color: #C0C0CC;
   }
 
-  /* White backgrounds become dark */
+  /* White backgrounds become cozy dark surface */
   .dark .bg-white {
-    background-color: #1e293b;
+    background-color: #2C2E3A;
   }
   .dark .bg-white\/95 {
-    background-color: rgb(30 41 59 / 0.95);
+    background-color: rgb(44 46 58 / 0.95);
   }
   .dark .bg-white\/90 {
-    background-color: rgb(30 41 59 / 0.9);
+    background-color: rgb(44 46 58 / 0.9);
   }
   .dark .bg-white\/80 {
-    background-color: rgb(30 41 59 / 0.8);
+    background-color: rgb(44 46 58 / 0.8);
   }
   .dark .bg-white\/60 {
-    background-color: rgb(30 41 59 / 0.6);
+    background-color: rgb(44 46 58 / 0.6);
+  }
+
+  /* ========================================
+     COZY DARK THEME UTILITIES
+     ======================================== */
+
+  /* Category Circle - Amber outlined icons */
+  .category-circle {
+    @apply flex items-center justify-center w-24 h-24 rounded-full border-2 border-cpAmber transition-all duration-300;
+    background-color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  .category-circle:hover {
+    @apply bg-cpAmber/10 scale-105;
+    box-shadow: 0 8px 24px rgba(255, 140, 115, 0.15);
+  }
+  .dark .category-circle {
+    @apply border-cpAmber;
+    background-color: #1F2024;
+    box-shadow: none;
+  }
+  .dark .category-circle:hover {
+    @apply bg-cpAmber/10 scale-105;
+  }
+
+  /* Cozy Card - Extra rounded with warm shadow */
+  .cozy-card {
+    @apply rounded-2xl bg-card p-6 transition-all duration-300;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+  .cozy-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(255, 140, 115, 0.15);
+  }
+
+  /* Coral Button - Primary CTA */
+  .btn-coral {
+    @apply bg-cpCoral text-cpCharcoal font-semibold rounded-xl px-6 py-3 transition-all duration-300;
+    box-shadow: 0 4px 15px rgba(255, 140, 115, 0.3);
+  }
+  .btn-coral:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 140, 115, 0.4);
+  }
+
+  /* Hero Overlay Gradient */
+  .hero-overlay {
+    background: linear-gradient(
+      to right,
+      rgba(31, 32, 36, 0.9) 0%,
+      rgba(31, 32, 36, 0.7) 40%,
+      rgba(31, 32, 36, 0.3) 100%
+    );
+  }
+
+  /* Amber Star Rating */
+  .star-amber {
+    @apply text-cpAmber fill-cpAmber;
+  }
+
+  /* Cozy Search Bar */
+  .cozy-search {
+    @apply bg-cpSurface rounded-2xl border-none;
+  }
+  .cozy-search input {
+    @apply bg-transparent text-cpCream placeholder:text-muted-foreground;
+  }
+
+  /* ========================================
+     COZY LIGHT THEME UTILITIES
+     "Sunny Morning" - Warm & Fresh
+     ======================================== */
+
+  /* Light Theme Background - Warm Cream */
+  .bg-cpLight {
+    background-color: #FDFBF7;
+  }
+
+  /* Light Theme Surface - Pure White */
+  .bg-cpLight-surface {
+    background-color: #FFFFFF;
+  }
+
+  /* Light Theme Surface Alt - Light Beige */
+  .bg-cpLight-surface-alt {
+    background-color: #F5F2EB;
+  }
+
+  /* Light Theme Text Colors */
+  .text-cpLight {
+    color: #2D2A26;
+  }
+  .text-cpLight-muted {
+    color: #7A7570;
+  }
+
+
+  /* Cozy Card - Light Mode */
+  :not(.dark) .cozy-card {
+    @apply bg-white;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+  :not(.dark) .cozy-card:hover {
+    box-shadow: 0 8px 30px rgba(255, 140, 115, 0.12);
+  }
+
+  /* Hero Overlay - Light Mode (softer overlay) */
+  :not(.dark) .hero-overlay {
+    background: linear-gradient(
+      to right,
+      rgba(253, 251, 247, 0.95) 0%,
+      rgba(253, 251, 247, 0.8) 40%,
+      rgba(253, 251, 247, 0.4) 100%
+    );
+  }
+
+  /* Cozy Search Bar - Light Mode */
+  :not(.dark) .cozy-search {
+    @apply bg-white rounded-2xl;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #E8E4DD;
+  }
+  :not(.dark) .cozy-search input {
+    @apply bg-transparent;
+    color: #2D2A26;
+  }
+  :not(.dark) .cozy-search input::placeholder {
+    color: #7A7570;
+  }
+
+  /* Light Mode Service Cards */
+  :not(.dark) .service-card-light {
+    @apply bg-white rounded-3xl p-6 text-center;
+    border: 1px solid #E8E4DD;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+  :not(.dark) .service-card-light:hover {
+    box-shadow: 0 8px 24px rgba(255, 140, 115, 0.12);
+    transform: translateY(-4px);
+  }
+
+  /* FAQ Details - Light Mode */
+  :not(.dark) details.faq-light {
+    @apply bg-white rounded-2xl;
+    border: 1px solid #E8E4DD;
+  }
+  :not(.dark) details.faq-light summary {
+    color: #2D2A26;
+  }
+  :not(.dark) details.faq-light .faq-answer {
+    color: #7A7570;
+  }
+
+  /* Testimonial Card - Light Mode */
+  :not(.dark) .testimonial-light {
+    @apply bg-white rounded-3xl p-6;
+    border: 1px solid #E8E4DD;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Stat Card - Light Mode */
+  :not(.dark) .stat-card-light {
+    @apply bg-white rounded-2xl p-6 text-center;
+    border: 1px solid #E8E4DD;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Country Card - Light Mode */
+  :not(.dark) .country-card-light {
+    @apply bg-white rounded-2xl p-4 text-center;
+    border: 1px solid #E8E4DD;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+  :not(.dark) .country-card-light:hover {
+    border-color: #FF8C73;
+    box-shadow: 0 4px 16px rgba(255, 140, 115, 0.15);
+  }
+
+  /* Gradient Text - Light Mode (coral based) */
+  .gradient-text-coral {
+    background: linear-gradient(135deg, #FF8C73 0%, #FFD166 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 }

@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -161,7 +162,7 @@ const labels = {
   },
 };
 
-// Simple bar chart component
+// Simple bar chart component - responsive sizing
 function BarChart({
   data,
   valueKey,
@@ -175,11 +176,11 @@ function BarChart({
 }) {
   if (data.length === 0 || maxValue === 0) {
     return (
-      <div className="h-32 flex items-end justify-center gap-0.5">
+      <div className="h-24 sm:h-32 flex items-end justify-center gap-px sm:gap-0.5">
         {Array.from({ length: 30 }).map((_, i) => (
           <div
             key={i}
-            className="w-2 bg-slate-200 rounded-t"
+            className="flex-1 max-w-2 bg-slate-200 rounded-t"
             style={{ height: "4px" }}
           />
         ))}
@@ -188,14 +189,14 @@ function BarChart({
   }
 
   return (
-    <div className="h-32 flex items-end justify-between gap-0.5">
+    <div className="h-24 sm:h-32 flex items-end justify-between gap-px sm:gap-0.5">
       {data.map((item, index) => {
         const value = item[valueKey] || 0;
         const height = Math.max((value / maxValue) * 100, 2);
         return (
           <div
             key={index}
-            className={cn("w-2 rounded-t transition-all hover:opacity-80", color)}
+            className={cn("flex-1 max-w-2 rounded-t transition-all hover:opacity-80", color)}
             style={{ height: `${height}%` }}
             title={`${item.date}: ${value}`}
           />
@@ -333,9 +334,11 @@ export function AnalyticsDashboard({
               </h3>
               <p className="text-slate-600 max-w-md">{t.upgradeDescription}</p>
             </div>
-            <Button className="bg-cpPink hover:bg-cpPink/90">
-              <Crown className="h-4 w-4 mr-2" />
-              {t.upgradeButton}
+            <Button className="bg-cpPink hover:bg-cpPink/90" asChild>
+              <Link href={`/${locale}/dashboard/business/${businessId}/plan`}>
+                <Crown className="h-4 w-4 mr-2" />
+                {t.upgradeButton}
+              </Link>
             </Button>
           </div>
         </CardContent>
@@ -357,61 +360,62 @@ export function AnalyticsDashboard({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Basic Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         {/* Total Views */}
         <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between mb-2">
-              <Eye className="h-5 w-5 text-cpAqua" />
-              <span className="text-2xl font-bold text-cpDark">
+          <CardContent className="p-4 sm:pt-6">
+            <div className="flex items-center justify-between mb-1 sm:mb-2">
+              <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-cpAqua" />
+              <span className="text-lg sm:text-2xl font-bold text-cpDark">
                 {basic?.totalViews.toLocaleString() || 0}
               </span>
             </div>
-            <p className="text-sm text-slate-500">{t.totalViews}</p>
+            <p className="text-xs sm:text-sm text-slate-500 truncate">{t.totalViews}</p>
           </CardContent>
         </Card>
 
         {/* Total Leads */}
         <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between mb-2">
-              <Mail className="h-5 w-5 text-cpPink" />
-              <span className="text-2xl font-bold text-cpDark">
+          <CardContent className="p-4 sm:pt-6">
+            <div className="flex items-center justify-between mb-1 sm:mb-2">
+              <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-cpPink" />
+              <span className="text-lg sm:text-2xl font-bold text-cpDark">
                 {basic?.totalLeads.toLocaleString() || 0}
               </span>
             </div>
-            <p className="text-sm text-slate-500">{t.totalLeads}</p>
+            <p className="text-xs sm:text-sm text-slate-500 truncate">{t.totalLeads}</p>
           </CardContent>
         </Card>
 
         {/* This Month Views */}
         <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-2xl font-bold text-cpDark">
+          <CardContent className="p-4 sm:pt-6">
+            <div className="flex items-center justify-between mb-1 sm:mb-2">
+              <span className="text-lg sm:text-2xl font-bold text-cpDark">
                 {basic?.thisMonthViews.toLocaleString() || 0}
               </span>
               {viewsChange !== 0 && (
                 <Badge
                   variant="outline"
                   className={cn(
+                    "text-xs px-1.5",
                     viewsChange > 0
                       ? "bg-green-50 text-green-700 border-green-200"
                       : "bg-red-50 text-red-700 border-red-200"
                   )}
                 >
                   {viewsChange > 0 ? (
-                    <TrendingUp className="h-3 w-3 mr-1" />
+                    <TrendingUp className="h-3 w-3 mr-0.5" />
                   ) : (
-                    <TrendingDown className="h-3 w-3 mr-1" />
+                    <TrendingDown className="h-3 w-3 mr-0.5" />
                   )}
                   {Math.abs(viewsChange)}%
                 </Badge>
               )}
             </div>
-            <p className="text-sm text-slate-500">
+            <p className="text-xs sm:text-sm text-slate-500 truncate">
               {t.views} - {t.thisMonth}
             </p>
           </CardContent>
@@ -419,30 +423,31 @@ export function AnalyticsDashboard({
 
         {/* This Month Leads */}
         <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-2xl font-bold text-cpDark">
+          <CardContent className="p-4 sm:pt-6">
+            <div className="flex items-center justify-between mb-1 sm:mb-2">
+              <span className="text-lg sm:text-2xl font-bold text-cpDark">
                 {basic?.thisMonthLeads.toLocaleString() || 0}
               </span>
               {leadsChange !== 0 && (
                 <Badge
                   variant="outline"
                   className={cn(
+                    "text-xs px-1.5",
                     leadsChange > 0
                       ? "bg-green-50 text-green-700 border-green-200"
                       : "bg-red-50 text-red-700 border-red-200"
                   )}
                 >
                   {leadsChange > 0 ? (
-                    <TrendingUp className="h-3 w-3 mr-1" />
+                    <TrendingUp className="h-3 w-3 mr-0.5" />
                   ) : (
-                    <TrendingDown className="h-3 w-3 mr-1" />
+                    <TrendingDown className="h-3 w-3 mr-0.5" />
                   )}
                   {Math.abs(leadsChange)}%
                 </Badge>
               )}
             </div>
-            <p className="text-sm text-slate-500">
+            <p className="text-xs sm:text-sm text-slate-500 truncate">
               {t.leads} - {t.thisMonth}
             </p>
           </CardContent>
@@ -634,9 +639,11 @@ export function AnalyticsDashboard({
                   {t.upgradeDescription}
                 </p>
               </div>
-              <Button variant="outline" className="border-cpPink text-cpPink hover:bg-cpPink/10">
-                <Crown className="h-4 w-4 mr-2" />
-                {t.upgradeButton}
+              <Button variant="outline" className="border-cpPink text-cpPink hover:bg-cpPink/10" asChild>
+                <Link href={`/${locale}/dashboard/business/${businessId}/plan`}>
+                  <Crown className="h-4 w-4 mr-2" />
+                  {t.upgradeButton}
+                </Link>
               </Button>
             </div>
           </CardContent>

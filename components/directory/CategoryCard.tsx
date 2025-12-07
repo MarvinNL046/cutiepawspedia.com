@@ -9,15 +9,15 @@ interface CategoryCardProps {
 
 /**
  * Modern category card with glassmorphism and gradient effects.
- * Inspired by postforge.ai and seogrove.ai design patterns.
+ * Supports both light and dark cozy themes.
  */
 export function CategoryCard({ href, icon, label, variant = "default" }: CategoryCardProps) {
   if (variant === "compact") {
     return (
       <Link href={href} className="group">
-        <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl glass-card hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-card dark:bg-cpSurface/60 border border-border dark:border-cpAmber/20 hover:shadow-md hover:border-cpCoral/30 dark:hover:border-cpAmber/40 transition-all duration-300 hover:-translate-y-0.5">
           <span className="text-lg">{icon}</span>
-          <span className="text-sm font-medium text-cpDark group-hover:text-cpPink transition-colors">
+          <span className="text-sm font-medium text-foreground dark:text-cpCream group-hover:text-cpCoral dark:group-hover:text-cpAmber transition-colors">
             {label}
           </span>
         </div>
@@ -27,18 +27,18 @@ export function CategoryCard({ href, icon, label, variant = "default" }: Categor
 
   return (
     <Link href={href} className="group block">
-      <div className="relative h-full rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50 p-5 transition-all duration-300 hover:shadow-lg hover:shadow-cpPink/10 hover:-translate-y-1 hover:border-cpPink/30 overflow-hidden">
+      <div className="relative h-full rounded-3xl bg-card dark:bg-cpSurface/80 border border-border dark:border-cpAmber/20 p-5 transition-all duration-300 hover:shadow-lg hover:shadow-cpCoral/10 dark:hover:shadow-cpAmber/10 hover:-translate-y-1 hover:border-cpCoral/30 dark:hover:border-cpAmber/40 overflow-hidden shadow-sm">
         {/* Gradient overlay on hover */}
-        <div className="absolute inset-0 bg-gradient-to-br from-cpPink/5 to-cpAqua/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-br from-cpCoral/5 to-cpAmber/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
         {/* Content */}
         <div className="relative text-center">
-          {/* Icon with gradient background */}
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-cpPink/10 to-cpPink/5 mb-3 group-hover:scale-110 transition-transform duration-300">
+          {/* Icon with amber outlined circle - cozy theme */}
+          <div className="category-circle mx-auto mb-3 group-hover:scale-110 group-hover:border-cpCoral transition-all duration-300">
             <span className="text-3xl">{icon}</span>
           </div>
 
-          <h3 className="font-semibold text-foreground group-hover:text-cpPink transition-colors text-sm">
+          <h3 className="font-semibold text-foreground group-hover:text-cpCoral dark:group-hover:text-cpAmber transition-colors text-sm">
             {label}
           </h3>
         </div>

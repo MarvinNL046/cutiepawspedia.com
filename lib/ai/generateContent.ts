@@ -47,6 +47,9 @@ import {
 } from "@/lib/seo/contentGenerators";
 import type { ContentLocale } from "@/lib/seo/aiContent";
 
+// Re-export for use in other files
+export type { ContentLocale };
+
 // ============================================================================
 // TYPES
 // ============================================================================

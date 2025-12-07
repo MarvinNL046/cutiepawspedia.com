@@ -28,8 +28,12 @@ import {
   User,
   Crown,
   BarChart3,
+  Home,
+  Heart,
+  Megaphone,
 } from "lucide-react";
 import { getPlan, type PlanKey } from "@/lib/plans/config";
+import { MobileSidebar } from "@/components/dashboard/MobileSidebar";
 
 interface BusinessLayoutProps {
   children: React.ReactNode;
@@ -99,9 +103,12 @@ export default async function BusinessLayout({
       leads: "Leads",
       analytics: "Analytics",
       plan: "Plan",
+      advertising: "Advertising",
       credits: "Credits",
       myAccount: "My Account",
       signOut: "Sign Out",
+      home: "Homepage",
+      favorites: "My Favorites",
     },
     nl: {
       overview: "Overzicht",
@@ -111,9 +118,12 @@ export default async function BusinessLayout({
       leads: "Leads",
       analytics: "Statistieken",
       plan: "Abonnement",
+      advertising: "Adverteren",
       credits: "Credits",
       myAccount: "Mijn Account",
       signOut: "Uitloggen",
+      home: "Homepage",
+      favorites: "Mijn Favorieten",
     },
     de: {
       overview: "Übersicht",
@@ -123,104 +133,151 @@ export default async function BusinessLayout({
       leads: "Leads",
       analytics: "Statistiken",
       plan: "Abonnement",
+      advertising: "Werbung",
       credits: "Guthaben",
       myAccount: "Mein Konto",
       signOut: "Abmelden",
+      home: "Startseite",
+      favorites: "Meine Favoriten",
     },
   };
 
   const t = labels[locale as keyof typeof labels] || labels.en;
 
   const navItems = [
-    { href: "", label: t.overview, icon: LayoutDashboard },
-    { href: "/places", label: t.places, icon: Building2 },
-    { href: "/reviews", label: t.reviews, icon: Star },
-    { href: "/inbox", label: t.inbox, icon: Inbox },
-    { href: "/leads", label: t.leads, icon: MessageSquare },
-    { href: "/analytics", label: t.analytics, icon: BarChart3 },
-    { href: "/plan", label: t.plan, icon: Crown },
-    // Credits feature disabled for now
-    // { href: "/credits", label: t.credits, icon: CreditCard },
+    { href: "", label: t.overview, icon: LayoutDashboard, iconName: "LayoutDashboard" },
+    { href: "/places", label: t.places, icon: Building2, iconName: "Building2" },
+    { href: "/reviews", label: t.reviews, icon: Star, iconName: "Star" },
+    { href: "/inbox", label: t.inbox, icon: Inbox, iconName: "Inbox" },
+    { href: "/leads", label: t.leads, icon: MessageSquare, iconName: "MessageSquare" },
+    { href: "/analytics", label: t.analytics, icon: BarChart3, iconName: "BarChart3" },
+    { href: "/plan", label: t.plan, icon: Crown, iconName: "Crown" },
+    { href: "/advertising", label: t.advertising, icon: Megaphone, iconName: "Megaphone" },
   ];
 
+  // For mobile sidebar (serializable props)
+  const mobileNavItems = navItems.map(({ href, label, iconName }) => ({
+    href,
+    label,
+    icon: iconName,
+  }));
+
+  const planInfo = getPlan((business.planKey as PlanKey) || "FREE");
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r flex flex-col">
-        {/* Logo */}
-        <div className="h-16 flex items-center gap-2 px-4 border-b">
-          <div className="p-2 rounded-lg bg-cpPink/10">
-            <PawPrint className="h-5 w-5 text-cpPink" />
-          </div>
-          <div>
-            <span className="font-bold text-cpDark">CutiePawsPedia</span>
-            <span className="text-xs text-slate-500 block">Business Dashboard</span>
-          </div>
+    <div className="fixed inset-0 z-[100] bg-slate-50 flex flex-col">
+      {/* Mobile Header */}
+      <header className="lg:hidden h-14 bg-white border-b flex items-center justify-between px-4 flex-shrink-0">
+        <MobileSidebar
+          businessName={business.name}
+          businessLogo={business.logo}
+          planName={planInfo.name}
+          navItems={mobileNavItems}
+          labels={{
+            myAccount: t.myAccount,
+            signOut: t.signOut,
+            home: t.home,
+            favorites: t.favorites,
+          }}
+          locale={locale}
+          businessId={businessId}
+        />
+        <div className="flex items-center gap-2">
+          <PawPrint className="h-5 w-5 text-cpPink" />
+          <span className="font-bold text-cpDark text-sm">CutiePawsPedia</span>
         </div>
+        <div className="w-10" /> {/* Spacer for centering */}
+      </header>
 
-        {/* Business Selector (if multiple businesses) */}
-        {allBusinesses.length > 1 && (
-          <div className="p-4 border-b">
-            <BusinessSelector
-              businesses={allBusinesses}
-              currentBusinessId={businessIdNum}
-              locale={locale}
-            />
-          </div>
-        )}
-
-        {/* Current Business Info */}
-        <div className="p-4 border-b">
-          <div className="flex items-center gap-3">
-            {business.logo ? (
-              <img
-                src={business.logo}
-                alt={business.name}
-                className="w-10 h-10 rounded-lg object-cover"
-              />
-            ) : (
-              <div className="w-10 h-10 rounded-lg bg-cpPink/10 flex items-center justify-center">
-                <Building2 className="h-5 w-5 text-cpPink" />
-              </div>
-            )}
-            <div className="truncate">
-              <p className="font-medium text-cpDark truncate">{business.name}</p>
-              <p className="text-xs text-slate-500">
-                {getPlan((business.planKey as PlanKey) || "FREE").name} plan
-              </p>
+      {/* Content wrapper - flex row on desktop */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Desktop Sidebar */}
+        <aside className="hidden lg:flex w-64 bg-white border-r flex-col flex-shrink-0">
+          {/* Logo */}
+          <div className="h-16 flex items-center gap-2 px-4 border-b">
+            <div className="p-2 rounded-lg bg-cpPink/10">
+              <PawPrint className="h-5 w-5 text-cpPink" />
+            </div>
+            <div>
+              <span className="font-bold text-cpDark">CutiePawsPedia</span>
+              <span className="text-xs text-slate-500 block">Business Dashboard</span>
             </div>
           </div>
-        </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-1">
-          <BusinessNavItems
-            items={navItems}
-            businessId={businessId}
-            locale={locale}
-          />
-        </nav>
+          {/* Business Selector (if multiple businesses) */}
+          {allBusinesses.length > 1 && (
+            <div className="p-4 border-b">
+              <BusinessSelector
+                businesses={allBusinesses}
+                currentBusinessId={businessIdNum}
+                locale={locale}
+              />
+            </div>
+          )}
 
-        {/* Footer */}
-        <div className="p-4 border-t space-y-2">
-          <Link href={`/${locale}/account/favorites`}>
-            <Button variant="ghost" className="w-full justify-start gap-3 text-slate-500 hover:text-cpPink">
-              <User className="h-4 w-4" />
-              {t.myAccount}
-            </Button>
-          </Link>
-          <Link href="/handler/sign-out">
-            <Button variant="ghost" className="w-full justify-start gap-3 text-slate-500 hover:text-red-600">
-              <LogOut className="h-4 w-4" />
-              {t.signOut}
-            </Button>
-          </Link>
-        </div>
-      </aside>
+          {/* Current Business Info */}
+          <div className="p-4 border-b">
+            <div className="flex items-center gap-3">
+              {business.logo ? (
+                <img
+                  src={business.logo}
+                  alt={business.name}
+                  className="w-10 h-10 rounded-lg object-cover"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-lg bg-cpPink/10 flex items-center justify-center">
+                  <Building2 className="h-5 w-5 text-cpPink" />
+                </div>
+              )}
+              <div className="truncate">
+                <p className="font-medium text-cpDark truncate">{business.name}</p>
+                <p className="text-xs text-slate-500">
+                  {planInfo.name} plan
+                </p>
+              </div>
+            </div>
+          </div>
 
-      {/* Main Content */}
-      <div className="pl-64">
-        {children}
+          {/* Navigation */}
+          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+            <BusinessNavItems
+              items={navItems}
+              businessId={businessId}
+              locale={locale}
+            />
+          </nav>
+
+          {/* Quick Links */}
+          <div className="p-4 border-t space-y-1">
+            <Link href={`/${locale}`}>
+              <Button variant="ghost" className="w-full justify-start gap-3 text-slate-500 hover:text-cpPink">
+                <Home className="h-4 w-4" />
+                {t.home}
+              </Button>
+            </Link>
+            <Link href={`/${locale}/account/favorites`}>
+              <Button variant="ghost" className="w-full justify-start gap-3 text-slate-500 hover:text-cpPink">
+                <Heart className="h-4 w-4" />
+                {t.favorites}
+              </Button>
+            </Link>
+          </div>
+
+          {/* Footer */}
+          <div className="p-4 border-t space-y-1">
+            <Link href="/handler/sign-out">
+              <Button variant="ghost" className="w-full justify-start gap-3 text-slate-500 hover:text-red-600">
+                <LogOut className="h-4 w-4" />
+                {t.signOut}
+              </Button>
+            </Link>
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 flex flex-col overflow-hidden">
+          {children}
+        </main>
       </div>
     </div>
   );

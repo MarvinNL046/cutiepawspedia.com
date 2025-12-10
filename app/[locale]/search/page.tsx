@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { searchPlaces, getCategories, getCountries } from "@/db/queries";
 import { getActiveAdForPlacement } from "@/db/queries/ads";
 import { getSearchMetadata, getLocalizedCategoryName, type ContentLocale } from "@/lib/seo";
+import { getLocaleForCountryCode } from "@/lib/geo/localeCountryMap";
 import { PlaceCard, MapWidgetLazy as MapWidget, type MapMarker, SearchResultsClient } from "@/components/directory";
 import { SearchBar } from "@/components/directory";
 import { SearchTracker } from "@/components/analytics";
@@ -481,17 +482,21 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
               <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream tracking-tight">Browse by Country</h2>
             </div>
             <div className="flex flex-wrap justify-center gap-3">
-              {countries.map((country) => (
-                <Link key={country.slug} href={`/${locale}/${country.slug}`}>
-                  <Badge
-                    variant="outline"
-                    className="hover:bg-cpCoral/10 hover:border-cpCoral dark:hover:bg-cpCoral/20 transition-all duration-300 cursor-pointer py-2.5 px-4 text-sm hover:-translate-y-0.5 border-border dark:border-cpAmber/20"
-                  >
-                    <MapPin className="h-3.5 w-3.5 mr-1.5 text-cpCoral" />
-                    {country.name}
-                  </Badge>
-                </Link>
-              ))}
+              {countries.map((country) => {
+                // Get the preferred locale for this country (e.g., DE → 'de', NL → 'nl')
+                const countryLocale = getLocaleForCountryCode(country.code);
+                return (
+                  <Link key={country.slug} href={`/${countryLocale}/${country.slug}`}>
+                    <Badge
+                      variant="outline"
+                      className="hover:bg-cpCoral/10 hover:border-cpCoral dark:hover:bg-cpCoral/20 transition-all duration-300 cursor-pointer py-2.5 px-4 text-sm hover:-translate-y-0.5 border-border dark:border-cpAmber/20"
+                    >
+                      <MapPin className="h-3.5 w-3.5 mr-1.5 text-cpCoral" />
+                      {country.name}
+                    </Badge>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>

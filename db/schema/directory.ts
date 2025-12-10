@@ -56,6 +56,25 @@ export const placeStatusEnum = pgEnum("place_status", [
   "unknown",
 ]);
 
+// Claim verification method enum
+export const claimVerificationMethodEnum = pgEnum("claim_verification_method", [
+  "email_domain",      // Verify via business email domain (e.g., @dierenartsjanssen.nl)
+  "phone",             // Verify via phone call/SMS to business number
+  "google_business",   // Link with Google Business Profile
+  "document",          // Upload KvK uittreksel or other proof
+  "manual",            // Admin manually verifies
+]);
+
+// Claim status enum (more detailed workflow)
+export const claimStatusEnum = pgEnum("claim_status", [
+  "pending",           // Initial submission, awaiting verification
+  "verification_sent", // Verification code sent (email/phone)
+  "verified",          // Ownership verified, awaiting admin approval
+  "approved",          // Fully approved, business linked
+  "rejected",          // Rejected by admin
+  "expired",           // Verification expired
+]);
+
 // Refresh job status enum
 export const refreshJobStatusEnum = pgEnum("refresh_job_status", [
   "pending",
@@ -590,30 +609,72 @@ export const leads = pgTable(
 );
 
 // ============================================================================
-// PLACE CLAIMS (ownership claim flow)
+// PLACE CLAIMS (ownership claim flow with verification)
 // ============================================================================
 
 // Place claims table - for users claiming ownership of places
-export const placeClaims = pgTable("place_claims", {
-  id: serial("id").primaryKey(),
-  placeId: integer("place_id")
-    .notNull()
-    .references(() => places.id, { onDelete: "cascade" }),
-  userId: integer("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  // Claim status workflow: pending → approved/rejected
-  status: varchar("status", { length: 20 }).default("pending").notNull(), // pending, approved, rejected
-  // Verification documents/proof
-  proofDocumentUrl: varchar("proof_document_url", { length: 500 }), // URL to uploaded proof
-  businessRole: varchar("business_role", { length: 100 }), // e.g., "owner", "manager", "authorized representative"
-  notes: text("notes"), // Claimant's notes/explanation
-  // Admin review
-  adminNotes: text("admin_notes"), // Internal admin notes
-  reviewedBy: integer("reviewed_by").references(() => users.id, { onDelete: "set null" }),
-  reviewedAt: timestamp("reviewed_at"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const placeClaims = pgTable(
+  "place_claims",
+  {
+    id: serial("id").primaryKey(),
+    placeId: integer("place_id")
+      .notNull()
+      .references(() => places.id, { onDelete: "cascade" }),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+
+    // Claim status workflow with detailed stages
+    status: claimStatusEnum("status").default("pending").notNull(),
+
+    // Verification method chosen
+    verificationMethod: claimVerificationMethodEnum("verification_method"),
+
+    // Email verification (for email_domain method)
+    verificationEmail: varchar("verification_email", { length: 255 }), // Business email to verify
+    verificationEmailDomain: varchar("verification_email_domain", { length: 255 }), // Domain extracted from email
+
+    // Phone verification (for phone method)
+    verificationPhone: varchar("verification_phone", { length: 50 }), // Business phone to verify
+
+    // Verification code (for email/phone methods)
+    verificationCode: varchar("verification_code", { length: 10 }), // 6-digit code
+    verificationCodeSentAt: timestamp("verification_code_sent_at"),
+    verificationCodeExpiresAt: timestamp("verification_code_expires_at"),
+    verificationAttempts: integer("verification_attempts").default(0).notNull(), // Track failed attempts
+    verifiedAt: timestamp("verified_at"), // When ownership was verified
+
+    // Google Business verification
+    googleBusinessId: varchar("google_business_id", { length: 255 }), // Google Business Profile ID
+    googleBusinessVerifiedAt: timestamp("google_business_verified_at"),
+
+    // Document verification (for document method)
+    proofDocumentUrl: varchar("proof_document_url", { length: 500 }), // URL to uploaded proof (KvK, etc.)
+    proofDocumentType: varchar("proof_document_type", { length: 50 }), // kvk_extract, business_license, etc.
+
+    // Claimant info
+    businessRole: varchar("business_role", { length: 100 }), // e.g., "owner", "manager", "authorized representative"
+    claimantName: varchar("claimant_name", { length: 255 }), // Full name of person claiming
+    claimantPhone: varchar("claimant_phone", { length: 50 }), // Contact phone for follow-up
+    notes: text("notes"), // Claimant's notes/explanation
+
+    // Admin review
+    adminNotes: text("admin_notes"), // Internal admin notes
+    rejectionReason: varchar("rejection_reason", { length: 500 }), // Why claim was rejected
+    reviewedBy: integer("reviewed_by").references(() => users.id, { onDelete: "set null" }),
+    reviewedAt: timestamp("reviewed_at"),
+
+    // Timestamps
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("place_claims_place_id_idx").on(table.placeId),
+    index("place_claims_user_id_idx").on(table.userId),
+    index("place_claims_status_idx").on(table.status),
+    index("place_claims_verification_code_idx").on(table.verificationCode),
+  ]
+);
 
 // ============================================================================
 // CREDIT TRANSACTIONS (pay-per-lead & premium billing)

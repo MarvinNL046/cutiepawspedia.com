@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { leads, places } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { sendNotification } from "@/lib/notifications";
+import { addToNewsletterAudience } from "@/lib/email/resend";
 // NOTE: Pay-per-lead paywall disabled - leads are now free to view
 // Keeping imports for potential future use or reference
 // import { chargeForLead } from "@/db/queries/credits";
@@ -209,6 +210,22 @@ export async function POST(request: NextRequest) {
         console.error("Failed to send lead notification email:", emailError);
       });
     }
+
+    // Add lead email to newsletter segment (non-blocking)
+    // This helps build the email list for future marketing
+    addToNewsletterAudience({
+      email,
+      firstName: name.split(" ")[0],
+      lastName: name.split(" ").slice(1).join(" ") || undefined,
+    }).then((result) => {
+      if (result.success) {
+        console.log(`✅ Lead ${email} added to newsletter segment`);
+      } else {
+        console.warn(`Failed to add lead to newsletter:`, result.error);
+      }
+    }).catch((err) => {
+      console.warn("Error adding lead to newsletter segment:", err);
+    });
 
     return NextResponse.json(
       {

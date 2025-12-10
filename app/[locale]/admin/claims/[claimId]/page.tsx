@@ -24,6 +24,12 @@ import {
   Calendar,
   ExternalLink,
   Building2,
+  Mail,
+  Phone,
+  ShieldCheck,
+  Send,
+  AlertTriangle,
+  KeyRound,
 } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 import { ClaimReviewForm } from "./ClaimReviewForm";
@@ -43,25 +49,76 @@ function getStatusBadge(status: string) {
       return (
         <Badge className="bg-amber-100 text-amber-800 border-amber-300">
           <Clock className="w-3 h-3 mr-1" />
-          Pending Review
+          Wacht op Review
+        </Badge>
+      );
+    case "verification_sent":
+      return (
+        <Badge className="bg-blue-100 text-blue-800 border-blue-300">
+          <Send className="w-3 h-3 mr-1" />
+          Code Verzonden
+        </Badge>
+      );
+    case "verified":
+      return (
+        <Badge className="bg-purple-100 text-purple-800 border-purple-300">
+          <ShieldCheck className="w-3 h-3 mr-1" />
+          Geverifieerd
         </Badge>
       );
     case "approved":
       return (
         <Badge className="bg-green-100 text-green-800 border-green-300">
           <CheckCircle className="w-3 h-3 mr-1" />
-          Approved
+          Goedgekeurd
         </Badge>
       );
     case "rejected":
       return (
         <Badge className="bg-red-100 text-red-800 border-red-300">
           <XCircle className="w-3 h-3 mr-1" />
-          Rejected
+          Afgewezen
+        </Badge>
+      );
+    case "expired":
+      return (
+        <Badge className="bg-gray-100 text-gray-800 border-gray-300">
+          <AlertTriangle className="w-3 h-3 mr-1" />
+          Verlopen
         </Badge>
       );
     default:
       return <Badge variant="outline">{status}</Badge>;
+  }
+}
+
+function getVerificationMethodIcon(method: string | null) {
+  switch (method) {
+    case "email_domain":
+      return <Mail className="h-5 w-5 text-cyan-600" />;
+    case "phone":
+      return <Phone className="h-5 w-5 text-violet-600" />;
+    case "document":
+      return <FileText className="h-5 w-5 text-orange-600" />;
+    case "manual":
+      return <ShieldCheck className="h-5 w-5 text-gray-600" />;
+    default:
+      return <KeyRound className="h-5 w-5 text-gray-400" />;
+  }
+}
+
+function getVerificationMethodLabel(method: string | null): string {
+  switch (method) {
+    case "email_domain":
+      return "E-mail Domein Verificatie";
+    case "phone":
+      return "Telefoon Verificatie";
+    case "document":
+      return "Document Verificatie";
+    case "manual":
+      return "Handmatige Verificatie";
+    default:
+      return "Onbekend";
   }
 }
 
@@ -81,7 +138,9 @@ export default async function ClaimDetailPage({
     notFound();
   }
 
-  const isPending = claim.status === "pending";
+  // Claims that need admin review: pending (document/manual) or verified (after user verified)
+  const needsReview = claim.status === "pending" || claim.status === "verified";
+  const isCodePending = claim.status === "verification_sent";
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -144,24 +203,24 @@ export default async function ClaimDetailPage({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <User className="h-5 w-5 text-cpAqua" />
-                  Claimant Information
+                  Claimant Informatie
                 </CardTitle>
-                <CardDescription>Who is making this claim</CardDescription>
+                <CardDescription>Wie doet deze claim</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-slate-500">Name</p>
-                    <p className="font-medium">{claim.userName || "Not provided"}</p>
+                    <p className="text-sm text-slate-500">Naam</p>
+                    <p className="font-medium">{claim.userName || "Niet opgegeven"}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-slate-500">Email</p>
+                    <p className="text-sm text-slate-500">E-mail</p>
                     <p className="font-medium">{claim.userEmail}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-slate-500">Role</p>
+                    <p className="text-sm text-slate-500">Rol</p>
                     <p className="font-medium capitalize">
-                      {claim.businessRole || "Owner"}
+                      {claim.businessRole || "Eigenaar"}
                     </p>
                   </div>
                   <div>
@@ -171,6 +230,139 @@ export default async function ClaimDetailPage({
                 </div>
               </CardContent>
             </Card>
+
+            {/* Verification Information */}
+            {claim.verificationMethod && (
+              <Card className={isCodePending ? "border-blue-200 bg-blue-50/30" : ""}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    {getVerificationMethodIcon(claim.verificationMethod)}
+                    Verificatie Informatie
+                  </CardTitle>
+                  <CardDescription>
+                    {getVerificationMethodLabel(claim.verificationMethod)}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    {claim.verificationEmail && (
+                      <div>
+                        <p className="text-sm text-slate-500">Verificatie E-mail</p>
+                        <p className="font-medium flex items-center gap-2">
+                          <Mail className="h-4 w-4 text-cyan-600" />
+                          {claim.verificationEmail}
+                        </p>
+                        {claim.verificationEmailDomain && (
+                          <p className="text-xs text-slate-400">
+                            Domein: @{claim.verificationEmailDomain}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    {claim.verificationPhone && (
+                      <div>
+                        <p className="text-sm text-slate-500">Verificatie Telefoon</p>
+                        <p className="font-medium flex items-center gap-2">
+                          <Phone className="h-4 w-4 text-violet-600" />
+                          {claim.verificationPhone}
+                        </p>
+                      </div>
+                    )}
+                    {claim.verificationCodeSentAt && (
+                      <div>
+                        <p className="text-sm text-slate-500">Code Verzonden</p>
+                        <p className="font-medium">
+                          {format(new Date(claim.verificationCodeSentAt), "PPp")}
+                        </p>
+                      </div>
+                    )}
+                    {claim.verificationCodeExpiresAt && (
+                      <div>
+                        <p className="text-sm text-slate-500">Code Verloopt</p>
+                        <p className={`font-medium ${new Date() > new Date(claim.verificationCodeExpiresAt) ? "text-red-600" : ""}`}>
+                          {format(new Date(claim.verificationCodeExpiresAt), "PPp")}
+                          {new Date() > new Date(claim.verificationCodeExpiresAt) && (
+                            <span className="text-xs ml-2 text-red-600">(Verlopen)</span>
+                          )}
+                        </p>
+                      </div>
+                    )}
+                    {claim.verificationAttempts !== null && claim.verificationAttempts > 0 && (
+                      <div>
+                        <p className="text-sm text-slate-500">Verificatie Pogingen</p>
+                        <p className="font-medium">
+                          {claim.verificationAttempts} / 5 pogingen
+                        </p>
+                      </div>
+                    )}
+                    {claim.verifiedAt && (
+                      <div>
+                        <p className="text-sm text-slate-500">Geverifieerd Op</p>
+                        <p className="font-medium text-green-600">
+                          {format(new Date(claim.verifiedAt), "PPp")}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Verification Status Alert */}
+                  {isCodePending && (
+                    <div className="bg-blue-100 border border-blue-200 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <Send className="h-5 w-5 text-blue-600 mt-0.5" />
+                        <div>
+                          <p className="font-medium text-blue-900">
+                            Wacht op verificatie van gebruiker
+                          </p>
+                          <p className="text-sm text-blue-700">
+                            De gebruiker heeft een verificatiecode ontvangen en moet deze nog invoeren.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {claim.status === "verified" && (
+                    <div className="bg-purple-100 border border-purple-200 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <ShieldCheck className="h-5 w-5 text-purple-600 mt-0.5" />
+                        <div>
+                          <p className="font-medium text-purple-900">
+                            Gebruiker geverifieerd - Wacht op goedkeuring
+                          </p>
+                          <p className="text-sm text-purple-700">
+                            De gebruiker heeft zich succesvol geverifieerd. Je kunt nu de claim goedkeuren of afwijzen.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Admin Verification Code Box - For manual verification */}
+                  {claim.verificationCode && (isCodePending || claim.status === "pending") && (
+                    <div className="bg-amber-50 border-2 border-amber-300 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <KeyRound className="h-5 w-5 text-amber-600 mt-0.5" />
+                        <div className="flex-1">
+                          <p className="font-medium text-amber-900 mb-2">
+                            Verificatiecode (alleen voor admin)
+                          </p>
+                          <div className="bg-white border border-amber-200 rounded-lg p-4 text-center">
+                            <p className="font-mono text-3xl font-bold tracking-[0.5em] text-slate-800">
+                              {claim.verificationCode}
+                            </p>
+                          </div>
+                          <p className="text-xs text-amber-700 mt-2">
+                            Gebruik deze code om de eigenaar handmatig te verifiëren via telefoon of e-mail.
+                            Deel deze code NOOIT publiekelijk.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
             {/* Claim Notes & Proof */}
             <Card>
@@ -291,8 +483,8 @@ export default async function ClaimDetailPage({
               </CardContent>
             </Card>
 
-            {/* Review Form (only for pending claims) */}
-            {isPending && (
+            {/* Review Form (for claims needing review) */}
+            {needsReview && (
               <Card className="border-2 border-amber-200 bg-amber-50/30">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">

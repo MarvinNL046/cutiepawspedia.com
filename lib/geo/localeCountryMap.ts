@@ -30,6 +30,32 @@ export const LOCALE_TO_COUNTRY_SLUG: Record<string, string> = {
   en: "netherlands", // Primary market
 };
 
+// Map country code to preferred locale (for country-based locale switching)
+export const COUNTRY_CODE_TO_LOCALE: Record<string, string> = {
+  NL: "nl", // Netherlands → Dutch
+  DE: "de", // Germany → German
+  FR: "fr", // France → French
+  ES: "es", // Spain → Spanish
+  IT: "it", // Italy → Italian
+  PT: "pt", // Portugal → Portuguese
+  BE: "nl", // Belgium → Dutch (could also be fr)
+  AT: "de", // Austria → German
+  CH: "de", // Switzerland → German (could also be fr/it)
+  GB: "en", // United Kingdom → English
+  US: "en", // United States → English
+  CA: "en", // Canada → English (could also be fr)
+  AU: "en", // Australia → English
+  IE: "en", // Ireland → English
+};
+
+/**
+ * Get the preferred locale for a country code
+ * Falls back to 'en' if no mapping exists
+ */
+export function getLocaleForCountryCode(countryCode: string): string {
+  return COUNTRY_CODE_TO_LOCALE[countryCode.toUpperCase()] || "en";
+}
+
 /**
  * Get the default country code for a locale
  */

@@ -1,15 +1,22 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { sendEmail, emailTemplates, isResendConfigured } from "@/lib/email/resend";
+import {
+  sendEmail,
+  emailTemplates,
+  isResendConfigured,
+  addToNewsletterAudience
+} from "@/lib/email/resend";
 
 // Validation schema
 const subscribeSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
 });
 
 /**
  * POST /api/email/subscribe
- * Subscribe to the newsletter
+ * Subscribe to the newsletter and add to Resend Audience
  */
 export async function POST(request: Request) {
   try {
@@ -32,16 +39,41 @@ export async function POST(request: Request) {
       );
     }
 
-    const { email } = result.data;
+    const { email, firstName, lastName } = result.data;
+
+    // Add to Resend Audience for marketing emails
+    const audienceResult = await addToNewsletterAudience({
+      email,
+      firstName,
+      lastName
+    });
+
+    if (!audienceResult.success) {
+      console.error("Failed to add to audience:", audienceResult.error);
+      // Continue anyway - we can still send the welcome email
+    }
+
+    // Check if already subscribed
+    if (audienceResult.alreadyExists) {
+      return NextResponse.json({
+        success: true,
+        message: "You're already subscribed to our newsletter!",
+        alreadySubscribed: true,
+      });
+    }
 
     // Send welcome email
-    const emailResult = await sendEmail(emailTemplates.welcomeNewsletter(email));
+    const emailResult = await sendEmail({
+      ...emailTemplates.welcomeNewsletter(email),
+      tags: [
+        { name: "type", value: "newsletter-welcome" },
+      ],
+    });
 
     if (!emailResult.success) {
-      return NextResponse.json(
-        { error: "Failed to subscribe. Please try again." },
-        { status: 500 }
-      );
+      // Contact was added to audience, but welcome email failed
+      // This is still a success
+      console.error("Welcome email failed, but contact added to audience");
     }
 
     return NextResponse.json({

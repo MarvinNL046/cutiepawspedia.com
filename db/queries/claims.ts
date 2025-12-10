@@ -6,23 +6,39 @@ import { placeClaims, places, users, cities, countries, businesses } from "../sc
 // TYPES
 // ============================================================================
 
-export type ClaimStatus = "pending" | "approved" | "rejected";
+export type ClaimStatus = "pending" | "verification_sent" | "verified" | "approved" | "rejected" | "expired";
+export type VerificationMethod = "email_domain" | "phone" | "google_business" | "document" | "manual";
 
 export type PlaceClaim = {
   id: number;
   placeId: number;
   userId: number;
   status: string;
+  verificationMethod: string | null;
+  verificationEmail: string | null;
+  verificationEmailDomain: string | null;
+  verificationPhone: string | null;
+  verificationCode: string | null;
+  verificationCodeSentAt: Date | null;
+  verificationCodeExpiresAt: Date | null;
+  verificationAttempts: number | null;
+  verifiedAt: Date | null;
   proofDocumentUrl: string | null;
+  proofDocumentType: string | null;
   businessRole: string | null;
+  claimantName: string | null;
+  claimantPhone: string | null;
   notes: string | null;
   adminNotes: string | null;
+  rejectionReason: string | null;
   reviewedBy: number | null;
   reviewedAt: Date | null;
   createdAt: Date;
   // Joined data
   placeName: string | null;
   placeSlug: string | null;
+  placeWebsite: string | null;
+  placePhone: string | null;
   cityName: string | null;
   countryName: string | null;
   userEmail: string | null;
@@ -33,6 +49,8 @@ export type PlaceClaim = {
 export type ClaimStats = {
   total: number;
   pending: number;
+  verificationSent: number;
+  verified: number;
   approved: number;
   rejected: number;
 };
@@ -127,15 +145,30 @@ export async function getClaims(options: {
       placeId: placeClaims.placeId,
       userId: placeClaims.userId,
       status: placeClaims.status,
+      verificationMethod: placeClaims.verificationMethod,
+      verificationEmail: placeClaims.verificationEmail,
+      verificationEmailDomain: placeClaims.verificationEmailDomain,
+      verificationPhone: placeClaims.verificationPhone,
+      verificationCode: placeClaims.verificationCode,
+      verificationCodeSentAt: placeClaims.verificationCodeSentAt,
+      verificationCodeExpiresAt: placeClaims.verificationCodeExpiresAt,
+      verificationAttempts: placeClaims.verificationAttempts,
+      verifiedAt: placeClaims.verifiedAt,
       proofDocumentUrl: placeClaims.proofDocumentUrl,
+      proofDocumentType: placeClaims.proofDocumentType,
       businessRole: placeClaims.businessRole,
+      claimantName: placeClaims.claimantName,
+      claimantPhone: placeClaims.claimantPhone,
       notes: placeClaims.notes,
       adminNotes: placeClaims.adminNotes,
+      rejectionReason: placeClaims.rejectionReason,
       reviewedBy: placeClaims.reviewedBy,
       reviewedAt: placeClaims.reviewedAt,
       createdAt: placeClaims.createdAt,
       placeName: places.name,
       placeSlug: places.slug,
+      placeWebsite: places.website,
+      placePhone: places.phone,
       cityName: cities.name,
       countryName: countries.name,
       userEmail: users.email,
@@ -188,15 +221,30 @@ export async function getClaimById(id: number): Promise<PlaceClaim | null> {
       placeId: placeClaims.placeId,
       userId: placeClaims.userId,
       status: placeClaims.status,
+      verificationMethod: placeClaims.verificationMethod,
+      verificationEmail: placeClaims.verificationEmail,
+      verificationEmailDomain: placeClaims.verificationEmailDomain,
+      verificationPhone: placeClaims.verificationPhone,
+      verificationCode: placeClaims.verificationCode,
+      verificationCodeSentAt: placeClaims.verificationCodeSentAt,
+      verificationCodeExpiresAt: placeClaims.verificationCodeExpiresAt,
+      verificationAttempts: placeClaims.verificationAttempts,
+      verifiedAt: placeClaims.verifiedAt,
       proofDocumentUrl: placeClaims.proofDocumentUrl,
+      proofDocumentType: placeClaims.proofDocumentType,
       businessRole: placeClaims.businessRole,
+      claimantName: placeClaims.claimantName,
+      claimantPhone: placeClaims.claimantPhone,
       notes: placeClaims.notes,
       adminNotes: placeClaims.adminNotes,
+      rejectionReason: placeClaims.rejectionReason,
       reviewedBy: placeClaims.reviewedBy,
       reviewedAt: placeClaims.reviewedAt,
       createdAt: placeClaims.createdAt,
       placeName: places.name,
       placeSlug: places.slug,
+      placeWebsite: places.website,
+      placePhone: places.phone,
       cityName: cities.name,
       countryName: countries.name,
       userEmail: users.email,
@@ -239,7 +287,10 @@ export async function approveClaim(
   // Get the claim
   const claim = await getClaimById(claimId);
   if (!claim) throw new Error("Claim not found");
-  if (claim.status !== "pending") throw new Error("Claim is not pending");
+  // Allow approving both pending (document/manual) and verified (user-verified) claims
+  if (claim.status !== "pending" && claim.status !== "verified") {
+    throw new Error("Claim cannot be approved - status is not pending or verified");
+  }
 
   // Get or create business for the user
   const existingBusiness = await db
@@ -304,7 +355,10 @@ export async function rejectClaim(
 
   const claim = await getClaimById(claimId);
   if (!claim) throw new Error("Claim not found");
-  if (claim.status !== "pending") throw new Error("Claim is not pending");
+  // Allow rejecting both pending (document/manual) and verified (user-verified) claims
+  if (claim.status !== "pending" && claim.status !== "verified") {
+    throw new Error("Claim cannot be rejected - status is not pending or verified");
+  }
 
   const [updatedClaim] = await db
     .update(placeClaims)
@@ -324,14 +378,22 @@ export async function rejectClaim(
  * Get claim statistics
  */
 export async function getClaimStats(): Promise<ClaimStats> {
-  if (!db) return { total: 0, pending: 0, approved: 0, rejected: 0 };
+  if (!db) return { total: 0, pending: 0, verificationSent: 0, verified: 0, approved: 0, rejected: 0 };
 
-  const [total, pending, approved, rejected] = await Promise.all([
+  const [total, pending, verificationSent, verified, approved, rejected] = await Promise.all([
     db.select({ value: count() }).from(placeClaims),
     db
       .select({ value: count() })
       .from(placeClaims)
       .where(eq(placeClaims.status, "pending")),
+    db
+      .select({ value: count() })
+      .from(placeClaims)
+      .where(eq(placeClaims.status, "verification_sent")),
+    db
+      .select({ value: count() })
+      .from(placeClaims)
+      .where(eq(placeClaims.status, "verified")),
     db
       .select({ value: count() })
       .from(placeClaims)
@@ -345,6 +407,8 @@ export async function getClaimStats(): Promise<ClaimStats> {
   return {
     total: total[0]?.value ?? 0,
     pending: pending[0]?.value ?? 0,
+    verificationSent: verificationSent[0]?.value ?? 0,
+    verified: verified[0]?.value ?? 0,
     approved: approved[0]?.value ?? 0,
     rejected: rejected[0]?.value ?? 0,
   };

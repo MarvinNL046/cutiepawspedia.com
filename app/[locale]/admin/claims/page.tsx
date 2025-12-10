@@ -27,6 +27,11 @@ import {
   XCircle,
   Eye,
   ExternalLink,
+  Mail,
+  Phone,
+  FileText,
+  ShieldCheck,
+  Send,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
@@ -46,25 +51,75 @@ function getStatusBadge(status: string) {
       return (
         <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
           <Clock className="w-3 h-3 mr-1" />
-          Pending
+          Wacht op Review
+        </Badge>
+      );
+    case "verification_sent":
+      return (
+        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+          <Send className="w-3 h-3 mr-1" />
+          Code Verzonden
+        </Badge>
+      );
+    case "verified":
+      return (
+        <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+          <ShieldCheck className="w-3 h-3 mr-1" />
+          Geverifieerd
         </Badge>
       );
     case "approved":
       return (
         <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
           <CheckCircle className="w-3 h-3 mr-1" />
-          Approved
+          Goedgekeurd
         </Badge>
       );
     case "rejected":
       return (
         <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
           <XCircle className="w-3 h-3 mr-1" />
-          Rejected
+          Afgewezen
         </Badge>
       );
     default:
       return <Badge variant="outline">{status}</Badge>;
+  }
+}
+
+function getVerificationMethodBadge(method: string | null) {
+  if (!method) return null;
+  switch (method) {
+    case "email_domain":
+      return (
+        <Badge variant="secondary" className="bg-cyan-50 text-cyan-700">
+          <Mail className="w-3 h-3 mr-1" />
+          Email
+        </Badge>
+      );
+    case "phone":
+      return (
+        <Badge variant="secondary" className="bg-violet-50 text-violet-700">
+          <Phone className="w-3 h-3 mr-1" />
+          Telefoon
+        </Badge>
+      );
+    case "document":
+      return (
+        <Badge variant="secondary" className="bg-orange-50 text-orange-700">
+          <FileText className="w-3 h-3 mr-1" />
+          Document
+        </Badge>
+      );
+    case "manual":
+      return (
+        <Badge variant="secondary" className="bg-gray-100 text-gray-700">
+          <ShieldCheck className="w-3 h-3 mr-1" />
+          Handmatig
+        </Badge>
+      );
+    default:
+      return <Badge variant="secondary">{method}</Badge>;
   }
 }
 
@@ -102,38 +157,50 @@ export default async function ClaimsPage({
 
       <main className="p-6 space-y-6">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <Card>
             <CardHeader className="pb-2">
-              <CardDescription>Total Claims</CardDescription>
+              <CardDescription>Totaal</CardDescription>
               <CardTitle className="text-2xl">{stats.total}</CardTitle>
             </CardHeader>
           </Card>
           <Card className="border-amber-200 bg-amber-50/50">
             <CardHeader className="pb-2">
-              <CardDescription className="text-amber-700">Pending Review</CardDescription>
+              <CardDescription className="text-amber-700">Wacht op Review</CardDescription>
               <CardTitle className="text-2xl text-amber-700">{stats.pending}</CardTitle>
+            </CardHeader>
+          </Card>
+          <Card className="border-blue-200 bg-blue-50/50">
+            <CardHeader className="pb-2">
+              <CardDescription className="text-blue-700">Code Verzonden</CardDescription>
+              <CardTitle className="text-2xl text-blue-700">{stats.verificationSent}</CardTitle>
+            </CardHeader>
+          </Card>
+          <Card className="border-purple-200 bg-purple-50/50">
+            <CardHeader className="pb-2">
+              <CardDescription className="text-purple-700">Geverifieerd</CardDescription>
+              <CardTitle className="text-2xl text-purple-700">{stats.verified}</CardTitle>
             </CardHeader>
           </Card>
           <Card className="border-green-200 bg-green-50/50">
             <CardHeader className="pb-2">
-              <CardDescription className="text-green-700">Approved</CardDescription>
+              <CardDescription className="text-green-700">Goedgekeurd</CardDescription>
               <CardTitle className="text-2xl text-green-700">{stats.approved}</CardTitle>
             </CardHeader>
           </Card>
           <Card className="border-red-200 bg-red-50/50">
             <CardHeader className="pb-2">
-              <CardDescription className="text-red-700">Rejected</CardDescription>
+              <CardDescription className="text-red-700">Afgewezen</CardDescription>
               <CardTitle className="text-2xl text-red-700">{stats.rejected}</CardTitle>
             </CardHeader>
           </Card>
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Link href={`/${locale}/admin/claims`}>
             <Button variant={!status ? "default" : "outline"} size="sm">
-              All ({stats.total})
+              Alle ({stats.total})
             </Button>
           </Link>
           <Link href={`/${locale}/admin/claims?status=pending`}>
@@ -143,7 +210,27 @@ export default async function ClaimsPage({
               className={status === "pending" ? "bg-amber-600 hover:bg-amber-700" : ""}
             >
               <Clock className="w-3 h-3 mr-1" />
-              Pending ({stats.pending})
+              Wacht op Review ({stats.pending})
+            </Button>
+          </Link>
+          <Link href={`/${locale}/admin/claims?status=verification_sent`}>
+            <Button
+              variant={status === "verification_sent" ? "default" : "outline"}
+              size="sm"
+              className={status === "verification_sent" ? "bg-blue-600 hover:bg-blue-700" : ""}
+            >
+              <Send className="w-3 h-3 mr-1" />
+              Code Verzonden ({stats.verificationSent})
+            </Button>
+          </Link>
+          <Link href={`/${locale}/admin/claims?status=verified`}>
+            <Button
+              variant={status === "verified" ? "default" : "outline"}
+              size="sm"
+              className={status === "verified" ? "bg-purple-600 hover:bg-purple-700" : ""}
+            >
+              <ShieldCheck className="w-3 h-3 mr-1" />
+              Geverifieerd ({stats.verified})
             </Button>
           </Link>
           <Link href={`/${locale}/admin/claims?status=approved`}>
@@ -153,7 +240,7 @@ export default async function ClaimsPage({
               className={status === "approved" ? "bg-green-600 hover:bg-green-700" : ""}
             >
               <CheckCircle className="w-3 h-3 mr-1" />
-              Approved ({stats.approved})
+              Goedgekeurd ({stats.approved})
             </Button>
           </Link>
           <Link href={`/${locale}/admin/claims?status=rejected`}>
@@ -163,7 +250,7 @@ export default async function ClaimsPage({
               className={status === "rejected" ? "bg-red-600 hover:bg-red-700" : ""}
             >
               <XCircle className="w-3 h-3 mr-1" />
-              Rejected ({stats.rejected})
+              Afgewezen ({stats.rejected})
             </Button>
           </Link>
         </div>
@@ -193,6 +280,7 @@ export default async function ClaimsPage({
                     <TableHead>Place</TableHead>
                     <TableHead>Claimant</TableHead>
                     <TableHead>Role</TableHead>
+                    <TableHead>Methode</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Submitted</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -222,6 +310,9 @@ export default async function ClaimsPage({
                         <span className="text-sm capitalize">
                           {claim.businessRole || "Owner"}
                         </span>
+                      </TableCell>
+                      <TableCell>
+                        {getVerificationMethodBadge(claim.verificationMethod)}
                       </TableCell>
                       <TableCell>{getStatusBadge(claim.status)}</TableCell>
                       <TableCell className="text-sm text-slate-500">

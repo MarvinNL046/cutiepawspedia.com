@@ -23,6 +23,7 @@ import {
   getLocalizedCategoryName,
   type ContentLocale,
 } from "@/lib/seo";
+import { getLocaleForCountryCode } from "@/lib/geo/localeCountryMap";
 import { Search, Star, CheckCircle } from "lucide-react";
 
 interface HomePageProps {
@@ -204,16 +205,20 @@ export default async function HomePage({ params }: HomePageProps) {
             </h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {countries.map((country) => (
-              <Link
-                key={country.slug || country.code}
-                href={`/${locale}/${country.slug}`}
-                className="bg-card dark:bg-cpSurface/50 rounded-2xl p-4 border border-border dark:border-cpAmber/20 hover:border-cpCoral/40 transition-all text-center group shadow-sm hover:shadow-md"
-              >
-                <span className="text-3xl mb-2 block">{getFlagEmoji(country.code)}</span>
-                <span className="text-foreground dark:text-cpCream font-medium group-hover:text-cpCoral transition-colors">{country.name}</span>
-              </Link>
-            ))}
+            {countries.map((country) => {
+              // Get the preferred locale for this country (e.g., DE → 'de', NL → 'nl')
+              const countryLocale = getLocaleForCountryCode(country.code);
+              return (
+                <Link
+                  key={country.slug || country.code}
+                  href={`/${countryLocale}/${country.slug}`}
+                  className="bg-card dark:bg-cpSurface/50 rounded-2xl p-4 border border-border dark:border-cpAmber/20 hover:border-cpCoral/40 transition-all text-center group shadow-sm hover:shadow-md"
+                >
+                  <span className="text-3xl mb-2 block">{getFlagEmoji(country.code)}</span>
+                  <span className="text-foreground dark:text-cpCream font-medium group-hover:text-cpCoral transition-colors">{country.name}</span>
+                </Link>
+              );
+            })}
           </div>
         </section>
 

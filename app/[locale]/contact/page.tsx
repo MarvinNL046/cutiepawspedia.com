@@ -7,11 +7,10 @@
  * - Optimal performance with pre-rendered content
  */
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Mail, MapPin, Clock, MessageSquare, Building2, HelpCircle, Send } from "lucide-react";
+import { Mail, MapPin, Clock, MessageSquare, HelpCircle, Send } from "lucide-react";
+import { ContactForm } from "@/components/forms";
 
 // Static page with daily revalidation - content rarely changes
 export const dynamic = "force-static";
@@ -36,6 +35,9 @@ const translations = {
       subject: "Subject",
       message: "Your message...",
       submit: "Send Message",
+      newsletter: "Subscribe to our newsletter for pet care tips and updates",
+      success: "Message sent successfully!",
+      error: "Something went wrong. Please try again.",
     },
 
     info: {
@@ -92,6 +94,9 @@ const translations = {
       subject: "Onderwerp",
       message: "Uw bericht...",
       submit: "Verstuur Bericht",
+      newsletter: "Schrijf je in voor onze nieuwsbrief met tips voor huisdierverzorging",
+      success: "Bericht succesvol verzonden!",
+      error: "Er is iets misgegaan. Probeer het opnieuw.",
     },
 
     info: {
@@ -148,6 +153,9 @@ const translations = {
       subject: "Betreff",
       message: "Ihre Nachricht...",
       submit: "Nachricht Senden",
+      newsletter: "Abonnieren Sie unseren Newsletter mit Tipps zur Tierpflege",
+      success: "Nachricht erfolgreich gesendet!",
+      error: "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.",
     },
 
     info: {
@@ -227,38 +235,7 @@ export default async function ContactPage({ params }: ContactPageProps) {
                   <CardDescription>{t.form.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <form className="space-y-4">
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <Input
-                        placeholder={t.form.firstName}
-                        className="border-border bg-background"
-                      />
-                      <Input
-                        placeholder={t.form.lastName}
-                        className="border-border bg-background"
-                      />
-                    </div>
-                    <Input
-                      type="email"
-                      placeholder={t.form.email}
-                      className="border-border bg-background"
-                    />
-                    <Input
-                      placeholder={t.form.subject}
-                      className="border-border bg-background"
-                    />
-                    <textarea
-                      className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm min-h-[120px] focus:outline-none focus:ring-2 focus:ring-cpCoral/50 focus:border-cpCoral"
-                      placeholder={t.form.message}
-                    />
-                    <Button
-                      type="submit"
-                      className="w-full bg-cpCoral hover:bg-cpCoral/90 text-white"
-                    >
-                      <Send className="h-4 w-4 mr-2" />
-                      {t.form.submit}
-                    </Button>
-                  </form>
+                  <ContactForm translations={t.form} />
                 </CardContent>
               </Card>
             </div>

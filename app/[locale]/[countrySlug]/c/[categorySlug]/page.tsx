@@ -206,30 +206,30 @@ export default async function CountryCategoryPage({ params }: CountryCategoryPag
       />
 
       {/* AI-Generated Intro Content */}
-      <section className="bg-gradient-to-b from-cpAqua/10 to-white border-b">
+      <section className="bg-gradient-to-b from-cpAqua/10 to-background dark:from-cpAqua/5 dark:to-cpCharcoal border-b border-border dark:border-cpAmber/20">
         <div className="container mx-auto max-w-6xl px-4 py-6">
-          <p className="text-slate-700 mb-2">{content.intro}</p>
+          <p className="text-foreground dark:text-cpCream/90 mb-2">{content.intro}</p>
           {content.secondary && (
-            <p className="text-sm text-muted-foreground">{content.secondary}</p>
+            <p className="text-sm text-muted-foreground dark:text-cpCream/70">{content.secondary}</p>
           )}
         </div>
       </section>
 
       {/* Filter Bar */}
-      <section className="sticky top-16 z-40 bg-white border-b shadow-sm">
+      <section className="sticky top-16 z-40 bg-background dark:bg-cpCharcoal border-b border-border dark:border-cpAmber/20 shadow-sm">
         <div className="container mx-auto max-w-6xl px-4 py-3">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="gap-2">
+              <Button variant="outline" size="sm" className="gap-2 dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10">
                 <Filter className="h-4 w-4" />
                 {locale === "nl" ? "Filters" : "Filters"}
               </Button>
-              <Badge variant="secondary" className="hidden sm:inline-flex gap-1">
+              <Badge variant="secondary" className="hidden sm:inline-flex gap-1 dark:bg-cpAmber/10 dark:text-cpCream">
                 <MapPin className="h-3 w-3" />
                 {locale === "nl" ? "Landelijk" : "Nationwide"}
               </Badge>
             </div>
-            <Button variant="ghost" size="sm" className="gap-2">
+            <Button variant="ghost" size="sm" className="gap-2 dark:text-cpCream dark:hover:bg-cpAmber/10">
               <SlidersHorizontal className="h-4 w-4" />
               {locale === "nl" ? "Sorteren" : "Sort"}
             </Button>
@@ -238,48 +238,50 @@ export default async function CountryCategoryPage({ params }: CountryCategoryPag
       </section>
 
       {/* Places Grid */}
-      <section className="container mx-auto max-w-6xl px-4 py-8">
-        {places.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {places.map((place) => (
-              <PlaceCard
-                key={place.id}
-                place={place}
-                locale={locale}
-                countrySlug={countrySlug}
-                citySlug={(() => { const city = Array.isArray(place.city) ? place.city[0] : place.city; return city?.slug || ""; })()}
-                categorySlug={categorySlug}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12">
-            <span className="text-6xl block mb-4">🔍</span>
-            <h2 className="text-xl font-semibold mb-2">
-              {locale === "nl" ? "Geen resultaten gevonden" : "No results found"}
-            </h2>
-            <p className="text-muted-foreground">
-              {locale === "nl"
-                ? `Er zijn nog geen ${categoryLabel.toLowerCase()} in ${countryName} geregistreerd.`
-                : `No ${categoryLabel.toLowerCase()} have been registered in ${countryName} yet.`}
-            </p>
-          </div>
-        )}
+      <section className="bg-background dark:bg-cpCharcoal py-8">
+        <div className="container mx-auto max-w-6xl px-4">
+          {places.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {places.map((place) => (
+                <PlaceCard
+                  key={place.id}
+                  place={place}
+                  locale={locale}
+                  countrySlug={countrySlug}
+                  citySlug={(() => { const city = Array.isArray(place.city) ? place.city[0] : place.city; return city?.slug || ""; })()}
+                  categorySlug={categorySlug}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <span className="text-6xl block mb-4">🔍</span>
+              <h2 className="text-xl font-semibold text-foreground dark:text-cpCream mb-2">
+                {locale === "nl" ? "Geen resultaten gevonden" : "No results found"}
+              </h2>
+              <p className="text-muted-foreground dark:text-cpCream/70">
+                {locale === "nl"
+                  ? `Er zijn nog geen ${categoryLabel.toLowerCase()} in ${countryName} geregistreerd.`
+                  : `No ${categoryLabel.toLowerCase()} have been registered in ${countryName} yet.`}
+              </p>
+            </div>
+          )}
+        </div>
       </section>
 
       {/* Related Links */}
-      <section className="bg-slate-50 py-12">
+      <section className="bg-muted/50 dark:bg-cpCharcoal/80 py-12 border-t border-border dark:border-cpAmber/20">
         <div className="container mx-auto max-w-6xl px-4">
           <SectionHeader
             title={locale === "nl" ? "Bekijk ook" : "See also"}
           />
           <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10">
+            <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10 dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpCoral/20">
               <a href={`/${locale}/${countrySlug}/best/${categorySlug}`}>
                 {locale === "nl" ? `Beste ${categoryLabel} in ${countryName}` : `Best ${categoryLabel} in ${countryName}`}
               </a>
             </Badge>
-            <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10">
+            <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10 dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpCoral/20">
               <a href={`/${locale}/${countrySlug}/top/${categorySlug}`}>
                 {locale === "nl" ? `Top 10 ${categoryLabel} in ${countryName}` : `Top 10 ${categoryLabel} in ${countryName}`}
               </a>

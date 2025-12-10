@@ -139,6 +139,12 @@ export interface AiContentStructure {
   // Bullet points
   bullets?: string[];
 
+  // Service highlights (place-specific)
+  serviceHighlights?: string[];
+
+  // Local relevance (place-specific)
+  localRelevance?: string;
+
   // Internal linking suggestions
   relatedLinks?: Array<{
     text: string;

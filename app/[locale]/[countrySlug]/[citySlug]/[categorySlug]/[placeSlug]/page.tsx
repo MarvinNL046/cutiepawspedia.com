@@ -41,7 +41,7 @@ import { FavoriteButton } from "@/components/favorites/FavoriteButton";
 import { isFavorite } from "@/db/queries/favorites";
 import { MapPin, Phone, Globe, Mail, Star, CheckCircle, MessageSquare, Lock, Shield, Crown } from "lucide-react";
 import { getCityName, getCountryName } from "@/lib/utils/place-helpers";
-import { AboutSection, ServicesSection, HighlightsSection, BusinessSnapshot, BusinessPhotoGallery, ContentSections } from "@/components/place";
+import { AboutSection, ServicesSection, HighlightsSection, BusinessSnapshot, BusinessPhotoGallery, ContentSections, ServiceHighlightsSection, CTASection, GoogleReviewsSection } from "@/components/place";
 import { EditorialByline } from "@/components/seo";
 import { getActivePhotosByPlaceId } from "@/db/queries/businessPhotos";
 import { getBusinessPhotoUrl } from "@/lib/storage/businessPhotos";
@@ -121,6 +121,14 @@ export default async function PlacePage({ params }: PlacePageProps) {
     googleRating?: number;
     googleReviewCount?: number;
     scrapedAt?: string;
+    googleMapsUrl?: string;
+    googleReviews?: Array<{
+      text: string;
+      rating: number;
+      author: string;
+      date?: string | null;
+      likes?: number;
+    }>;
     facts?: {
       foundedYear?: number;
       specializations?: string[];
@@ -416,12 +424,41 @@ export default async function PlacePage({ params }: PlacePageProps) {
               locale={locale}
             />
 
+            {/* Google Reviews Section - Show scraped reviews from Google Maps */}
+            {scrapedContent?.googleReviews && scrapedContent.googleReviews.length > 0 && (
+              <GoogleReviewsSection
+                reviews={scrapedContent.googleReviews}
+                placeName={place.name}
+                googleMapsUrl={scrapedContent.googleMapsUrl || place.googleMapsUrl}
+                locale={locale}
+              />
+            )}
+
+            {/* Service Highlights - AI-generated USPs */}
+            {content.serviceHighlights && content.serviceHighlights.length > 0 && (
+              <ServiceHighlightsSection
+                highlights={content.serviceHighlights}
+                placeName={place.name}
+                locale={locale}
+              />
+            )}
+
             {/* AI-Generated Content Sections for richer content */}
             <ContentSections
               content={content}
               placeName={place.name}
               locale={locale}
             />
+
+            {/* CTA Section - AI-generated call-to-action */}
+            {content.cta && (
+              <CTASection
+                cta={content.cta}
+                placeName={place.name}
+                phone={placeFeatures.canShowPhone ? place.phone : null}
+                locale={locale}
+              />
+            )}
 
             {/* Editorial Byline - E-E-A-T Trust Signal */}
             <div className="py-4">

@@ -41,7 +41,7 @@ import { FavoriteButton } from "@/components/favorites/FavoriteButton";
 import { isFavorite } from "@/db/queries/favorites";
 import { MapPin, Phone, Globe, Mail, Star, CheckCircle, Lock, Shield, Crown, MessageSquare } from "lucide-react";
 import { ReviewSection } from "@/components/reviews";
-import { AboutSection, ServicesSection, HighlightsSection, BusinessSnapshot, BusinessPhotoGallery } from "@/components/place";
+import { AboutSection, ServicesSection, HighlightsSection, BusinessSnapshot, BusinessPhotoGallery, GoogleReviewsSection } from "@/components/place";
 import { getActivePhotosByPlaceId } from "@/db/queries/businessPhotos";
 import { getBusinessPhotoUrl } from "@/lib/storage/businessPhotos";
 import { BetweenContentAd, SidebarAd } from "@/components/ads";
@@ -175,6 +175,14 @@ export default async function PlacePage({ params }: PlacePageProps) {
     googleRating?: number;
     googleReviewCount?: number;
     scrapedAt?: string;
+    googleMapsUrl?: string;
+    googleReviews?: Array<{
+      text: string;
+      rating: number;
+      author: string;
+      date?: string | null;
+      likes?: number;
+    }>;
     facts?: {
       foundedYear?: number;
       specializations?: string[];
@@ -452,6 +460,16 @@ export default async function PlacePage({ params }: PlacePageProps) {
               }}
               locale={locale}
             />
+
+            {/* Google Reviews Section - Show scraped reviews from Google Maps */}
+            {scrapedContent?.googleReviews && scrapedContent.googleReviews.length > 0 && (
+              <GoogleReviewsSection
+                reviews={scrapedContent.googleReviews}
+                placeName={place.name}
+                googleMapsUrl={scrapedContent.googleMapsUrl || place.googleMapsUrl}
+                locale={locale}
+              />
+            )}
 
             <BetweenContentAd />
 

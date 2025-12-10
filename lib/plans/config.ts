@@ -82,9 +82,14 @@ export const PLAN_CONFIG: Record<PlanKey, PlanDefinition> = {
     sortOrder: 1,
     features: {
       maxPhotos: 0, // Only UGC photos allowed
-      canShowWebsite: false,
-      canShowEmail: false,
-      canShowPhone: false,
+      // GATING DISABLED FOR ADSENSE - show all contact info for better user experience
+      // Original values (can be re-enabled for premium gating):
+      // canShowWebsite: false,
+      // canShowEmail: false,
+      // canShowPhone: false,
+      canShowWebsite: true,
+      canShowEmail: true,
+      canShowPhone: true,
       canShowSocialLinks: false,
       maxCategories: 1,
       canShowDescription: false,
@@ -339,7 +344,7 @@ export const FEATURE_COMPARISONS: FeatureComparison[] = [
   {
     name: "Website link",
     nameNl: "Website link",
-    free: false,
+    free: true, // UNGATED FOR ADSENSE
     starter: true,
     pro: true,
     elite: true,
@@ -347,7 +352,7 @@ export const FEATURE_COMPARISONS: FeatureComparison[] = [
   {
     name: "Email & phone contact",
     nameNl: "E-mail & telefoon contact",
-    free: false,
+    free: true, // UNGATED FOR ADSENSE
     starter: true,
     pro: true,
     elite: true,

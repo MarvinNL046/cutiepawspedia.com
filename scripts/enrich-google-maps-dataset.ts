@@ -20,6 +20,7 @@ const DATASET_ID = "gd_m8ebnr0q2qlklc02fz";
 
 interface GoogleMapsPlace {
   place_id?: string;
+  cid?: string;  // Google CID for exact matching
   name?: string;
   rating?: number;
   reviews_count?: number;
@@ -41,6 +42,20 @@ interface GoogleMapsPlace {
   lon?: number;
   permanently_closed?: boolean;
   temporarily_closed?: boolean;
+  // Top reviews from Google Maps Full Info dataset
+  // BrightData uses: content, rating, review_date, reviewer_name
+  top_reviews?: {
+    content?: string;           // Review text
+    rating?: number;            // Star rating (1-5)
+    review_date?: string;       // ISO date
+    reviewer_name?: string;     // Author name
+    reviewer_image_url?: string;
+    reviewer_reviews_number?: number;
+    reviewer_photos_number?: number;
+    // Legacy field names (for compatibility)
+    review_text?: string;
+    review_rating?: number;
+  }[];
 }
 
 interface Place {
@@ -49,12 +64,28 @@ interface Place {
   address: string | null;
   city_name: string;
   country_name: string;
+  google_cid: string | null;  // Google CID for exact matching
 }
 
 /**
- * Construct Google Maps search URL for a place
+ * Check if a string is a valid numeric CID (not a Place ID)
+ * CID: numeric string (e.g., "8453003438972459578")
+ * Place ID: base64-like string starting with "ChIJ" (e.g., "ChIJk6gQMljuxkcRf3dqP5mgA1w")
+ */
+function isNumericCid(id: string): boolean {
+  return /^\d+$/.test(id);
+}
+
+/**
+ * Construct Google Maps URL for a place
+ * Prefers CID-based URL for exact matching, falls back to search URL
  */
 function buildGoogleMapsUrl(place: Place): string {
+  if (place.google_cid && isNumericCid(place.google_cid)) {
+    // Use CID-based URL for exact place matching (preferred)
+    return `https://www.google.com/maps?cid=${place.google_cid}`;
+  }
+  // Fallback to search URL (for Place IDs or missing CID)
   const searchQuery = encodeURIComponent(`${place.name} ${place.city_name} ${place.country_name}`);
   return `https://www.google.com/maps/search/${searchQuery}`;
 }
@@ -110,8 +141,9 @@ async function triggerDatasetCollection(places: Place[]): Promise<string | null>
 /**
  * Poll for dataset results
  */
-async function pollForResults(snapshotId: string, maxAttempts = 30): Promise<GoogleMapsPlace[]> {
-  console.log(`\n⏳ Polling for results (max ${maxAttempts * 10}s)...`);
+async function pollForResults(snapshotId: string, maxAttempts = 180): Promise<GoogleMapsPlace[]> {
+  // 180 attempts × 10s = 30 minutes (enough for ~50 URLs @ 37s/input)
+  console.log(`\n⏳ Polling for results (max ${maxAttempts * 10}s = ${Math.round(maxAttempts * 10 / 60)} min)...`);
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     await new Promise(r => setTimeout(r, 10000)); // Wait 10 seconds
@@ -188,11 +220,20 @@ function convertOpeningHours(gmHours: GoogleMapsPlace["open_hours"]): Record<str
 }
 
 /**
- * Match Google Maps result to our place by name similarity
+ * Match Google Maps result to our place by CID (preferred) or name
  */
-function matchPlaceByName(gmPlace: GoogleMapsPlace, places: Place[]): Place | null {
-  if (!gmPlace.name) return null;
+function matchPlace(gmPlace: GoogleMapsPlace, places: Place[]): Place | null {
+  // Try CID match first (most reliable)
+  if (gmPlace.cid) {
+    for (const place of places) {
+      if (place.google_cid === gmPlace.cid) {
+        return place;
+      }
+    }
+  }
 
+  // Fallback to name matching
+  if (!gmPlace.name) return null;
   const gmNameLower = gmPlace.name.toLowerCase();
 
   // Try exact match first
@@ -214,12 +255,40 @@ function matchPlaceByName(gmPlace: GoogleMapsPlace, places: Place[]): Place | nu
 }
 
 /**
- * Update place with Google Maps data
+ * Clean review text - remove excessive whitespace, truncate if needed
  */
-async function updatePlace(placeId: number, gmData: GoogleMapsPlace): Promise<boolean> {
+function cleanReviewText(text: string): string {
+  return text
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 500); // Max 500 chars per review
+}
+
+/**
+ * Update place with Google Maps data (including reviews)
+ */
+async function updatePlace(placeId: number, gmData: GoogleMapsPlace): Promise<{ success: boolean; reviewsStored: number }> {
   try {
-    const scrapedContent = {
-      googlePlaceId: gmData.place_id,
+    // Format top_reviews for storage (keep top 5)
+    // BrightData Google Maps Full Info uses: content, rating, review_date, reviewer_name
+    const formattedReviews = (gmData.top_reviews || [])
+      .slice(0, 5)
+      .map((r: Record<string, unknown>) => {
+        // BrightData uses 'content' for review text
+        const reviewText = (r.content || r.review_text || r.text || "") as string;
+        return {
+          text: cleanReviewText(reviewText),
+          rating: (r.rating || r.review_rating || 0) as number,
+          author: (r.reviewer_name || r.author || "Anoniem") as string,
+          date: (r.review_date || r.review_datetime_utc || null) as string | null,
+          likes: (r.review_likes || r.likes || 0) as number,
+          ownerResponse: null,  // Full Info dataset doesn't include owner responses
+        };
+      })
+      .filter(r => r.text.length > 10); // Only keep reviews with actual text
+
+    const scrapedContent: Record<string, unknown> = {
+      googlePlaceId: gmData.place_id || gmData.cid,
       googleRating: gmData.rating,
       googleReviewCount: gmData.reviews_count,
       description: gmData.description,
@@ -230,14 +299,21 @@ async function updatePlace(placeId: number, gmData: GoogleMapsPlace): Promise<bo
       enrichedAt: new Date().toISOString(),
     };
 
+    // Add reviews if available
+    if (formattedReviews.length > 0) {
+      scrapedContent.googleReviews = formattedReviews;
+    }
+
     const openingHours = convertOpeningHours(gmData.open_hours);
 
     // Build update query
-    const newFlags = JSON.stringify([
+    const flags = [
       "RATING_VIA_GOOGLE",
       "ENRICHMENT_COMPLETE",
       ...(openingHours ? ["OPENING_HOURS_VIA_SCHEMA"] : []),
-    ]);
+      ...(formattedReviews.length > 0 ? ["REVIEWS_VIA_GOOGLE"] : []),
+    ];
+    const newFlags = JSON.stringify(flags);
 
     await sql`
       UPDATE places SET
@@ -256,10 +332,10 @@ async function updatePlace(placeId: number, gmData: GoogleMapsPlace): Promise<bo
       WHERE id = ${placeId}
     `;
 
-    return true;
+    return { success: true, reviewsStored: formattedReviews.length };
   } catch (error) {
     console.error(`   ❌ Update error:`, error instanceof Error ? error.message : error);
-    return false;
+    return { success: false, reviewsStored: 0 };
   }
 }
 
@@ -278,26 +354,86 @@ async function main() {
   const limit = limitArg ? parseInt(limitArg.split("=")[1], 10) : 50;
   const cityArg = args.find(a => a.startsWith("--city="));
   const cityFilter = cityArg ? cityArg.split("=")[1] : null;
+  const forceIncomplete = args.includes("--force-incomplete");
+  const allIncomplete = args.includes("--all-incomplete");
 
   console.log(`📍 City: ${cityFilter || "All"}`);
-  console.log(`📊 Limit: ${limit}\n`);
+  console.log(`📊 Limit: ${limit}`);
+  if (allIncomplete) {
+    console.log(`🔄 Mode: ALL incomplete places (rating but no website/hours, any flag status)`);
+  } else if (forceIncomplete) {
+    console.log(`🔄 Mode: Force re-enrich ENRICHMENT_COMPLETE places missing data`);
+  }
+  console.log("");
 
-  // Get places that need opening hours enrichment
+  // Get places that need enrichment (prioritize those with CIDs for exact matching)
   const cityCondition = cityFilter ? sql`AND c.name = ${cityFilter}` : sql``;
 
-  const places = await sql`
-    SELECT
-      p.id, p.name, p.address,
-      c.name as city_name,
-      co.name as country_name
-    FROM places p
-    LEFT JOIN cities c ON p.city_id = c.id
-    LEFT JOIN countries co ON c.country_id = co.id
-    WHERE p.opening_hours IS NULL
-    ${cityCondition}
-    ORDER BY p.id
-    LIMIT ${limit}
-  ` as Place[];
+  // Different query based on mode:
+  // Normal: places without opening_hours
+  // Force-incomplete: places that have ENRICHMENT_COMPLETE but no website OR opening_hours
+  // All-incomplete: ALL places with rating but missing website OR opening_hours (regardless of flags)
+  let places: Place[];
+
+  if (allIncomplete) {
+    // Re-enrich ALL incomplete places - those with rating but missing website or hours
+    // This catches both flagged and unflagged places
+    places = await sql`
+      SELECT
+        p.id, p.name, p.address,
+        c.name as city_name,
+        co.name as country_name,
+        p.scraped_content->>'googlePlaceId' as google_cid
+      FROM places p
+      LEFT JOIN cities c ON p.city_id = c.id
+      LEFT JOIN countries co ON c.country_id = co.id
+      WHERE (p.website IS NULL OR p.opening_hours IS NULL)
+        AND p.avg_rating IS NOT NULL
+        ${cityCondition}
+      ORDER BY
+        CASE WHEN p.scraped_content->>'googlePlaceId' IS NOT NULL THEN 0 ELSE 1 END,
+        p.review_count DESC NULLS LAST,
+        p.id
+      LIMIT ${limit}
+    ` as Place[];
+  } else if (forceIncomplete) {
+    // Re-enrich places that were marked complete but only have rating data (old enrichment)
+    places = await sql`
+      SELECT
+        p.id, p.name, p.address,
+        c.name as city_name,
+        co.name as country_name,
+        p.scraped_content->>'googlePlaceId' as google_cid
+      FROM places p
+      LEFT JOIN cities c ON p.city_id = c.id
+      LEFT JOIN countries co ON c.country_id = co.id
+      WHERE p.data_quality_flags @> '["ENRICHMENT_COMPLETE"]'::jsonb
+        AND (p.website IS NULL OR p.opening_hours IS NULL)
+        AND p.avg_rating IS NOT NULL
+        ${cityCondition}
+      ORDER BY
+        CASE WHEN p.scraped_content->>'googlePlaceId' IS NOT NULL THEN 0 ELSE 1 END,
+        p.id
+      LIMIT ${limit}
+    ` as Place[];
+  } else {
+    places = await sql`
+      SELECT
+        p.id, p.name, p.address,
+        c.name as city_name,
+        co.name as country_name,
+        p.scraped_content->>'googlePlaceId' as google_cid
+      FROM places p
+      LEFT JOIN cities c ON p.city_id = c.id
+      LEFT JOIN countries co ON c.country_id = co.id
+      WHERE p.opening_hours IS NULL
+      ${cityCondition}
+      ORDER BY
+        CASE WHEN p.scraped_content->>'googlePlaceId' IS NOT NULL THEN 0 ELSE 1 END,
+        p.id
+      LIMIT ${limit}
+    ` as Place[];
+  }
 
   console.log(`📊 Found ${places.length} places to enrich\n`);
 
@@ -306,7 +442,16 @@ async function main() {
     return;
   }
 
-  places.forEach((p, i) => console.log(`   ${i + 1}. ${p.name} (${p.city_name})`));
+  const withNumericCid = places.filter(p => p.google_cid && isNumericCid(p.google_cid)).length;
+  const withPlaceId = places.filter(p => p.google_cid && !isNumericCid(p.google_cid)).length;
+  console.log(`   (${withNumericCid} with numeric CID, ${withPlaceId} with Place ID, ${places.length - withNumericCid - withPlaceId} via search)\n`);
+  places.slice(0, 10).forEach((p, i) => {
+    const marker = p.google_cid
+      ? (isNumericCid(p.google_cid) ? " ✓CID" : " ~PlaceID")
+      : " ◦search";
+    console.log(`   ${i + 1}. ${p.name} (${p.city_name})${marker}`);
+  });
+  if (places.length > 10) console.log(`   ... and ${places.length - 10} more`);
 
   // Trigger dataset collection
   console.log("\n🔄 Triggering Google Maps Dataset collection...\n");
@@ -330,13 +475,19 @@ async function main() {
   let matched = 0;
   let updated = 0;
   let withHours = 0;
+  let withReviews = 0;
+  let totalReviews = 0;
+  let cidMatches = 0;
 
   for (const gmPlace of results) {
-    const matchedPlace = matchPlaceByName(gmPlace, places);
+    const matchedPlace = matchPlace(gmPlace, places);
 
     if (matchedPlace) {
       matched++;
-      console.log(`\n🔍 ${matchedPlace.name}`);
+      const isCidMatch = gmPlace.cid && matchedPlace.google_cid === gmPlace.cid;
+      if (isCidMatch) cidMatches++;
+
+      console.log(`\n🔍 ${matchedPlace.name}${isCidMatch ? " (CID match)" : ""}`);
 
       if (gmPlace.rating) {
         console.log(`   ⭐ ${gmPlace.rating}/5 (${gmPlace.reviews_count || 0} reviews)`);
@@ -352,24 +503,39 @@ async function main() {
         console.log(`   📞 ${gmPlace.phone_number}`);
       }
 
-      const success = await updatePlace(matchedPlace.id, gmPlace);
-      if (success) {
+      if (gmPlace.top_reviews && gmPlace.top_reviews.length > 0) {
+        console.log(`   💬 ${gmPlace.top_reviews.length} reviews found`);
+        // Show preview of first review (BrightData uses 'content' field)
+        const firstReview = gmPlace.top_reviews[0];
+        if (firstReview?.content) {
+          const preview = firstReview.content.slice(0, 60);
+          console.log(`      "${preview}..."`);
+        }
+      }
+
+      const result = await updatePlace(matchedPlace.id, gmPlace);
+      if (result.success) {
         updated++;
-        console.log(`   ✅ Updated!`);
+        if (result.reviewsStored > 0) {
+          withReviews++;
+          totalReviews += result.reviewsStored;
+        }
+        console.log(`   ✅ Updated!${result.reviewsStored > 0 ? ` (${result.reviewsStored} reviews saved)` : ""}`);
       }
     } else {
-      console.log(`\n⚠️ No match for: ${gmPlace.name}`);
+      console.log(`\n⚠️ No match for: ${gmPlace.name} (CID: ${gmPlace.cid || "none"})`);
     }
   }
 
   // Summary
   console.log("\n" + "━".repeat(60));
   console.log("📊 Enrichment Complete!\n");
-  console.log(`   Places queried: ${places.length}`);
-  console.log(`   Results received: ${results.length}`);
-  console.log(`   Matched: ${matched}`);
-  console.log(`   Updated: ${updated}`);
+  console.log(`   Places queried:    ${places.length}`);
+  console.log(`   Results received:  ${results.length}`);
+  console.log(`   Matched:           ${matched} (${cidMatches} via CID)`);
+  console.log(`   Updated:           ${updated}`);
   console.log(`   With opening hours: ${withHours}`);
+  console.log(`   With reviews:       ${withReviews} (${totalReviews} total reviews)`);
 }
 
 main().catch(console.error);

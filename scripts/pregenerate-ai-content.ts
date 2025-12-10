@@ -178,6 +178,11 @@ async function getPlaces(): Promise<ContentItem[]> {
       googleReviewCount?: number;
       description?: string;
       servicesProvided?: string[];
+      googleReviews?: Array<{
+        text: string;
+        rating: number;
+        author: string;
+      }>;
       facts?: {
         foundedYear?: number;
         specializations?: string[];
@@ -209,6 +214,7 @@ async function getPlaces(): Promise<ContentItem[]> {
         aboutUs: scrapedContent?.aboutUs,
         aboutUsFacts: scrapedContent?.facts,
         servicesProvided: scrapedContent?.servicesProvided,
+        googleReviews: scrapedContent?.googleReviews,
       },
       prompt: buildPrompt("place", {
         placeName: row.name,
@@ -225,6 +231,7 @@ async function getPlaces(): Promise<ContentItem[]> {
         aboutUs: scrapedContent?.aboutUs,
         aboutUsFacts: scrapedContent?.facts,
         servicesProvided: scrapedContent?.servicesProvided,
+        googleReviews: scrapedContent?.googleReviews,
       }),
     };
   });
@@ -687,14 +694,26 @@ ${(data.aboutUs as string).slice(0, 1500)}`;
         }
       }
 
+      // Build reviews section from Google Reviews
+      let reviewsSection = "";
+      if (data.googleReviews && (data.googleReviews as Array<{text: string; rating: number; author: string}>).length > 0) {
+        const reviews = data.googleReviews as Array<{text: string; rating: number; author: string}>;
+        const topReviews = reviews.slice(0, 3).map(r => {
+          const text = r.text.length > 200 ? r.text.slice(0, 200) + "..." : r.text;
+          return `"${text}" - ${r.author} (${r.rating}/5)`;
+        });
+        reviewsSection = `\n\nCustomer Reviews from Google:\n${topReviews.join("\n")}`;
+      }
+
       return `Generate comprehensive SEO content for: ${data.placeName} in ${data.cityName}, ${data.countryName}.
 
 Business Context:
-${contextSections.map(s => `- ${s}`).join("\n")}${aboutUsSection}
+${contextSections.map(s => `- ${s}`).join("\n")}${aboutUsSection}${reviewsSection}
 
 ${categoryContext ? `\n${categoryContext}\n` : ""}
 IMPORTANT INSTRUCTIONS:
 ${data.aboutUs ? "- Use the about-us information to write personalized, unique content" : "- Create unique content based on the business type and location"}
+${data.googleReviews ? "- Use the customer reviews to highlight what customers appreciate about this business" : ""}
 - Generate 4 UNIQUE FAQs specific to THIS business (use business name, location, category)
 - Include sections: "What to Expect", "Services Overview", "Why Choose This Business"
 - Write a localRelevance paragraph about serving ${data.cityName} area

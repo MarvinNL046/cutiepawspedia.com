@@ -30,6 +30,17 @@ export const LOCALE_TO_COUNTRY_SLUG: Record<string, string> = {
   en: "netherlands", // Primary market
 };
 
+// Map country slug to preferred locale for URL generation
+export const COUNTRY_SLUG_TO_LOCALE: Record<string, string> = {
+  netherlands: "nl",
+  belgie: "nl", // Belgium uses Dutch locale (also supports French)
+  germany: "de",
+  france: "fr",
+  spain: "es",
+  italy: "it",
+  portugal: "pt",
+};
+
 // Map country code to preferred locale (for country-based locale switching)
 export const COUNTRY_CODE_TO_LOCALE: Record<string, string> = {
   NL: "nl", // Netherlands → Dutch
@@ -75,4 +86,12 @@ export function getCountrySlugForLocale(locale: string): string {
  */
 export function hasCountryMapping(locale: string): boolean {
   return locale in LOCALE_TO_COUNTRY_CODE;
+}
+
+/**
+ * Get the preferred locale for a country slug
+ * Falls back to 'nl' if no mapping exists
+ */
+export function getLocaleForCountrySlug(countrySlug: string): string {
+  return COUNTRY_SLUG_TO_LOCALE[countrySlug.toLowerCase()] || "nl";
 }

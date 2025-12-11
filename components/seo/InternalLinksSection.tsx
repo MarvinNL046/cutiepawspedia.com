@@ -5,7 +5,7 @@
  * Supports multiple display variants and grouped/flat layouts.
  */
 
-import Link from "next/link";
+import { OptimizedLink as Link } from "@/components/ui/optimized-link";
 import { ChevronRight, MapPin, Tag, Building2, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

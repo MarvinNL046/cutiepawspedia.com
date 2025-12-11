@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { OptimizedLink as Link } from "@/components/ui/optimized-link";
 import { BadgeCheck, GraduationCap, Users, Lock, Shield } from "lucide-react";
 import { NewsletterForm } from "@/components/forms";
 

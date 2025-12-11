@@ -1,4 +1,9 @@
 import Link from "next/link";
+
+// Wrapper to disable prefetch for performance (prevents 300+ RSC requests)
+const OptimizedLink = ({ children, ...props }: React.ComponentProps<typeof Link>) => (
+  <Link prefetch={false} {...props}>{children}</Link>
+);
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, Phone, Crown, CheckCircle, Sparkles } from "lucide-react";
@@ -81,7 +86,7 @@ export function PlaceCard({ place, locale, countrySlug, citySlug, provinceSlug, 
     : "bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20";
 
   return (
-    <Link href={href} className="block">
+    <OptimizedLink href={href} className="block">
       <Card className={`group hover-lift hover:shadow-xl hover:shadow-cpCoral/10 dark:hover:shadow-cpCoral/20 relative overflow-hidden transition-all duration-300 hover:-translate-y-1 rounded-2xl ${featuredStyles}`}>
         {/* Plan Badge Ribbon */}
         {place.planBadge && (
@@ -167,6 +172,6 @@ export function PlaceCard({ place, locale, countrySlug, citySlug, provinceSlug, 
           )}
         </CardContent>
       </Card>
-    </Link>
+    </OptimizedLink>
   );
 }

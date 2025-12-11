@@ -2,6 +2,11 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronRight, MapPin } from "lucide-react";
 
+// Wrapper to disable prefetch for performance (prevents 300+ RSC requests)
+const OptimizedLink = ({ children, ...props }: React.ComponentProps<typeof Link>) => (
+  <Link prefetch={false} {...props}>{children}</Link>
+);
+
 interface CityCardProps {
   href: string;
   name: string;
@@ -14,7 +19,7 @@ interface CityCardProps {
  */
 export function CityCard({ href, name, placeCount }: CityCardProps) {
   return (
-    <Link href={href} className="group block">
+    <OptimizedLink href={href} className="group block">
       <Card className="hover-lift hover:shadow-md hover:border-cpCoral/50 h-full">
         <CardContent className="p-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -31,6 +36,6 @@ export function CityCard({ href, name, placeCount }: CityCardProps) {
           </div>
         </CardContent>
       </Card>
-    </Link>
+    </OptimizedLink>
   );
 }

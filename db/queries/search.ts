@@ -264,7 +264,7 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
     });
   }
 
-  // Re-sort by plan priority if enabled (since DB ordering doesn't join plan table efficiently)
+  // Re-sort by plan priority if enabled, but respect user's sortBy as secondary sort
   if (planPriorityFirst && results.length > 0) {
     results.sort((a, b) => {
       const aBusiness = getRelation(a.business);
@@ -273,7 +273,26 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
       const bPlan = bBusiness ? getRelation(bBusiness.subscriptionPlan) : null;
       const aPriority = aPlan?.priorityRank ?? 1; // Default to FREE (1) if no plan
       const bPriority = bPlan?.priorityRank ?? 1;
-      return bPriority - aPriority; // Higher priority first
+
+      // First compare by plan priority
+      if (bPriority !== aPriority) {
+        return bPriority - aPriority; // Higher priority first
+      }
+
+      // Then apply secondary sort based on user's sortBy preference
+      if (sortBy === "name") {
+        return a.name.localeCompare(b.name);
+      } else if (sortBy === "newest") {
+        const aDate = a.createdAt?.getTime() ?? 0;
+        const bDate = b.createdAt?.getTime() ?? 0;
+        return bDate - aDate;
+      } else {
+        // Default: rating (for both "rating" and "relevance")
+        const aRating = parseFloat(a.avgRating ?? "0");
+        const bRating = parseFloat(b.avgRating ?? "0");
+        if (bRating !== aRating) return bRating - aRating;
+        return b.reviewCount - a.reviewCount;
+      }
     });
   }
 

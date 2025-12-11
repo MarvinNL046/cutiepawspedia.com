@@ -195,10 +195,11 @@ export async function getPlacesByCountrySlugAndCategorySlug(
     offset?: number;
     premiumFirst?: boolean;
     topRated?: boolean;
+    sortBy?: "rating" | "name" | "newest" | "reviews";
   }
 ) {
   if (!db) return [];
-  const { limit = 50, offset = 0, premiumFirst = true, topRated = false } = options ?? {};
+  const { limit = 50, offset = 0, premiumFirst = true, topRated = false, sortBy } = options ?? {};
 
   // Get country
   const country = await db.query.countries.findFirst({
@@ -227,39 +228,41 @@ export async function getPlacesByCountrySlugAndCategorySlug(
   const placeIds = placeCategoryResults.map((pc) => pc.placeId);
   if (placeIds.length === 0) return [];
 
-  // Return with appropriate ordering - inline with clause for proper type inference
-  if (topRated) {
-    return db.query.places.findMany({
-      where: (places, { and, inArray }) =>
-        and(inArray(places.cityId, cityIds), inArray(places.id, placeIds)),
-      orderBy: (places, { desc }) => [desc(places.avgRating), desc(places.reviewCount)],
-      limit,
-      offset,
-      with: {
-        city: { with: { country: true } },
-        placeCategories: { with: { category: true } },
-      },
-    });
-  }
+  // Build orderBy based on sortBy parameter
+  const getOrderBy = (places: Parameters<Parameters<typeof db.query.places.findMany>[0]["orderBy"]>[0], { desc, asc }: Parameters<Parameters<typeof db.query.places.findMany>[0]["orderBy"]>[1]) => {
+    const orders = [];
 
-  if (premiumFirst) {
-    return db.query.places.findMany({
-      where: (places, { and, inArray }) =>
-        and(inArray(places.cityId, cityIds), inArray(places.id, placeIds)),
-      orderBy: (places, { desc, asc }) => [desc(places.isPremium), desc(places.avgRating), asc(places.name)],
-      limit,
-      offset,
-      with: {
-        city: { with: { country: true } },
-        placeCategories: { with: { category: true } },
-      },
-    });
-  }
+    // Premium/featured items first (if enabled)
+    if (premiumFirst && !topRated) {
+      orders.push(desc(places.isPremium));
+    }
+
+    // Apply user's sort preference
+    if (sortBy === "name") {
+      orders.push(asc(places.name));
+    } else if (sortBy === "newest") {
+      orders.push(desc(places.createdAt));
+    } else if (sortBy === "reviews") {
+      orders.push(desc(places.reviewCount));
+      orders.push(desc(places.avgRating));
+    } else {
+      // Default: rating (for both "rating" and undefined)
+      orders.push(desc(places.avgRating));
+      orders.push(desc(places.reviewCount));
+    }
+
+    // Always add name as final tiebreaker
+    if (sortBy !== "name") {
+      orders.push(asc(places.name));
+    }
+
+    return orders;
+  };
 
   return db.query.places.findMany({
     where: (places, { and, inArray }) =>
       and(inArray(places.cityId, cityIds), inArray(places.id, placeIds)),
-    orderBy: (places, { desc, asc }) => [desc(places.avgRating), asc(places.name)],
+    orderBy: getOrderBy,
     limit,
     offset,
     with: {

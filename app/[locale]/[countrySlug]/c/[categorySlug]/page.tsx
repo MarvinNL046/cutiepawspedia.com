@@ -11,8 +11,8 @@
 
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   getCountries,
   getCategories,
@@ -22,7 +22,7 @@ import {
 } from "@/db/queries";
 import { PlaceCard, getCategoryIcon } from "@/components/directory";
 import { PageHeader, SectionHeader } from "@/components/layout";
-import { Filter, SlidersHorizontal, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import {
   DEFAULT_SEO_CONFIG,
   buildAlternateUrls,
@@ -35,6 +35,7 @@ import { generateContent } from "@/lib/ai/generateContent";
 
 interface CountryCategoryPageProps {
   params: Promise<{ locale: string; countrySlug: string; categorySlug: string }>;
+  searchParams: Promise<{ sort?: string }>;
 }
 
 // ISR: Country-level data, 10-minute revalidation
@@ -140,13 +141,18 @@ export async function generateMetadata({ params }: CountryCategoryPageProps): Pr
   };
 }
 
-export default async function CountryCategoryPage({ params }: CountryCategoryPageProps) {
+export default async function CountryCategoryPage({ params, searchParams }: CountryCategoryPageProps) {
   const { locale, countrySlug, categorySlug } = await params;
+  const { sort: sortBy } = await searchParams;
 
   const [country, category, places] = await Promise.all([
     getCountryBySlug(countrySlug),
     getCategoryBySlug(categorySlug),
-    getPlacesByCountrySlugAndCategorySlug(countrySlug, categorySlug, { limit: 50, premiumFirst: true }),
+    getPlacesByCountrySlugAndCategorySlug(countrySlug, categorySlug, {
+      limit: 50,
+      premiumFirst: true,
+      sortBy: sortBy as "rating" | "name" | "newest" | "reviews" | undefined,
+    }),
   ]);
 
   if (!country || !category) {
@@ -218,21 +224,45 @@ export default async function CountryCategoryPage({ params }: CountryCategoryPag
       {/* Filter Bar */}
       <section className="sticky top-16 z-40 bg-background dark:bg-cpCharcoal border-b border-border dark:border-cpAmber/20 shadow-sm">
         <div className="container mx-auto max-w-6xl px-4 py-3">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="gap-2 dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10">
-                <Filter className="h-4 w-4" />
-                {locale === "nl" ? "Filters" : "Filters"}
-              </Button>
-              <Badge variant="secondary" className="hidden sm:inline-flex gap-1 dark:bg-cpAmber/10 dark:text-cpCream">
+              <Badge variant="secondary" className="inline-flex gap-1 dark:bg-cpAmber/10 dark:text-cpCream">
                 <MapPin className="h-3 w-3" />
                 {locale === "nl" ? "Landelijk" : "Nationwide"}
               </Badge>
+              <span className="text-sm text-muted-foreground dark:text-cpCream/70">
+                {places.length} {locale === "nl" ? "resultaten" : "results"}
+              </span>
             </div>
-            <Button variant="ghost" size="sm" className="gap-2 dark:text-cpCream dark:hover:bg-cpAmber/10">
-              <SlidersHorizontal className="h-4 w-4" />
-              {locale === "nl" ? "Sorteren" : "Sort"}
-            </Button>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm text-muted-foreground dark:text-cpCream/70 hidden sm:inline">
+                {locale === "nl" ? "Sorteren:" : "Sort:"}
+              </span>
+              {[
+                { value: "rating", labelNl: "Beoordeling", labelEn: "Rating" },
+                { value: "reviews", labelNl: "Reviews", labelEn: "Reviews" },
+                { value: "name", labelNl: "Naam", labelEn: "Name" },
+                { value: "newest", labelNl: "Nieuwste", labelEn: "Newest" },
+              ].map((option) => (
+                <Badge
+                  key={option.value}
+                  variant={(!sortBy && option.value === "rating") || sortBy === option.value ? "default" : "outline"}
+                  className={
+                    (!sortBy && option.value === "rating") || sortBy === option.value
+                      ? "bg-cpAmber text-cpCharcoal"
+                      : "cursor-pointer hover:bg-cpAmber/10 hover:border-cpAmber/40 dark:border-cpAmber/30 dark:text-cpCream"
+                  }
+                  asChild
+                >
+                  <Link
+                    href={`/${locale}/${countrySlug}/c/${categorySlug}${option.value !== "rating" ? `?sort=${option.value}` : ""}`}
+                    prefetch={false}
+                  >
+                    {locale === "nl" ? option.labelNl : option.labelEn}
+                  </Link>
+                </Badge>
+              ))}
+            </div>
           </div>
         </div>
       </section>

@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import NextLink from "next/link";
+
+// Wrapper to disable prefetch for performance
+const Link = ({ children, ...props }: React.ComponentProps<typeof NextLink>) => (
+  <NextLink prefetch={false} {...props}>{children}</NextLink>
+);
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,

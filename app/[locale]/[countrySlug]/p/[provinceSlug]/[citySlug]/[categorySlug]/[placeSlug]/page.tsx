@@ -264,7 +264,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
     { name: countryName, url: `${BASE_URL}/${locale}/${countrySlug}` },
     { name: provinceName, url: `${BASE_URL}/${locale}/${countrySlug}/p/${provinceSlug}` },
     { name: cityName, url: `${BASE_URL}${baseUrl}` },
-    { name: primaryCategory?.labelKey || categorySlug, url: `${BASE_URL}${baseUrl}/${categorySlug}` },
+    { name: getLocalizedCategoryName(primaryCategory?.slug || categorySlug, locale as ContentLocale), url: `${BASE_URL}${baseUrl}/${categorySlug}` },
     { name: place.name, url: `${BASE_URL}${baseUrl}/${categorySlug}/${place.slug}` },
   ];
 
@@ -327,7 +327,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
               { label: countryName, href: `/${locale}/${countrySlug}` },
               { label: provinceName, href: `/${locale}/${countrySlug}/p/${provinceSlug}` },
               { label: cityName, href: baseUrl },
-              { label: primaryCategory?.labelKey || categorySlug, href: `${baseUrl}/${categorySlug}` },
+              { label: getLocalizedCategoryName(primaryCategory?.slug || categorySlug, locale as ContentLocale), href: `${baseUrl}/${categorySlug}` },
               { label: place.name },
             ]}
           />
@@ -630,6 +630,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 category={primaryCategory?.labelKey}
                 city={cityName}
                 country={countryName}
+                locale={locale}
               />
             </div>
 

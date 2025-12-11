@@ -1,0 +1,368 @@
+{
+  "description": "50 SEO-optimized blog topics for CutiePawsPedia (Dutch locale)",
+  "locale": "nl",
+  "topics": [
+    {
+      "id": 1,
+      "title": "Waarom trilt mijn hond? 7 oorzaken en wanneer naar de dierenarts",
+      "slug": "waarom-trilt-mijn-hond",
+      "category": "dierengezondheid",
+      "keywords": ["hond trilt", "trillen hond", "hond bibbert"]
+    },
+    {
+      "id": 2,
+      "title": "Kat miauwt 's nachts: oorzaken en 5 oplossingen die werken",
+      "slug": "kat-miauwt-s-nachts",
+      "category": "huisdiergedrag",
+      "keywords": ["kat miauwt nachts", "kat jankt", "kat slaapt niet"]
+    },
+    {
+      "id": 3,
+      "title": "Hoeveel water moet een hond drinken per dag?",
+      "slug": "hoeveel-water-moet-hond-drinken",
+      "category": "dierengezondheid",
+      "keywords": ["hond water", "hond drinken", "hoeveel water hond"]
+    },
+    {
+      "id": 4,
+      "title": "Kat verliest veel haar: normaal of reden tot zorg?",
+      "slug": "kat-verliest-veel-haar",
+      "category": "kattenverzorging",
+      "keywords": ["kat verliest haar", "kat verharing", "kale plekken kat"]
+    },
+    {
+      "id": 5,
+      "title": "Hond eet gras: 5 redenen en wanneer je moet ingrijpen",
+      "slug": "hond-eet-gras",
+      "category": "huisdiergedrag",
+      "keywords": ["hond eet gras", "waarom eet hond gras", "hond grazen"]
+    },
+    {
+      "id": 6,
+      "title": "De beste speeltjes voor honden die graag kauwen",
+      "slug": "beste-speeltjes-kauwende-honden",
+      "category": "hondenverzorging",
+      "keywords": ["hondenspeeltjes", "kauwspeelgoed hond", "onverwoestbaar hondenspeelgoed"]
+    },
+    {
+      "id": 7,
+      "title": "Kat drinkt veel water: wanneer is het te veel?",
+      "slug": "kat-drinkt-veel-water",
+      "category": "dierengezondheid",
+      "keywords": ["kat drinkt veel", "kat dorst", "polydipsie kat"]
+    },
+    {
+      "id": 8,
+      "title": "Hond hijgt veel: normaal of alarmsignaal?",
+      "slug": "hond-hijgt-veel",
+      "category": "dierengezondheid",
+      "keywords": ["hond hijgt", "hond ademt snel", "hond kortademig"]
+    },
+    {
+      "id": 9,
+      "title": "Waarom snurkt mijn kat? Schattig of zorgwekkend?",
+      "slug": "waarom-snurkt-mijn-kat",
+      "category": "dierengezondheid",
+      "keywords": ["kat snurkt", "snurkende kat", "ademhaling kat"]
+    },
+    {
+      "id": 10,
+      "title": "Hond ruikt uit zijn bek: oorzaken en oplossingen",
+      "slug": "hond-ruikt-uit-bek",
+      "category": "dierengezondheid",
+      "keywords": ["hond stinkende adem", "slechte adem hond", "hond mondgeur"]
+    },
+    {
+      "id": 11,
+      "title": "Kattenkruid: wat doet het en is het veilig?",
+      "slug": "kattenkruid-effect-veilig",
+      "category": "kattenverzorging",
+      "keywords": ["kattenkruid", "catnip", "valeriaan kat"]
+    },
+    {
+      "id": 12,
+      "title": "Hond heeft last van jeuk: 8 oorzaken en behandelingen",
+      "slug": "hond-jeuk-oorzaken-behandeling",
+      "category": "dierengezondheid",
+      "keywords": ["hond jeuk", "hond krabt veel", "hond allergie"]
+    },
+    {
+      "id": 13,
+      "title": "Kat wil niet eten: 6 redenen en wat je kunt doen",
+      "slug": "kat-wil-niet-eten",
+      "category": "huisdiervoeding",
+      "keywords": ["kat eet niet", "kat geen eetlust", "kat weigert eten"]
+    },
+    {
+      "id": 14,
+      "title": "Hond slaapt de hele dag: is dat normaal?",
+      "slug": "hond-slaapt-hele-dag",
+      "category": "huisdiergedrag",
+      "keywords": ["hond slaapt veel", "hond moe", "hoeveel slaap hond"]
+    },
+    {
+      "id": 15,
+      "title": "Waarom kwijlt mijn kat? 7 mogelijke oorzaken",
+      "slug": "waarom-kwijlt-mijn-kat",
+      "category": "dierengezondheid",
+      "keywords": ["kat kwijlt", "kwijlen kat", "speeksel kat"]
+    },
+    {
+      "id": 16,
+      "title": "De perfecte hondenmand kiezen: complete gids",
+      "slug": "perfecte-hondenmand-kiezen",
+      "category": "hondenverzorging",
+      "keywords": ["hondenmand", "hondenbed", "slaapplaats hond"]
+    },
+    {
+      "id": 17,
+      "title": "Kat plast buiten de bak: oorzaken en oplossingen",
+      "slug": "kat-plast-buiten-bak",
+      "category": "huisdiergedrag",
+      "keywords": ["kat plast naast bak", "kat onzindelijk", "kat markeren"]
+    },
+    {
+      "id": 18,
+      "title": "Hond trekt aan de lijn: 5 effectieve trainingstips",
+      "slug": "hond-trekt-aan-lijn-training",
+      "category": "huisdiertraining",
+      "keywords": ["hond trekt", "lijntraining", "hond leren lopen"]
+    },
+    {
+      "id": 19,
+      "title": "Waarom spint mijn kat? De wetenschap achter het spinnen",
+      "slug": "waarom-spint-mijn-kat",
+      "category": "huisdiergedrag",
+      "keywords": ["kat spint", "spinnen kat", "kat snort"]
+    },
+    {
+      "id": 20,
+      "title": "Hond en kat samen in huis: tips voor een goede introductie",
+      "slug": "hond-kat-samen-introductie",
+      "category": "huisdiergedrag",
+      "keywords": ["hond en kat", "huisdieren introduceren", "kat bij hond"]
+    },
+    {
+      "id": 21,
+      "title": "Kattenbrokjes vs natvoer: wat is beter voor je kat?",
+      "slug": "kattenbrokjes-vs-natvoer",
+      "category": "huisdiervoeding",
+      "keywords": ["kattenvoer vergelijken", "brokjes of natvoer", "beste kattenvoeding"]
+    },
+    {
+      "id": 22,
+      "title": "Hond braakt geel schuim: oorzaken en wat te doen",
+      "slug": "hond-braakt-geel-schuim",
+      "category": "dierengezondheid",
+      "keywords": ["hond braakt", "hond overgeven", "geel braaksel hond"]
+    },
+    {
+      "id": 23,
+      "title": "Kat bijt zomaar: waarom en hoe stop je het?",
+      "slug": "kat-bijt-zomaar-stoppen",
+      "category": "huisdiergedrag",
+      "keywords": ["kat bijt", "bijtende kat", "agressieve kat"]
+    },
+    {
+      "id": 24,
+      "title": "Hondenverzekering vergelijken: waar let je op in 2025?",
+      "slug": "hondenverzekering-vergelijken-2025",
+      "category": "professionele-diensten",
+      "keywords": ["hondenverzekering", "huisdierverzekering", "dierenverzekering"]
+    },
+    {
+      "id": 25,
+      "title": "Waarom likt mijn hond mijn gezicht? 5 verklaringen",
+      "slug": "waarom-likt-hond-gezicht",
+      "category": "huisdiergedrag",
+      "keywords": ["hond likt gezicht", "hond likt", "likgedrag hond"]
+    },
+    {
+      "id": 26,
+      "title": "Kat heeft koorts: symptomen herkennen en handelen",
+      "slug": "kat-koorts-symptomen",
+      "category": "dierengezondheid",
+      "keywords": ["kat koorts", "kat ziek", "temperatuur kat"]
+    },
+    {
+      "id": 27,
+      "title": "De beste hondensnoepjes voor training",
+      "slug": "beste-hondensnoepjes-training",
+      "category": "huisdiertraining",
+      "keywords": ["hondensnoepjes", "trainingssnacks", "beloningen hond"]
+    },
+    {
+      "id": 28,
+      "title": "Kat verstopt zich steeds: 6 mogelijke redenen",
+      "slug": "kat-verstopt-zich-steeds",
+      "category": "huisdiergedrag",
+      "keywords": ["kat verstopt", "kat angstig", "kat bang"]
+    },
+    {
+      "id": 29,
+      "title": "Hond jankt als hij alleen is: zo los je het op",
+      "slug": "hond-jankt-alleen-oplossing",
+      "category": "huisdiertraining",
+      "keywords": ["hond jankt", "verlatingsangst", "hond huilt"]
+    },
+    {
+      "id": 30,
+      "title": "Hoeveel moet een kitten eten per dag?",
+      "slug": "hoeveel-moet-kitten-eten",
+      "category": "puppies-kittens",
+      "keywords": ["kitten voeding", "kitten eten", "kitten voedingsschema"]
+    },
+    {
+      "id": 31,
+      "title": "Hond heeft diarree: oorzaken, behandeling en preventie",
+      "slug": "hond-diarree-behandeling",
+      "category": "dierengezondheid",
+      "keywords": ["hond diarree", "dunne ontlasting hond", "hond buikpijn"]
+    },
+    {
+      "id": 32,
+      "title": "Waarom kopjes mijn kat tegen mij aan?",
+      "slug": "waarom-kopjes-kat-tegen-mij",
+      "category": "huisdiergedrag",
+      "keywords": ["kat kopjes", "kat knuffelen", "kat genegenheid"]
+    },
+    {
+      "id": 33,
+      "title": "Hondenras kiezen: welke past bij jouw levensstijl?",
+      "slug": "hondenras-kiezen-levensstijl",
+      "category": "puppies-kittens",
+      "keywords": ["hondenras kiezen", "welke hond past bij mij", "beste hondenras"]
+    },
+    {
+      "id": 34,
+      "title": "Kat niest veel: onschuldig of teken van ziekte?",
+      "slug": "kat-niest-veel-oorzaken",
+      "category": "dierengezondheid",
+      "keywords": ["kat niest", "niezen kat", "kat verkouden"]
+    },
+    {
+      "id": 35,
+      "title": "Hond wil niet wandelen: 7 mogelijke oorzaken",
+      "slug": "hond-wil-niet-wandelen",
+      "category": "huisdiergedrag",
+      "keywords": ["hond weigert lopen", "hond wil niet naar buiten", "hond lui"]
+    },
+    {
+      "id": 36,
+      "title": "Indoor vs outdoor kat: voor- en nadelen",
+      "slug": "indoor-outdoor-kat-voordelen",
+      "category": "kattenverzorging",
+      "keywords": ["binnenkat", "buitenkat", "kat binnen houden"]
+    },
+    {
+      "id": 37,
+      "title": "Hond gromt naar gezinsleden: oorzaken en aanpak",
+      "slug": "hond-gromt-gezinsleden",
+      "category": "huisdiergedrag",
+      "keywords": ["hond gromt", "agressie hond", "hond waarschuwt"]
+    },
+    {
+      "id": 38,
+      "title": "Kattenluikje installeren: complete handleiding",
+      "slug": "kattenluikje-installeren-handleiding",
+      "category": "kattenverzorging",
+      "keywords": ["kattenluik", "kattenluikje plaatsen", "kattendeur"]
+    },
+    {
+      "id": 39,
+      "title": "Hond schuurt kont over de grond: sleetje rijden verklaard",
+      "slug": "hond-sleetje-rijden-oorzaak",
+      "category": "dierengezondheid",
+      "keywords": ["hond sleetje rijden", "hond schuurt kont", "anaalklieren hond"]
+    },
+    {
+      "id": 40,
+      "title": "Nieuwe kat in huis: de eerste 7 dagen",
+      "slug": "nieuwe-kat-eerste-week",
+      "category": "puppies-kittens",
+      "keywords": ["nieuwe kat", "kat wennen", "kat introductie"]
+    },
+    {
+      "id": 41,
+      "title": "Hond verliest nagel: eerste hulp en nazorg",
+      "slug": "hond-verliest-nagel-eerste-hulp",
+      "category": "dierengezondheid",
+      "keywords": ["hond nagel eraf", "hond nagel bloedt", "nagelblessure hond"]
+    },
+    {
+      "id": 42,
+      "title": "Kat en zwangerschap: toxoplasmose voorkomen",
+      "slug": "kat-zwangerschap-toxoplasmose",
+      "category": "dierengezondheid",
+      "keywords": ["kat zwanger", "toxoplasmose", "zwanger met kat"]
+    },
+    {
+      "id": 43,
+      "title": "GPS tracker voor honden: de beste opties in 2025",
+      "slug": "gps-tracker-honden-2025",
+      "category": "hondenverzorging",
+      "keywords": ["gps hond", "hond tracker", "locatie hond"]
+    },
+    {
+      "id": 44,
+      "title": "Waarom graaft mijn hond gaten in de tuin?",
+      "slug": "waarom-graaft-hond-gaten",
+      "category": "huisdiergedrag",
+      "keywords": ["hond graaft", "graven hond", "hond tuin"]
+    },
+    {
+      "id": 45,
+      "title": "Kat en kerst: giftige planten en gevaren",
+      "slug": "kat-kerst-giftige-planten",
+      "category": "dierengezondheid",
+      "keywords": ["kat kerst", "giftig voor katten", "kerstboom kat"]
+    },
+    {
+      "id": 46,
+      "title": "Hond heeft last van oorontsteking: herkennen en behandelen",
+      "slug": "hond-oorontsteking-behandelen",
+      "category": "dierengezondheid",
+      "keywords": ["hond oorontsteking", "hond schudt hoofd", "hond jeuk oren"]
+    },
+    {
+      "id": 47,
+      "title": "Kattenoppas vinden: tips voor de perfecte match",
+      "slug": "kattenoppas-vinden-tips",
+      "category": "professionele-diensten",
+      "keywords": ["kattenoppas", "kattensitter", "oppas kat"]
+    },
+    {
+      "id": 48,
+      "title": "Hond pakt alles in zijn bek: zo leer je het af",
+      "slug": "hond-pakt-alles-in-bek",
+      "category": "huisdiertraining",
+      "keywords": ["hond pakt dingen", "hond kauwt overal op", "hond afleren"]
+    },
+    {
+      "id": 49,
+      "title": "Kat rouwt om andere kat: tekenen en hoe je helpt",
+      "slug": "kat-rouwt-andere-kat",
+      "category": "huisdiergedrag",
+      "keywords": ["kat rouwt", "kat verdriet", "kat mist andere kat"]
+    },
+    {
+      "id": 50,
+      "title": "Hond in de auto: veilig en comfortabel reizen",
+      "slug": "hond-auto-veilig-reizen",
+      "category": "reizen-met-huisdieren",
+      "keywords": ["hond auto", "hond vervoeren", "autoreizen hond"]
+    }
+  ],
+  "agentDistribution": [
+    {"agent": 1, "topics": [1, 2, 3, 4, 5]},
+    {"agent": 2, "topics": [6, 7, 8, 9, 10]},
+    {"agent": 3, "topics": [11, 12, 13, 14, 15]},
+    {"agent": 4, "topics": [16, 17, 18, 19, 20]},
+    {"agent": 5, "topics": [21, 22, 23, 24, 25]},
+    {"agent": 6, "topics": [26, 27, 28, 29, 30]},
+    {"agent": 7, "topics": [31, 32, 33, 34, 35]},
+    {"agent": 8, "topics": [36, 37, 38, 39, 40]},
+    {"agent": 9, "topics": [41, 42, 43, 44, 45]},
+    {"agent": 10, "topics": [46, 47, 48, 49, 50]}
+  ]
+}

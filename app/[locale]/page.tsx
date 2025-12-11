@@ -385,7 +385,7 @@ export default async function HomePage({ params }: HomePageProps) {
                 <div key={review.id} className="bg-card dark:bg-cpSurface/50 rounded-3xl p-6 border border-border dark:border-cpAmber/20 shadow-sm">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cpCoral to-cpAmber flex items-center justify-center text-white dark:text-cpCharcoal font-bold">
-                      {(review.user?.displayName || "A").charAt(0).toUpperCase()}
+                      {(review.user?.name || "A").charAt(0).toUpperCase()}
                     </div>
                     <div className="flex gap-1">
                       {[...Array(5)].map((_, i) => (
@@ -401,7 +401,7 @@ export default async function HomePage({ params }: HomePageProps) {
                   </p>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground dark:text-cpCream/60">
-                      {review.user?.displayName || (locale === "nl" ? "Anoniem" : "Anonymous")}
+                      {review.user?.name || (locale === "nl" ? "Anoniem" : "Anonymous")}
                       {place?.name && <span className="text-cpCoral"> • {place.name}</span>}
                     </span>
                     {reviewUrl && (
@@ -619,5 +619,4 @@ const faqs = [
     },
   },
 ];
-
 

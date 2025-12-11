@@ -675,6 +675,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 category={primaryCategory?.labelKey}
                 city={cityName}
                 country={countryName}
+                locale={locale}
               />
             </div>
 

@@ -20,6 +20,7 @@ interface LeadFormProps {
   variant?: "card" | "inline" | "modal";
   onSuccess?: () => void;
   className?: string;
+  locale?: string;
 }
 
 export function LeadForm({
@@ -32,7 +33,29 @@ export function LeadForm({
   variant = "card",
   onSuccess,
   className = "",
+  locale = "en",
 }: LeadFormProps) {
+  const isNL = locale === "nl";
+
+  // Translations
+  const t = {
+    messageSent: isNL ? "Bericht Verzonden!" : "Message Sent!",
+    inquirySent: isNL ? `Je aanvraag is verzonden naar ${placeName}. Ze nemen snel contact met je op.` : `Your inquiry has been sent to ${placeName}. They will contact you soon.`,
+    sendAnother: isNL ? "Nog een Bericht Sturen" : "Send Another Message",
+    yourName: isNL ? "Je Naam *" : "Your Name *",
+    emailAddress: isNL ? "E-mailadres *" : "Email Address *",
+    phoneNumber: isNL ? "Telefoonnummer (optioneel)" : "Phone Number (optional)",
+    message: isNL ? "Bericht (optioneel)" : "Message (optional)",
+    messagePlaceholder: isNL ? "Vertel ons wat je zoekt..." : "Tell us what you're looking for...",
+    sending: isNL ? "Verzenden..." : "Sending...",
+    sendInquiry: isNL ? "Verstuur Aanvraag" : "Send Inquiry",
+    protectedBy: isNL ? "Beschermd door reCAPTCHA" : "Protected by reCAPTCHA",
+    bySubmitting: isNL ? "Door te versturen ga je akkoord met ons" : "By submitting, you agree to our",
+    privacyPolicy: isNL ? "Privacybeleid" : "Privacy Policy",
+    andGoogle: isNL ? "en Google's" : "and Google's",
+    contactTitle: isNL ? `Neem contact op met ${placeName}` : `Contact ${placeName}`,
+    sendInquiryDesc: isNL ? "Stuur een aanvraag direct naar dit bedrijf" : "Send an inquiry directly to this business",
+  };
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -125,10 +148,10 @@ export function LeadForm({
             <CheckCircle className="h-12 w-12 text-green-600 dark:text-green-400 mx-auto mb-4" aria-hidden="true" />
           </div>
           <h3 className="text-lg font-semibold text-foreground dark:text-cpCream mb-2 animate-slide-up">
-            Message Sent!
+            {t.messageSent}
           </h3>
           <p className="text-muted-foreground dark:text-cpCream/70 mb-4 animate-slide-up" style={{ animationDelay: "0.1s" }}>
-            Your inquiry has been sent to {placeName}. They will contact you soon.
+            {t.inquirySent}
           </p>
           <Button
             variant="outline"
@@ -136,7 +159,7 @@ export function LeadForm({
             className="border-cpCoral text-cpCoral hover:bg-cpCoral/10 dark:border-cpCoral dark:hover:bg-cpCoral/20 animate-slide-up"
             style={{ animationDelay: "0.2s" }}
           >
-            Send Another Message
+            {t.sendAnother}
           </Button>
         </CardContent>
       </Card>
@@ -155,7 +178,7 @@ export function LeadForm({
 
       {/* Name */}
       <div className="space-y-2">
-        <Label htmlFor="name">Your Name *</Label>
+        <Label htmlFor="name">{t.yourName}</Label>
         <Input
           id="name"
           name="name"
@@ -169,7 +192,7 @@ export function LeadForm({
 
       {/* Email */}
       <div className="space-y-2">
-        <Label htmlFor="email">Email Address *</Label>
+        <Label htmlFor="email">{t.emailAddress}</Label>
         <Input
           id="email"
           name="email"
@@ -184,7 +207,7 @@ export function LeadForm({
 
       {/* Phone */}
       <div className="space-y-2">
-        <Label htmlFor="phone">Phone Number (optional)</Label>
+        <Label htmlFor="phone">{t.phoneNumber}</Label>
         <Input
           id="phone"
           name="phone"
@@ -198,11 +221,11 @@ export function LeadForm({
 
       {/* Message */}
       <div className="space-y-2">
-        <Label htmlFor="message">Message (optional)</Label>
+        <Label htmlFor="message">{t.message}</Label>
         <Textarea
           id="message"
           name="message"
-          placeholder="Tell us what you're looking for..."
+          placeholder={t.messagePlaceholder}
           value={formData.message}
           onChange={handleChange}
           rows={4}
@@ -219,12 +242,12 @@ export function LeadForm({
         {isSubmitting ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-            Sending...
+            {t.sending}
           </>
         ) : (
           <>
             <Send className="h-4 w-4" aria-hidden="true" />
-            Send Inquiry
+            {t.sendInquiry}
           </>
         )}
       </Button>
@@ -234,23 +257,23 @@ export function LeadForm({
         {recaptchaConfigured && (
           <span className="flex items-center justify-center gap-1 mb-1">
             <ShieldCheck className="h-3 w-3 text-green-500 dark:text-green-400" />
-            Protected by reCAPTCHA
+            {t.protectedBy}
           </span>
         )}
-        By submitting, you agree to our{" "}
+        {t.bySubmitting}{" "}
         <a href="/privacy" className="text-cpCoral hover:underline">
-          Privacy Policy
+          {t.privacyPolicy}
         </a>
         {recaptchaConfigured && (
           <>
-            {" "}and Google&apos;s{" "}
+            {" "}{t.andGoogle}{" "}
             <a
               href="https://policies.google.com/privacy"
               target="_blank"
               rel="noopener noreferrer"
               className="text-cpCoral hover:underline"
             >
-              Privacy Policy
+              {t.privacyPolicy}
             </a>{" "}
             &{" "}
             <a
@@ -274,10 +297,10 @@ export function LeadForm({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
             <MessageSquare className="h-5 w-5 text-cpCoral" aria-hidden="true" />
-            Contact {placeName}
+            {t.contactTitle}
           </CardTitle>
           <CardDescription className="dark:text-cpCream/70">
-            Send an inquiry directly to this business
+            {t.sendInquiryDesc}
           </CardDescription>
         </CardHeader>
         <CardContent>{formContent}</CardContent>

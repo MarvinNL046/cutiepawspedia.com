@@ -53,7 +53,7 @@ echo ""
 echo "Zoekt nieuwe huisdierenbedrijven in alle Belgische steden..."
 echo ""
 
-CATEGORIES="veterinary grooming dog-training dog-walking pet-hotel pet-store emergency-vet shelter dog-daycare"
+CATEGORIES="veterinary grooming dog-training dog-walking pet-hotel pet-store cat-grooming pet-sitting emergency-vet dog-daycare exotic-vet shelter dog-park"
 LIMIT=20
 
 for CATEGORY in $CATEGORIES; do

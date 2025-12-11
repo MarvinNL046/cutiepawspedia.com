@@ -1,4 +1,4 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, count } from "drizzle-orm";
 import { db } from "../index";
 import { countries, cities, provinces } from "../schema";
 
@@ -163,38 +163,41 @@ export async function getCityById(cityId: number) {
 
 export async function getCountryCount() {
   if (!db) return 0;
-  const result = await db.query.countries.findMany();
-  return result.length;
+  const result = await db.select({ count: count() }).from(countries);
+  return result[0]?.count ?? 0;
 }
 
 export async function getCityCount() {
   if (!db) return 0;
-  const result = await db.query.cities.findMany();
-  return result.length;
+  const result = await db.select({ count: count() }).from(cities);
+  return result[0]?.count ?? 0;
 }
 
 export async function getCityCountByCountry(countryId: number) {
   if (!db) return 0;
-  const result = await db.query.cities.findMany({
-    where: eq(cities.countryId, countryId),
-  });
-  return result.length;
+  const result = await db
+    .select({ count: count() })
+    .from(cities)
+    .where(eq(cities.countryId, countryId));
+  return result[0]?.count ?? 0;
 }
 
 export async function getProvinceCountByCountry(countryId: number) {
   if (!db) return 0;
-  const result = await db.query.provinces.findMany({
-    where: eq(provinces.countryId, countryId),
-  });
-  return result.length;
+  const result = await db
+    .select({ count: count() })
+    .from(provinces)
+    .where(eq(provinces.countryId, countryId));
+  return result[0]?.count ?? 0;
 }
 
 export async function getCityCountByProvince(provinceId: number) {
   if (!db) return 0;
-  const result = await db.query.cities.findMany({
-    where: eq(cities.provinceId, provinceId),
-  });
-  return result.length;
+  const result = await db
+    .select({ count: count() })
+    .from(cities)
+    .where(eq(cities.provinceId, provinceId));
+  return result[0]?.count ?? 0;
 }
 
 // ============================================================================

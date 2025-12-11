@@ -1,4 +1,4 @@
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, count } from "drizzle-orm";
 import { db } from "../index";
 import { places, categories, placeCategories, reviews } from "../schema";
 import { getCityBySlugAndCountry } from "./locations";
@@ -473,8 +473,10 @@ export async function getPopularPlaces(limit = 6) {
  */
 export async function getPlaceCount() {
   if (!db) return 0;
-  const result = await db.query.places.findMany({ columns: { id: true } });
-  return result.length;
+  const result = await db
+    .select({ count: count() })
+    .from(places);
+  return result[0]?.count ?? 0;
 }
 
 /**
@@ -482,11 +484,11 @@ export async function getPlaceCount() {
  */
 export async function getPlaceCountByCity(cityId: number) {
   if (!db) return 0;
-  const result = await db.query.places.findMany({
-    where: eq(places.cityId, cityId),
-    columns: { id: true },
-  });
-  return result.length;
+  const result = await db
+    .select({ count: count() })
+    .from(places)
+    .where(eq(places.cityId, cityId));
+  return result[0]?.count ?? 0;
 }
 
 // ============================================================================

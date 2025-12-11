@@ -10,6 +10,9 @@ import "./globals.css";
 const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 const ADS_ENABLED = process.env.NEXT_PUBLIC_ADS_ENABLED === "true";
 
+// Google Analytics 4 configuration
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+
 /**
  * PERFORMANCE: Viewport configuration for mobile optimization
  */
@@ -88,12 +91,39 @@ export default function RootLayout({
     />
   );
 
+  /**
+   * Google Analytics 4 script
+   * Uses afterInteractive strategy for non-blocking load
+   */
+  const ga4Script = GA_MEASUREMENT_ID && (
+    <>
+      <Script
+        id="google-analytics"
+        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+        strategy="afterInteractive"
+      />
+      <Script
+        id="google-analytics-config"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_MEASUREMENT_ID}');
+          `,
+        }}
+      />
+    </>
+  );
+
   // Only wrap with StackProvider if configured
   if (stackServerApp) {
     return (
       <html lang="en" suppressHydrationWarning>
         {preconnectLinks}
         <body className={bodyClasses} suppressHydrationWarning>
+          {ga4Script}
           {adsenseScript}
           <ThemeProvider>
             <StackProvider app={stackServerApp}>
@@ -111,6 +141,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       {preconnectLinks}
       <body className={bodyClasses}>
+        {ga4Script}
         {adsenseScript}
         <ThemeProvider>
           {children}

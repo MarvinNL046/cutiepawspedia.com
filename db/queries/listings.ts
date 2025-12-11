@@ -115,7 +115,12 @@ export async function getPlaceBySlugAndCity(placeSlug: string, cityId: number) {
         orderBy: [desc(reviews.createdAt)],
         limit: 10,
         with: {
-          user: true,
+          user: {
+            columns: {
+              id: true,
+              name: true,
+            },
+          },
         },
       },
       // Include business with plan for feature gating
@@ -499,7 +504,12 @@ export async function getReviewsByPlaceId(placeId: number, limit = 20, offset = 
     limit,
     offset,
     with: {
-      user: true,
+      user: {
+        columns: {
+          id: true,
+          name: true,
+        },
+      },
     },
   });
 }

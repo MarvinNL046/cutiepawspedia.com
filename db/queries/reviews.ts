@@ -109,13 +109,24 @@ export async function getReviewById(id: number) {
   return db.query.reviews.findFirst({
     where: eq(reviews.id, id),
     with: {
-      user: true,
+      user: {
+        columns: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
       place: true,
       business: true,
       replies: {
         orderBy: [asc(reviewReplies.createdAt)],
         with: {
-          author: true,
+          author: {
+            columns: {
+              id: true,
+              name: true,
+            },
+          },
         },
       },
     },
@@ -207,11 +218,21 @@ export async function getReviewsForPlace(
     limit,
     offset,
     with: {
-      user: true,
+      user: {
+        columns: {
+          id: true,
+          name: true,
+        },
+      },
       replies: {
         orderBy: [asc(reviewReplies.createdAt)],
         with: {
-          author: true,
+          author: {
+            columns: {
+              id: true,
+              name: true,
+            },
+          },
         },
       },
     },
@@ -232,7 +253,12 @@ export async function getFeaturedReviewsForPlace(placeId: number, limit = 3) {
     orderBy: [desc(reviews.rating), desc(reviews.createdAt)],
     limit,
     with: {
-      user: true,
+      user: {
+        columns: {
+          id: true,
+          name: true,
+        },
+      },
     },
   });
 }
@@ -285,12 +311,22 @@ export async function getReviewsForBusiness(
     limit,
     offset,
     with: {
-      user: true,
+      user: {
+        columns: {
+          id: true,
+          name: true,
+        },
+      },
       place: true,
       replies: {
         orderBy: [asc(reviewReplies.createdAt)],
         with: {
-          author: true,
+          author: {
+            columns: {
+              id: true,
+              name: true,
+            },
+          },
         },
       },
     },
@@ -308,7 +344,13 @@ export async function getPendingReviews(limit = 50, offset = 0) {
     limit,
     offset,
     with: {
-      user: true,
+      user: {
+        columns: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
       place: true,
     },
   });
@@ -325,7 +367,13 @@ export async function getFlaggedReviews(limit = 50, offset = 0) {
     limit,
     offset,
     with: {
-      user: true,
+      user: {
+        columns: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
       place: true,
     },
   });
@@ -469,7 +517,12 @@ export async function getRepliesForReview(reviewId: number) {
     where: eq(reviewReplies.reviewId, reviewId),
     orderBy: [asc(reviewReplies.createdAt)],
     with: {
-      author: true,
+      author: {
+        columns: {
+          id: true,
+          name: true,
+        },
+      },
     },
   });
 }
@@ -620,7 +673,8 @@ export async function getFeaturedReviewsForHomepage(limit = 3) {
     with: {
       user: {
         columns: {
-          displayName: true,
+          id: true,
+          name: true,
         },
       },
       place: {
@@ -664,7 +718,8 @@ export async function getTopReviewsForHomepage(limit = 3) {
     with: {
       user: {
         columns: {
-          displayName: true,
+          id: true,
+          name: true,
         },
       },
       place: {

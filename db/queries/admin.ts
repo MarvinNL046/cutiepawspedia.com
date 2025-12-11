@@ -643,7 +643,13 @@ export async function getPlaceByIdForAdmin(id: number) {
           country: true,
         },
       },
-      owner: true,
+      owner: {
+        columns: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
       placeCategories: {
         with: {
           category: true,

@@ -357,13 +357,39 @@ export async function generateContent(
     };
   }
 
-  // 3. Generate via LLM
+  // 3. NON-BLOCKING: Return fallback immediately, generate AI in background
+  // This prevents 20-30 second page loads for uncached content
+  const fallbackContent = generateFallbackContent(type, data, locale);
+
+  // Fire-and-forget: Generate AI content in background and cache it
+  // Next page load will use the cached AI content
+  generateAndCacheInBackground(cacheKey, type, data, locale).catch((error) => {
+    console.error(`Background AI generation failed for ${cacheKey}:`, error);
+  });
+
+  return {
+    content: fallbackContent,
+    fromCache: false,
+    isStale: true, // Mark as stale so we know AI content is being generated
+    version: "fallback-pending",
+  };
+}
+
+/**
+ * Generate AI content in background and cache it (non-blocking)
+ */
+async function generateAndCacheInBackground(
+  cacheKey: string,
+  type: AiContentType,
+  data: ContentData,
+  locale: ContentLocale
+): Promise<void> {
   try {
     const startTime = Date.now();
     const result = await generateViaLLM(type, data, locale);
     const generationTimeMs = Date.now() - startTime;
 
-    // 4. Save to cache
+    // Save to cache
     if (AI_CACHE_ENABLED) {
       await upsertCachedContent({
         key: cacheKey,
@@ -378,28 +404,14 @@ export async function generateContent(
       });
     }
 
-    return {
-      content: result.content,
-      fromCache: false,
-      isStale: false,
-      version: AI_VERSION,
-    };
+    console.log(`Background AI generation completed for ${cacheKey} in ${generationTimeMs}ms`);
   } catch (error) {
-    console.error(`AI generation failed for ${cacheKey}:`, error);
+    console.error(`Background AI generation failed for ${cacheKey}:`, error);
 
     // Mark cache error
     if (AI_CACHE_ENABLED) {
       await markCacheError(cacheKey, error instanceof Error ? error.message : "Unknown error");
     }
-
-    // Fall back to template
-    const fallbackContent = generateFallbackContent(type, data, locale);
-    return {
-      content: fallbackContent,
-      fromCache: false,
-      isStale: false,
-      version: "fallback",
-    };
   }
 }
 

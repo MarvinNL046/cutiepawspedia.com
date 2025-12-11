@@ -238,6 +238,7 @@ async function SearchResults({
       <SearchResultsClient
         initialPlaces={results.places}
         initialHasMore={results.hasMore}
+        totalCount={results.total}
         locale={locale}
         searchParams={{
           query,

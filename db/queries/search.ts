@@ -281,6 +281,43 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
   const hasMore = results.length > limit;
   const finalResults = results.slice(0, limit);
 
+  // Get total count for display (separate count query for accuracy)
+  let totalCount = finalResults.length;
+  try {
+    if (query && query.trim()) {
+      const searchTerm = `%${query.trim()}%`;
+      const countResult = await db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(places)
+        .where(
+          and(
+            or(
+              ilike(places.name, searchTerm),
+              ilike(places.description, searchTerm),
+              ilike(places.address, searchTerm)
+            ),
+            resolvedCityId ? eq(places.cityId, resolvedCityId) : undefined,
+            categoryPlaceIds ? sql`${places.id} = ANY(${categoryPlaceIds})` : undefined
+          )
+        );
+      totalCount = countResult[0]?.count ?? finalResults.length;
+    } else {
+      const countResult = await db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(places)
+        .where(
+          and(
+            resolvedCityId ? eq(places.cityId, resolvedCityId) : undefined,
+            categoryPlaceIds ? sql`${places.id} = ANY(${categoryPlaceIds})` : undefined
+          )
+        );
+      totalCount = countResult[0]?.count ?? finalResults.length;
+    }
+  } catch {
+    // Fallback to results length if count query fails
+    totalCount = hasMore ? offset + limit + 1 : offset + finalResults.length;
+  }
+
   // Transform results
   const transformedResults = finalResults.map((place) => {
     const cityRel = getRelation(place.city);
@@ -338,7 +375,7 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
 
   return {
     places: transformedResults,
-    total: finalResults.length, // For proper total, you'd need a separate count query
+    total: totalCount,
     hasMore,
   };
 }

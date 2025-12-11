@@ -11,6 +11,7 @@ type Place = SearchResult["places"][number];
 interface SearchResultsClientProps {
   initialPlaces: Place[];
   initialHasMore: boolean;
+  totalCount: number;
   locale: string;
   searchParams: {
     query?: string;
@@ -24,6 +25,7 @@ interface SearchResultsClientProps {
 export function SearchResultsClient({
   initialPlaces,
   initialHasMore,
+  totalCount,
   locale,
   searchParams,
 }: SearchResultsClientProps) {
@@ -85,8 +87,20 @@ export function SearchResultsClient({
     return country?.slug || searchParams.countrySlug || "";
   };
 
+  const isNl = locale === "nl";
+
   return (
     <>
+      {/* Results count */}
+      <p className="text-sm text-muted-foreground dark:text-cpCream/70 mb-4">
+        {totalCount} {isNl ? "resultaten" : "results"}
+        {searchParams.citySlug && (
+          <span> {isNl ? "in" : "in"} <span className="capitalize">{searchParams.citySlug.replace(/-/g, " ")}</span></span>
+        )}
+        {searchParams.categorySlug && (
+          <span> • <span className="capitalize">{searchParams.categorySlug.replace(/-/g, " ")}</span></span>
+        )}
+      </p>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {places.map((place) => (
           <PlaceCard

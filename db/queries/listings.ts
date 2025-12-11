@@ -284,6 +284,103 @@ export async function getTopPlacesByCountrySlugAndCategorySlug(
   });
 }
 
+// ============================================================================
+// PROVINCE-LEVEL CATEGORY QUERIES
+// ============================================================================
+
+/**
+ * Get places in a province for a specific category
+ */
+export async function getPlacesByProvinceSlugAndCategorySlug(
+  provinceSlug: string,
+  countrySlug: string,
+  categorySlug: string,
+  options?: {
+    limit?: number;
+    offset?: number;
+    premiumFirst?: boolean;
+    topRated?: boolean;
+  }
+) {
+  if (!db) return [];
+  const { limit = 50, offset = 0, premiumFirst = true, topRated = false } = options ?? {};
+
+  // Get country
+  const country = await db.query.countries.findFirst({
+    where: (countries, { eq }) => eq(countries.slug, countrySlug),
+  });
+  if (!country) return [];
+
+  // Get province
+  const province = await db.query.provinces.findFirst({
+    where: (provinces, { and, eq }) =>
+      and(eq(provinces.slug, provinceSlug), eq(provinces.countryId, country.id)),
+  });
+  if (!province) return [];
+
+  // Get cities in this province
+  const provinceCities = await db.query.cities.findMany({
+    where: (cities, { eq }) => eq(cities.provinceId, province.id),
+    columns: { id: true },
+  });
+  const cityIds = provinceCities.map(c => c.id);
+  if (cityIds.length === 0) return [];
+
+  // Get category
+  const category = await getCategoryBySlug(categorySlug);
+  if (!category) return [];
+
+  // Get place IDs that have the specified category
+  const placeCategoryResults = await db
+    .select({ placeId: placeCategories.placeId })
+    .from(placeCategories)
+    .where(eq(placeCategories.categoryId, category.id));
+
+  const placeIds = placeCategoryResults.map((pc) => pc.placeId);
+  if (placeIds.length === 0) return [];
+
+  // Return with appropriate ordering
+  if (topRated) {
+    return db.query.places.findMany({
+      where: (places, { and, inArray }) =>
+        and(inArray(places.cityId, cityIds), inArray(places.id, placeIds)),
+      orderBy: (places, { desc }) => [desc(places.avgRating), desc(places.reviewCount)],
+      limit,
+      offset,
+      with: {
+        city: { with: { country: true, province: true } },
+        placeCategories: { with: { category: true } },
+      },
+    });
+  }
+
+  if (premiumFirst) {
+    return db.query.places.findMany({
+      where: (places, { and, inArray }) =>
+        and(inArray(places.cityId, cityIds), inArray(places.id, placeIds)),
+      orderBy: (places, { desc, asc }) => [desc(places.isPremium), desc(places.avgRating), asc(places.name)],
+      limit,
+      offset,
+      with: {
+        city: { with: { country: true, province: true } },
+        placeCategories: { with: { category: true } },
+      },
+    });
+  }
+
+  return db.query.places.findMany({
+    where: (places, { and, inArray }) =>
+      and(inArray(places.cityId, cityIds), inArray(places.id, placeIds)),
+    orderBy: (places, { desc, asc }) => [desc(places.avgRating), asc(places.name)],
+    limit,
+    offset,
+    with: {
+      city: { with: { country: true, province: true } },
+      placeCategories: { with: { category: true } },
+    },
+  });
+}
+
 /**
  * Get top-rated places in a city for a specific category
  */

@@ -61,7 +61,7 @@ function BlogCardSkeleton({ featured = false }: { featured?: boolean }) {
 
 export default function BlogListingLoading() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cpCream/30 to-white dark:from-cpDark dark:to-cpDark">
+    <div className="min-h-screen bg-background">
       <section className="container mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="text-center mb-12 space-y-4">

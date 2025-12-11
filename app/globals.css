@@ -189,6 +189,25 @@
     @apply bg-background text-foreground;
   }
 
+  /* Smooth page transitions - prevents flash during navigation */
+  html {
+    background-color: var(--background);
+  }
+
+  /* Ensure main content area has smooth opacity transitions */
+  main, [role="main"] {
+    animation: pageEnter 0.15s ease-out;
+  }
+
+  @keyframes pageEnter {
+    from {
+      opacity: 0.95;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
   /* Enhanced focus states for accessibility */
   a:focus-visible,
   button:focus-visible,

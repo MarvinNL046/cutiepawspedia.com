@@ -47,7 +47,7 @@ function CategoryCardSkeleton() {
 
 export default function HomepageLoading() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-cpCoral/10 via-cpCream/50 to-cpAmber/10 dark:from-cpDark dark:via-cpDark dark:to-cpDark py-16 md:py-24">
         <div className="container mx-auto px-4">

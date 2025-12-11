@@ -46,7 +46,7 @@ function SearchResultSkeleton() {
 
 export default function SearchLoading() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cpCream/30 to-white dark:from-cpDark dark:to-cpDark">
+    <div className="min-h-screen bg-background">
       <section className="container mx-auto px-4 py-6">
         {/* Search Header */}
         <div className="mb-8 space-y-4">

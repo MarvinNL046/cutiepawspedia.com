@@ -135,11 +135,11 @@ export async function uploadReviewPhoto(
     buffer = file;
   }
 
-  // TODO: Image processing (resize, compress) - requires sharp
-  // const processedBuffer = await processImage(buffer, mimeType);
+  // Process image (resize, compress)
+  const processedBuffer = await processImage(buffer, mimeType);
 
   // Upload
-  const result = await storage.upload(storageKey, buffer, {
+  const result = await storage.upload(storageKey, processedBuffer, {
     contentType: mimeType,
     cacheControl: "public, max-age=31536000, immutable",
     metadata: {
@@ -171,40 +171,45 @@ export function getReviewPhotoUrl(storageKey: string): string {
 }
 
 // ============================================================================
-// IMAGE PROCESSING (STUB)
+// IMAGE PROCESSING
 // ============================================================================
 
 /**
  * Process image (resize, compress)
- *
- * TODO: Implement with sharp when needed
- * npm install sharp @types/sharp
+ * Uses sharp for efficient image processing
  */
-// async function processImage(
-//   buffer: Buffer,
-//   mimeType: string
-// ): Promise<Buffer> {
-//   const sharp = (await import("sharp")).default;
-//
-//   let image = sharp(buffer);
-//
-//   // Resize if too large
-//   const metadata = await image.metadata();
-//   const { width, height } = metadata;
-//
-//   if (width && height) {
-//     if (width > REVIEW_PHOTO_CONFIG.MAX_WIDTH || height > REVIEW_PHOTO_CONFIG.MAX_HEIGHT) {
-//       image = image.resize(REVIEW_PHOTO_CONFIG.MAX_WIDTH, REVIEW_PHOTO_CONFIG.MAX_HEIGHT, {
-//         fit: "inside",
-//         withoutEnlargement: true,
-//       });
-//     }
-//   }
-//
-//   // Convert to JPEG with compression
-//   if (mimeType === "image/png" || mimeType === "image/webp") {
-//     return image.jpeg({ quality: REVIEW_PHOTO_CONFIG.JPEG_QUALITY }).toBuffer();
-//   }
-//
-//   return image.jpeg({ quality: REVIEW_PHOTO_CONFIG.JPEG_QUALITY }).toBuffer();
-// }
+async function processImage(
+  buffer: Buffer,
+  mimeType: string
+): Promise<Buffer> {
+  const sharp = (await import("sharp")).default;
+
+  let image = sharp(buffer);
+
+  // Get metadata to check dimensions
+  const metadata = await image.metadata();
+  const { width, height } = metadata;
+
+  // Resize if too large (maintains aspect ratio)
+  if (width && height) {
+    if (width > REVIEW_PHOTO_CONFIG.MAX_WIDTH || height > REVIEW_PHOTO_CONFIG.MAX_HEIGHT) {
+      image = image.resize(REVIEW_PHOTO_CONFIG.MAX_WIDTH, REVIEW_PHOTO_CONFIG.MAX_HEIGHT, {
+        fit: "inside",
+        withoutEnlargement: true,
+      });
+    }
+  }
+
+  // Auto-rotate based on EXIF orientation
+  image = image.rotate();
+
+  // Output based on original format or convert to JPEG
+  if (mimeType === "image/png") {
+    return image.png({ quality: REVIEW_PHOTO_CONFIG.JPEG_QUALITY }).toBuffer();
+  } else if (mimeType === "image/webp") {
+    return image.webp({ quality: REVIEW_PHOTO_CONFIG.JPEG_QUALITY }).toBuffer();
+  }
+
+  // Default: JPEG with quality compression
+  return image.jpeg({ quality: REVIEW_PHOTO_CONFIG.JPEG_QUALITY }).toBuffer();
+}

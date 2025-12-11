@@ -90,18 +90,87 @@ function slugify(text: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
+// Parse inline markdown (links, bold, italic) to React elements
+function parseInlineMarkdown(text: string): React.ReactNode {
+  const parts: React.ReactNode[] = [];
+  let remaining = text;
+  let keyIndex = 0;
+
+  // Pattern to match markdown links [text](url) and **bold** and *italic*
+  const patterns = [
+    { regex: /\[([^\]]+)\]\(([^)]+)\)/, type: "link" },
+    { regex: /\*\*([^*]+)\*\*/, type: "bold" },
+    { regex: /\*([^*]+)\*/, type: "italic" },
+  ];
+
+  while (remaining.length > 0) {
+    let earliestMatch: { index: number; match: RegExpMatchArray; type: string } | null = null;
+
+    // Find the earliest match among all patterns
+    for (const { regex, type } of patterns) {
+      const match = remaining.match(regex);
+      if (match && match.index !== undefined) {
+        if (!earliestMatch || match.index < earliestMatch.index) {
+          earliestMatch = { index: match.index, match, type };
+        }
+      }
+    }
+
+    if (earliestMatch) {
+      // Add text before the match
+      if (earliestMatch.index > 0) {
+        parts.push(remaining.slice(0, earliestMatch.index));
+      }
+
+      // Add the formatted element
+      const { match, type } = earliestMatch;
+      if (type === "link") {
+        parts.push(
+          <Link
+            key={`link-${keyIndex++}`}
+            href={match[2]}
+            className="text-cpCoral hover:text-cpCoral/80 underline underline-offset-2"
+          >
+            {match[1]}
+          </Link>
+        );
+      } else if (type === "bold") {
+        parts.push(<strong key={`bold-${keyIndex++}`}>{match[1]}</strong>);
+      } else if (type === "italic") {
+        parts.push(<em key={`italic-${keyIndex++}`}>{match[1]}</em>);
+      }
+
+      remaining = remaining.slice(earliestMatch.index + match[0].length);
+    } else {
+      // No more matches, add remaining text
+      parts.push(remaining);
+      break;
+    }
+  }
+
+  return parts.length === 1 ? parts[0] : parts;
+}
+
 // Parse content and add IDs to headings, plus insert ads
 function parseContentWithAds(content: string, showAds: boolean = true) {
   const paragraphs = content.split("\n\n");
   const elements: React.ReactNode[] = [];
   let paragraphCount = 0;
   const AD_INTERVAL = 4; // Show ad every 4 paragraphs
+  const seenIds = new Map<string, number>(); // Track duplicate IDs
+
+  // Helper to get unique ID
+  const getUniqueId = (baseId: string) => {
+    const count = seenIds.get(baseId) || 0;
+    seenIds.set(baseId, count + 1);
+    return count === 0 ? baseId : `${baseId}-${count}`;
+  };
 
   paragraphs.forEach((paragraph, index) => {
     // Check for headings
     if (paragraph.startsWith("## ")) {
       const text = paragraph.replace("## ", "").trim();
-      const id = `heading-${slugify(text)}`;
+      const id = getUniqueId(`heading-${slugify(text)}`);
       elements.push(
         <h2
           key={`h2-${index}`}
@@ -113,7 +182,7 @@ function parseContentWithAds(content: string, showAds: boolean = true) {
       );
     } else if (paragraph.startsWith("### ")) {
       const text = paragraph.replace("### ", "").trim();
-      const id = `heading-${slugify(text)}`;
+      const id = getUniqueId(`heading-${slugify(text)}`);
       elements.push(
         <h3
           key={`h3-${index}`}
@@ -132,7 +201,7 @@ function parseContentWithAds(content: string, showAds: boolean = true) {
           className="list-disc list-inside space-y-2 mb-4 text-muted-foreground dark:text-cpCream/80"
         >
           {items.map((item, i) => (
-            <li key={i}>{item.replace(/^[-*]\s/, "")}</li>
+            <li key={i}>{parseInlineMarkdown(item.replace(/^[-*]\s/, ""))}</li>
           ))}
         </ul>
       );
@@ -144,7 +213,7 @@ function parseContentWithAds(content: string, showAds: boolean = true) {
           key={`p-${index}`}
           className="text-muted-foreground dark:text-cpCream/80 leading-relaxed mb-4"
         >
-          {paragraph}
+          {parseInlineMarkdown(paragraph)}
         </p>
       );
       paragraphCount++;
@@ -152,7 +221,7 @@ function parseContentWithAds(content: string, showAds: boolean = true) {
       // Insert ad after every AD_INTERVAL paragraphs
       if (showAds && paragraphCount > 0 && paragraphCount % AD_INTERVAL === 0) {
         elements.push(
-          <BetweenContentAd key={`ad-${index}`} testMode={true} />
+          <BetweenContentAd key={`ad-${index}`} />
         );
       }
     }
@@ -161,19 +230,27 @@ function parseContentWithAds(content: string, showAds: boolean = true) {
   return elements;
 }
 
-// Extract TOC items with proper IDs
+// Extract TOC items with proper IDs (handles duplicates)
 function extractTocItemsWithIds(content: string) {
   const items: { id: string; text: string; level: 2 | 3 }[] = [];
   const lines = content.split("\n");
+  const seenIds = new Map<string, number>(); // Track duplicate IDs
+
+  // Helper to get unique ID (same logic as parseContentWithAds)
+  const getUniqueId = (baseId: string) => {
+    const count = seenIds.get(baseId) || 0;
+    seenIds.set(baseId, count + 1);
+    return count === 0 ? baseId : `${baseId}-${count}`;
+  };
 
   lines.forEach((line) => {
     if (line.startsWith("## ")) {
       const text = line.replace("## ", "").trim();
-      const id = `heading-${slugify(text)}`;
+      const id = getUniqueId(`heading-${slugify(text)}`);
       items.push({ id, text, level: 2 });
     } else if (line.startsWith("### ")) {
       const text = line.replace("### ", "").trim();
-      const id = `heading-${slugify(text)}`;
+      const id = getUniqueId(`heading-${slugify(text)}`);
       items.push({ id, text, level: 3 });
     }
   });

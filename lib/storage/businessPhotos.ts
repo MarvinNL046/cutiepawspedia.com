@@ -191,14 +191,14 @@ export async function uploadBusinessPhoto(
     buffer = file;
   }
 
-  // Get file size
-  const sizeBytes = buffer.length;
+  // Process image (resize, compress)
+  const { buffer: processedBuffer, width, height } = await processImage(buffer, mimeType);
 
-  // TODO: Image processing (resize, compress) - requires sharp
-  // const { buffer: processedBuffer, width, height } = await processImage(buffer, mimeType);
+  // Get file size after processing
+  const sizeBytes = processedBuffer.length;
 
   // Upload
-  const result = await storage.upload(storageKey, buffer, {
+  const result = await storage.upload(storageKey, processedBuffer, {
     contentType: mimeType,
     cacheControl: "public, max-age=31536000, immutable",
     metadata: {
@@ -212,6 +212,8 @@ export async function uploadBusinessPhoto(
     ...result,
     storageKey,
     sizeBytes,
+    width,
+    height,
   };
 }
 
@@ -232,50 +234,58 @@ export function getBusinessPhotoUrl(storageKey: string): string {
 }
 
 // ============================================================================
-// IMAGE PROCESSING (STUB)
+// IMAGE PROCESSING
 // ============================================================================
+
+interface ProcessedImage {
+  buffer: Buffer;
+  width: number;
+  height: number;
+}
 
 /**
  * Process image (resize, compress)
- *
- * TODO: Implement with sharp when needed
- * npm install sharp @types/sharp
+ * Uses sharp for efficient image processing
  */
-// interface ProcessedImage {
-//   buffer: Buffer;
-//   width: number;
-//   height: number;
-// }
-//
-// async function processImage(
-//   buffer: Buffer,
-//   mimeType: string
-// ): Promise<ProcessedImage> {
-//   const sharp = (await import("sharp")).default;
-//
-//   let image = sharp(buffer);
-//   const metadata = await image.metadata();
-//   let { width, height } = metadata;
-//
-//   // Resize if too large
-//   if (width && height) {
-//     if (width > BUSINESS_PHOTO_CONFIG.MAX_WIDTH || height > BUSINESS_PHOTO_CONFIG.MAX_HEIGHT) {
-//       image = image.resize(BUSINESS_PHOTO_CONFIG.MAX_WIDTH, BUSINESS_PHOTO_CONFIG.MAX_HEIGHT, {
-//         fit: "inside",
-//         withoutEnlargement: true,
-//       });
-//       const resized = await image.metadata();
-//       width = resized.width;
-//       height = resized.height;
-//     }
-//   }
-//
-//   // Convert to JPEG with compression
-//   const processedBuffer = await image.jpeg({ quality: BUSINESS_PHOTO_CONFIG.JPEG_QUALITY }).toBuffer();
-//
-//   return {
-//     buffer: processedBuffer,
-//     width: width || 0,
-//     height: height || 0,
-//   };
-// }
+async function processImage(
+  buffer: Buffer,
+  mimeType: string
+): Promise<ProcessedImage> {
+  const sharp = (await import("sharp")).default;
+
+  let image = sharp(buffer);
+  const metadata = await image.metadata();
+  let { width, height } = metadata;
+
+  // Resize if too large (maintains aspect ratio)
+  if (width && height) {
+    if (width > BUSINESS_PHOTO_CONFIG.MAX_WIDTH || height > BUSINESS_PHOTO_CONFIG.MAX_HEIGHT) {
+      image = image.resize(BUSINESS_PHOTO_CONFIG.MAX_WIDTH, BUSINESS_PHOTO_CONFIG.MAX_HEIGHT, {
+        fit: "inside",
+        withoutEnlargement: true,
+      });
+      const resized = await image.metadata();
+      width = resized.width;
+      height = resized.height;
+    }
+  }
+
+  // Auto-rotate based on EXIF orientation
+  image = image.rotate();
+
+  // Output based on original format
+  let processedBuffer: Buffer;
+  if (mimeType === "image/png") {
+    processedBuffer = await image.png({ quality: BUSINESS_PHOTO_CONFIG.JPEG_QUALITY }).toBuffer();
+  } else if (mimeType === "image/webp") {
+    processedBuffer = await image.webp({ quality: BUSINESS_PHOTO_CONFIG.JPEG_QUALITY }).toBuffer();
+  } else {
+    processedBuffer = await image.jpeg({ quality: BUSINESS_PHOTO_CONFIG.JPEG_QUALITY }).toBuffer();
+  }
+
+  return {
+    buffer: processedBuffer,
+    width: width || 0,
+    height: height || 0,
+  };
+}

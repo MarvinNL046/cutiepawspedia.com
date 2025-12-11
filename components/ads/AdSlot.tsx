@@ -18,7 +18,10 @@ import { useAdVisibility } from "./AdVisibilityContext";
 import { hasAdConsent } from "@/lib/ads/consent";
 
 // Environment configuration
-const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
+const ADSENSE_CLIENT_RAW = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
+// Only consider AdSense configured if it's a real publisher ID (starts with ca-pub- followed by at least 10 digits)
+const IS_VALID_ADSENSE_ID = ADSENSE_CLIENT_RAW && /^ca-pub-\d{10,}$/.test(ADSENSE_CLIENT_RAW);
+const ADSENSE_CLIENT = IS_VALID_ADSENSE_ID ? ADSENSE_CLIENT_RAW : undefined;
 
 // Slot IDs from environment
 const SLOT_IDS = {
@@ -123,8 +126,13 @@ export function AdSlot({ slotId, type, format = "auto", className = "", testMode
     return null;
   }
 
-  // Test/development mode - show placeholder
-  if (testMode || !resolvedSlotId) {
+  // Don't render if no slot ID is configured (return null, not a placeholder)
+  if (!resolvedSlotId && !testMode) {
+    return null;
+  }
+
+  // Test/development mode only - show placeholder (requires explicit testMode=true)
+  if (testMode) {
     return (
       <div
         className={`bg-slate-100 border-2 border-dashed border-slate-300 rounded-lg flex items-center justify-center text-slate-400 text-sm ${className}`}

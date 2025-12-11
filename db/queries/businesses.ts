@@ -1,6 +1,6 @@
-import { sql, eq, desc, count, gte, and, or, ilike } from "drizzle-orm";
+import { sql, eq, desc, count, gte, and, or, ilike, sum } from "drizzle-orm";
 import { db } from "../index";
-import { businesses, users, places, leads, cities, countries, categories, placeCategories } from "../schema";
+import { businesses, users, places, leads, cities, countries, categories, placeCategories, creditTransactions } from "../schema";
 
 // ============================================================================
 // TYPES
@@ -33,7 +33,7 @@ export type BusinessWithStats = {
 };
 
 export type BusinessDetails = BusinessWithStats & {
-  totalRevenue: number; // Placeholder for billing integration
+  totalRevenue: number; // Total revenue from credit purchases (in euros)
   conversionRate: number;
   // Additional business info
   slug: string | null;
@@ -215,8 +215,8 @@ export async function getBusinessById(id: number): Promise<BusinessDetails | nul
   const business = result[0];
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-  // Get all stats
-  const [placesResult, leadsResult, leadsLast30DaysResult] = await Promise.all([
+  // Get all stats including revenue from credit transactions
+  const [placesResult, leadsResult, leadsLast30DaysResult, revenueResult] = await Promise.all([
     db.select({ value: count() }).from(places).where(eq(places.businessId, business.id)),
     db
       .select({ value: count() })
@@ -233,11 +233,24 @@ export async function getBusinessById(id: number): Promise<BusinessDetails | nul
           gte(leads.createdAt, thirtyDaysAgo)
         )
       ),
+    // Calculate total revenue from credit purchases (type = 'purchase')
+    db
+      .select({ value: sum(creditTransactions.amountCents) })
+      .from(creditTransactions)
+      .where(
+        and(
+          eq(creditTransactions.businessId, business.id),
+          eq(creditTransactions.type, "purchase")
+        )
+      ),
   ]);
 
   const placesCount = placesResult[0]?.value ?? 0;
   const leadsCount = leadsResult[0]?.value ?? 0;
   const leadsLast30Days = leadsLast30DaysResult[0]?.value ?? 0;
+  // Revenue in cents from purchases - convert to euros
+  const totalRevenueCents = Number(revenueResult[0]?.value ?? 0);
+  const totalRevenue = totalRevenueCents / 100;
 
   // Calculate conversion rate (leads / 30 = approximate daily, * 100 for percentage)
   // This is a placeholder - real conversion would need views/impressions data
@@ -248,7 +261,7 @@ export async function getBusinessById(id: number): Promise<BusinessDetails | nul
     placesCount,
     leadsCount,
     leadsLast30Days,
-    totalRevenue: 0, // Placeholder for Stripe integration
+    totalRevenue,
     conversionRate: Math.round(conversionRate * 10) / 10,
   };
 }

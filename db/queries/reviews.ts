@@ -600,10 +600,103 @@ export async function getReviewCountsByStatus() {
 }
 
 // ============================================================================
+// HOMEPAGE FEATURED REVIEWS
+// ============================================================================
+
+/**
+ * Get featured reviews for homepage testimonials section
+ * Returns high-rating reviews that are marked as featured
+ */
+export async function getFeaturedReviewsForHomepage(limit = 3) {
+  if (!db) return [];
+
+  return db.query.reviews.findMany({
+    where: and(
+      eq(reviews.status, "published"),
+      eq(reviews.isFeatured, true)
+    ),
+    orderBy: [desc(reviews.rating), desc(reviews.createdAt)],
+    limit,
+    with: {
+      user: {
+        columns: {
+          displayName: true,
+        },
+      },
+      place: {
+        columns: {
+          name: true,
+          slug: true,
+        },
+        with: {
+          city: {
+            columns: {
+              slug: true,
+            },
+            with: {
+              country: {
+                columns: {
+                  slug: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+/**
+ * Get top-rated reviews for homepage (fallback if no featured reviews)
+ * Returns published reviews with rating >= 4
+ */
+export async function getTopReviewsForHomepage(limit = 3) {
+  if (!db) return [];
+
+  return db.query.reviews.findMany({
+    where: and(
+      eq(reviews.status, "published"),
+      sql`${reviews.rating} >= 4`
+    ),
+    orderBy: [desc(reviews.rating), desc(reviews.createdAt)],
+    limit,
+    with: {
+      user: {
+        columns: {
+          displayName: true,
+        },
+      },
+      place: {
+        columns: {
+          name: true,
+          slug: true,
+        },
+        with: {
+          city: {
+            columns: {
+              slug: true,
+            },
+            with: {
+              country: {
+                columns: {
+                  slug: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+// ============================================================================
 // EXPORTS FOR TYPES
 // ============================================================================
 
 export type Review = NonNullable<Awaited<ReturnType<typeof getReviewById>>>;
+export type HomepageReview = Awaited<ReturnType<typeof getFeaturedReviewsForHomepage>>[number];
 export type ReviewWithUser = Awaited<ReturnType<typeof getReviewsForPlace>>[number];
 export type ReviewReply = NonNullable<
   Awaited<ReturnType<typeof getRepliesForReview>>[number]

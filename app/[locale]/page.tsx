@@ -13,7 +13,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { SearchBar, CategoryCard, getCategoryIcon } from "@/components/directory";
-import { getCountries, getCategories, getPlaceCount, getCityCount, getLatestPosts, getPopularPlaces, type Locale } from "@/db/queries";
+import { getCountries, getCategories, getPlaceCount, getCityCount, getLatestPosts, getPopularPlaces, getFeaturedReviewsForHomepage, getTopReviewsForHomepage, type Locale } from "@/db/queries";
 import { getActiveAdForPlacement } from "@/db/queries/ads";
 import { HomepageFeaturedAd } from "@/components/ads";
 import {
@@ -64,7 +64,7 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
 export default async function HomePage({ params }: HomePageProps) {
   const { locale } = await params;
 
-  const [countries, categories, totalPlaces, totalCities, latestPosts, homepageSponsorAd, popularPlaces] = await Promise.all([
+  const [countries, categories, totalPlaces, totalCities, latestPosts, homepageSponsorAd, popularPlaces, featuredReviews] = await Promise.all([
     getCountries(),
     getCategories(),
     getPlaceCount(),
@@ -72,7 +72,13 @@ export default async function HomePage({ params }: HomePageProps) {
     getLatestPosts(locale as Locale, 2),
     getActiveAdForPlacement("homepage_featured", locale as "en" | "nl"),
     getPopularPlaces(6),
+    getFeaturedReviewsForHomepage(3),
   ]);
+
+  // Fallback to top-rated reviews if no featured reviews
+  const testimonialReviews = featuredReviews.length > 0
+    ? featuredReviews
+    : await getTopReviewsForHomepage(3);
 
   const displayCategories = categories.length > 0 ? categories : defaultCategories;
 
@@ -358,7 +364,8 @@ export default async function HomePage({ params }: HomePageProps) {
           )}
         </section>
 
-        {/* Testimonials */}
+        {/* Testimonials - Real reviews from database */}
+        {testimonialReviews.length > 0 && (
         <section className="container mx-auto max-w-6xl px-4 py-16">
           <div className="text-center mb-10">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
@@ -366,24 +373,49 @@ export default async function HomePage({ params }: HomePageProps) {
             </h2>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
-            {testimonials.slice(0, 2).map((testimonial, index) => (
-              <div key={index} className="bg-card dark:bg-cpSurface/50 rounded-3xl p-6 border border-border dark:border-cpAmber/20 shadow-sm">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cpCoral to-cpAmber flex items-center justify-center text-white dark:text-cpCharcoal font-bold">
-                    {testimonial.name.charAt(0)}
+            {testimonialReviews.slice(0, 2).map((review) => {
+              const place = review.place;
+              const city = place?.city;
+              const country = city?.country;
+              const reviewUrl = place && city && country
+                ? `/${locale}/${country.slug}/${city.slug}/all/${place.slug}`
+                : null;
+
+              return (
+                <div key={review.id} className="bg-card dark:bg-cpSurface/50 rounded-3xl p-6 border border-border dark:border-cpAmber/20 shadow-sm">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cpCoral to-cpAmber flex items-center justify-center text-white dark:text-cpCharcoal font-bold">
+                      {(review.user?.displayName || "A").charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-4 h-4 ${i < review.rating ? "fill-cpAmber text-cpAmber" : "text-gray-300"}`}
+                        />
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-cpAmber text-cpAmber" />
-                    ))}
+                  <p className="text-muted-foreground dark:text-cpCream/80 mb-4 line-clamp-3">
+                    "{review.body}"
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground dark:text-cpCream/60">
+                      {review.user?.displayName || (locale === "nl" ? "Anoniem" : "Anonymous")}
+                      {place?.name && <span className="text-cpCoral"> • {place.name}</span>}
+                    </span>
+                    {reviewUrl && (
+                      <Link href={reviewUrl} className="text-cpCoral text-sm font-medium hover:underline">
+                        {locale === "nl" ? "Bekijk →" : "View →"}
+                      </Link>
+                    )}
                   </div>
                 </div>
-                <p className="text-muted-foreground dark:text-cpCream/80 mb-4">"{testimonial.quote[locale as 'en' | 'nl']}"</p>
-                <span className="text-cpCoral text-sm font-medium">{locale === "nl" ? "Lees meer →" : "Read more →"}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
+        )}
 
         {/* Featured Places - Real data from database */}
         {popularPlaces.length > 0 && (
@@ -588,31 +620,4 @@ const faqs = [
   },
 ];
 
-// Testimonials data
-const testimonials = [
-  {
-    name: "Sarah Johnson",
-    pet: "Owner of Max (Golden Retriever)",
-    quote: {
-      en: "Found the perfect pet hotel for our vacation. Max was so happy and well-cared for. The reviews really helped us make the right choice!",
-      nl: "De perfecte dierenpension gevonden voor onze vakantie. Max was zo blij en goed verzorgd. De reviews hielpen ons echt de juiste keuze te maken!",
-    },
-  },
-  {
-    name: "Peter van den Berg",
-    pet: "Owner of Luna (British Shorthair)",
-    quote: {
-      en: "As a first-time cat owner, finding a good vet was crucial. CutiePawsPedia made it so easy to compare options and read honest reviews.",
-      nl: "Als eerste katteneigenaar was het vinden van een goede dierenarts cruciaal. CutiePawsPedia maakte het zo makkelijk om opties te vergelijken en eerlijke reviews te lezen.",
-    },
-  },
-  {
-    name: "Emma Williams",
-    pet: "Owner of Buddy & Bailey (Beagles)",
-    quote: {
-      en: "The groomer we found through this site was amazing! Both dogs came back looking and smelling fantastic. Highly recommend!",
-      nl: "De trimmer die we via deze site vonden was geweldig! Beide honden kwamen terug en zagen er fantastisch uit. Echt een aanrader!",
-    },
-  },
-];
 

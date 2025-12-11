@@ -426,6 +426,37 @@ export async function getTopPlacesByCitySlugAndCategorySlug(
 }
 
 // ============================================================================
+// POPULAR PLACES (HOMEPAGE)
+// ============================================================================
+
+/**
+ * Get most popular places across all locations
+ * Ordered by review count (most reviews first), then by rating
+ * Used for "Popular Places" section on homepage
+ */
+export async function getPopularPlaces(limit = 6) {
+  if (!db) return [];
+  return db.query.places.findMany({
+    where: (places, { gt }) => gt(places.reviewCount, 0),
+    orderBy: (places, { desc }) => [desc(places.reviewCount), desc(places.avgRating)],
+    limit,
+    with: {
+      city: {
+        with: {
+          country: true,
+          province: true,
+        },
+      },
+      placeCategories: {
+        with: {
+          category: true,
+        },
+      },
+    },
+  });
+}
+
+// ============================================================================
 // COUNTS / STATS
 // ============================================================================
 

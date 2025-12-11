@@ -13,7 +13,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { SearchBar, CategoryCard, getCategoryIcon } from "@/components/directory";
-import { getCountries, getCategories, getPlaceCount, getCityCount, getLatestPosts, type Locale } from "@/db/queries";
+import { getCountries, getCategories, getPlaceCount, getCityCount, getLatestPosts, getPopularPlaces, type Locale } from "@/db/queries";
 import { getActiveAdForPlacement } from "@/db/queries/ads";
 import { HomepageFeaturedAd } from "@/components/ads";
 import {
@@ -64,13 +64,14 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
 export default async function HomePage({ params }: HomePageProps) {
   const { locale } = await params;
 
-  const [countries, categories, totalPlaces, totalCities, latestPosts, homepageSponsorAd] = await Promise.all([
+  const [countries, categories, totalPlaces, totalCities, latestPosts, homepageSponsorAd, popularPlaces] = await Promise.all([
     getCountries(),
     getCategories(),
     getPlaceCount(),
     getCityCount(),
     getLatestPosts(locale as Locale, 2),
     getActiveAdForPlacement("homepage_featured", locale as "en" | "nl"),
+    getPopularPlaces(6),
   ]);
 
   const displayCategories = categories.length > 0 ? categories : defaultCategories;
@@ -384,7 +385,8 @@ export default async function HomePage({ params }: HomePageProps) {
           </div>
         </section>
 
-        {/* Featured Places */}
+        {/* Featured Places - Real data from database */}
+        {popularPlaces.length > 0 && (
         <section className="container mx-auto max-w-6xl px-4 py-16">
           <div className="text-center mb-10">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
@@ -392,28 +394,51 @@ export default async function HomePage({ params }: HomePageProps) {
             </h2>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
-            {featuredPlaces.map((place) => (
-              <Link key={place.name} href={`/${locale}/${place.href}`} className="group">
-                <div className="bg-card dark:bg-cpSurface/50 rounded-3xl overflow-hidden border border-border dark:border-cpAmber/20 hover:border-cpCoral/40 transition-all shadow-sm hover:shadow-lg">
-                  <div className="h-40 bg-gradient-to-br from-cpCoral/10 dark:from-cpCoral/20 to-cpAmber/5 dark:to-cpAmber/10 flex items-center justify-center">
-                    <span className="text-5xl">{place.emoji}</span>
-                  </div>
-                  <div className="p-5">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs text-cpAmber font-medium">{place.category}</span>
-                      <span className="flex items-center gap-1 text-cpAmber text-sm">
-                        <Star className="w-3 h-3 fill-cpAmber" />
-                        {place.rating}
-                      </span>
+            {popularPlaces.map((place) => {
+              const city = place.city;
+              const country = city?.country;
+              const province = city?.province;
+              const categoriesArray = Array.isArray(place.placeCategories) ? place.placeCategories : place.placeCategories ? [place.placeCategories] : [];
+              const firstCategory = categoriesArray[0]?.category;
+              const categorySlug = firstCategory?.slug || "all";
+              const categoryIcon = getCategoryIcon(firstCategory?.icon || categorySlug);
+
+              // Build URL with province prefix
+              const href = province
+                ? `/${locale}/${country?.slug || "netherlands"}/p/${province.slug}/${city?.slug || ""}/${categorySlug}/${place.slug}`
+                : `/${locale}/${country?.slug || "netherlands"}/${city?.slug || ""}/${categorySlug}/${place.slug}`;
+
+              const locationText = city && country
+                ? `${city.name}, ${country.name}`
+                : city?.name || "";
+
+              return (
+                <Link key={place.id} href={href} className="group" prefetch={false}>
+                  <div className="bg-card dark:bg-cpSurface/50 rounded-3xl overflow-hidden border border-border dark:border-cpAmber/20 hover:border-cpCoral/40 transition-all shadow-sm hover:shadow-lg">
+                    <div className="h-40 bg-gradient-to-br from-cpCoral/10 dark:from-cpCoral/20 to-cpAmber/5 dark:to-cpAmber/10 flex items-center justify-center">
+                      <span className="text-5xl">{categoryIcon}</span>
                     </div>
-                    <h3 className="font-bold text-foreground dark:text-cpCream group-hover:text-cpCoral transition-colors">{place.name}</h3>
-                    <p className="text-sm text-muted-foreground dark:text-slate-400">{place.location}</p>
+                    <div className="p-5">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs text-cpAmber font-medium">{getLocalizedCategoryName(categorySlug, locale as ContentLocale)}</span>
+                        <span className="flex items-center gap-1 text-cpAmber text-sm">
+                          <Star className="w-3 h-3 fill-cpAmber" />
+                          {place.avgRating ? parseFloat(place.avgRating).toFixed(1) : "–"}
+                        </span>
+                      </div>
+                      <h3 className="font-bold text-foreground dark:text-cpCream group-hover:text-cpCoral transition-colors">{place.name}</h3>
+                      <p className="text-sm text-muted-foreground dark:text-slate-400">{locationText}</p>
+                      <p className="text-xs text-muted-foreground dark:text-slate-500 mt-1">
+                        {place.reviewCount} {locale === "nl" ? "reviews" : "reviews"}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         </section>
+        )}
 
         {/* FAQ */}
         <section className="container mx-auto max-w-4xl px-4 py-16">
@@ -523,33 +548,6 @@ const defaultCategories = [
   { slug: "dog-walking", icon: "walking", labelKey: "Dog Walking" },
 ];
 
-// Featured places data
-const featuredPlaces = [
-  {
-    name: "Happy Paws Pet Hotel",
-    href: "netherlands/amsterdam/pet-hotels/happy-paws",
-    location: "Amsterdam, Netherlands",
-    category: "Pet Hotel",
-    rating: "4.9",
-    emoji: "🏨",
-  },
-  {
-    name: "Dr. Whiskers Veterinary Clinic",
-    href: "netherlands/rotterdam/veterinarians/dr-whiskers",
-    location: "Rotterdam, Netherlands",
-    category: "Veterinarian",
-    rating: "4.8",
-    emoji: "🩺",
-  },
-  {
-    name: "Fluffy Grooming Salon",
-    href: "belgium/brussels/grooming/fluffy-salon",
-    location: "Brussels, Belgium",
-    category: "Grooming",
-    rating: "4.7",
-    emoji: "✂️",
-  },
-];
 
 // FAQ data
 const faqs = [

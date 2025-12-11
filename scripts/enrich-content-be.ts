@@ -51,13 +51,16 @@ interface ContentResult {
 async function generateAboutContent(place: Place): Promise<ContentResult | null> {
   const categoryContext = getCategoryContext(place.category_slug);
 
-  // Extract any existing scraped data from Jina
+  // Extract any existing scraped data from Jina and BrightData
   const scraped = place.scraped_content || {};
   const existingAbout = scraped.aboutUs as string || "";
   const existingServices = scraped.services as string[] || [];
   const openingHours = scraped.openingHours as Record<string, string> || {};
   const specialties = scraped.specialties as string[] || [];
   const description = scraped.description as string || "";
+  const facts = scraped.facts as { teamSize?: string; foundedYear?: number; specializations?: string[] } || {};
+  const highlights = scraped.highlights as string[] || [];
+  const googleReviews = scraped.googleReviews as { author: string; rating: number; text: string }[] || [];
 
   // Build context from scraped data
   let scrapedContext = "";
@@ -75,6 +78,30 @@ async function generateAboutContent(place: Place): Promise<ContentResult | null>
   }
   if (Object.keys(openingHours).length > 0) {
     scrapedContext += `\nOpeningstijden beschikbaar: Ja\n`;
+  }
+
+  // Add facts if available
+  if (facts.teamSize) {
+    scrapedContext += `\nTeam grootte: ${facts.teamSize}\n`;
+  }
+  if (facts.foundedYear) {
+    scrapedContext += `\nOpgericht: ${facts.foundedYear}\n`;
+  }
+  if (facts.specializations && facts.specializations.length > 0) {
+    scrapedContext += `\nSpecialisaties: ${facts.specializations.join(", ")}\n`;
+  }
+
+  // Add existing highlights
+  if (highlights.length > 0) {
+    scrapedContext += `\nUSPs van website: ${highlights.slice(0, 5).join("; ")}\n`;
+  }
+
+  // Add Google reviews for context (max 3)
+  if (googleReviews.length > 0) {
+    scrapedContext += `\n=== GOOGLE REVIEWS (${googleReviews.length} stuks) ===\n`;
+    for (const review of googleReviews.slice(0, 3)) {
+      scrapedContext += `- "${review.text.slice(0, 150)}..." (${review.rating}/5 sterren)\n`;
+    }
   }
 
   const prompt = `Je bent een professionele copywriter voor een huisdieren directory website.

@@ -360,6 +360,18 @@ async function placeExists(slug: string, cityId: number): Promise<boolean> {
 // SERP API SEARCH
 // =============================================================================
 
+interface OpeningHours {
+  [day: string]: string;
+}
+
+interface GoogleReview {
+  author: string;
+  rating: number;
+  text: string;
+  date?: string;
+  language?: string;
+}
+
 interface LocalResult {
   name: string;
   address?: string;
@@ -369,6 +381,11 @@ interface LocalResult {
   reviews?: number;
   placeId?: string;
   category?: string;
+  openingHours?: OpeningHours;
+  googleReviews?: GoogleReview[];
+  latitude?: number;
+  longitude?: number;
+  priceRange?: string;
 }
 
 async function searchGoogleMaps(
@@ -430,6 +447,64 @@ async function searchGoogleMaps(
   }
 }
 
+function parseOpeningHours(hoursData: unknown): OpeningHours | undefined {
+  if (!hoursData) return undefined;
+
+  const hours: OpeningHours = {};
+
+  // Handle array format: [{ day: "Monday", hours: "9:00 - 18:00" }]
+  if (Array.isArray(hoursData)) {
+    for (const entry of hoursData) {
+      if (entry && typeof entry === "object") {
+        const e = entry as Record<string, unknown>;
+        const day = e.day || e.weekday || e.name;
+        const time = e.hours || e.time || e.opening_hours || e.open;
+        if (day && time) {
+          hours[String(day)] = String(time);
+        }
+      }
+    }
+  }
+  // Handle object format: { Monday: "9:00 - 18:00" }
+  else if (typeof hoursData === "object") {
+    const h = hoursData as Record<string, unknown>;
+    for (const [key, val] of Object.entries(h)) {
+      if (val && typeof val === "string") {
+        hours[key] = val;
+      }
+    }
+  }
+
+  return Object.keys(hours).length > 0 ? hours : undefined;
+}
+
+function parseGoogleReviews(reviewsData: unknown): GoogleReview[] | undefined {
+  if (!reviewsData || !Array.isArray(reviewsData)) return undefined;
+
+  const reviews: GoogleReview[] = [];
+
+  for (const r of reviewsData.slice(0, 10)) { // Max 10 reviews
+    if (r && typeof r === "object") {
+      const rev = r as Record<string, unknown>;
+      const author = rev.author || rev.user || rev.name || rev.reviewer;
+      const rating = parseFloat(String(rev.rating || rev.stars || rev.score || 0));
+      const text = rev.text || rev.content || rev.review || rev.snippet || rev.body;
+
+      if (author && text) {
+        reviews.push({
+          author: String(author),
+          rating: rating > 0 ? rating : 5,
+          text: String(text).slice(0, 500), // Truncate long reviews
+          date: rev.date ? String(rev.date) : undefined,
+          language: rev.language ? String(rev.language) : undefined,
+        });
+      }
+    }
+  }
+
+  return reviews.length > 0 ? reviews : undefined;
+}
+
 function parseSerpResults(data: object): LocalResult[] {
   const results: LocalResult[] = [];
   const d = data as Record<string, unknown>;
@@ -444,6 +519,20 @@ function parseSerpResults(data: object): LocalResult[] {
     const rating = parseFloat(String(r.rating || r.stars || 0));
     const reviews = parseInt(String(r.reviews_cnt || r.reviews || r.review_count || 0), 10);
 
+    // Parse opening hours from various possible fields
+    const openingHours = parseOpeningHours(
+      r.hours || r.opening_hours || r.work_hours || r.business_hours || r.open_hours
+    );
+
+    // Parse Google reviews
+    const googleReviews = parseGoogleReviews(
+      r.reviews_list || r.google_reviews || r.user_reviews || r.review_list
+    );
+
+    // Parse coordinates
+    const lat = parseFloat(String(r.lat || r.latitude || (r.gps_coordinates as Record<string, unknown>)?.latitude || 0));
+    const lng = parseFloat(String(r.lng || r.longitude || (r.gps_coordinates as Record<string, unknown>)?.longitude || 0));
+
     results.push({
       name: String(name),
       address: String(r.address || r.location || ""),
@@ -453,6 +542,11 @@ function parseSerpResults(data: object): LocalResult[] {
       reviews: reviews > 0 ? reviews : undefined,
       placeId: String(r.cid || r.place_id || r.data_id || ""),
       category: String(r.type || r.category || r.business_type || ""),
+      openingHours,
+      googleReviews,
+      latitude: lat > 0 ? lat : undefined,
+      longitude: lng > 0 ? lng : undefined,
+      priceRange: r.price_range ? String(r.price_range) : undefined,
     });
   }
 
@@ -485,7 +579,7 @@ async function createPlace(
   }
 
   try {
-    const scrapedContent = {
+    const scrapedContent: Record<string, unknown> = {
       googlePlaceId: result.placeId,
       googleRating: result.rating,
       googleReviewCount: result.reviews,
@@ -493,6 +587,29 @@ async function createPlace(
       discoveredAt: new Date().toISOString(),
       discoverySource: "brightdata_serp_api_be",
     };
+
+    // Add opening hours if available
+    if (result.openingHours) {
+      scrapedContent.openingHours = result.openingHours;
+    }
+
+    // Add Google reviews if available
+    if (result.googleReviews && result.googleReviews.length > 0) {
+      scrapedContent.googleReviews = result.googleReviews;
+    }
+
+    // Add coordinates if available
+    if (result.latitude && result.longitude) {
+      scrapedContent.coordinates = {
+        lat: result.latitude,
+        lng: result.longitude,
+      };
+    }
+
+    // Add price range if available
+    if (result.priceRange) {
+      scrapedContent.priceRange = result.priceRange;
+    }
 
     const [inserted] = await db
       .insert(schema.places)
@@ -503,6 +620,8 @@ async function createPlace(
         address: result.address || null,
         phone: result.phone || null,
         website: result.website || null,
+        lat: result.latitude?.toString() || null,
+        lng: result.longitude?.toString() || null,
         avgRating: result.rating?.toString() || "0",
         reviewCount: result.reviews || 0,
         scrapedContent: scrapedContent,

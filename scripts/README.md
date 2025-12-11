@@ -87,7 +87,7 @@ tail -f overnight.log  # Check progress
 
 ---
 
-### `discover-be.sh` - Alleen Discovery
+### `discover-be.sh` - Alleen Discovery (Belgium)
 **Gebruik:** Nieuwe places zoeken zonder enrichment.
 
 ```bash
@@ -98,6 +98,40 @@ tail -f overnight.log  # Check progress
 - Doorloopt alle 13 categorieën
 - Zoekt in alle Belgische steden
 - NL en FR zoektermen (per regio)
+
+---
+
+### `overnight-full-nl.sh` - Netherlands Pipeline
+**Gebruik:** Enrichment voor Nederlandse places.
+
+```bash
+./scripts/overnight-full-nl.sh
+```
+
+**Wat het doet:**
+1. Jina scraping voor NL places
+2. GPT content voor NL places
+
+**Let op:** Discovery voor NL gebruikt andere scripts (file-based).
+
+---
+
+### `overnight-full-all.sh` - Beide Landen
+**Gebruik:** Complete pipeline voor België + Nederland.
+
+```bash
+./scripts/overnight-full-all.sh
+```
+
+**Wat het doet:**
+1. Belgium: Discovery + Jina + GPT
+2. Netherlands: Jina + GPT
+
+**Met nohup:**
+```bash
+nohup ./scripts/overnight-full-all.sh > overnight-all.log 2>&1 &
+tail -f overnight-all.log
+```
 
 ---
 
@@ -128,10 +162,12 @@ dog-daycare, exotic-vet, shelter, dog-park
 
 ### Enrichment
 
-| Script | Beschrijving | Gebruik |
-|--------|--------------|---------|
-| `enrich-jina-be.ts` | Website scraping voor Belgium | `npx tsx scripts/enrich-jina-be.ts --batch-size=50` |
-| `enrich-content-be.ts` | GPT content voor Belgium | `npx tsx scripts/enrich-content-be.ts --batch-size=50` |
+| Script | Land | Beschrijving | Gebruik |
+|--------|------|--------------|---------|
+| `enrich-jina-be.ts` | BE | Website scraping | `npx tsx scripts/enrich-jina-be.ts --batch-size=50` |
+| `enrich-jina-nl.ts` | NL | Website scraping | `npx tsx scripts/enrich-jina-nl.ts --batch-size=50` |
+| `enrich-content-be.ts` | BE | GPT content | `npx tsx scripts/enrich-content-be.ts --batch-size=50` |
+| `enrich-content-nl.ts` | NL | GPT content | `npx tsx scripts/enrich-content-nl.ts --batch-size=50` |
 
 **Opties:**
 - `--batch-size=<n>` - Aantal per batch (default: 50)

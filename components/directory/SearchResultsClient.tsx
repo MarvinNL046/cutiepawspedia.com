@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { PlaceCard } from "./PlaceCard";
@@ -36,6 +36,13 @@ export function SearchResultsClient({
   const [isPending, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(false);
   const t = useTranslations("search");
+
+  // Reset state when search params change (new search)
+  useEffect(() => {
+    setPlaces(initialPlaces);
+    setHasMore(initialHasMore);
+    setPage(1);
+  }, [initialPlaces, initialHasMore, searchParams.query, searchParams.citySlug, searchParams.categorySlug, searchParams.countrySlug, searchParams.sortBy]);
 
   const loadMore = async () => {
     if (isLoading || !hasMore) return;

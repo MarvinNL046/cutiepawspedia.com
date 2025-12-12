@@ -426,7 +426,10 @@
     "forBusinesses": "Voor Bedrijven",
     "listYourBusiness": "Meld je Bedrijf Aan",
     "signIn": "Inloggen",
-    "signUp": "Registreren"
+    "signUp": "Registreren",
+    "myAccount": "Mijn Account",
+    "settings": "Instellingen",
+    "signOut": "Uitloggen"
   },
   "footer": {
     "stayUpdated": "Blijf Op De Hoogte",

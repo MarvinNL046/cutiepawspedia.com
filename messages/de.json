@@ -426,7 +426,10 @@
     "forBusinesses": "Für Unternehmen",
     "listYourBusiness": "Unternehmen Eintragen",
     "signIn": "Anmelden",
-    "signUp": "Registrieren"
+    "signUp": "Registrieren",
+    "myAccount": "Mein Konto",
+    "settings": "Einstellungen",
+    "signOut": "Abmelden"
   },
   "footer": {
     "stayUpdated": "Bleiben Sie Informiert",

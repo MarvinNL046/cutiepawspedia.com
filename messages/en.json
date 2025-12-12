@@ -426,7 +426,10 @@
     "forBusinesses": "For Businesses",
     "listYourBusiness": "List Your Business",
     "signIn": "Sign In",
-    "signUp": "Sign Up"
+    "signUp": "Sign Up",
+    "myAccount": "My Account",
+    "settings": "Settings",
+    "signOut": "Sign Out"
   },
   "footer": {
     "stayUpdated": "Stay Updated",

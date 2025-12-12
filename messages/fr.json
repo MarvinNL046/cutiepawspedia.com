@@ -427,7 +427,10 @@
     "forBusinesses": "Pour les Entreprises",
     "listYourBusiness": "Inscrivez Votre Entreprise",
     "signIn": "Connexion",
-    "signUp": "Inscription"
+    "signUp": "Inscription",
+    "myAccount": "Mon Compte",
+    "settings": "Paramètres",
+    "signOut": "Déconnexion"
   },
   "footer": {
     "stayUpdated": "Restez Informé",

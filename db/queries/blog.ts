@@ -19,7 +19,7 @@ import { users } from "@/db/schema/directory";
 // TYPES
 // ============================================================================
 
-export type Locale = "en" | "nl";
+export type Locale = "en" | "nl" | "de" | "fr";
 
 export type BlogPost = {
   id: number;

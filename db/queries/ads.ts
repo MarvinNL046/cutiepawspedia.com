@@ -25,7 +25,7 @@ export type AdPlacementType =
   | "search_results"
   | "homepage_featured";
 
-export type Locale = "en" | "nl";
+export type Locale = "en" | "nl" | "de" | "fr";
 
 export interface ActiveAd {
   id: number;

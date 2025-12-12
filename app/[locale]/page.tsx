@@ -72,7 +72,7 @@ export default async function HomePage({ params }: HomePageProps) {
     getPlaceCount(),
     getCityCount(),
     getLatestPosts(locale as Locale, 2),
-    getActiveAdForPlacement("homepage_featured", locale as "en" | "nl"),
+    getActiveAdForPlacement("homepage_featured", locale as Locale),
     getPopularPlaces(6),
     getFeaturedReviewsForHomepage(3),
   ]);

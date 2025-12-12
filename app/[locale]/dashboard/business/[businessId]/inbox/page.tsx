@@ -105,6 +105,17 @@ export default async function InboxPage({ params, searchParams }: InboxPageProps
       from: "Von",
       about: "Über",
     },
+    fr: {
+      inbox: "Messagerie",
+      open: "Ouvert",
+      archived: "Archivé",
+      spam: "Spam",
+      noMessages: "Pas encore de messages",
+      noMessagesDesc: "Lorsque des utilisateurs vous envoient des messages, ils apparaîtront ici.",
+      unread: "non lu(s)",
+      from: "De",
+      about: "À propos",
+    },
   };
 
   const t = labels[locale as keyof typeof labels] || labels.en;

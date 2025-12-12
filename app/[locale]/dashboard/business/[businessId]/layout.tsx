@@ -141,6 +141,21 @@ export default async function BusinessLayout({
       home: "Startseite",
       favorites: "Meine Favoriten",
     },
+    fr: {
+      overview: "Aperçu",
+      places: "Mes Établissements",
+      reviews: "Avis",
+      inbox: "Messagerie",
+      leads: "Prospects",
+      analytics: "Statistiques",
+      plan: "Abonnement",
+      advertising: "Publicité",
+      credits: "Crédits",
+      myAccount: "Mon Compte",
+      signOut: "Déconnexion",
+      home: "Accueil",
+      favorites: "Mes Favoris",
+    },
   };
 
   const t = labels[locale as keyof typeof labels] || labels.en;

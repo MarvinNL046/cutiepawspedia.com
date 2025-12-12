@@ -52,7 +52,152 @@ export function CampaignForm({
   locale,
 }: CampaignFormProps) {
   const router = useRouter();
-  const isNl = locale === "nl";
+
+  // Localization labels
+  const labels = {
+    en: {
+      adPackage: "Ad Package",
+      selectPackage: "Select package",
+      days: "days",
+      campaignDetails: "Campaign Details",
+      campaignName: "Campaign Name",
+      internalOnly: "internal only",
+      campaignNamePlaceholder: "e.g. Summer Campaign 2025",
+      headlineEnglish: "Headline (English)",
+      headlinePlaceholder: "e.g. The best dog groomer!",
+      characters: "characters",
+      headlineDutch: "Headline (Dutch)",
+      headlineNlPlaceholder: "e.g. De beste hondentrimmer!",
+      optionalFallback: "Optional - falls back to English",
+      description: "Description",
+      optional: "optional",
+      descriptionEnglish: "Description (English)",
+      descriptionPlaceholder: "Short description of your service...",
+      descriptionDutch: "Description (Dutch)",
+      descriptionNlPlaceholder: "Korte beschrijving...",
+      imageAndLink: "Image & Link",
+      imageUrl: "Image URL",
+      imageRecommended: "Recommended: 300x250px or 728x90px",
+      destinationUrl: "Destination URL",
+      destinationHint: "Where visitors go when they click",
+      ctaEnglish: "CTA (English)",
+      ctaDutch: "CTA (Dutch)",
+      readyToAdvertise: "Ready to advertise?",
+      paymentInfo: "You'll pay {price} for {days} days of advertising",
+      loading: "Loading...",
+      continueToPayment: "Continue to Payment",
+      somethingWentWrong: "Something went wrong",
+      campaign: "Campaign",
+      learnMore: "Learn More",
+    },
+    nl: {
+      adPackage: "Advertentiepakket",
+      selectPackage: "Selecteer pakket",
+      days: "dagen",
+      campaignDetails: "Campagne Details",
+      campaignName: "Campagne Naam",
+      internalOnly: "alleen voor jou zichtbaar",
+      campaignNamePlaceholder: "Bijv. Zomer Campagne 2025",
+      headlineEnglish: "Kop (Engels)",
+      headlinePlaceholder: "Bijv. De beste hondentrimmer!",
+      characters: "tekens",
+      headlineDutch: "Kop (Nederlands)",
+      headlineNlPlaceholder: "Bijv. De beste hondentrimmer!",
+      optionalFallback: "Optioneel - valt terug op Engelse tekst",
+      description: "Beschrijving",
+      optional: "optioneel",
+      descriptionEnglish: "Beschrijving (Engels)",
+      descriptionPlaceholder: "Korte beschrijving van je dienst...",
+      descriptionDutch: "Beschrijving (Nederlands)",
+      descriptionNlPlaceholder: "Korte beschrijving van je dienst...",
+      imageAndLink: "Afbeelding & Link",
+      imageUrl: "Afbeelding URL",
+      imageRecommended: "Aanbevolen: 300x250px of 728x90px",
+      destinationUrl: "Bestemmings URL",
+      destinationHint: "Waar bezoekers naartoe gaan als ze klikken",
+      ctaEnglish: "CTA (Engels)",
+      ctaDutch: "CTA (Nederlands)",
+      readyToAdvertise: "Klaar om te adverteren?",
+      paymentInfo: "Je betaalt {price} voor {days} dagen adverteren",
+      loading: "Laden...",
+      continueToPayment: "Doorgaan naar Betaling",
+      somethingWentWrong: "Er is iets misgegaan",
+      campaign: "Campagne",
+      learnMore: "Meer informatie",
+    },
+    de: {
+      adPackage: "Werbepaket",
+      selectPackage: "Paket auswählen",
+      days: "Tage",
+      campaignDetails: "Kampagnendetails",
+      campaignName: "Kampagnenname",
+      internalOnly: "nur intern sichtbar",
+      campaignNamePlaceholder: "z.B. Sommerkampagne 2025",
+      headlineEnglish: "Überschrift (Englisch)",
+      headlinePlaceholder: "z.B. Der beste Hundefriseur!",
+      characters: "Zeichen",
+      headlineDutch: "Überschrift (Niederländisch)",
+      headlineNlPlaceholder: "z.B. De beste hondentrimmer!",
+      optionalFallback: "Optional - greift auf Englisch zurück",
+      description: "Beschreibung",
+      optional: "optional",
+      descriptionEnglish: "Beschreibung (Englisch)",
+      descriptionPlaceholder: "Kurze Beschreibung Ihres Services...",
+      descriptionDutch: "Beschreibung (Niederländisch)",
+      descriptionNlPlaceholder: "Korte beschrijving...",
+      imageAndLink: "Bild & Link",
+      imageUrl: "Bild-URL",
+      imageRecommended: "Empfohlen: 300x250px oder 728x90px",
+      destinationUrl: "Ziel-URL",
+      destinationHint: "Wohin Besucher beim Klicken gelangen",
+      ctaEnglish: "CTA (Englisch)",
+      ctaDutch: "CTA (Niederländisch)",
+      readyToAdvertise: "Bereit zu werben?",
+      paymentInfo: "Sie zahlen {price} für {days} Tage Werbung",
+      loading: "Laden...",
+      continueToPayment: "Weiter zur Zahlung",
+      somethingWentWrong: "Etwas ist schiefgelaufen",
+      campaign: "Kampagne",
+      learnMore: "Mehr erfahren",
+    },
+    fr: {
+      adPackage: "Forfait Publicitaire",
+      selectPackage: "Sélectionner un forfait",
+      days: "jours",
+      campaignDetails: "Détails de la Campagne",
+      campaignName: "Nom de la Campagne",
+      internalOnly: "visible uniquement en interne",
+      campaignNamePlaceholder: "ex. Campagne Été 2025",
+      headlineEnglish: "Titre (Anglais)",
+      headlinePlaceholder: "ex. Le meilleur toiletteur pour chiens !",
+      characters: "caractères",
+      headlineDutch: "Titre (Néerlandais)",
+      headlineNlPlaceholder: "ex. De beste hondentrimmer!",
+      optionalFallback: "Facultatif - revient à l'anglais",
+      description: "Description",
+      optional: "facultatif",
+      descriptionEnglish: "Description (Anglais)",
+      descriptionPlaceholder: "Courte description de votre service...",
+      descriptionDutch: "Description (Néerlandais)",
+      descriptionNlPlaceholder: "Korte beschrijving...",
+      imageAndLink: "Image & Lien",
+      imageUrl: "URL de l'image",
+      imageRecommended: "Recommandé : 300x250px ou 728x90px",
+      destinationUrl: "URL de destination",
+      destinationHint: "Où vont les visiteurs lorsqu'ils cliquent",
+      ctaEnglish: "CTA (Anglais)",
+      ctaDutch: "CTA (Néerlandais)",
+      readyToAdvertise: "Prêt à faire de la publicité ?",
+      paymentInfo: "Vous paierez {price} pour {days} jours de publicité",
+      loading: "Chargement...",
+      continueToPayment: "Continuer vers le paiement",
+      somethingWentWrong: "Une erreur s'est produite",
+      campaign: "Campagne",
+      learnMore: "En savoir plus",
+    },
+  };
+
+  const t = labels[locale as keyof typeof labels] || labels.en;
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +205,7 @@ export function CampaignForm({
   // Form state
   const [packageKey, setPackageKey] = useState(selectedPackageKey);
   const [campaignName, setCampaignName] = useState(
-    `${businessName} ${isNl ? "Campagne" : "Campaign"}`
+    `${businessName} ${t.campaign}`
   );
   const [headline, setHeadline] = useState("");
   const [headlineNl, setHeadlineNl] = useState("");
@@ -68,7 +213,7 @@ export function CampaignForm({
   const [descriptionNl, setDescriptionNl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [destinationUrl, setDestinationUrl] = useState("");
-  const [ctaText, setCtaText] = useState(isNl ? "Meer informatie" : "Learn More");
+  const [ctaText, setCtaText] = useState(t.learnMore);
   const [ctaTextNl, setCtaTextNl] = useState("Meer informatie");
 
   const selectedPackage = packages.find((p) => p.key === packageKey);
@@ -144,9 +289,7 @@ export function CampaignForm({
       setError(
         err instanceof Error
           ? err.message
-          : isNl
-          ? "Er is iets misgegaan"
-          : "Something went wrong"
+          : t.somethingWentWrong
       );
       setIsLoading(false);
     }
@@ -164,12 +307,12 @@ export function CampaignForm({
       <div className="bg-white rounded-xl border p-6 space-y-4">
         <div className="flex items-center gap-2 text-cpDark font-medium">
           <Package className="w-5 h-5 text-cpCoral" />
-          {isNl ? "Advertentiepakket" : "Ad Package"}
+          {t.adPackage}
         </div>
 
         <Select value={packageKey} onValueChange={setPackageKey}>
           <SelectTrigger className="w-full">
-            <SelectValue placeholder={isNl ? "Selecteer pakket" : "Select package"} />
+            <SelectValue placeholder={t.selectPackage} />
           </SelectTrigger>
           <SelectContent>
             {packages.map((pkg) => (
@@ -178,8 +321,7 @@ export function CampaignForm({
                   {pkg.isPopular && <Star className="w-3 h-3 text-cpCoral" />}
                   <span>{pkg.name}</span>
                   <span className="text-slate-500">
-                    - {formatPrice(pkg.priceCents)} / {pkg.durationDays}{" "}
-                    {isNl ? "dagen" : "days"}
+                    - {formatPrice(pkg.priceCents)} / {pkg.durationDays} {t.days}
                   </span>
                 </div>
               </SelectItem>
@@ -192,23 +334,23 @@ export function CampaignForm({
       <div className="bg-white rounded-xl border p-6 space-y-4">
         <div className="flex items-center gap-2 text-cpDark font-medium">
           <Type className="w-5 h-5 text-cpCoral" />
-          {isNl ? "Campagne Details" : "Campaign Details"}
+          {t.campaignDetails}
         </div>
 
         <div className="space-y-4">
           {/* Campaign Name (internal) */}
           <div>
             <Label htmlFor="campaignName">
-              {isNl ? "Campagne Naam" : "Campaign Name"}{" "}
+              {t.campaignName}{" "}
               <span className="text-slate-400 text-xs">
-                ({isNl ? "alleen voor jou zichtbaar" : "internal only"})
+                ({t.internalOnly})
               </span>
             </Label>
             <Input
               id="campaignName"
               value={campaignName}
               onChange={(e) => setCampaignName(e.target.value)}
-              placeholder={isNl ? "Bijv. Zomer Campagne 2025" : "e.g. Summer Campaign 2025"}
+              placeholder={t.campaignNamePlaceholder}
               required
             />
           </div>
@@ -216,37 +358,35 @@ export function CampaignForm({
           {/* Headline (English) */}
           <div>
             <Label htmlFor="headline">
-              {isNl ? "Kop (Engels)" : "Headline (English)"} *
+              {t.headlineEnglish} *
             </Label>
             <Input
               id="headline"
               value={headline}
               onChange={(e) => setHeadline(e.target.value)}
-              placeholder={isNl ? "Bijv. De beste hondentrimmer!" : "e.g. The best dog groomer!"}
+              placeholder={t.headlinePlaceholder}
               maxLength={100}
               required
             />
             <p className="text-xs text-slate-500 mt-1">
-              {headline.length}/100 {isNl ? "tekens" : "characters"}
+              {headline.length}/100 {t.characters}
             </p>
           </div>
 
           {/* Headline (Dutch) */}
           <div>
             <Label htmlFor="headlineNl">
-              {isNl ? "Kop (Nederlands)" : "Headline (Dutch)"}
+              {t.headlineDutch}
             </Label>
             <Input
               id="headlineNl"
               value={headlineNl}
               onChange={(e) => setHeadlineNl(e.target.value)}
-              placeholder={isNl ? "Bijv. De beste hondentrimmer!" : "e.g. De beste hondentrimmer!"}
+              placeholder={t.headlineNlPlaceholder}
               maxLength={100}
             />
             <p className="text-xs text-slate-500 mt-1">
-              {isNl
-                ? "Optioneel - valt terug op Engelse tekst"
-                : "Optional - falls back to English"}
+              {t.optionalFallback}
             </p>
           </div>
         </div>
@@ -256,47 +396,39 @@ export function CampaignForm({
       <div className="bg-white rounded-xl border p-6 space-y-4">
         <div className="flex items-center gap-2 text-cpDark font-medium">
           <FileText className="w-5 h-5 text-cpCoral" />
-          {isNl ? "Beschrijving" : "Description"}{" "}
+          {t.description}{" "}
           <span className="text-slate-400 text-xs">
-            ({isNl ? "optioneel" : "optional"})
+            ({t.optional})
           </span>
         </div>
 
         <div className="space-y-4">
           <div>
             <Label htmlFor="description">
-              {isNl ? "Beschrijving (Engels)" : "Description (English)"}
+              {t.descriptionEnglish}
             </Label>
             <Textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder={
-                isNl
-                  ? "Korte beschrijving van je dienst..."
-                  : "Short description of your service..."
-              }
+              placeholder={t.descriptionPlaceholder}
               maxLength={255}
               rows={2}
             />
             <p className="text-xs text-slate-500 mt-1">
-              {description.length}/255 {isNl ? "tekens" : "characters"}
+              {description.length}/255 {t.characters}
             </p>
           </div>
 
           <div>
             <Label htmlFor="descriptionNl">
-              {isNl ? "Beschrijving (Nederlands)" : "Description (Dutch)"}
+              {t.descriptionDutch}
             </Label>
             <Textarea
               id="descriptionNl"
               value={descriptionNl}
               onChange={(e) => setDescriptionNl(e.target.value)}
-              placeholder={
-                isNl
-                  ? "Korte beschrijving van je dienst..."
-                  : "Korte beschrijving..."
-              }
+              placeholder={t.descriptionNlPlaceholder}
               maxLength={255}
               rows={2}
             />
@@ -308,15 +440,15 @@ export function CampaignForm({
       <div className="bg-white rounded-xl border p-6 space-y-4">
         <div className="flex items-center gap-2 text-cpDark font-medium">
           <ImageIcon className="w-5 h-5 text-cpCoral" />
-          {isNl ? "Afbeelding & Link" : "Image & Link"}
+          {t.imageAndLink}
         </div>
 
         <div className="space-y-4">
           <div>
             <Label htmlFor="imageUrl">
-              {isNl ? "Afbeelding URL" : "Image URL"}{" "}
+              {t.imageUrl}{" "}
               <span className="text-slate-400 text-xs">
-                ({isNl ? "optioneel" : "optional"})
+                ({t.optional})
               </span>
             </Label>
             <Input
@@ -327,9 +459,7 @@ export function CampaignForm({
               placeholder="https://example.com/image.jpg"
             />
             <p className="text-xs text-slate-500 mt-1">
-              {isNl
-                ? "Aanbevolen: 300x250px of 728x90px"
-                : "Recommended: 300x250px or 728x90px"}
+              {t.imageRecommended}
             </p>
           </div>
 
@@ -337,9 +467,9 @@ export function CampaignForm({
             <Label htmlFor="destinationUrl">
               <div className="flex items-center gap-1">
                 <LinkIcon className="w-3 h-3" />
-                {isNl ? "Bestemmings URL" : "Destination URL"}{" "}
+                {t.destinationUrl}{" "}
                 <span className="text-slate-400 text-xs">
-                  ({isNl ? "optioneel" : "optional"})
+                  ({t.optional})
                 </span>
               </div>
             </Label>
@@ -351,16 +481,14 @@ export function CampaignForm({
               placeholder="https://yourwebsite.com"
             />
             <p className="text-xs text-slate-500 mt-1">
-              {isNl
-                ? "Waar bezoekers naartoe gaan als ze klikken"
-                : "Where visitors go when they click"}
+              {t.destinationHint}
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="ctaText">
-                CTA {isNl ? "(Engels)" : "(English)"}
+                {t.ctaEnglish}
               </Label>
               <Input
                 id="ctaText"
@@ -372,7 +500,7 @@ export function CampaignForm({
             </div>
             <div>
               <Label htmlFor="ctaTextNl">
-                CTA {isNl ? "(Nederlands)" : "(Dutch)"}
+                {t.ctaDutch}
               </Label>
               <Input
                 id="ctaTextNl"
@@ -391,12 +519,12 @@ export function CampaignForm({
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <p className="font-medium text-cpDark">
-              {isNl ? "Klaar om te adverteren?" : "Ready to advertise?"}
+              {t.readyToAdvertise}
             </p>
             <p className="text-sm text-slate-600">
-              {isNl
-                ? `Je betaalt ${selectedPackage ? formatPrice(selectedPackage.priceCents) : "..."} voor ${selectedPackage?.durationDays || "..."} dagen adverteren`
-                : `You'll pay ${selectedPackage ? formatPrice(selectedPackage.priceCents) : "..."} for ${selectedPackage?.durationDays || "..."} days of advertising`}
+              {t.paymentInfo
+                .replace("{price}", selectedPackage ? formatPrice(selectedPackage.priceCents) : "...")
+                .replace("{days}", String(selectedPackage?.durationDays || "..."))}
             </p>
           </div>
 
@@ -409,12 +537,12 @@ export function CampaignForm({
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                {isNl ? "Laden..." : "Loading..."}
+                {t.loading}
               </>
             ) : (
               <>
                 <CreditCard className="w-4 h-4" />
-                {isNl ? "Doorgaan naar Betaling" : "Continue to Payment"}
+                {t.continueToPayment}
               </>
             )}
           </Button>

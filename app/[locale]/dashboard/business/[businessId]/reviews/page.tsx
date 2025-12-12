@@ -94,6 +94,18 @@ export default async function BusinessReviewsPage({ params }: PageProps) {
       customerReviews: "Kundenbewertungen",
       viewRespond: "Alle Bewertungen anzeigen und antworten",
     },
+    fr: {
+      title: "Avis",
+      description: "Consultez et répondez aux avis clients",
+      totalReviews: "Total des Avis",
+      acrossPlaces: "Sur tous vos établissements",
+      avgRating: "Note Moyenne",
+      outOf5: "Sur 5 étoiles",
+      needsResponse: "Réponse Requise",
+      noReply: "Avis sans réponse",
+      customerReviews: "Avis Clients",
+      viewRespond: "Consultez tous les avis et répondez à vos clients",
+    },
   };
   const t = labels[locale as keyof typeof labels] || labels.en;
 

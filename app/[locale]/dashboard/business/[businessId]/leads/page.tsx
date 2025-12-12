@@ -134,6 +134,26 @@ export default async function LeadsPage({ params, searchParams }: LeadsPageProps
       converted: "Konvertiert",
       spam: "Spam",
     },
+    fr: {
+      title: "Prospects",
+      description: "Demandes clients de vos annonces",
+      noLeads: "Pas encore de prospects",
+      noLeadsDesc: "Lorsque des clients vous contactent via vos annonces, leurs demandes apparaîtront ici.",
+      date: "Date",
+      place: "Établissement",
+      contact: "Contact",
+      message: "Message",
+      status: "Statut",
+      actions: "Actions",
+      reply: "Répondre",
+      call: "Appeler",
+      all: "Tous",
+      new: "Nouveau",
+      sent: "Envoyé",
+      viewed: "Consulté",
+      converted: "Converti",
+      spam: "Spam",
+    },
   };
 
   const t = labels[locale as keyof typeof labels] || labels.en;

@@ -69,6 +69,15 @@ export default async function BusinessIndexPage({ params }: BusinessIndexPagePro
       selectBusiness: "Auswählen",
       credits: "Credits",
     },
+    fr: {
+      title: "Mes Entreprises",
+      description: "Sélectionnez une entreprise à gérer",
+      noBusiness: "Pas encore d'entreprise",
+      noBusinessDesc: "Vous n'avez pas encore d'entreprise enregistrée. Commencez l'inscription pour être référencé !",
+      claimListing: "Enregistrer Votre Entreprise",
+      selectBusiness: "Sélectionner",
+      credits: "crédits",
+    },
   };
 
   const t = labels[locale as keyof typeof labels] || labels.en;

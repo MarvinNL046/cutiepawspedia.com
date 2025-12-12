@@ -60,6 +60,10 @@ export default async function AnalyticsPage({ params }: AnalyticsPageProps) {
       title: "Statistiken",
       description: "Verfolgen Sie Ihre Geschäftsleistung und Besuchereinblicke",
     },
+    fr: {
+      title: "Statistiques",
+      description: "Suivez les performances de votre entreprise et les informations visiteurs",
+    },
   };
 
   const t = labels[locale as keyof typeof labels] || labels.en;

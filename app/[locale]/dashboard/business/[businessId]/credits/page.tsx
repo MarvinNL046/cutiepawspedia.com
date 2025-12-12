@@ -144,6 +144,32 @@ export default async function CreditsPage({ params }: CreditsPageProps) {
         premium_subscription: "Premium",
       },
     },
+    fr: {
+      title: "Crédits",
+      description: "Votre solde et historique des transactions",
+      currentBalance: "Solde Actuel",
+      availableCredits: "Crédits disponibles",
+      spentLast30Days: "Dépensé (30 jours)",
+      leadsCharged: "Prospects Facturés",
+      avgCostPerLead: "Coût Moy./Prospect",
+      transactionHistory: "Historique des Transactions",
+      noTransactions: "Pas encore de transactions",
+      noTransactionsDesc: "Lorsque vous achetez des crédits ou recevez des prospects, vos transactions apparaîtront ici.",
+      date: "Date",
+      type: "Type",
+      description_col: "Description",
+      amount: "Montant",
+      balance: "Solde",
+      stripeComingSoon: "Intégration Stripe bientôt disponible",
+      stripeComingSoonDesc: "Dans la prochaine phase, vous pourrez acheter des crédits directement via Stripe. Restez connecté !",
+      typeLabels: {
+        purchase: "Achat",
+        lead_charge: "Frais Prospect",
+        refund: "Remboursement",
+        bonus: "Bonus",
+        premium_subscription: "Premium",
+      },
+    },
   };
 
   const t = labels[locale as keyof typeof labels] || labels.en;

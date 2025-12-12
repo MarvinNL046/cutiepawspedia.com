@@ -82,15 +82,67 @@ export default async function NewCampaignPage({
     );
   }
 
-  const isNl = locale === "nl";
+  // Localization labels
+  const labels = {
+    en: {
+      backToAdvertising: "Back to advertising",
+      newCampaign: "New Campaign",
+      createAdPromote: "Create your ad and start promoting",
+      selectedPackage: "Selected Package",
+      price: "Price",
+      duration: "Duration",
+      days: "days",
+      placements: "Placements",
+      maxImpressions: "Max impressions",
+      selectPackageFromForm: "Select a package from the form",
+    },
+    nl: {
+      backToAdvertising: "Terug naar adverteren",
+      newCampaign: "Nieuwe Campagne",
+      createAdPromote: "Maak je advertentie en start met promoten",
+      selectedPackage: "Geselecteerd Pakket",
+      price: "Prijs",
+      duration: "Duur",
+      days: "dagen",
+      placements: "Plaatsingen",
+      maxImpressions: "Max impressies",
+      selectPackageFromForm: "Selecteer een pakket hiernaast",
+    },
+    de: {
+      backToAdvertising: "Zurück zur Werbung",
+      newCampaign: "Neue Kampagne",
+      createAdPromote: "Erstellen Sie Ihre Anzeige und starten Sie die Promotion",
+      selectedPackage: "Ausgewähltes Paket",
+      price: "Preis",
+      duration: "Dauer",
+      days: "Tage",
+      placements: "Platzierungen",
+      maxImpressions: "Max. Impressionen",
+      selectPackageFromForm: "Wählen Sie ein Paket aus dem Formular",
+    },
+    fr: {
+      backToAdvertising: "Retour à la publicité",
+      newCampaign: "Nouvelle Campagne",
+      createAdPromote: "Créez votre annonce et commencez à promouvoir",
+      selectedPackage: "Forfait Sélectionné",
+      price: "Prix",
+      duration: "Durée",
+      days: "jours",
+      placements: "Emplacements",
+      maxImpressions: "Impressions max",
+      selectPackageFromForm: "Sélectionnez un forfait dans le formulaire",
+    },
+  };
+
+  const t = labels[locale as keyof typeof labels] || labels.en;
 
   // Get placement labels
-  const placementLabels: Record<string, { en: string; nl: string }> = {
-    blog_sidebar: { en: "Blog Sidebar", nl: "Blog Zijbalk" },
-    blog_inline: { en: "Blog In-Content", nl: "Blog In-Content" },
-    directory_sidebar: { en: "Directory Sidebar", nl: "Directory Zijbalk" },
-    search_results: { en: "Search Results", nl: "Zoekresultaten" },
-    homepage_featured: { en: "Homepage Featured", nl: "Homepage Uitgelicht" },
+  const placementLabels: Record<string, { en: string; nl: string; de: string; fr: string }> = {
+    blog_sidebar: { en: "Blog Sidebar", nl: "Blog Zijbalk", de: "Blog-Seitenleiste", fr: "Barre latérale du blog" },
+    blog_inline: { en: "Blog In-Content", nl: "Blog In-Content", de: "Blog Im-Inhalt", fr: "Blog Dans le Contenu" },
+    directory_sidebar: { en: "Directory Sidebar", nl: "Directory Zijbalk", de: "Verzeichnis-Seitenleiste", fr: "Barre latérale annuaire" },
+    search_results: { en: "Search Results", nl: "Zoekresultaten", de: "Suchergebnisse", fr: "Résultats de recherche" },
+    homepage_featured: { en: "Homepage Featured", nl: "Homepage Uitgelicht", de: "Homepage Hervorgehoben", fr: "Page d'accueil en vedette" },
   };
 
   // Format price
@@ -111,17 +163,15 @@ export default async function NewCampaignPage({
             className="inline-flex items-center gap-2 text-slate-600 hover:text-cpCoral mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
-            {isNl ? "Terug naar adverteren" : "Back to advertising"}
+            {t.backToAdvertising}
           </Link>
 
           <h1 className="text-2xl font-bold text-cpDark flex items-center gap-2">
             <Megaphone className="w-6 h-6 text-cpCoral" />
-            {isNl ? "Nieuwe Campagne" : "New Campaign"}
+            {t.newCampaign}
           </h1>
           <p className="text-slate-600 mt-1">
-            {isNl
-              ? "Maak je advertentie en start met promoten"
-              : "Create your ad and start promoting"}
+            {t.createAdPromote}
           </p>
         </div>
 
@@ -153,7 +203,7 @@ export default async function NewCampaignPage({
               <div className="flex items-center gap-2 mb-4">
                 <Sparkles className="w-5 h-5 text-cpCoral" />
                 <h3 className="font-semibold text-cpDark">
-                  {isNl ? "Geselecteerd Pakket" : "Selected Package"}
+                  {t.selectedPackage}
                 </h3>
               </div>
 
@@ -169,7 +219,7 @@ export default async function NewCampaignPage({
                   <div className="mt-4 pt-4 border-t">
                     <div className="flex justify-between items-baseline">
                       <span className="text-slate-600">
-                        {isNl ? "Prijs" : "Price"}
+                        {t.price}
                       </span>
                       <span className="text-2xl font-bold text-cpDark">
                         {formatPrice(selectedPackage.priceCents)}
@@ -177,18 +227,17 @@ export default async function NewCampaignPage({
                     </div>
                     <div className="flex justify-between text-sm mt-1">
                       <span className="text-slate-500">
-                        {isNl ? "Duur" : "Duration"}
+                        {t.duration}
                       </span>
                       <span className="text-slate-700">
-                        {selectedPackage.durationDays}{" "}
-                        {isNl ? "dagen" : "days"}
+                        {selectedPackage.durationDays} {t.days}
                       </span>
                     </div>
                   </div>
 
                   <div className="mt-4 pt-4 border-t space-y-2">
                     <p className="text-xs font-medium text-slate-500 uppercase">
-                      {isNl ? "Plaatsingen" : "Placements"}
+                      {t.placements}
                     </p>
                     {selectedPackage.includedPlacements
                       .split(",")
@@ -199,8 +248,8 @@ export default async function NewCampaignPage({
                         >
                           <Check className="w-4 h-4 text-cpCoral" />
                           <span className="text-slate-700">
-                            {placementLabels[placement]?.[isNl ? "nl" : "en"] ||
-                              placement}
+                            {placementLabels[placement]?.[locale as keyof typeof placementLabels[string]] ||
+                              placementLabels[placement]?.en || placement}
                           </span>
                         </div>
                       ))}
@@ -210,7 +259,7 @@ export default async function NewCampaignPage({
                     <div className="mt-4 pt-4 border-t">
                       <div className="flex justify-between text-sm">
                         <span className="text-slate-500">
-                          {isNl ? "Max impressies" : "Max impressions"}
+                          {t.maxImpressions}
                         </span>
                         <span className="text-slate-700">
                           {selectedPackage.maxImpressions.toLocaleString()}
@@ -221,9 +270,7 @@ export default async function NewCampaignPage({
                 </>
               ) : (
                 <p className="text-slate-500 text-sm">
-                  {isNl
-                    ? "Selecteer een pakket hiernaast"
-                    : "Select a package from the form"}
+                  {t.selectPackageFromForm}
                 </p>
               )}
             </div>

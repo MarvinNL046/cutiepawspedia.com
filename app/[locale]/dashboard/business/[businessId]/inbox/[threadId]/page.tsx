@@ -128,6 +128,17 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
       send: "Senden",
       you: "Du",
     },
+    fr: {
+      backToInbox: "Retour à la messagerie",
+      conversation: "Conversation avec",
+      about: "À propos de",
+      archive: "Archiver",
+      markAsSpam: "Marquer comme spam",
+      reopen: "Rouvrir",
+      writeMessage: "Écrire un message...",
+      send: "Envoyer",
+      you: "Vous",
+    },
   };
 
   const t = labels[locale as keyof typeof labels] || labels.en;

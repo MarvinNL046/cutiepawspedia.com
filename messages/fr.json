@@ -667,7 +667,11 @@
     "waitMoment": "Un instant !",
     "dontMissTips": "Ne manquez pas nos précieux conseils et offres exclusives.",
     "subscribeNewsletter": "Abonnez-vous à notre newsletter",
-    "receiveOffers": "Recevez les meilleurs conseils, offres et mises à jour directement dans votre boîte mail."
+    "receiveOffers": "Recevez les meilleurs conseils, offres et mises à jour directement dans votre boîte mail.",
+    "weeklyTips": "Conseils hebdomadaires",
+    "exclusiveDeals": "Offres exclusives",
+    "noSpam": "Pas de spam",
+    "noThanks": "Non merci, je ne veux pas recevoir de conseils"
   },
   "homepage": {
     "badge": "Annuaire Services Animaux",

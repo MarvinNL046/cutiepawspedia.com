@@ -666,7 +666,11 @@
     "waitMoment": "Wacht even!",
     "dontMissTips": "Mis geen waardevolle huisdiertips en exclusieve aanbiedingen.",
     "subscribeNewsletter": "Abonneer op onze nieuwsbrief",
-    "receiveOffers": "Ontvang de beste tips, aanbiedingen en updates rechtstreeks in je inbox."
+    "receiveOffers": "Ontvang de beste tips, aanbiedingen en updates rechtstreeks in je inbox.",
+    "weeklyTips": "Wekelijkse tips",
+    "exclusiveDeals": "Exclusieve deals",
+    "noSpam": "Geen spam",
+    "noThanks": "Nee bedankt, ik wil geen tips ontvangen"
   },
   "homepage": {
     "badge": "Huisdierdiensten Gids",

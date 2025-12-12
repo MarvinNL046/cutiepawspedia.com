@@ -666,7 +666,11 @@
     "waitMoment": "Wait a moment!",
     "dontMissTips": "Don't miss valuable pet care tips and exclusive offers.",
     "subscribeNewsletter": "Subscribe to our newsletter",
-    "receiveOffers": "Receive the best tips, offers and updates straight to your inbox."
+    "receiveOffers": "Receive the best tips, offers and updates straight to your inbox.",
+    "weeklyTips": "Weekly tips",
+    "exclusiveDeals": "Exclusive deals",
+    "noSpam": "No spam",
+    "noThanks": "No thanks, I don't want tips"
   },
   "homepage": {
     "badge": "Pet Services Directory",

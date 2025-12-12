@@ -666,7 +666,11 @@
     "waitMoment": "Einen Moment!",
     "dontMissTips": "Verpassen Sie keine wertvollen Haustiertipps und exklusiven Angebote.",
     "subscribeNewsletter": "Abonnieren Sie unseren Newsletter",
-    "receiveOffers": "Erhalten Sie die besten Tipps, Angebote und Updates direkt in Ihr Postfach."
+    "receiveOffers": "Erhalten Sie die besten Tipps, Angebote und Updates direkt in Ihr Postfach.",
+    "weeklyTips": "Wöchentliche Tipps",
+    "exclusiveDeals": "Exklusive Angebote",
+    "noSpam": "Kein Spam",
+    "noThanks": "Nein danke, ich möchte keine Tipps erhalten"
   },
   "homepage": {
     "badge": "Haustierservices Verzeichnis",

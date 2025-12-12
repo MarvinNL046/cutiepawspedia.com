@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -30,8 +30,15 @@ export function SearchBar({
   const [location, setLocation] = useState(initialLocation);
   const [isPending, startTransition] = useTransition();
 
+  // Sync state with props when URL params change (e.g., after navigation)
+  useEffect(() => {
+    setQuery(initialQuery);
+    setLocation(initialLocation);
+  }, [initialQuery, initialLocation]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    // Allow search with just location OR just query OR both (but not neither)
     if (!query.trim() && !location.trim()) return;
 
     const params = new URLSearchParams();

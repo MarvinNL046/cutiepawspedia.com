@@ -633,6 +633,7 @@
     "placeholder": "Search for pet services...",
     "cityPlaceholder": "City or postal code...",
     "searchButton": "Search",
+    "searching": "Searching...",
     "results": "results",
     "in": "in",
     "loading": "Loading...",

@@ -549,7 +549,9 @@
     "verifiedBusinesses": "Verifizierte Unternehmen",
     "communityDriven": "Community Getrieben",
     "expertReviews": "Experten Bewertungen",
-    "activelyModerated": "Aktiv Moderiert"
+    "activelyModerated": "Aktiv Moderiert",
+    "tools": "Nützliche Tools",
+    "dogFoodCalculator": "Futter Rechner"
   },
   "categories": {
     "veterinary": "Tierarzt",

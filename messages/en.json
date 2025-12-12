@@ -549,7 +549,9 @@
     "verifiedBusinesses": "Verified Businesses",
     "communityDriven": "Community Driven",
     "expertReviews": "Expert Reviews",
-    "activelyModerated": "Actively Moderated"
+    "activelyModerated": "Actively Moderated",
+    "tools": "Useful Tools",
+    "dogFoodCalculator": "Food Calculator"
   },
   "categories": {
     "veterinary": "Veterinary",

@@ -196,6 +196,11 @@ export function Footer({ locale }: FooterProps) {
                   ✉️ {tCommon("contact")}
                 </Link>
               </li>
+              <li>
+                <Link href={`/${locale}/tools/dog-food-calculator`} className="hover:text-cpCoral transition-colors">
+                  🧮 {t("dogFoodCalculator")}
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

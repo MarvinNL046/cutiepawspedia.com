@@ -439,3 +439,14 @@ export async function getSitemapCounts(): Promise<Record<string, number>> {
     places: Number(placeCount.count),
   };
 }
+
+/**
+ * Get the number of paginated place sitemaps needed
+ * Used by sitemap index to generate correct number of sitemap entries
+ */
+export async function getPlaceSitemapPageCount(
+  config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
+): Promise<number> {
+  const urls = await buildPlaceUrls(config);
+  return Math.max(1, Math.ceil(urls.length / config.maxUrlsPerSitemap));
+}

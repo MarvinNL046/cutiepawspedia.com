@@ -11,7 +11,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { buildSitemapIndexXml, type SitemapSection, DEFAULT_SITEMAP_CONFIG } from "@/lib/sitemap";
+import { buildSitemapIndexXml, type SitemapSection, DEFAULT_SITEMAP_CONFIG, getPlaceSitemapPageCount } from "@/lib/sitemap";
 
 // ISR: Sitemap index changes rarely, 1-hour revalidation
 export const revalidate = 3600;
@@ -19,11 +19,15 @@ export const revalidate = 3600;
 /**
  * Define all sitemap sections
  * Each section corresponds to a separate sitemap file for better crawl efficiency
+ * Now async to support dynamic pagination for places
  */
-function getSitemapSections(): SitemapSection[] {
+async function getSitemapSections(): Promise<SitemapSection[]> {
   const today = new Date().toISOString().split("T")[0];
 
-  return [
+  // Get number of paginated place sitemaps needed
+  const placePageCount = await getPlaceSitemapPageCount();
+
+  const sections: SitemapSection[] = [
     // Static pages (about, contact, privacy, search, etc.)
     {
       id: "static",
@@ -65,14 +69,22 @@ function getSitemapSections(): SitemapSection[] {
       path: "/sitemap-categories-country.xml",
       lastmod: today,
     },
+  ];
 
-    // Individual place/business pages - the bulk of URLs
-    {
-      id: "places",
-      path: "/sitemap-places.xml",
+  // Add paginated place sitemaps
+  // e.g., /sitemap-places-1.xml, /sitemap-places-2.xml, etc.
+  // We pre-create 3 pages (supports up to 135K places)
+  // Empty pages return valid empty sitemaps
+  for (let i = 1; i <= Math.max(placePageCount, 3); i++) {
+    sections.push({
+      id: `places-${i}`,
+      path: `/sitemap-places-${i}.xml`,
       lastmod: today,
-    },
+    });
+  }
 
+  // Add remaining sections
+  sections.push(
     // "Best X in City" aggregation pages (e.g., /nl/netherlands/amsterdam/best/veterinary)
     {
       id: "best-city",
@@ -92,13 +104,15 @@ function getSitemapSections(): SitemapSection[] {
       id: "best-country",
       path: "/sitemap-best-country.xml",
       lastmod: today,
-    },
-  ];
+    }
+  );
+
+  return sections;
 }
 
 export async function GET() {
   try {
-    const sections = getSitemapSections();
+    const sections = await getSitemapSections();
     const baseUrl = DEFAULT_SITEMAP_CONFIG.baseUrl;
     const xml = buildSitemapIndexXml(sections, baseUrl);
 

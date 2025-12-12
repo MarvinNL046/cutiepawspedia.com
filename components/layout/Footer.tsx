@@ -130,26 +130,44 @@ export function Footer({ locale }: FooterProps) {
               </li>
               <li>
                 <Link
-                  href={`/${locale}/netherlands/best/grooming`}
+                  href={`/${locale}/netherlands/stats/veterinary`}
                   className="hover:text-cpCoral transition-colors"
                 >
-                  ⭐ {tCategories("grooming")}
+                  📊 {t("statistics")}
                 </Link>
               </li>
               <li>
                 <Link
-                  href={`/${locale}/netherlands/amsterdam/best/veterinary`}
+                  href={`/${locale}/awards/2025`}
                   className="hover:text-cpCoral transition-colors"
                 >
-                  🩺 Amsterdam
+                  🏆 {t("awards")}
                 </Link>
               </li>
               <li>
                 <Link
-                  href={`/${locale}/netherlands/top/pet-store`}
+                  href={`/${locale}/netherlands/new`}
                   className="hover:text-cpCoral transition-colors"
                 >
-                  🛒 Top 10 {tCategories("petStore")}
+                  🆕 {t("newAdditions")}
+                </Link>
+              </li>
+              {/* Map link temporarily disabled
+              <li>
+                <Link
+                  href={`/${locale}/netherlands/map`}
+                  className="hover:text-cpCoral transition-colors"
+                >
+                  🗺️ {t("interactiveMap")}
+                </Link>
+              </li>
+              */}
+              <li>
+                <Link
+                  href={`/${locale}/netherlands/compare/amsterdam-vs-rotterdam/veterinary`}
+                  className="hover:text-cpCoral transition-colors"
+                >
+                  ⚔️ {t("compareCities")}
                 </Link>
               </li>
             </ul>

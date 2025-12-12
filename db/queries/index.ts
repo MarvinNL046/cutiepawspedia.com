@@ -20,6 +20,10 @@ export * from "./karma";
 export * from "./messaging";
 export * from "./blog";
 export * from "./ads";
+export * from "./map";
+export * from "./statistics";
+export * from "./awards";
+export * from "./comparison";
 
 // Admin queries are exported separately from "@/db/queries/admin"
 // to avoid naming conflicts with getCityById, getCountryById, etc.

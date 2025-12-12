@@ -43,6 +43,13 @@ export function buildCanonicalUrl(ctx: SeoContext): string {
   if (ctx.countrySlug) {
     parts.push(ctx.countrySlug);
   }
+
+  // If a custom path is provided, use it instead of standard segments
+  if (ctx.path) {
+    parts.push(ctx.path);
+    return `${base}/${parts.join("/")}`;
+  }
+
   if (ctx.citySlug) {
     parts.push(ctx.citySlug);
   }
@@ -51,6 +58,11 @@ export function buildCanonicalUrl(ctx: SeoContext): string {
   }
   if (ctx.placeSlug) {
     parts.push(ctx.placeSlug);
+  }
+
+  // Append additional path at the end (e.g., "map", "stats")
+  if (ctx.additionalPath) {
+    parts.push(ctx.additionalPath);
   }
 
   return `${base}/${parts.join("/")}`;

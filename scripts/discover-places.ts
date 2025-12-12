@@ -162,6 +162,13 @@ const CATEGORIES: Record<string, CategoryConfig> = {
     labelKey: "Dog Parks",
     icon: "Trees",
   },
+  "boarding": {
+    slug: "boarding",
+    searchTermNl: "dierenpension hond kat",
+    searchTermEn: "pet boarding",
+    labelKey: "Pet Boarding",
+    icon: "Bed",
+  },
 };
 
 // =============================================================================
@@ -172,6 +179,7 @@ interface CliArgs {
   category?: string;
   city?: string;
   allCities?: boolean;
+  allCategories?: boolean;
   limit?: number;
   dryRun?: boolean;
   verbose?: boolean;
@@ -185,6 +193,7 @@ function parseCliArgs(): CliArgs {
         category: { type: "string", short: "c" },
         city: { type: "string", short: "t" },
         "all-cities": { type: "boolean", short: "a" },
+        "all-categories": { type: "boolean" },
         limit: { type: "string", short: "l" },
         "dry-run": { type: "boolean", short: "d" },
         verbose: { type: "boolean", short: "v" },
@@ -197,6 +206,7 @@ function parseCliArgs(): CliArgs {
       category: values.category,
       city: values.city,
       allCities: values["all-cities"],
+      allCategories: values["all-categories"],
       limit: values.limit ? parseInt(values.limit, 10) : 20,
       dryRun: values["dry-run"],
       verbose: values.verbose,
@@ -210,6 +220,10 @@ function parseCliArgs(): CliArgs {
 }
 
 function printHelp(): void {
+  const categoryList = Object.entries(CATEGORIES)
+    .map(([slug, config]) => `  ${slug.padEnd(16)} ${config.searchTermNl} / ${config.labelKey}`)
+    .join("\n");
+
   console.log(`
 Discover Places via BrightData SERP API
 
@@ -219,29 +233,27 @@ Uses SERP API for real-time Google search results with high relevance.
 Usage:
   npx tsx scripts/discover-places.ts --category=<slug> --city=<name>
   npx tsx scripts/discover-places.ts --category=<slug> --all-cities
+  npx tsx scripts/discover-places.ts --all-categories --all-cities
   npx tsx scripts/discover-places.ts --help
 
 Options:
-  -c, --category <slug>   Category to search (required)
+  -c, --category <slug>   Category to search (required unless --all-categories)
+      --all-categories    Search all ${Object.keys(CATEGORIES).length} categories
   -t, --city <name>       City name (e.g., Amsterdam, Rotterdam)
-  -a, --all-cities        Search in all configured cities
+  -a, --all-cities        Search in all cities in database
   -l, --limit <n>         Max results per search (default: 20)
   -d, --dry-run           Show what would be done without changes
   -v, --verbose           Verbose output
   -h, --help              Show this help
 
-Categories:
-  dog-training    Hondentraining / Dog Training
-  dog-walking     Hondenuitlaatservice / Dog Walking
-  pet-hotel       Dierenpension / Pet Hotels
-  pet-grooming    Trimsalon / Pet Grooming
-  veterinary      Dierenarts / Veterinarians
-  pet-store       Dierenwinkel / Pet Stores
+Categories (${Object.keys(CATEGORIES).length} total):
+${categoryList}
 
 Examples:
   npx tsx scripts/discover-places.ts --category=dog-training --city=Amsterdam
   npx tsx scripts/discover-places.ts --category=dog-walking --all-cities --limit=10
   npx tsx scripts/discover-places.ts --category=pet-hotel --city=Rotterdam --dry-run
+  npx tsx scripts/discover-places.ts --all-categories --all-cities --limit=15
 `);
 }
 
@@ -716,8 +728,8 @@ async function main(): Promise<void> {
   console.log("━".repeat(60));
 
   // Validate args
-  if (!args.category) {
-    console.error("❌ --category is required");
+  if (!args.category && !args.allCategories) {
+    console.error("❌ --category or --all-categories is required");
     console.error("   Available: " + Object.keys(CATEGORIES).join(", "));
     process.exit(1);
   }
@@ -727,6 +739,7 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
+  // Validate BrightData credentials
   if (!BRIGHTDATA_API_TOKEN) {
     console.error("❌ BRIGHTDATA_API_TOKEN not set in environment");
     console.error("   Get your token from: https://brightdata.com/cp/account");
@@ -745,8 +758,57 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  // Get category config
-  const categoryConfig = CATEGORIES[args.category];
+  // Handle --all-categories flag
+  if (args.allCategories) {
+    console.log(`🚀 Running discovery for ALL ${Object.keys(CATEGORIES).length} categories\n`);
+    const allCategoryStats: Record<string, { found: number; added: number; skipped: number }> = {};
+
+    for (const [categorySlug, categoryConfig] of Object.entries(CATEGORIES)) {
+      console.log("\n" + "═".repeat(60));
+      console.log(`📁 Category: ${categoryConfig.labelKey} (${categorySlug})`);
+      console.log("═".repeat(60));
+
+      const categoryId = await getOrCreateCategory(categoryConfig);
+      const cities = await getCitiesFromDb(args.allCities ? undefined : args.city);
+
+      let totalFound = 0, totalAdded = 0, totalSkipped = 0;
+
+      for (const city of cities) {
+        const stats = await discoverForCity(
+          city,
+          categoryConfig,
+          categoryId,
+          args.limit || 20,
+          args.dryRun ?? false
+        );
+        totalFound += stats.found;
+        totalAdded += stats.added;
+        totalSkipped += stats.skipped;
+      }
+
+      allCategoryStats[categorySlug] = { found: totalFound, added: totalAdded, skipped: totalSkipped };
+      console.log(`   ✅ ${categorySlug}: Found ${totalFound}, Added ${totalAdded}, Skipped ${totalSkipped}`);
+    }
+
+    // Final summary
+    console.log("\n" + "═".repeat(60));
+    console.log("📊 FINAL SUMMARY - ALL CATEGORIES");
+    console.log("═".repeat(60));
+    let grandTotalFound = 0, grandTotalAdded = 0, grandTotalSkipped = 0;
+    for (const [cat, stats] of Object.entries(allCategoryStats)) {
+      console.log(`   ${cat}: Found ${stats.found}, Added ${stats.added}, Skipped ${stats.skipped}`);
+      grandTotalFound += stats.found;
+      grandTotalAdded += stats.added;
+      grandTotalSkipped += stats.skipped;
+    }
+    console.log("─".repeat(60));
+    console.log(`   TOTAL: Found ${grandTotalFound}, Added ${grandTotalAdded}, Skipped ${grandTotalSkipped}`);
+
+    process.exit(0);
+  }
+
+  // Get category config (for single category mode)
+  const categoryConfig = CATEGORIES[args.category!];
   if (!categoryConfig) {
     console.error(`❌ Unknown category: ${args.category}`);
     console.error("   Available: " + Object.keys(CATEGORIES).join(", "));

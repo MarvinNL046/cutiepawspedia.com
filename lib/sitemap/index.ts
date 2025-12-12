@@ -31,6 +31,7 @@ export {
   buildCategoryInCountryUrls,
   buildStaticUrls,
   getSitemapCounts,
+  getPlaceSitemapPageCount,
 } from "./urls";
 
 // XML builders

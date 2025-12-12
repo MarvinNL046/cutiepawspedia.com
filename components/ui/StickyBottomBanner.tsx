@@ -16,7 +16,7 @@ const content = {
       title: "Heb je een dierenzaak?",
       subtitle: "Claim gratis je vermelding en bereik meer klanten",
       cta: "Claim Nu",
-      link: "/voor-bedrijven",
+      link: "/for-businesses",
     },
     affiliate: {
       title: "Tot 40% korting op huisdiervoeding!",
@@ -46,7 +46,7 @@ const content = {
       title: "Besitzen Sie ein Tiergeschäft?",
       subtitle: "Beanspruchen Sie Ihren kostenlosen Eintrag",
       cta: "Jetzt Beanspruchen",
-      link: "/fuer-unternehmen",
+      link: "/for-businesses",
     },
     affiliate: {
       title: "Bis zu 40% Rabatt auf Tierfutter!",
@@ -61,7 +61,7 @@ const content = {
       title: "Vous avez une animalerie?",
       subtitle: "Réclamez gratuitement votre fiche",
       cta: "Réclamer",
-      link: "/pour-entreprises",
+      link: "/for-businesses",
     },
     affiliate: {
       title: "Jusqu'à 40% de réduction!",

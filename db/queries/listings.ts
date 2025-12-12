@@ -438,6 +438,22 @@ export async function getTopPlacesByCitySlugAndCategorySlug(
   });
 }
 
+/**
+ * Get top-rated places in a province for a specific category
+ */
+export async function getTopPlacesByProvinceSlugAndCategorySlug(
+  provinceSlug: string,
+  countrySlug: string,
+  categorySlug: string,
+  limit = 10
+) {
+  return getPlacesByProvinceSlugAndCategorySlug(provinceSlug, countrySlug, categorySlug, {
+    limit,
+    topRated: true,
+    premiumFirst: false,
+  });
+}
+
 // ============================================================================
 // POPULAR PLACES (HOMEPAGE)
 // ============================================================================
@@ -549,9 +565,230 @@ export async function getPlaceById(placeId: number) {
 }
 
 // ============================================================================
+// RECENTLY ADDED PLACES (for "New Additions" pages)
+// ============================================================================
+
+/**
+ * Get recently added places in a country
+ */
+export async function getRecentlyAddedPlaces(
+  countrySlug: string,
+  options?: {
+    days?: number;
+    limit?: number;
+    offset?: number;
+  }
+) {
+  if (!db) return [];
+  const { days = 30, limit = 50, offset = 0 } = options ?? {};
+
+  // Get country
+  const country = await db.query.countries.findFirst({
+    where: (countries, { eq }) => eq(countries.slug, countrySlug),
+  });
+  if (!country) return [];
+
+  // Get cities in this country
+  const countryCities = await db.query.cities.findMany({
+    where: (cities, { eq }) => eq(cities.countryId, country.id),
+    columns: { id: true },
+  });
+  const cityIds = countryCities.map(c => c.id);
+  if (cityIds.length === 0) return [];
+
+  // Calculate date threshold
+  const dateThreshold = new Date();
+  dateThreshold.setDate(dateThreshold.getDate() - days);
+
+  return db.query.places.findMany({
+    where: (places, { and, inArray, gte }) =>
+      and(
+        inArray(places.cityId, cityIds),
+        gte(places.createdAt, dateThreshold)
+      ),
+    orderBy: (places, { desc }) => [desc(places.createdAt)],
+    limit,
+    offset,
+    with: {
+      city: { with: { country: true } },
+      placeCategories: { with: { category: true } },
+    },
+  });
+}
+
+/**
+ * Get recently added places in a country for a specific category
+ */
+export async function getRecentlyAddedPlacesByCategory(
+  countrySlug: string,
+  categorySlug: string,
+  options?: {
+    days?: number;
+    limit?: number;
+    offset?: number;
+  }
+) {
+  if (!db) return [];
+  const { days = 30, limit = 50, offset = 0 } = options ?? {};
+
+  // Get country
+  const country = await db.query.countries.findFirst({
+    where: (countries, { eq }) => eq(countries.slug, countrySlug),
+  });
+  if (!country) return [];
+
+  // Get cities in this country
+  const countryCities = await db.query.cities.findMany({
+    where: (cities, { eq }) => eq(cities.countryId, country.id),
+    columns: { id: true },
+  });
+  const cityIds = countryCities.map(c => c.id);
+  if (cityIds.length === 0) return [];
+
+  // Get category
+  const category = await getCategoryBySlug(categorySlug);
+  if (!category) return [];
+
+  // Get place IDs that have the specified category
+  const placeCategoryResults = await db
+    .select({ placeId: placeCategories.placeId })
+    .from(placeCategories)
+    .where(eq(placeCategories.categoryId, category.id));
+
+  const placeIds = placeCategoryResults.map((pc) => pc.placeId);
+  if (placeIds.length === 0) return [];
+
+  // Calculate date threshold
+  const dateThreshold = new Date();
+  dateThreshold.setDate(dateThreshold.getDate() - days);
+
+  return db.query.places.findMany({
+    where: (places, { and, inArray, gte }) =>
+      and(
+        inArray(places.cityId, cityIds),
+        inArray(places.id, placeIds),
+        gte(places.createdAt, dateThreshold)
+      ),
+    orderBy: (places, { desc }) => [desc(places.createdAt)],
+    limit,
+    offset,
+    with: {
+      city: { with: { country: true } },
+      placeCategories: { with: { category: true } },
+    },
+  });
+}
+
+/**
+ * Get count of recently added places in a country
+ */
+export async function getRecentlyAddedPlacesCount(
+  countrySlug: string,
+  days: number = 30
+) {
+  if (!db) return 0;
+
+  // Get country
+  const country = await db.query.countries.findFirst({
+    where: (countries, { eq }) => eq(countries.slug, countrySlug),
+  });
+  if (!country) return 0;
+
+  // Get cities in this country
+  const countryCities = await db.query.cities.findMany({
+    where: (cities, { eq }) => eq(cities.countryId, country.id),
+    columns: { id: true },
+  });
+  const cityIds = countryCities.map(c => c.id);
+  if (cityIds.length === 0) return 0;
+
+  // Calculate date threshold
+  const dateThreshold = new Date();
+  dateThreshold.setDate(dateThreshold.getDate() - days);
+
+  const result = await db
+    .select({ count: count() })
+    .from(places)
+    .where(
+      and(
+        // Check if cityId is in the list of city IDs
+        // Using a subquery approach since inArray needs a direct comparison
+        eq(places.cityId, cityIds[0]) // This is a simplification; for proper implementation we need SQL
+      )
+    );
+
+  // For now, use the query builder approach instead
+  const allPlaces = await db.query.places.findMany({
+    where: (places, { and, inArray, gte }) =>
+      and(
+        inArray(places.cityId, cityIds),
+        gte(places.createdAt, dateThreshold)
+      ),
+    columns: { id: true },
+  });
+
+  return allPlaces.length;
+}
+
+/**
+ * Get count of recently added places by category
+ */
+export async function getRecentlyAddedPlacesByCategoryCount(
+  countrySlug: string,
+  categorySlug: string,
+  days: number = 30
+) {
+  if (!db) return 0;
+
+  // Get country
+  const country = await db.query.countries.findFirst({
+    where: (countries, { eq }) => eq(countries.slug, countrySlug),
+  });
+  if (!country) return 0;
+
+  // Get cities in this country
+  const countryCities = await db.query.cities.findMany({
+    where: (cities, { eq }) => eq(cities.countryId, country.id),
+    columns: { id: true },
+  });
+  const cityIds = countryCities.map(c => c.id);
+  if (cityIds.length === 0) return 0;
+
+  // Get category
+  const category = await getCategoryBySlug(categorySlug);
+  if (!category) return 0;
+
+  // Get place IDs that have the specified category
+  const placeCategoryResults = await db
+    .select({ placeId: placeCategories.placeId })
+    .from(placeCategories)
+    .where(eq(placeCategories.categoryId, category.id));
+
+  const placeIds = placeCategoryResults.map((pc) => pc.placeId);
+  if (placeIds.length === 0) return 0;
+
+  // Calculate date threshold
+  const dateThreshold = new Date();
+  dateThreshold.setDate(dateThreshold.getDate() - days);
+
+  const allPlaces = await db.query.places.findMany({
+    where: (places, { and, inArray, gte }) =>
+      and(
+        inArray(places.cityId, cityIds),
+        inArray(places.id, placeIds),
+        gte(places.createdAt, dateThreshold)
+      ),
+    columns: { id: true },
+  });
+
+  return allPlaces.length;
+}
+
+// ============================================================================
 // TYPES
 // ============================================================================
 
 export type Category = Awaited<ReturnType<typeof getCategoryBySlug>>;
 export type Place = Awaited<ReturnType<typeof getPlaceBySlug>>;
 export type PlaceList = Awaited<ReturnType<typeof getPlacesByCityAndCategory>>;
+export type RecentlyAddedPlaceList = Awaited<ReturnType<typeof getRecentlyAddedPlaces>>;

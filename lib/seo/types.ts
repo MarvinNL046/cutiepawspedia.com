@@ -57,6 +57,10 @@ export interface SeoContext {
   listVariant?: SeoListVariant;
   /** For top-N pages, how many to show */
   topCount?: number;
+  /** Custom path segment (e.g., "stats/veterinary") */
+  path?: string;
+  /** Additional path appended after standard segments (e.g., "map") */
+  additionalPath?: string;
 }
 
 /**

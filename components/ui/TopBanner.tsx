@@ -6,49 +6,91 @@ import { cn } from "@/lib/utils";
 
 interface TopBannerProps {
   className?: string;
+  locale?: string;
 }
 
-const messages = [
-  {
-    icon: Sparkles,
-    text: "We voegen dagelijks nieuwe locaties toe!",
-    textEn: "We're adding new locations daily!",
-    textDe: "Wir fügen täglich neue Standorte hinzu!",
-    textFr: "Nous ajoutons de nouveaux lieux chaque jour!",
-  },
-  {
-    icon: MapPin,
-    text: "11.000+ dierenzaken in 3 landen",
-    textEn: "11,000+ pet businesses in 3 countries",
-    textDe: "11.000+ Tiergeschäfte in 3 Ländern",
-    textFr: "11 000+ entreprises pour animaux dans 3 pays",
-  },
-  {
-    icon: TrendingUp,
-    text: "Elke dag groeit onze database",
-    textEn: "Our database grows every day",
-    textDe: "Unsere Datenbank wächst jeden Tag",
-    textFr: "Notre base de données grandit chaque jour",
-  },
-];
+type LocaleKey = "nl" | "en" | "de" | "fr";
 
-export function TopBanner({ className }: TopBannerProps) {
+const messages = {
+  nl: [
+    {
+      icon: Sparkles,
+      text: "We voegen dagelijks nieuwe locaties toe!",
+    },
+    {
+      icon: MapPin,
+      text: "11.000+ dierenzaken in 3 landen",
+    },
+    {
+      icon: TrendingUp,
+      text: "Elke dag groeit onze database",
+    },
+  ],
+  en: [
+    {
+      icon: Sparkles,
+      text: "We're adding new locations daily!",
+    },
+    {
+      icon: MapPin,
+      text: "11,000+ pet businesses in 3 countries",
+    },
+    {
+      icon: TrendingUp,
+      text: "Our database grows every day",
+    },
+  ],
+  de: [
+    {
+      icon: Sparkles,
+      text: "Wir fügen täglich neue Standorte hinzu!",
+    },
+    {
+      icon: MapPin,
+      text: "11.000+ Tiergeschäfte in 3 Ländern",
+    },
+    {
+      icon: TrendingUp,
+      text: "Unsere Datenbank wächst jeden Tag",
+    },
+  ],
+  fr: [
+    {
+      icon: Sparkles,
+      text: "Nous ajoutons de nouveaux lieux chaque jour!",
+    },
+    {
+      icon: MapPin,
+      text: "11 000+ entreprises pour animaux dans 3 pays",
+    },
+    {
+      icon: TrendingUp,
+      text: "Notre base de données grandit chaque jour",
+    },
+  ],
+};
+
+export function TopBanner({ className, locale = "nl" }: TopBannerProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+
+  // Get messages for current locale
+  const localeKey = (locale as LocaleKey) in messages ? (locale as LocaleKey) : "nl";
+  const localeMessages = messages[localeKey];
 
   // Rotate messages every 5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setIsAnimating(true);
       setTimeout(() => {
-        setCurrentMessageIndex((prev) => (prev + 1) % messages.length);
+        setCurrentMessageIndex((prev) => (prev + 1) % localeMessages.length);
         setIsAnimating(false);
       }, 300);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [localeMessages.length]);
 
   // Check localStorage for dismissed state
   useEffect(() => {
@@ -69,7 +111,7 @@ export function TopBanner({ className }: TopBannerProps) {
 
   if (!isVisible) return null;
 
-  const currentMessage = messages[currentMessageIndex];
+  const currentMessage = localeMessages[currentMessageIndex];
   const Icon = currentMessage.icon;
 
   return (
@@ -111,7 +153,7 @@ export function TopBanner({ className }: TopBannerProps) {
 
         {/* Progress dots */}
         <div className="hidden md:flex items-center gap-1.5 ml-4">
-          {messages.map((_, index) => (
+          {localeMessages.map((_, index) => (
             <div
               key={index}
               className={cn(

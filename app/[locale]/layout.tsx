@@ -47,7 +47,7 @@ export default async function LocaleLayout({
           {/* Global JSON-LD structured data */}
           <JsonLd data={[websiteSchema(), organizationSchema()]} />
           {/* Growing database announcement banner */}
-          <TopBanner />
+          <TopBanner locale={locale} />
           <Header locale={locale} variant="directory" />
           <main id="main-content" className="flex-1" tabIndex={-1}>{children}</main>
           <Footer locale={locale} />

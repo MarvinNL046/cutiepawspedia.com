@@ -34,6 +34,7 @@ import {
 } from "@/lib/seo";
 import { generateContent } from "@/lib/ai/generateContent";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 interface TopInCountryPageProps {
   params: Promise<{ locale: string; countrySlug: string; categorySlug: string }>;
@@ -151,6 +152,8 @@ export async function generateMetadata({ params }: TopInCountryPageProps): Promi
 export default async function TopInCountryPage({ params }: TopInCountryPageProps) {
   const { locale, countrySlug, categorySlug } = await params;
 
+  const t = await getTranslations("categoryPages");
+
   const [country, category, places] = await Promise.all([
     getCountryBySlug(countrySlug),
     getCategoryBySlug(categorySlug),
@@ -209,16 +212,16 @@ export default async function TopInCountryPage({ params }: TopInCountryPageProps
         subtitle={
           <span className="flex items-center gap-2">
             <Trophy className="h-5 w-5 text-cpYellow" />
-            {locale === "nl" ? "2025 Ranking" : "2025 Ranking"}
+            {t("ranking2025")}
           </span>
         }
         icon={<span className="text-3xl">{categoryIcon}</span>}
         variant="gradient-pink"
         breadcrumbs={[
-          { label: "Directory", href: `/${locale}` },
+          { label: t("directory"), href: `/${locale}` },
           { label: countryName, href: `/${locale}/${countrySlug}` },
           { label: categoryLabel, href: `/${locale}/${countrySlug}/c/${categorySlug}` },
-          { label: "Top 10" },
+          { label: t("top10") },
         ]}
       />
 
@@ -298,7 +301,7 @@ export default async function TopInCountryPage({ params }: TopInCountryPageProps
                       href={`/${locale}/${countrySlug}/${getCitySlug(place)}/${categorySlug}/${place.slug}`}
                       className="flex-shrink-0 inline-flex items-center gap-1 px-4 py-2 bg-cpCoral text-white rounded-lg hover:bg-cpCoral/90 transition-colors text-sm font-medium"
                     >
-                      {locale === "nl" ? "Bekijk" : "View"}
+                      {t("view")}
                       <ExternalLink className="h-4 w-4" />
                     </Link>
                   </div>
@@ -310,12 +313,10 @@ export default async function TopInCountryPage({ params }: TopInCountryPageProps
           <div className="text-center py-12">
             <span className="text-6xl block mb-4">🏆</span>
             <h2 className="text-xl font-semibold mb-2">
-              {locale === "nl" ? "Geen ranking beschikbaar" : "No ranking available"}
+              {t("noRankingAvailable")}
             </h2>
             <p className="text-muted-foreground">
-              {locale === "nl"
-                ? `Er zijn nog niet genoeg ${categoryLabel.toLowerCase()} met reviews in ${countryName}.`
-                : `There are not enough ${categoryLabel.toLowerCase()} with reviews in ${countryName} yet.`}
+              {t("notEnoughReviews", { category: categoryLabel.toLowerCase(), location: countryName })}
             </p>
           </div>
         )}
@@ -324,16 +325,16 @@ export default async function TopInCountryPage({ params }: TopInCountryPageProps
       {/* Related Links */}
       <section className="bg-slate-50 py-12">
         <div className="container mx-auto max-w-6xl px-4">
-          <SectionHeader title={locale === "nl" ? "Meer ontdekken" : "Explore more"} />
+          <SectionHeader title={t("exploreMore")} />
           <div className="flex flex-wrap gap-2">
             <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10">
               <a href={`/${locale}/${countrySlug}/c/${categorySlug}`}>
-                {locale === "nl" ? `Alle ${categoryLabel} in ${countryName}` : `All ${categoryLabel} in ${countryName}`}
+                {t("allIn", { category: categoryLabel, location: countryName })}
               </a>
             </Badge>
             <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10">
               <a href={`/${locale}/${countrySlug}/best/${categorySlug}`}>
-                {locale === "nl" ? `Beste ${categoryLabel}` : `Best ${categoryLabel}`}
+                {t("bestIn", { category: categoryLabel, location: "" }).replace(" in ", "")}
               </a>
             </Badge>
           </div>

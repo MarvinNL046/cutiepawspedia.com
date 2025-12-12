@@ -7,7 +7,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { GraduationCap, Heart, CheckCircle, Star, AlertCircle, TrendingUp } from "lucide-react";
+import { GraduationCap, Heart, CheckCircle, Star, AlertCircle, TrendingUp, Clock } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Puppy Training Basics: Complete Guide to Raising a Well-Behaved Dog",

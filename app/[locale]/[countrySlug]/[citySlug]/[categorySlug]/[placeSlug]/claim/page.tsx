@@ -3,6 +3,7 @@
  */
 
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getPlaceBySlug } from "@/db/queries";
 import { getClaims } from "@/db/queries/claims";
@@ -25,10 +26,8 @@ interface ClaimPageProps {
 }
 
 export async function generateMetadata({ params }: ClaimPageProps): Promise<Metadata> {
-  const { placeSlug, locale } = await params;
-  const title = locale === "nl"
-    ? `Claim ${placeSlug.replace(/-/g, " ")} | CutiePawsPedia`
-    : `Claim ${placeSlug.replace(/-/g, " ")} | CutiePawsPedia`;
+  const { placeSlug } = await params;
+  const title = `Claim ${placeSlug.replace(/-/g, " ")} | CutiePawsPedia`;
   return {
     title,
     robots: { index: false, follow: false },
@@ -37,6 +36,9 @@ export async function generateMetadata({ params }: ClaimPageProps): Promise<Meta
 
 export default async function ClaimPage({ params }: ClaimPageProps) {
   const { locale, countrySlug, citySlug, categorySlug, placeSlug } = await params;
+
+  const t = await getTranslations("claim");
+  const tCommon = await getTranslations("common");
 
   // Get place
   const place = await getPlaceBySlug(placeSlug, citySlug, countrySlug);
@@ -76,7 +78,7 @@ export default async function ClaimPage({ params }: ClaimPageProps) {
           <CardContent className="pt-6">
             <div className="flex items-center gap-3 text-red-600">
               <AlertCircle className="h-5 w-5" />
-              <p>Unable to verify your account. Please try signing out and back in.</p>
+              <p>{t("unableToVerifyAccount")}</p>
             </div>
           </CardContent>
         </Card>
@@ -99,37 +101,17 @@ export default async function ClaimPage({ params }: ClaimPageProps) {
   const cityName = getCityName(place, citySlug);
   const countryName = getCountryName(place, countrySlug);
 
-  const labels = {
-    en: {
-      title: "Claim this business",
-      description: "Submit your claim to manage this business listing. Our team will review your request within 2-3 business days.",
-      placeInfo: "Business Information",
-    },
-    nl: {
-      title: "Claim dit bedrijf",
-      description: "Dien je claim in om deze bedrijfspagina te beheren. Ons team beoordeelt je aanvraag binnen 2-3 werkdagen.",
-      placeInfo: "Bedrijfsinformatie",
-    },
-    de: {
-      title: "Diesen Eintrag beanspruchen",
-      description: "Reichen Sie Ihren Antrag ein, um diesen Geschäftseintrag zu verwalten. Unser Team wird Ihre Anfrage innerhalb von 2-3 Werktagen prüfen.",
-      placeInfo: "Geschäftsinformationen",
-    },
-  };
-
-  const t = labels[locale as keyof typeof labels] || labels.en;
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       <div className="container mx-auto max-w-2xl px-4 py-8">
         {/* Breadcrumbs */}
         <Breadcrumbs
           items={[
-            { label: "Directory", href: `/${locale}` },
+            { label: tCommon("directory"), href: `/${locale}` },
             { label: countryName, href: `/${locale}/${countrySlug}` },
             { label: cityName, href: `/${locale}/${countrySlug}/${citySlug}` },
             { label: place.name, href: `/${locale}/${countrySlug}/${citySlug}/${categorySlug}/${placeSlug}` },
-            { label: t.title },
+            { label: t("title") },
           ]}
         />
 
@@ -139,14 +121,14 @@ export default async function ClaimPage({ params }: ClaimPageProps) {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-cpCoral/10 mb-4">
               <Building2 className="h-8 w-8 text-cpCoral" />
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-cpDark">{t.title}</h1>
-            <p className="mt-2 text-slate-600 max-w-md mx-auto">{t.description}</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-cpDark">{t("title")}</h1>
+            <p className="mt-2 text-slate-600 max-w-md mx-auto">{t("description")}</p>
           </div>
 
           {/* Place Info Card */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg">{t.placeInfo}</CardTitle>
+              <CardTitle className="text-lg">{t("placeInfo")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-start gap-4">

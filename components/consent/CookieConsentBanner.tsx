@@ -16,6 +16,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { X, Cookie, Settings, Check } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -31,59 +32,8 @@ interface CookieConsentBannerProps {
   locale?: string;
 }
 
-// Translations
-const translations = {
-  en: {
-    title: "We value your privacy",
-    description: "We use cookies to enhance your browsing experience, serve personalized ads, and analyze our traffic. By clicking \"Accept All\", you consent to our use of cookies.",
-    acceptAll: "Accept All",
-    decline: "Decline",
-    customize: "Customize",
-    savePreferences: "Save Preferences",
-    essential: "Essential Cookies",
-    essentialDesc: "Required for the website to function. Cannot be disabled.",
-    analytics: "Analytics Cookies",
-    analyticsDesc: "Help us understand how visitors interact with our website.",
-    advertising: "Advertising Cookies",
-    advertisingDesc: "Used to show you relevant ads and measure ad effectiveness.",
-    learnMore: "Learn more in our",
-    privacyPolicy: "Privacy Policy",
-  },
-  nl: {
-    title: "Wij respecteren uw privacy",
-    description: "Wij gebruiken cookies om uw browse-ervaring te verbeteren, gepersonaliseerde advertenties te tonen en ons verkeer te analyseren. Door op \"Alles accepteren\" te klikken, stemt u in met ons gebruik van cookies.",
-    acceptAll: "Alles accepteren",
-    decline: "Weigeren",
-    customize: "Aanpassen",
-    savePreferences: "Voorkeuren opslaan",
-    essential: "Essentiële cookies",
-    essentialDesc: "Vereist voor het functioneren van de website. Kan niet worden uitgeschakeld.",
-    analytics: "Analytische cookies",
-    analyticsDesc: "Helpen ons te begrijpen hoe bezoekers onze website gebruiken.",
-    advertising: "Advertentiecookies",
-    advertisingDesc: "Worden gebruikt om u relevante advertenties te tonen.",
-    learnMore: "Meer informatie in ons",
-    privacyPolicy: "Privacybeleid",
-  },
-  de: {
-    title: "Wir respektieren Ihre Privatsphäre",
-    description: "Wir verwenden Cookies, um Ihr Browsererlebnis zu verbessern, personalisierte Werbung anzuzeigen und unseren Datenverkehr zu analysieren. Durch Klicken auf \"Alle akzeptieren\" stimmen Sie unserer Verwendung von Cookies zu.",
-    acceptAll: "Alle akzeptieren",
-    decline: "Ablehnen",
-    customize: "Anpassen",
-    savePreferences: "Einstellungen speichern",
-    essential: "Erforderliche Cookies",
-    essentialDesc: "Für das Funktionieren der Website erforderlich. Kann nicht deaktiviert werden.",
-    analytics: "Analyse-Cookies",
-    analyticsDesc: "Helfen uns zu verstehen, wie Besucher unsere Website nutzen.",
-    advertising: "Werbe-Cookies",
-    advertisingDesc: "Werden verwendet, um Ihnen relevante Werbung anzuzeigen.",
-    learnMore: "Mehr Informationen in unserer",
-    privacyPolicy: "Datenschutzerklärung",
-  },
-};
-
 export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps) {
+  const t = useTranslations("cookies");
   const [isVisible, setIsVisible] = useState(false);
   const [showCustomize, setShowCustomize] = useState(false);
   // Initialize preferences from existing consent if available
@@ -99,8 +49,6 @@ export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps)
     }
     return { analytics: true, advertising: true };
   });
-
-  const t = translations[locale as keyof typeof translations] || translations.en;
 
   // Initialize on mount
   useEffect(() => {
@@ -162,10 +110,10 @@ export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps)
             </div>
             <div className="flex-1">
               <h2 id="consent-title" className="text-lg font-semibold text-cpDark">
-                {t.title}
+                {t("title")}
               </h2>
               <p className="mt-1 text-sm text-slate-600">
-                {t.description}
+                {t("description")}
               </p>
             </div>
           </div>
@@ -177,8 +125,8 @@ export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps)
             {/* Essential - Always on */}
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <Label className="font-medium text-cpDark">{t.essential}</Label>
-                <p className="text-xs text-slate-500">{t.essentialDesc}</p>
+                <Label className="font-medium text-cpDark">{t("essential")}</Label>
+                <p className="text-xs text-slate-500">{t("essentialDesc")}</p>
               </div>
               <Switch checked disabled className="data-[state=checked]:bg-cpAqua" />
             </div>
@@ -186,8 +134,8 @@ export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps)
             {/* Analytics */}
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <Label className="font-medium text-cpDark">{t.analytics}</Label>
-                <p className="text-xs text-slate-500">{t.analyticsDesc}</p>
+                <Label className="font-medium text-cpDark">{t("analytics")}</Label>
+                <p className="text-xs text-slate-500">{t("analyticsDesc")}</p>
               </div>
               <Switch
                 checked={preferences.analytics}
@@ -199,8 +147,8 @@ export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps)
             {/* Advertising */}
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <Label className="font-medium text-cpDark">{t.advertising}</Label>
-                <p className="text-xs text-slate-500">{t.advertisingDesc}</p>
+                <Label className="font-medium text-cpDark">{t("advertising")}</Label>
+                <p className="text-xs text-slate-500">{t("advertisingDesc")}</p>
               </div>
               <Switch
                 checked={preferences.advertising}
@@ -221,14 +169,14 @@ export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps)
                 onClick={() => setShowCustomize(false)}
               >
                 <X className="h-4 w-4 mr-2" />
-                {t.decline}
+                {t("decline")}
               </Button>
               <Button
                 className="flex-1 bg-cpCoral hover:bg-cpCoral/90"
                 onClick={handleSavePreferences}
               >
                 <Check className="h-4 w-4 mr-2" />
-                {t.savePreferences}
+                {t("savePreferences")}
               </Button>
             </>
           ) : (
@@ -240,7 +188,7 @@ export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps)
                 onClick={() => setShowCustomize(true)}
               >
                 <Settings className="h-4 w-4 mr-2" />
-                {t.customize}
+                {t("customize")}
               </Button>
               <Button
                 variant="ghost"
@@ -248,7 +196,7 @@ export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps)
                 className="sm:order-2"
                 onClick={handleDecline}
               >
-                {t.decline}
+                {t("decline")}
               </Button>
               <Button
                 size="sm"
@@ -256,7 +204,7 @@ export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps)
                 onClick={handleAcceptAll}
               >
                 <Check className="h-4 w-4 mr-2" />
-                {t.acceptAll}
+                {t("acceptAll")}
               </Button>
             </>
           )}
@@ -265,9 +213,9 @@ export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps)
         {/* Footer */}
         <div className="px-6 pb-4 text-center">
           <p className="text-xs text-slate-400">
-            {t.learnMore}{" "}
+            {t("learnMore")}{" "}
             <Link href={`/${locale}/privacy`} className="text-cpCoral hover:underline">
-              {t.privacyPolicy}
+              {t("privacyPolicy")}
             </Link>
           </p>
         </div>

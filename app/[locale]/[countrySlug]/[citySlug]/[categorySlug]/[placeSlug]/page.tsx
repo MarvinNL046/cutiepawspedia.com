@@ -10,6 +10,7 @@
 
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -70,6 +71,7 @@ export async function generateMetadata({ params }: PlacePageProps): Promise<Meta
 
 export default async function PlacePage({ params }: PlacePageProps) {
   const { locale, countrySlug, citySlug, categorySlug, placeSlug } = await params;
+  const t = await getTranslations("place");
   const place = await getPlaceBySlug(placeSlug, citySlug, countrySlug);
 
   if (!place) notFound();
@@ -305,7 +307,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 {placeFeatures.hasVerifiedBadge && (
                   <Badge className="bg-purple-100 text-purple-700 border-purple-300 gap-1">
                     <Shield className="h-3 w-3" />
-                    {locale === "nl" ? "Geverifieerd" : "Verified"}
+                    {t("verified")}
                   </Badge>
                 )}
                 {/* Legacy verified badge (admin-set) */}
@@ -347,21 +349,21 @@ export default async function PlacePage({ params }: PlacePageProps) {
               {/* Call button - only show if plan allows phone display */}
               {place.phone && placeFeatures.canShowPhone ? (
                 <Button asChild className="bg-cpCoral hover:bg-cpCoral/90 gap-2">
-                  <a href={`tel:${place.phone}`}><Phone className="h-4 w-4" />{locale === "nl" ? "Bel Nu" : "Call Now"}</a>
+                  <a href={`tel:${place.phone}`}><Phone className="h-4 w-4" />{t("callNow")}</a>
                 </Button>
               ) : place.phone && !placeFeatures.canShowPhone ? (
                 <Button variant="outline" className="gap-2 text-slate-400" disabled>
-                  <Lock className="h-4 w-4" />{locale === "nl" ? "Telefoon verborgen" : "Phone hidden"}
+                  <Lock className="h-4 w-4" />{t("phoneHidden")}
                 </Button>
               ) : null}
               <Button asChild variant="outline" className="gap-2">
-                <a href="#inquiry-form"><MessageSquare className="h-4 w-4" />{locale === "nl" ? "Stuur Bericht" : "Send Inquiry"}</a>
+                <a href="#inquiry-form"><MessageSquare className="h-4 w-4" />{t("sendInquiry")}</a>
               </Button>
               {/* Plan badge for ELITE */}
               {placeFeatures.hasVerifiedBadge && (
                 <Badge className="justify-center bg-purple-100 text-purple-700 border-purple-300 gap-1">
                   <Shield className="h-3 w-3" />
-                  {locale === "nl" ? "Geverifieerd Bedrijf" : "Verified Business"}
+                  {t("verifiedBusiness")}
                 </Badge>
               )}
             </div>
@@ -473,9 +475,9 @@ export default async function PlacePage({ params }: PlacePageProps) {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>{locale === "nl" ? "Beoordelingen" : "Reviews"}</CardTitle>
+                <CardTitle>{t("reviews")}</CardTitle>
                 <Button variant="outline" size="sm">
-                  {locale === "nl" ? "Schrijf een Review" : "Write a Review"}
+                  {t("writeReview")}
                 </Button>
               </CardHeader>
               <CardContent>
@@ -512,7 +514,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                             {review.replies.map((reply) => (
                               <div key={reply.id} className="bg-slate-50 rounded p-3 mt-2">
                                 <p className="text-xs text-cpCoral font-medium mb-1">
-                                  {reply.authorType === "business" ? (locale === "nl" ? "Reactie van bedrijf" : "Business Response") : (locale === "nl" ? "Reactie van beheerder" : "Admin Response")}
+                                  {reply.authorType === "business" ? t("businessResponse") : t("adminResponse")}
                                 </p>
                                 <p className="text-sm text-slate-600">{reply.body}</p>
                               </div>
@@ -526,7 +528,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                   <div className="text-center py-8">
                     <MessageSquare className="h-12 w-12 text-slate-300 mx-auto mb-3" />
                     <p className="text-slate-500">
-                      {locale === "nl" ? "Nog geen reviews. Wees de eerste!" : "No reviews yet. Be the first!"}
+                      {t("noReviewsBeFirst")}
                     </p>
                   </div>
                 )}
@@ -538,7 +540,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>{locale === "nl" ? "Contactgegevens" : "Contact Information"}</CardTitle>
+                <CardTitle>{t("contactInformation")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Address - always shown */}
@@ -567,7 +569,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                     <Phone className="h-5 w-5" />
                     <span className="flex items-center gap-1">
                       <Lock className="h-3 w-3" />
-                      {locale === "nl" ? "Upgrade voor telefoonnummer" : "Upgrade to see phone"}
+                      {t("upgradeToSeePhone")}
                     </span>
                   </div>
                 ) : null}
@@ -585,7 +587,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                     <Mail className="h-5 w-5" />
                     <span className="flex items-center gap-1">
                       <Lock className="h-3 w-3" />
-                      {locale === "nl" ? "Upgrade voor e-mail" : "Upgrade to see email"}
+                      {t("upgradeToSeeEmail")}
                     </span>
                   </div>
                 ) : null}
@@ -595,7 +597,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                   <div className="flex items-center gap-3">
                     <Globe className="h-5 w-5 text-cpCoral" />
                     <a href={place.website} target="_blank" rel="noopener noreferrer" className="text-cpDark hover:text-cpCoral transition-colors">
-                      {locale === "nl" ? "Bezoek Website" : "Visit Website"}
+                      {t("visitWebsite")}
                     </a>
                   </div>
                 ) : place.website && !placeFeatures.canShowWebsite ? (
@@ -603,7 +605,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                     <Globe className="h-5 w-5" />
                     <span className="flex items-center gap-1">
                       <Lock className="h-3 w-3" />
-                      {locale === "nl" ? "Upgrade voor website" : "Upgrade to see website"}
+                      {t("upgradeToSeeWebsite")}
                     </span>
                   </div>
                 ) : null}
@@ -615,7 +617,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                     <Button asChild size="sm" variant="outline" className="w-full gap-1 text-cpCoral border-cpCoral/30 hover:bg-cpCoral/5">
                       <a href={`/${locale}/for-businesses`}>
                         <Crown className="h-3 w-3" />
-                        {locale === "nl" ? "Bekijk Abonnementen" : "View Plans"}
+                        {t("viewPlans")}
                       </a>
                     </Button>
                   </div>
@@ -639,7 +641,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
             {place.lat && place.lng && (
               <Card>
                 <CardHeader>
-                  <CardTitle>{locale === "nl" ? "Locatie" : "Location"}</CardTitle>
+                  <CardTitle>{t("location")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <StaticMap
@@ -659,7 +661,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                       className="flex items-center justify-center gap-2 mt-3 text-sm text-cpAqua hover:text-cpCoral transition-colors"
                     >
                       <MapPin className="h-4 w-4" />
-                      {locale === "nl" ? "Open in Google Maps" : "Open in Google Maps"}
+                      {t("openInGoogleMaps")}
                     </a>
                   )}
                 </CardContent>

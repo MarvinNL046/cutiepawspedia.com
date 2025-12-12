@@ -18,6 +18,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Check, AlertCircle, Globe, Instagram, Link as LinkIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface ProfileFormData {
   name: string;
@@ -35,69 +36,9 @@ interface ProfileSettingsFormProps {
   locale: string;
 }
 
-// Translations
-const t = {
-  en: {
-    name: "Display Name",
-    namePlaceholder: "How you want to be known",
-    username: "Username",
-    usernamePlaceholder: "your-unique-username",
-    usernameHelp: "Used for your public profile URL: cutiepawspedia.com/u/",
-    usernameAvailable: "Username is available!",
-    usernameUnavailable: "Username is not available",
-    usernameChecking: "Checking...",
-    bio: "Bio",
-    bioPlaceholder: "Tell others about yourself...",
-    bioHelp: "Max 500 characters",
-    location: "Location",
-    locationPlaceholder: "City, Country",
-    website: "Website",
-    websitePlaceholder: "https://your-website.com",
-    socialLinks: "Social Links",
-    instagram: "Instagram username",
-    facebook: "Facebook profile URL",
-    tiktok: "TikTok username",
-    language: "Preferred Language",
-    profileVisibility: "Public Profile",
-    profileVisibilityHelp: "When enabled, other users can see your profile, reviews, and badges",
-    save: "Save Changes",
-    saving: "Saving...",
-    saved: "Changes saved!",
-    error: "Failed to save changes. Please try again.",
-  },
-  nl: {
-    name: "Weergavenaam",
-    namePlaceholder: "Hoe je bekend wilt zijn",
-    username: "Gebruikersnaam",
-    usernamePlaceholder: "jouw-unieke-naam",
-    usernameHelp: "Wordt gebruikt voor je profiel URL: cutiepawspedia.com/u/",
-    usernameAvailable: "Gebruikersnaam is beschikbaar!",
-    usernameUnavailable: "Gebruikersnaam is niet beschikbaar",
-    usernameChecking: "Controleren...",
-    bio: "Bio",
-    bioPlaceholder: "Vertel anderen over jezelf...",
-    bioHelp: "Max 500 tekens",
-    location: "Locatie",
-    locationPlaceholder: "Stad, Land",
-    website: "Website",
-    websitePlaceholder: "https://jouw-website.nl",
-    socialLinks: "Social Media",
-    instagram: "Instagram gebruikersnaam",
-    facebook: "Facebook profiel URL",
-    tiktok: "TikTok gebruikersnaam",
-    language: "Voorkeurstaal",
-    profileVisibility: "Openbaar Profiel",
-    profileVisibilityHelp: "Wanneer ingeschakeld kunnen anderen je profiel, reviews en badges zien",
-    save: "Opslaan",
-    saving: "Opslaan...",
-    saved: "Wijzigingen opgeslagen!",
-    error: "Opslaan mislukt. Probeer het opnieuw.",
-  },
-};
-
 export function ProfileSettingsForm({ profile, locale }: ProfileSettingsFormProps) {
   const router = useRouter();
-  const text = locale === "nl" ? t.nl : t.en;
+  const t = useTranslations("profile");
 
   const [formData, setFormData] = useState<ProfileFormData>(profile);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -191,23 +132,23 @@ export function ProfileSettingsForm({ profile, locale }: ProfileSettingsFormProp
           {/* Name & Username */}
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="name">{text.name}</Label>
+              <Label htmlFor="name">{t("name")}</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                placeholder={text.namePlaceholder}
+                placeholder={t("namePlaceholder")}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="username">{text.username}</Label>
+              <Label htmlFor="username">{t("username")}</Label>
               <div className="relative">
                 <Input
                   id="username"
                   value={formData.username}
                   onChange={(e) => setFormData((prev) => ({ ...prev, username: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, "") }))}
-                  placeholder={text.usernamePlaceholder}
+                  placeholder={t("usernamePlaceholder")}
                   className={cn(
                     usernameStatus === "available" && "border-green-500 pr-10",
                     usernameStatus === "unavailable" && "border-red-500 pr-10"
@@ -224,43 +165,43 @@ export function ProfileSettingsForm({ profile, locale }: ProfileSettingsFormProp
                 )}
               </div>
               <p className="text-xs text-slate-500">
-                {usernameStatus === "available" && <span className="text-green-600">{text.usernameAvailable}</span>}
-                {usernameStatus === "unavailable" && <span className="text-red-600">{text.usernameUnavailable}</span>}
-                {usernameStatus === "checking" && <span>{text.usernameChecking}</span>}
-                {usernameStatus === "idle" && <span>{text.usernameHelp}{formData.username || "username"}</span>}
+                {usernameStatus === "available" && <span className="text-green-600">{t("usernameAvailable")}</span>}
+                {usernameStatus === "unavailable" && <span className="text-red-600">{t("usernameUnavailable")}</span>}
+                {usernameStatus === "checking" && <span>{t("usernameChecking")}</span>}
+                {usernameStatus === "idle" && <span>{t("usernameHelp")}{formData.username || "username"}</span>}
               </p>
             </div>
           </div>
 
           {/* Bio */}
           <div className="space-y-2">
-            <Label htmlFor="bio">{text.bio}</Label>
+            <Label htmlFor="bio">{t("bio")}</Label>
             <Textarea
               id="bio"
               value={formData.bio}
               onChange={(e) => setFormData((prev) => ({ ...prev, bio: e.target.value.slice(0, 500) }))}
-              placeholder={text.bioPlaceholder}
+              placeholder={t("bioPlaceholder")}
               rows={3}
             />
             <p className="text-xs text-slate-500">
-              {text.bioHelp} ({formData.bio.length}/500)
+              {t("bioHelp")} ({formData.bio.length}/500)
             </p>
           </div>
 
           {/* Location & Website */}
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="location">{text.location}</Label>
+              <Label htmlFor="location">{t("location")}</Label>
               <Input
                 id="location"
                 value={formData.location}
                 onChange={(e) => setFormData((prev) => ({ ...prev, location: e.target.value }))}
-                placeholder={text.locationPlaceholder}
+                placeholder={t("locationPlaceholder")}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="website">{text.website}</Label>
+              <Label htmlFor="website">{t("website")}</Label>
               <div className="relative">
                 <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <Input
@@ -268,7 +209,7 @@ export function ProfileSettingsForm({ profile, locale }: ProfileSettingsFormProp
                   type="url"
                   value={formData.websiteUrl}
                   onChange={(e) => setFormData((prev) => ({ ...prev, websiteUrl: e.target.value }))}
-                  placeholder={text.websitePlaceholder}
+                  placeholder={t("websitePlaceholder")}
                   className="pl-9"
                 />
               </div>
@@ -277,14 +218,14 @@ export function ProfileSettingsForm({ profile, locale }: ProfileSettingsFormProp
 
           {/* Social Links */}
           <div className="space-y-3">
-            <Label>{text.socialLinks}</Label>
+            <Label>{t("socialLinksTitle")}</Label>
             <div className="grid gap-3">
               <div className="relative">
                 <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <Input
                   value={formData.socialLinks.instagram || ""}
                   onChange={(e) => updateSocialLink("instagram", e.target.value)}
-                  placeholder={text.instagram}
+                  placeholder={t("instagram")}
                   className="pl-9"
                 />
               </div>
@@ -293,7 +234,7 @@ export function ProfileSettingsForm({ profile, locale }: ProfileSettingsFormProp
                 <Input
                   value={formData.socialLinks.facebook || ""}
                   onChange={(e) => updateSocialLink("facebook", e.target.value)}
-                  placeholder={text.facebook}
+                  placeholder={t("facebook")}
                   className="pl-9"
                 />
               </div>
@@ -302,7 +243,7 @@ export function ProfileSettingsForm({ profile, locale }: ProfileSettingsFormProp
                 <Input
                   value={formData.socialLinks.tiktok || ""}
                   onChange={(e) => updateSocialLink("tiktok", e.target.value)}
-                  placeholder={text.tiktok}
+                  placeholder={t("tiktok")}
                   className="pl-9"
                 />
               </div>
@@ -311,7 +252,7 @@ export function ProfileSettingsForm({ profile, locale }: ProfileSettingsFormProp
 
           {/* Language Preference */}
           <div className="space-y-2">
-            <Label htmlFor="language">{text.language}</Label>
+            <Label htmlFor="language">{t("language")}</Label>
             <Select
               value={formData.preferredLocale}
               onValueChange={(value) => setFormData((prev) => ({ ...prev, preferredLocale: value }))}
@@ -330,8 +271,8 @@ export function ProfileSettingsForm({ profile, locale }: ProfileSettingsFormProp
           {/* Profile Visibility */}
           <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
             <div>
-              <p className="font-medium text-cpDark">{text.profileVisibility}</p>
-              <p className="text-sm text-slate-500">{text.profileVisibilityHelp}</p>
+              <p className="font-medium text-cpDark">{t("profileVisibility")}</p>
+              <p className="text-sm text-slate-500">{t("profileVisibilityHelp")}</p>
             </div>
             <Switch
               checked={formData.isPublic}
@@ -343,14 +284,14 @@ export function ProfileSettingsForm({ profile, locale }: ProfileSettingsFormProp
           {status === "success" && (
             <Alert className="border-green-200 bg-green-50">
               <Check className="h-4 w-4 text-green-600" />
-              <AlertDescription className="text-green-700">{text.saved}</AlertDescription>
+              <AlertDescription className="text-green-700">{t("saved")}</AlertDescription>
             </Alert>
           )}
 
           {status === "error" && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{text.error}</AlertDescription>
+              <AlertDescription>{t("error")}</AlertDescription>
             </Alert>
           )}
 
@@ -363,10 +304,10 @@ export function ProfileSettingsForm({ profile, locale }: ProfileSettingsFormProp
             {isSubmitting ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                {text.saving}
+                {t("saving")}
               </>
             ) : (
-              text.save
+              t("save")
             )}
           </Button>
         </form>

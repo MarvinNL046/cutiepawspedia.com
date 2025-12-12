@@ -3,6 +3,7 @@ import { stackServerApp } from "@/lib/auth/stack";
 import { getUserByStackAuthId, upsertUserFromStackAuth, getBusinessesForUser } from "@/db/queries";
 import Link from "next/link";
 import { Heart, Clock, User, Settings, Bell, Building2, ChevronRight, Plus, Shield } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 interface AccountLayoutProps {
   children: React.ReactNode;
@@ -20,14 +21,15 @@ export default async function AccountLayout({
   params,
 }: AccountLayoutProps) {
   const { locale } = await params;
+  const t = await getTranslations("account");
 
   // Check if StackAuth is configured
   if (!stackServerApp) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center p-8">
-          <h1 className="text-2xl font-bold text-cpDark mb-2">Account Unavailable</h1>
-          <p className="text-slate-600">Authentication is not configured.</p>
+          <h1 className="text-2xl font-bold text-cpDark mb-2">{t("accountUnavailable")}</h1>
+          <p className="text-slate-600">{t("authNotConfigured")}</p>
         </div>
       </div>
     );
@@ -59,8 +61,8 @@ export default async function AccountLayout({
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center p-8">
-          <h1 className="text-2xl font-bold text-cpDark mb-2">Account Error</h1>
-          <p className="text-slate-600">Unable to sync your account. Please try again.</p>
+          <h1 className="text-2xl font-bold text-cpDark mb-2">{t("accountError")}</h1>
+          <p className="text-slate-600">{t("unableToSync")}</p>
         </div>
       </div>
     );
@@ -72,27 +74,27 @@ export default async function AccountLayout({
   const navItems = [
     {
       href: `/${locale}/account/favorites`,
-      label: locale === "nl" ? "Opgeslagen" : "Saved Places",
+      label: t("saved"),
       icon: Heart,
     },
     {
       href: `/${locale}/account/recent`,
-      label: locale === "nl" ? "Recent Bekeken" : "Recently Viewed",
+      label: t("recentlyViewed"),
       icon: Clock,
     },
     {
       href: `/${locale}/account/profile`,
-      label: locale === "nl" ? "Profiel" : "Profile",
+      label: t("profile"),
       icon: User,
     },
     {
       href: `/${locale}/account/notifications`,
-      label: locale === "nl" ? "Meldingen" : "Notifications",
+      label: t("notifications"),
       icon: Bell,
     },
     {
       href: "/handler/account-settings",
-      label: locale === "nl" ? "Beveiliging" : "Security",
+      label: t("security"),
       icon: Settings,
       external: true, // StackAuth for password/2FA management
     },
@@ -113,7 +115,7 @@ export default async function AccountLayout({
               </Link>
               <span className="text-slate-300">|</span>
               <span className="text-slate-600">
-                {locale === "nl" ? "Mijn Account" : "My Account"}
+                {t("myAccount")}
               </span>
             </div>
             <div className="flex items-center gap-4">
@@ -124,7 +126,7 @@ export default async function AccountLayout({
                   className="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 text-red-600 rounded-full text-sm font-medium hover:bg-red-500/20 transition-colors"
                 >
                   <Shield className="h-4 w-4" />
-                  <span className="hidden sm:inline">Admin</span>
+                  <span className="hidden sm:inline">{t("admin")}</span>
                 </Link>
               )}
 
@@ -136,7 +138,7 @@ export default async function AccountLayout({
                 >
                   <Building2 className="h-4 w-4" />
                   <span className="hidden sm:inline">
-                    {locale === "nl" ? "Zakelijk Dashboard" : "Business Dashboard"}
+                    {t("businessDashboard")}
                   </span>
                   <ChevronRight className="h-4 w-4" />
                 </Link>
@@ -147,7 +149,7 @@ export default async function AccountLayout({
                 >
                   <Plus className="h-4 w-4" />
                   <span className="hidden sm:inline">
-                    {locale === "nl" ? "Claim je bedrijf" : "Claim Business"}
+                    {t("claimBusiness")}
                   </span>
                 </Link>
               )}

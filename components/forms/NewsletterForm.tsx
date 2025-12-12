@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Mail, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
@@ -11,6 +12,8 @@ interface NewsletterFormProps {
 }
 
 export function NewsletterForm({ variant = "inline", className = "" }: NewsletterFormProps) {
+  const t = useTranslations("newsletter");
+  const tForms = useTranslations("forms");
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -20,7 +23,7 @@ export function NewsletterForm({ variant = "inline", className = "" }: Newslette
 
     if (!email) {
       setStatus("error");
-      setMessage("Please enter your email address");
+      setMessage(tForms("required"));
       return;
     }
 
@@ -38,15 +41,15 @@ export function NewsletterForm({ variant = "inline", className = "" }: Newslette
 
       if (response.ok) {
         setStatus("success");
-        setMessage(data.message || "Successfully subscribed!");
+        setMessage(data.message || t("success"));
         setEmail("");
       } else {
         setStatus("error");
-        setMessage(data.error || "Failed to subscribe. Please try again.");
+        setMessage(data.error || t("error"));
       }
     } catch {
       setStatus("error");
-      setMessage("An unexpected error occurred. Please try again.");
+      setMessage(t("error"));
     }
   };
 
@@ -68,7 +71,7 @@ export function NewsletterForm({ variant = "inline", className = "" }: Newslette
           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
           <Input
             type="email"
-            placeholder="Enter your email"
+            placeholder={t("placeholder")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="pl-10"
@@ -83,10 +86,10 @@ export function NewsletterForm({ variant = "inline", className = "" }: Newslette
           {status === "loading" ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
-              Subscribing...
+              {tForms("sending")}
             </>
           ) : (
-            "Subscribe"
+            tForms("subscribe")
           )}
         </Button>
       </div>

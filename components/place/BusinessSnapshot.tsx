@@ -21,6 +21,7 @@ import {
   hasOpeningHours,
   type PlaceData,
 } from "@/lib/enrichment/ui";
+import { useTranslations } from "next-intl";
 
 interface CutieRating {
   avgRating: number | null;
@@ -35,6 +36,7 @@ interface BusinessSnapshotProps {
 
 export function BusinessSnapshot({ place, locale = "en", cutieRating }: BusinessSnapshotProps) {
   const [hoursOpen, setHoursOpen] = useState(false);
+  const t = useTranslations("place");
 
   const rating = formatRating(place.avgRating);
   const ratingSource = getRatingSource(place.dataQualityFlags);
@@ -50,14 +52,14 @@ export function BusinessSnapshot({ place, locale = "en", cutieRating }: Business
     <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
       <CardHeader className="pb-3">
         <CardTitle className="text-base text-foreground dark:text-cpCream">
-          {locale === "nl" ? "Bedrijfsinfo" : "Business Info"}
+          {t("businessInfo")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
         {/* Rating Section - Google rating */}
         <div className="space-y-1">
           <p className="text-xs font-medium uppercase text-muted-foreground dark:text-cpCream/60 tracking-wide">
-            {locale === "nl" ? "Google Beoordeling" : "Google Rating"}
+            {t("googleRating")}
           </p>
           {rating.hasRating && place.reviewCount && place.reviewCount > 0 ? (
             <div className="flex items-center gap-2">
@@ -82,7 +84,7 @@ export function BusinessSnapshot({ place, locale = "en", cutieRating }: Business
             </div>
           ) : (
             <p className="text-sm text-muted-foreground dark:text-cpCream/60">
-              {locale === "nl" ? "Nog geen beoordeling" : "No rating yet"}
+              {t("noRatingYet")}
             </p>
           )}
           {rating.hasRating && place.reviewCount && place.reviewCount > 0 && ratingSource && (
@@ -97,7 +99,7 @@ export function BusinessSnapshot({ place, locale = "en", cutieRating }: Business
         <div className="space-y-1">
           <p className="text-xs font-medium uppercase text-muted-foreground dark:text-cpCream/60 tracking-wide flex items-center gap-1">
             <PawPrint className="h-3 w-3 text-cpCoral" />
-            {locale === "nl" ? "Cutie Beoordeling" : "Cutie Rating"}
+            {t("cutieRating")}
           </p>
           {hasCutieRating ? (
             <div className="flex items-center gap-2">
@@ -122,7 +124,7 @@ export function BusinessSnapshot({ place, locale = "en", cutieRating }: Business
             </div>
           ) : (
             <p className="text-sm text-muted-foreground dark:text-cpCream/60">
-              {locale === "nl" ? "Nog geen reviews - wees de eerste! 🐾" : "No reviews yet - be the first! 🐾"}
+              {t("noReviewsYetFirst")}
             </p>
           )}
           {hasCutieRating && (
@@ -137,7 +139,7 @@ export function BusinessSnapshot({ place, locale = "en", cutieRating }: Business
         <div className="space-y-2">
           <p className="text-xs font-medium uppercase text-muted-foreground dark:text-cpCream/60 tracking-wide flex items-center gap-1">
             <Clock className="h-3 w-3" />
-            {locale === "nl" ? "Openingstijden" : "Business Hours"}
+            {t("businessHours")}
           </p>
 
           {hasHours ? (
@@ -159,9 +161,7 @@ export function BusinessSnapshot({ place, locale = "en", cutieRating }: Business
                     size="sm"
                     className="text-cpCoral hover:text-cpCoral/80 hover:bg-cpCoral/5 dark:hover:bg-cpCoral/10 gap-1 -ml-3 h-auto py-1"
                   >
-                    {locale === "nl"
-                      ? "Bekijk alle openingstijden"
-                      : "View all opening hours"}
+                    {t("viewAllHours")}
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </DialogTrigger>
@@ -169,7 +169,7 @@ export function BusinessSnapshot({ place, locale = "en", cutieRating }: Business
                   <DialogHeader>
                     <DialogTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
                       <Clock className="h-5 w-5 text-cpCoral" />
-                      {locale === "nl" ? "Openingstijden" : "Opening Hours"}
+                      {t("businessHours")}
                     </DialogTitle>
                     <DialogDescription className="dark:text-cpCream/70">{place.name}</DialogDescription>
                   </DialogHeader>
@@ -207,10 +207,10 @@ export function BusinessSnapshot({ place, locale = "en", cutieRating }: Business
                   {hoursSource && (
                     <p className="text-xs text-muted-foreground dark:text-cpCream/60 flex items-center gap-1 mt-4 pt-4 border-t border-border dark:border-cpAmber/20">
                       <Info className="h-3 w-3" />
-                      {locale === "nl" ? "Bron" : "Source"}: {hoursSource.source}
+                      {t("source")}: {hoursSource.source}
                       {hoursSource.reliability === "low" && (
                         <span className="text-yellow-600 dark:text-yellow-400 ml-1">
-                          ({locale === "nl" ? "mogelijk onnauwkeurig" : "may be inaccurate"})
+                          ({t("mayBeInaccurate")})
                         </span>
                       )}
                     </p>
@@ -220,9 +220,7 @@ export function BusinessSnapshot({ place, locale = "en", cutieRating }: Business
             </>
           ) : (
             <p className="text-sm text-muted-foreground dark:text-cpCream/60">
-              {locale === "nl"
-                ? "Neem contact op met het bedrijf voor openingstijden."
-                : "Contact the business for opening hours."}
+              {t("contactBusiness")}
             </p>
           )}
         </div>
@@ -235,6 +233,8 @@ function getCurrentDayName(locale: string): string {
   const days: Record<string, string[]> = {
     en: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
     nl: ["Zondag", "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag"],
+    de: ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"],
+    fr: ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
   };
   const dayNames = days[locale] || days.en;
   return dayNames[new Date().getDay()];

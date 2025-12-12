@@ -9,6 +9,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import { getPublishedPosts, getAllBlogCategories, getPublishedPostCount, type Locale } from "@/db/queries";
 import { Calendar, Clock, ArrowRight } from "lucide-react";
 
@@ -22,14 +23,10 @@ export const revalidate = 300;
 
 export async function generateMetadata({ params }: BlogPageProps): Promise<Metadata> {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "blog" });
 
-  const title = locale === "nl"
-    ? "Blog - Tips & Advies voor Huisdiereigenaren | CutiePawsPedia"
-    : "Blog - Tips & Advice for Pet Owners | CutiePawsPedia";
-
-  const description = locale === "nl"
-    ? "Ontdek de beste tips, adviezen en verhalen voor huisdiereigenaren. Leer meer over verzorging, training, gezondheid en meer."
-    : "Discover the best tips, advice and stories for pet owners. Learn about care, training, health and more.";
+  const title = t("metaTitle");
+  const description = t("metaDescription");
 
   return {
     title,
@@ -45,6 +42,7 @@ export async function generateMetadata({ params }: BlogPageProps): Promise<Metad
 export default async function BlogPage({ params, searchParams }: BlogPageProps) {
   const { locale } = await params;
   const { category, page = "1" } = await searchParams;
+  const t = await getTranslations({ locale, namespace: "blog" });
 
   const currentPage = Math.max(1, parseInt(page, 10) || 1);
   const postsPerPage = 9;
@@ -80,22 +78,16 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cpCoral/10 dark:bg-cpCoral/20 border border-cpCoral/30 text-cpCoral dark:text-cpCoral mb-6">
               <span className="text-lg">📖</span>
               <span className="text-sm font-medium">
-                {locale === "nl" ? "Blog & Artikelen" : "Blog & Articles"}
+                {t("badge")}
               </span>
             </span>
 
             <h1 className="text-4xl md:text-5xl font-bold text-foreground dark:text-cpCream mb-4">
-              {locale === "nl" ? (
-                <>Tips & <span className="text-cpCoral">Advies</span></>
-              ) : (
-                <>Tips & <span className="text-cpCoral">Advice</span></>
-              )}
+              {t("title")} <span className="text-cpCoral">{t("titleHighlight")}</span>
             </h1>
 
             <p className="text-lg text-muted-foreground dark:text-cpCream/70 max-w-2xl mx-auto">
-              {locale === "nl"
-                ? "Ontdek nuttige tips, deskundig advies en interessante verhalen voor jou en je huisdier."
-                : "Discover helpful tips, expert advice and interesting stories for you and your pet."}
+              {t("subtitle")}
             </p>
           </div>
         </div>
@@ -114,7 +106,7 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
                     : "bg-secondary dark:bg-cpCharcoal text-muted-foreground dark:text-cpCream/70 hover:bg-cpCoral/10 dark:hover:bg-cpCoral/20"
                 }`}
               >
-                {locale === "nl" ? "Alles" : "All"}
+                {t("allCategories")}
               </Link>
               {categories.map((cat) => (
                 <Link
@@ -141,12 +133,10 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
           <div className="text-center py-16">
             <div className="text-6xl mb-4">📝</div>
             <h2 className="text-2xl font-bold text-foreground dark:text-cpCream mb-2">
-              {locale === "nl" ? "Nog geen artikelen" : "No articles yet"}
+              {t("noArticles")}
             </h2>
             <p className="text-muted-foreground dark:text-cpCream/70">
-              {locale === "nl"
-                ? "We werken aan nieuwe content. Kom snel terug!"
-                : "We're working on new content. Check back soon!"}
+              {t("noArticlesDesc")}
             </p>
           </div>
         ) : (
@@ -192,7 +182,7 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
                         {post.readingTimeMinutes && (
                           <span className="flex items-center gap-1">
                             <Clock className="w-4 h-4" />
-                            {post.readingTimeMinutes} min
+                            {post.readingTimeMinutes} {t("minutesShort")}
                           </span>
                         )}
                       </div>
@@ -211,7 +201,7 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
 
                       {/* Read More */}
                       <span className="inline-flex items-center gap-1 text-cpCoral font-medium text-sm group-hover:gap-2 transition-all">
-                        {locale === "nl" ? "Lees meer" : "Read more"}
+                        {t("readMore")}
                         <ArrowRight className="w-4 h-4" />
                       </span>
                     </div>
@@ -228,14 +218,12 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
                     href={`/${locale}/blog?page=${currentPage - 1}${category ? `&category=${category}` : ""}`}
                     className="px-4 py-2 rounded-lg bg-secondary dark:bg-cpSurface text-foreground dark:text-cpCream hover:bg-cpCoral/10 dark:hover:bg-cpCoral/20 transition-colors"
                   >
-                    {locale === "nl" ? "Vorige" : "Previous"}
+                    {t("previous")}
                   </Link>
                 )}
 
                 <span className="px-4 py-2 text-muted-foreground dark:text-cpCream/70">
-                  {locale === "nl"
-                    ? `Pagina ${currentPage} van ${totalPages}`
-                    : `Page ${currentPage} of ${totalPages}`}
+                  {t("pageOf", { current: currentPage, total: totalPages })}
                 </span>
 
                 {currentPage < totalPages && (
@@ -243,7 +231,7 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
                     href={`/${locale}/blog?page=${currentPage + 1}${category ? `&category=${category}` : ""}`}
                     className="px-4 py-2 rounded-lg bg-secondary dark:bg-cpSurface text-foreground dark:text-cpCream hover:bg-cpCoral/10 dark:hover:bg-cpCoral/20 transition-colors"
                   >
-                    {locale === "nl" ? "Volgende" : "Next"}
+                    {t("next")}
                   </Link>
                 )}
               </div>

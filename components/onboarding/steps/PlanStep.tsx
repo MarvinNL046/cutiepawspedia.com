@@ -4,6 +4,7 @@
  * Plan Step - Select subscription plan
  */
 
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Check, Star, Crown, Sparkles, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -37,126 +38,53 @@ export function PlanStep({
   const plans = getActivePlans();
   const isNl = locale === "nl";
   const isDe = locale === "de";
-
-  const translations = {
-    en: {
-      title: "Choose Your Plan",
-      description: "Start free and upgrade anytime. All plans include reviews.",
-      perMonth: "/month",
-      current: "Current Selection",
-      popular: "Most Popular",
-      freeForever: "Free forever",
-      features: {
-        photos: "photos",
-        noPhotos: "No photos",
-        categories: "categories",
-        category: "category",
-        website: "Website link",
-        contact: "Phone & email",
-        description: "Business description",
-        analytics: "Analytics",
-        basicAnalytics: "Basic analytics",
-        advancedAnalytics: "Advanced analytics",
-        verifiedBadge: "Verified badge",
-        homepageSpotlight: "Homepage spotlight",
-        prioritySupport: "Priority support",
-      },
-    },
-    nl: {
-      title: "Kies Je Abonnement",
-      description: "Begin gratis en upgrade wanneer je wilt. Alle abonnementen inclusief reviews.",
-      perMonth: "/maand",
-      current: "Huidige Selectie",
-      popular: "Meest Populair",
-      freeForever: "Altijd gratis",
-      features: {
-        photos: "foto's",
-        noPhotos: "Geen foto's",
-        categories: "categorieën",
-        category: "categorie",
-        website: "Website link",
-        contact: "Telefoon & e-mail",
-        description: "Bedrijfsomschrijving",
-        analytics: "Statistieken",
-        basicAnalytics: "Basis statistieken",
-        advancedAnalytics: "Geavanceerde statistieken",
-        verifiedBadge: "Geverifieerd badge",
-        homepageSpotlight: "Homepage uitgelicht",
-        prioritySupport: "Prioriteit support",
-      },
-    },
-    de: {
-      title: "Wähle Deinen Plan",
-      description: "Starte kostenlos und upgrade jederzeit. Alle Pläne inklusive Bewertungen.",
-      perMonth: "/Monat",
-      current: "Aktuelle Auswahl",
-      popular: "Am Beliebtesten",
-      freeForever: "Für immer kostenlos",
-      features: {
-        photos: "Fotos",
-        noPhotos: "Keine Fotos",
-        categories: "Kategorien",
-        category: "Kategorie",
-        website: "Website-Link",
-        contact: "Telefon & E-Mail",
-        description: "Unternehmensbeschreibung",
-        analytics: "Statistiken",
-        basicAnalytics: "Basis-Statistiken",
-        advancedAnalytics: "Erweiterte Statistiken",
-        verifiedBadge: "Verifiziert-Badge",
-        homepageSpotlight: "Homepage-Spotlight",
-        prioritySupport: "Prioritäts-Support",
-      },
-    },
-  };
-
-  const t = translations[locale as keyof typeof translations] || translations.en;
+  const t = useTranslations("onboarding.planStep");
 
   const getFeaturesList = (plan: PlanDefinition): string[] => {
     const features: string[] = [];
 
     // Photos
     if (plan.features.maxPhotos > 0) {
-      features.push(`${plan.features.maxPhotos} ${t.features.photos}`);
+      features.push(`${plan.features.maxPhotos} ${t("features.photos")}`);
     } else {
-      features.push(t.features.noPhotos);
+      features.push(t("features.noPhotos"));
     }
 
     // Categories
     features.push(
       `${plan.features.maxCategories} ${
-        plan.features.maxCategories === 1 ? t.features.category : t.features.categories
+        plan.features.maxCategories === 1 ? t("features.category") : t("features.categories")
       }`
     );
 
     // Contact info
     if (plan.features.canShowPhone) {
-      features.push(t.features.contact);
+      features.push(t("features.contact"));
     }
 
     // Website
     if (plan.features.canShowWebsite) {
-      features.push(t.features.website);
+      features.push(t("features.website"));
     }
 
     // Description
     if (plan.features.canShowDescription) {
-      features.push(t.features.description);
+      features.push(t("features.description"));
     }
 
     // Analytics
     if (plan.features.hasAdvancedAnalytics) {
-      features.push(t.features.advancedAnalytics);
+      features.push(t("features.advancedAnalytics"));
     } else if (plan.features.hasBasicAnalytics) {
-      features.push(t.features.basicAnalytics);
+      features.push(t("features.basicAnalytics"));
     }
 
     // ELITE features
     if (plan.features.hasVerifiedBadge) {
-      features.push(t.features.verifiedBadge);
+      features.push(t("features.verifiedBadge"));
     }
     if (plan.features.hasHomepageSpotlight) {
-      features.push(t.features.homepageSpotlight);
+      features.push(t("features.homepageSpotlight"));
     }
 
     return features;
@@ -166,10 +94,10 @@ export function PlanStep({
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-xl font-semibold text-cpDark dark:text-white mb-2">
-          {t.title}
+          {t("title")}
         </h2>
         <p className="text-slate-600 dark:text-slate-400">
-          {t.description}
+          {t("description")}
         </p>
       </div>
 
@@ -196,14 +124,14 @@ export function PlanStep({
               {/* Popular Badge */}
               {plan.isPopular && (
                 <span className="absolute -top-3 left-4 px-2 py-0.5 text-xs font-medium bg-cpCoral text-white rounded-full">
-                  {t.popular}
+                  {t("popular")}
                 </span>
               )}
 
               {/* Selected Badge */}
               {isSelected && (
                 <span className="absolute -top-3 right-4 px-2 py-0.5 text-xs font-medium bg-green-500 text-white rounded-full">
-                  {t.current}
+                  {t("current")}
                 </span>
               )}
 
@@ -229,8 +157,8 @@ export function PlanStep({
                     </h3>
                     <span className="text-lg font-bold text-cpDark dark:text-white">
                       {plan.monthlyPriceCents === 0
-                        ? t.freeForever
-                        : `${formatPlanPrice(plan.monthlyPriceCents, locale)}${t.perMonth}`}
+                        ? t("freeForever")
+                        : `${formatPlanPrice(plan.monthlyPriceCents, locale)}${t("perMonth")}`}
                     </span>
                   </div>
 

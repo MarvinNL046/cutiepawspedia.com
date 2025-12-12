@@ -32,6 +32,7 @@ import {
   type ContentLocale,
 } from "@/lib/seo";
 import { generateContent } from "@/lib/ai/generateContent";
+import { getTranslations } from "next-intl/server";
 
 interface ProvinceCategoryPageProps {
   params: Promise<{
@@ -118,6 +119,8 @@ export async function generateMetadata({ params }: ProvinceCategoryPageProps): P
 export default async function ProvinceCategoryPage({ params }: ProvinceCategoryPageProps) {
   const { locale, countrySlug, provinceSlug, categorySlug } = await params;
 
+  const t = await getTranslations("categoryPages");
+
   const [country, province, category, places] = await Promise.all([
     getCountryBySlug(countrySlug),
     getProvinceBySlugAndCountry(provinceSlug, countrySlug),
@@ -155,47 +158,6 @@ export default async function ProvinceCategoryPage({ params }: ProvinceCategoryP
     `${categoryLabel} in ${provinceName}`
   );
 
-  const labels = {
-    en: {
-      directory: "Directory",
-      locationsFound: `${places.length} locations found`,
-      filters: "Filters",
-      sort: "Sort",
-      provincial: "Provincial",
-      noResults: "No results found",
-      noResultsDesc: `No ${categoryLabel.toLowerCase()} have been registered in ${provinceName} yet.`,
-      seeAlso: "See also",
-      bestIn: `Best ${categoryLabel} in ${provinceName}`,
-      allCategories: "All categories",
-    },
-    nl: {
-      directory: "Overzicht",
-      locationsFound: `${places.length} locaties gevonden`,
-      filters: "Filters",
-      sort: "Sorteren",
-      provincial: "Provinciaal",
-      noResults: "Geen resultaten gevonden",
-      noResultsDesc: `Er zijn nog geen ${categoryLabel.toLowerCase()} in ${provinceName} geregistreerd.`,
-      seeAlso: "Bekijk ook",
-      bestIn: `Beste ${categoryLabel} in ${provinceName}`,
-      allCategories: "Alle categorieën",
-    },
-    de: {
-      directory: "Verzeichnis",
-      locationsFound: `${places.length} Standorte gefunden`,
-      filters: "Filter",
-      sort: "Sortieren",
-      provincial: "Provinziell",
-      noResults: "Keine Ergebnisse gefunden",
-      noResultsDesc: `Es sind noch keine ${categoryLabel.toLowerCase()} in ${provinceName} registriert.`,
-      seeAlso: "Siehe auch",
-      bestIn: `Beste ${categoryLabel} in ${provinceName}`,
-      allCategories: "Alle Kategorien",
-    },
-  };
-
-  const t = labels[locale as keyof typeof labels] || labels.en;
-
   return (
     <>
       {/* JSON-LD ItemList */}
@@ -206,11 +168,11 @@ export default async function ProvinceCategoryPage({ params }: ProvinceCategoryP
 
       <PageHeader
         title={`${categoryLabel} in ${provinceName}`}
-        subtitle={t.locationsFound}
+        subtitle={`${places.length} ${t("locationsFound")}`}
         icon={<span className="text-3xl">{categoryIcon}</span>}
         variant="gradient-aqua"
         breadcrumbs={[
-          { label: t.directory, href: `/${locale}` },
+          { label: t("directory"), href: `/${locale}` },
           { label: countryName, href: `/${locale}/${countrySlug}` },
           { label: provinceName, href: `/${locale}/${countrySlug}/p/${provinceSlug}` },
           { label: categoryLabel },
@@ -235,16 +197,16 @@ export default async function ProvinceCategoryPage({ params }: ProvinceCategoryP
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" className="gap-2 dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10">
                 <Filter className="h-4 w-4" />
-                {t.filters}
+                {t("filters")}
               </Button>
               <Badge variant="secondary" className="hidden sm:inline-flex gap-1 dark:bg-cpAmber/10 dark:text-cpCream">
                 <MapPin className="h-3 w-3" />
-                {t.provincial}
+                {t("provincial")}
               </Badge>
             </div>
             <Button variant="ghost" size="sm" className="gap-2 dark:text-cpCream dark:hover:bg-cpAmber/10">
               <SlidersHorizontal className="h-4 w-4" />
-              {t.sort}
+              {t("sort")}
             </Button>
           </div>
         </div>
@@ -274,10 +236,10 @@ export default async function ProvinceCategoryPage({ params }: ProvinceCategoryP
             <div className="text-center py-12">
               <span className="text-6xl block mb-4">🔍</span>
               <h2 className="text-xl font-semibold text-foreground dark:text-cpCream mb-2">
-                {t.noResults}
+                {t("noResults")}
               </h2>
               <p className="text-muted-foreground dark:text-cpCream/70">
-                {t.noResultsDesc}
+                {t("notRegisteredYet", { category: categoryLabel.toLowerCase(), location: provinceName })}
               </p>
             </div>
           )}
@@ -287,16 +249,16 @@ export default async function ProvinceCategoryPage({ params }: ProvinceCategoryP
       {/* Related Links */}
       <section className="bg-muted/50 dark:bg-cpCharcoal/80 py-12 border-t border-border dark:border-cpAmber/20">
         <div className="container mx-auto max-w-6xl px-4">
-          <SectionHeader title={t.seeAlso} />
+          <SectionHeader title={t("seeAlso")} />
           <div className="flex flex-wrap gap-2">
             <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10 dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpCoral/20">
               <a href={`/${locale}/${countrySlug}/p/${provinceSlug}`}>
-                {t.allCategories}
+                {t("allCategories")}
               </a>
             </Badge>
             <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10 dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpCoral/20">
               <a href={`/${locale}/${countrySlug}/c/${categorySlug}`}>
-                {categoryLabel} in {countryName}
+                {t("allIn", { category: categoryLabel, location: countryName })}
               </a>
             </Badge>
           </div>

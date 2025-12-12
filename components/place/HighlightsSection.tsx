@@ -1,18 +1,20 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Sparkles } from "lucide-react";
 import { getHighlights, type PlaceData, type AIContent } from "@/lib/enrichment/ui";
 
 interface HighlightsSectionProps {
   place: PlaceData;
   aiContent?: AIContent;
-  locale?: string;
 }
 
 export function HighlightsSection({
   place,
   aiContent,
-  locale = "en",
 }: HighlightsSectionProps) {
-  const highlights = getHighlights(place, aiContent, locale);
+  const t = useTranslations("place");
+  const highlights = getHighlights(place, aiContent);
 
   // Don't render if no highlights
   if (highlights.length === 0) return null;
@@ -21,7 +23,7 @@ export function HighlightsSection({
     <section className="mt-6 p-4 bg-gradient-to-br from-cpCoral/5 to-cpAmber/5 dark:from-cpCoral/10 dark:to-cpAmber/10 rounded-xl border border-cpCoral/10 dark:border-cpAmber/20">
       <h3 className="text-sm font-semibold text-foreground dark:text-cpCream mb-3 flex items-center gap-2">
         <Sparkles className="h-4 w-4 text-cpAmber" />
-        {locale === "nl" ? "Waarom mensen kiezen voor dit bedrijf" : "Why people choose this place"}
+        {t("whyPeopleChoose")}
       </h3>
       <ul className="space-y-2">
         {highlights.map((highlight, index) => (

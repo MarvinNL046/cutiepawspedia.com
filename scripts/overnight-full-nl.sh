@@ -60,8 +60,15 @@ while true; do
     OUTPUT=$(npx tsx scripts/enrich-jina-nl.ts --offset=$OFFSET --batch-size=$BATCH_SIZE 2>&1)
     echo "$OUTPUT"
 
-    # Check of we klaar zijn
-    if echo "$OUTPUT" | grep -qE "No more places|0 places|All.*scraped|have been scraped"; then
+    # Check of we klaar zijn (alleen als er GEEN "Next batch command" staat)
+    if echo "$OUTPUT" | grep -q "No more places to process"; then
+        echo ""
+        echo "✅ STAP 1 KLAAR: Alle websites gescraped!"
+        break
+    fi
+
+    # Check ook of alle places klaar zijn (alleen eindmelding ZONDER next batch)
+    if echo "$OUTPUT" | grep -q "🎉" && ! echo "$OUTPUT" | grep -q "Next batch command"; then
         echo ""
         echo "✅ STAP 1 KLAAR: Alle websites gescraped!"
         break
@@ -97,8 +104,15 @@ while true; do
     OUTPUT=$(npx tsx scripts/enrich-content-nl.ts --offset=$OFFSET --batch-size=$BATCH_SIZE 2>&1)
     echo "$OUTPUT"
 
-    # Check of we klaar zijn
-    if echo "$OUTPUT" | grep -qE "No more places|0 places|All.*enriched|have been enriched"; then
+    # Check of we klaar zijn (alleen als er GEEN "Next batch command" staat)
+    if echo "$OUTPUT" | grep -q "No more places to process"; then
+        echo ""
+        echo "✅ STAP 2 KLAAR: Alle content gegenereerd!"
+        break
+    fi
+
+    # Check ook of alle places klaar zijn (alleen eindmelding ZONDER next batch)
+    if echo "$OUTPUT" | grep -q "🎉" && ! echo "$OUTPUT" | grep -q "Next batch command"; then
         echo ""
         echo "✅ STAP 2 KLAAR: Alle content gegenereerd!"
         break

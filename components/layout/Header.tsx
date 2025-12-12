@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import NextLink from "next/link";
+import { useTranslations } from "next-intl";
 
 // Wrapper to disable prefetch for performance
 const Link = ({ children, ...props }: React.ComponentProps<typeof NextLink>) => (
@@ -18,22 +19,25 @@ import {
 import { Globe, Menu, X, User, LogOut, Settings, Heart } from "lucide-react";
 import { useAuth, isAuthConfigured } from "@/lib/auth/use-auth";
 import { ThemeToggle } from "@/components/theme";
+import { localeNames, type Locale } from "@/i18n/config";
 
 interface HeaderProps {
   locale: string;
   variant?: "marketing" | "directory";
 }
 
-const locales = [
-  { code: "en", label: "English" },
-  { code: "nl", label: "Nederlands" },
-  { code: "de", label: "Deutsch" },
-  { code: "fr", label: "Français" },
+const locales: { code: Locale; label: string }[] = [
+  { code: "en", label: localeNames.en },
+  { code: "nl", label: localeNames.nl },
+  { code: "de", label: localeNames.de },
+  { code: "fr", label: localeNames.fr },
 ];
 
 export function Header({ locale, variant = "marketing" }: HeaderProps) {
   const user = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const t = useTranslations("common");
+  const tHeader = useTranslations("header");
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -54,31 +58,31 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
                 href={`/${locale}`}
                 className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors"
               >
-                Home
+                {t("home")}
               </Link>
               <Link
                 href={`/${locale}/blog`}
                 className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors"
               >
-                Blog
+                {t("blog")}
               </Link>
               <Link
                 href={`/${locale}/about`}
                 className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors"
               >
-                About
+                {t("about")}
               </Link>
               <Link
                 href={`/${locale}/for-businesses`}
                 className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors"
               >
-                For Businesses
+                {t("forBusinesses")}
               </Link>
               <Link
                 href={`/${locale}/contact`}
                 className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors"
               >
-                Contact
+                {t("contact")}
               </Link>
             </>
           ) : (
@@ -87,19 +91,19 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
                 href={`/${locale}`}
                 className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors"
               >
-                Directory
+                {t("directory")}
               </Link>
               <Link
                 href={`/${locale}/search`}
                 className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors"
               >
-                Search
+                {t("search")}
               </Link>
               <Link
                 href={`/${locale}/blog`}
                 className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors"
               >
-                Blog
+                {t("blog")}
               </Link>
             </>
           )}
@@ -142,20 +146,20 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
                 <DropdownMenuItem asChild>
                   <Link href={`/${locale}/account/favorites`} className="gap-2">
                     <Heart className="h-4 w-4" />
-                    My Account
+                    {tHeader("myAccount")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href={`/${locale}/account/notifications`} className="gap-2">
                     <Settings className="h-4 w-4" />
-                    Settings
+                    {tHeader("settings")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/handler/sign-out" className="gap-2 text-red-600">
                     <LogOut className="h-4 w-4" />
-                    Sign Out
+                    {tHeader("signOut")}
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -163,10 +167,10 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
           ) : isAuthConfigured ? (
             <div className="hidden sm:flex items-center gap-2">
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/handler/sign-in">Sign In</Link>
+                <Link href="/handler/sign-in">{tHeader("signIn")}</Link>
               </Button>
               <Button size="sm" className="bg-cpCoral hover:bg-cpCoral/90" asChild>
-                <Link href="/handler/sign-up">Sign Up</Link>
+                <Link href="/handler/sign-up">{tHeader("signUp")}</Link>
               </Button>
             </div>
           ) : null}
@@ -174,7 +178,7 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
           {/* CTA Button - always show for non-logged in users */}
           {!user && (
             <Button size="sm" className="bg-cpCoral hover:bg-cpCoral/90 hidden sm:flex" asChild>
-              <Link href={`/${locale}/for-businesses`}>List Your Business</Link>
+              <Link href={`/${locale}/for-businesses`}>{t("listYourBusiness")}</Link>
             </Button>
           )}
 
@@ -207,35 +211,35 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
                   className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Home
+                  {t("home")}
                 </Link>
                 <Link
                   href={`/${locale}/blog`}
                   className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Blog
+                  {t("blog")}
                 </Link>
                 <Link
                   href={`/${locale}/about`}
                   className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  About
+                  {t("about")}
                 </Link>
                 <Link
                   href={`/${locale}/for-businesses`}
                   className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  For Businesses
+                  {t("forBusinesses")}
                 </Link>
                 <Link
                   href={`/${locale}/contact`}
                   className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Contact
+                  {t("contact")}
                 </Link>
               </>
             ) : (
@@ -245,21 +249,21 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
                   className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Directory
+                  {t("directory")}
                 </Link>
                 <Link
                   href={`/${locale}/search`}
                   className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Search
+                  {t("search")}
                 </Link>
                 <Link
                   href={`/${locale}/blog`}
                   className="text-sm font-medium text-muted-foreground hover:text-cpCoral transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Blog
+                  {t("blog")}
                 </Link>
               </>
             )}
@@ -274,7 +278,7 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <Heart className="h-4 w-4" />
-                    My Account
+                    {tHeader("myAccount")}
                   </Link>
                   <Link
                     href={`/${locale}/account/notifications`}
@@ -282,7 +286,7 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <Settings className="h-4 w-4" />
-                    Settings
+                    {tHeader("settings")}
                   </Link>
                   <Link
                     href="/handler/sign-out"
@@ -290,7 +294,7 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <LogOut className="h-4 w-4" />
-                    Sign Out
+                    {tHeader("signOut")}
                   </Link>
                 </div>
               </>
@@ -298,12 +302,12 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
               <div className="border-t border-border pt-4 mt-2 flex flex-col gap-2">
                 <Button variant="outline" size="sm" asChild>
                   <Link href="/handler/sign-in" onClick={() => setMobileMenuOpen(false)}>
-                    Sign In
+                    {tHeader("signIn")}
                   </Link>
                 </Button>
                 <Button size="sm" className="bg-cpCoral hover:bg-cpCoral/90" asChild>
                   <Link href="/handler/sign-up" onClick={() => setMobileMenuOpen(false)}>
-                    Sign Up
+                    {tHeader("signUp")}
                   </Link>
                 </Button>
               </div>
@@ -314,7 +318,7 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
               <div className="border-t border-border pt-4 mt-2">
                 <Button size="sm" className="bg-cpCoral hover:bg-cpCoral/90 w-full" asChild>
                   <Link href={`/${locale}/for-businesses`} onClick={() => setMobileMenuOpen(false)}>
-                    List Your Business
+                    {t("listYourBusiness")}
                   </Link>
                 </Button>
               </div>

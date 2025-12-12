@@ -13,6 +13,7 @@ import { getUserByStackAuthId, getBusinessesForUser } from "@/db/queries";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Building2, Plus, Shield, ArrowRight } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 interface DashboardPageProps {
   params: Promise<{ locale: string }>;
@@ -20,6 +21,7 @@ interface DashboardPageProps {
 
 export default async function DashboardPage({ params }: DashboardPageProps) {
   const { locale } = await params;
+  const t = await getTranslations("dashboard");
 
   // Get current user
   const stackUser = await stackServerApp?.getUser();
@@ -47,12 +49,10 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground dark:text-cpCream">
-              {locale === "nl" ? "Kies een bedrijf" : "Select a Business"}
+              {t("selectBusiness")}
             </h1>
             <p className="text-muted-foreground dark:text-cpCream/70 mt-2">
-              {locale === "nl"
-                ? "Je hebt meerdere bedrijven. Kies welke je wilt beheren."
-                : "You have multiple businesses. Choose which one to manage."}
+              {t("selectBusinessDesc")}
             </p>
           </div>
 
@@ -89,7 +89,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
               <Link href={`/${locale}/admin`}>
                 <Button variant="outline" className="gap-2 dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10">
                   <Shield className="h-4 w-4" />
-                  {locale === "nl" ? "Ga naar Admin Panel" : "Go to Admin Panel"}
+                  {t("goToAdminPanel")}
                 </Button>
               </Link>
             </div>
@@ -108,25 +108,23 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
             <Building2 className="h-8 w-8 text-cpCoral" />
           </div>
           <CardTitle className="text-2xl text-foreground dark:text-cpCream">
-            {locale === "nl" ? "Geen bedrijven" : "No Businesses"}
+            {t("noBusinesses")}
           </CardTitle>
           <CardDescription className="dark:text-cpCream/70">
-            {locale === "nl"
-              ? "Je hebt nog geen bedrijven gekoppeld aan je account."
-              : "You don't have any businesses linked to your account yet."}
+            {t("noBusinessesDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Link href={`/${locale}/onboarding/business`} className="block">
             <Button className="w-full bg-cpCoral hover:bg-cpCoral/90 gap-2">
               <Plus className="h-4 w-4" />
-              {locale === "nl" ? "Registreer je bedrijf" : "Register Your Business"}
+              {t("registerYourBusiness")}
             </Button>
           </Link>
 
           <Link href={`/${locale}/account/favorites`} className="block">
             <Button variant="outline" className="w-full dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10">
-              {locale === "nl" ? "Terug naar Mijn Account" : "Back to My Account"}
+              {t("backToMyAccount")}
             </Button>
           </Link>
 
@@ -135,7 +133,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
             <Link href={`/${locale}/admin`} className="block">
               <Button variant="ghost" className="w-full gap-2 text-muted-foreground dark:text-cpCream/70">
                 <Shield className="h-4 w-4" />
-                {locale === "nl" ? "Admin Panel" : "Admin Panel"}
+                {t("adminPanel")}
               </Button>
             </Link>
           )}

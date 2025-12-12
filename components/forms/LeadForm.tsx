@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { trackLeadSubmitted } from "@/lib/analytics";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { Send, Loader2, CheckCircle, AlertCircle, MessageSquare, ShieldCheck } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface LeadFormProps {
   placeId: number;
@@ -35,27 +36,7 @@ export function LeadForm({
   className = "",
   locale = "en",
 }: LeadFormProps) {
-  const isNL = locale === "nl";
-
-  // Translations
-  const t = {
-    messageSent: isNL ? "Bericht Verzonden!" : "Message Sent!",
-    inquirySent: isNL ? `Je aanvraag is verzonden naar ${placeName}. Ze nemen snel contact met je op.` : `Your inquiry has been sent to ${placeName}. They will contact you soon.`,
-    sendAnother: isNL ? "Nog een Bericht Sturen" : "Send Another Message",
-    yourName: isNL ? "Je Naam *" : "Your Name *",
-    emailAddress: isNL ? "E-mailadres *" : "Email Address *",
-    phoneNumber: isNL ? "Telefoonnummer (optioneel)" : "Phone Number (optional)",
-    message: isNL ? "Bericht (optioneel)" : "Message (optional)",
-    messagePlaceholder: isNL ? "Vertel ons wat je zoekt..." : "Tell us what you're looking for...",
-    sending: isNL ? "Verzenden..." : "Sending...",
-    sendInquiry: isNL ? "Verstuur Aanvraag" : "Send Inquiry",
-    protectedBy: isNL ? "Beschermd door reCAPTCHA" : "Protected by reCAPTCHA",
-    bySubmitting: isNL ? "Door te versturen ga je akkoord met ons" : "By submitting, you agree to our",
-    privacyPolicy: isNL ? "Privacybeleid" : "Privacy Policy",
-    andGoogle: isNL ? "en Google's" : "and Google's",
-    contactTitle: isNL ? `Neem contact op met ${placeName}` : `Contact ${placeName}`,
-    sendInquiryDesc: isNL ? "Stuur een aanvraag direct naar dit bedrijf" : "Send an inquiry directly to this business",
-  };
+  const t = useTranslations("leadForm");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -148,10 +129,10 @@ export function LeadForm({
             <CheckCircle className="h-12 w-12 text-green-600 dark:text-green-400 mx-auto mb-4" aria-hidden="true" />
           </div>
           <h3 className="text-lg font-semibold text-foreground dark:text-cpCream mb-2 animate-slide-up">
-            {t.messageSent}
+            {t("messageSent")}
           </h3>
           <p className="text-muted-foreground dark:text-cpCream/70 mb-4 animate-slide-up" style={{ animationDelay: "0.1s" }}>
-            {t.inquirySent}
+            {t("inquirySent", { placeName })}
           </p>
           <Button
             variant="outline"
@@ -159,7 +140,7 @@ export function LeadForm({
             className="border-cpCoral text-cpCoral hover:bg-cpCoral/10 dark:border-cpCoral dark:hover:bg-cpCoral/20 animate-slide-up"
             style={{ animationDelay: "0.2s" }}
           >
-            {t.sendAnother}
+            {t("sendAnother")}
           </Button>
         </CardContent>
       </Card>
@@ -178,7 +159,7 @@ export function LeadForm({
 
       {/* Name */}
       <div className="space-y-2">
-        <Label htmlFor="name">{t.yourName}</Label>
+        <Label htmlFor="name">{t("yourName")}</Label>
         <Input
           id="name"
           name="name"
@@ -192,7 +173,7 @@ export function LeadForm({
 
       {/* Email */}
       <div className="space-y-2">
-        <Label htmlFor="email">{t.emailAddress}</Label>
+        <Label htmlFor="email">{t("emailAddress")}</Label>
         <Input
           id="email"
           name="email"
@@ -207,7 +188,7 @@ export function LeadForm({
 
       {/* Phone */}
       <div className="space-y-2">
-        <Label htmlFor="phone">{t.phoneNumber}</Label>
+        <Label htmlFor="phone">{t("phoneNumber")}</Label>
         <Input
           id="phone"
           name="phone"
@@ -221,11 +202,11 @@ export function LeadForm({
 
       {/* Message */}
       <div className="space-y-2">
-        <Label htmlFor="message">{t.message}</Label>
+        <Label htmlFor="message">{t("message")}</Label>
         <Textarea
           id="message"
           name="message"
-          placeholder={t.messagePlaceholder}
+          placeholder={t("messagePlaceholder")}
           value={formData.message}
           onChange={handleChange}
           rows={4}
@@ -242,12 +223,12 @@ export function LeadForm({
         {isSubmitting ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-            {t.sending}
+            {t("sending")}
           </>
         ) : (
           <>
             <Send className="h-4 w-4" aria-hidden="true" />
-            {t.sendInquiry}
+            {t("sendInquiry")}
           </>
         )}
       </Button>
@@ -257,23 +238,23 @@ export function LeadForm({
         {recaptchaConfigured && (
           <span className="flex items-center justify-center gap-1 mb-1">
             <ShieldCheck className="h-3 w-3 text-green-500 dark:text-green-400" />
-            {t.protectedBy}
+            {t("protectedBy")}
           </span>
         )}
-        {t.bySubmitting}{" "}
+        {t("bySubmitting")}{" "}
         <a href="/privacy" className="text-cpCoral hover:underline">
-          {t.privacyPolicy}
+          {t("privacyPolicy")}
         </a>
         {recaptchaConfigured && (
           <>
-            {" "}{t.andGoogle}{" "}
+            {" "}{t("andGoogle")}{" "}
             <a
               href="https://policies.google.com/privacy"
               target="_blank"
               rel="noopener noreferrer"
               className="text-cpCoral hover:underline"
             >
-              {t.privacyPolicy}
+              {t("privacyPolicy")}
             </a>{" "}
             &{" "}
             <a
@@ -297,10 +278,10 @@ export function LeadForm({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
             <MessageSquare className="h-5 w-5 text-cpCoral" aria-hidden="true" />
-            {t.contactTitle}
+            {t("contactTitle", { placeName })}
           </CardTitle>
           <CardDescription className="dark:text-cpCream/70">
-            {t.sendInquiryDesc}
+            {t("sendInquiryDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent>{formContent}</CardContent>

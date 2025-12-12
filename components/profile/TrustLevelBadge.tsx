@@ -8,6 +8,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Progress } from "@/components/ui/progress";
+import { useTranslations } from "next-intl";
 
 interface TrustLevelInfo {
   level: number;
@@ -54,6 +55,8 @@ export function TrustLevelBadge({
   showProgress = false,
   size = "md",
 }: TrustLevelBadgeProps) {
+  const t = useTranslations("profile");
+
   const name = locale === "nl" && trustLevelInfo?.nameNl
     ? trustLevelInfo.nameNl
     : trustLevelInfo?.name || `Level ${trustLevel}`;
@@ -96,7 +99,7 @@ export function TrustLevelBadge({
               <div className="w-full">
                 <Progress value={progress} className="h-1.5" />
                 <p className="text-[10px] text-slate-400 mt-0.5 text-center">
-                  {karmaToNext} {locale === "nl" ? "punten tot volgend niveau" : "points to next level"}
+                  {karmaToNext} {t("pointsToNextLevel")}
                 </p>
               </div>
             )}
@@ -107,13 +110,14 @@ export function TrustLevelBadge({
             <p className="font-medium">{icon} {name}</p>
             <p className="text-sm text-slate-500">{description}</p>
             <p className="text-xs text-slate-400">
-              {karmaPoints} {locale === "nl" ? "karma punten" : "karma points"}
+              {karmaPoints} {t("karmaPoints")}
             </p>
             {nextLevel && (
               <p className="text-xs text-slate-400">
-                {locale === "nl"
-                  ? `${karmaToNext} punten nodig voor ${nextLevel.nameNl || nextLevel.name}`
-                  : `${karmaToNext} points until ${nextLevel.name}`}
+                {t("pointsUntil", {
+                  count: karmaToNext,
+                  level: locale === "nl" ? (nextLevel.nameNl || nextLevel.name) : nextLevel.name
+                })}
               </p>
             )}
           </div>

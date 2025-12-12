@@ -35,7 +35,13 @@
     "enrich:content": "npx tsx scripts/enrich-content.ts",
     "enrich:content:help": "npx tsx scripts/enrich-content.ts --help",
     "enrich:google": "npx tsx scripts/enrich-google-places.ts",
-    "enrich:google:help": "npx tsx scripts/enrich-google-places.ts --help"
+    "enrich:google:help": "npx tsx scripts/enrich-google-places.ts --help",
+    "pipeline:discover": "npx tsx scripts/pipeline/discover.ts",
+    "pipeline:enrich": "npx tsx scripts/pipeline/enrich.ts",
+    "pipeline:gmaps": "npx tsx scripts/pipeline/enrich-gmaps.ts",
+    "pipeline:gmaps:help": "npx tsx scripts/pipeline/enrich-gmaps.ts --help",
+    "pipeline:run": "npx tsx scripts/pipeline/run.ts",
+    "pipeline:status": "npx tsx scripts/pipeline/enrich.ts --status"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.946.0",
@@ -58,6 +64,7 @@
     "mapbox-gl": "^3.16.0",
     "next": "^16.0.7",
     "next-auth": "^4.24.13",
+    "next-intl": "^4.5.8",
     "next-themes": "^0.4.6",
     "openai": "^6.9.1",
     "react": "19.2.0",

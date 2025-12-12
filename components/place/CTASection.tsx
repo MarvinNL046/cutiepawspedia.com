@@ -5,9 +5,12 @@
  * user engagement (contact, visit, book appointment).
  */
 
+"use client";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Phone, MessageSquare, Calendar } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface CTASectionProps {
   cta: string;
@@ -24,6 +27,7 @@ export function CTASection({
   locale = "en",
   className = "",
 }: CTASectionProps) {
+  const t = useTranslations("place");
   // Don't render if no CTA
   if (!cta || cta.length === 0) {
     return null;
@@ -50,7 +54,7 @@ export function CTASection({
               >
                 <a href={`tel:${phone}`}>
                   <Phone className="h-4 w-4" />
-                  {locale === "nl" ? "Bel Nu" : "Call Now"}
+                  {t("callNow")}
                 </a>
               </Button>
             )}
@@ -61,7 +65,7 @@ export function CTASection({
             >
               <a href="#inquiry-form">
                 <MessageSquare className="h-4 w-4" />
-                {locale === "nl" ? "Contact" : "Contact"}
+                {t("contact")}
                 <ArrowRight className="h-4 w-4" />
               </a>
             </Button>

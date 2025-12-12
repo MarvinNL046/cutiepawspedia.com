@@ -31,6 +31,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { BadgeDisplay } from "../../account/profile/BadgeDisplay";
+import { getTranslations } from "next-intl/server";
 
 interface PublicProfilePageProps {
   params: Promise<{ locale: string; username: string }>;
@@ -64,39 +65,9 @@ export async function generateMetadata({
   };
 }
 
-// Translations
-const t = {
-  en: {
-    memberSince: "Member since",
-    reviewsWritten: "Reviews written",
-    badges: "Badges",
-    noBadges: "No badges yet",
-    recentReviews: "Recent Reviews",
-    noReviews: "No reviews yet",
-    privateProfile: "Private Profile",
-    privateProfileDesc: "This user has chosen to keep their profile private.",
-    visitPlace: "View Place",
-    viewAll: "View all reviews",
-    socialLinks: "Connect",
-  },
-  nl: {
-    memberSince: "Lid sinds",
-    reviewsWritten: "Reviews geschreven",
-    badges: "Badges",
-    noBadges: "Nog geen badges",
-    recentReviews: "Recente Reviews",
-    noReviews: "Nog geen reviews",
-    privateProfile: "Privé Profiel",
-    privateProfileDesc: "Deze gebruiker heeft ervoor gekozen om zijn profiel privé te houden.",
-    visitPlace: "Bekijk Plek",
-    viewAll: "Bekijk alle reviews",
-    socialLinks: "Verbind",
-  },
-};
-
 export default async function PublicProfilePage({ params }: PublicProfilePageProps) {
   const { username, locale } = await params;
-  const text = locale === "nl" ? t.nl : t.en;
+  const t = await getTranslations("profile");
 
   // Get public profile
   const profile = await getPublicProfile(username);
@@ -114,9 +85,9 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
             <CardContent className="py-12 text-center">
               <Lock className="h-12 w-12 mx-auto text-slate-400 mb-4" />
               <h1 className="text-xl font-bold text-cpDark mb-2">
-                {text.privateProfile}
+                {t("privateProfile")}
               </h1>
-              <p className="text-slate-600">{text.privateProfileDesc}</p>
+              <p className="text-slate-600">{t("privateProfileDesc")}</p>
             </CardContent>
           </Card>
         </div>
@@ -211,7 +182,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
                   )}
                   <span className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
-                    {text.memberSince}{" "}
+                    {t("memberSince")}{" "}
                     {new Date(profile.createdAt).toLocaleDateString(
                       locale === "nl" ? "nl-NL" : "en-US",
                       { month: "short", year: "numeric" }
@@ -223,7 +194,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
                 <div className="flex gap-4 pt-2">
                   <Badge variant="secondary" className="gap-1">
                     <MessageSquare className="h-3 w-3" />
-                    {profile.reviewCount || 0} {text.reviewsWritten}
+                    {profile.reviewCount || 0} {t("reviewsWritten")}
                   </Badge>
                 </div>
 
@@ -274,7 +245,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
         {profile.badges && profile.badges.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">{text.badges}</CardTitle>
+              <CardTitle className="text-lg">{t("badges")}</CardTitle>
             </CardHeader>
             <CardContent>
               <BadgeDisplay
@@ -298,11 +269,11 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
         {/* Recent Reviews */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">{text.recentReviews}</CardTitle>
+            <CardTitle className="text-lg">{t("recentReviews")}</CardTitle>
           </CardHeader>
           <CardContent>
             {recentReviews.length === 0 ? (
-              <p className="text-slate-500 text-center py-4">{text.noReviews}</p>
+              <p className="text-slate-500 text-center py-4">{t("noReviews")}</p>
             ) : (
               <div className="space-y-4">
                 {recentReviews.map((review) => (

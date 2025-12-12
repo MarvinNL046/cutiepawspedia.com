@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Loader2, Send } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { RatingStars } from "./RatingStars";
 import { PhotoUploader, type PhotoPreview } from "./PhotoUploader";
 import { Button } from "@/components/ui/button";
@@ -56,6 +57,7 @@ export function ReviewForm({
 }: ReviewFormProps) {
   const router = useRouter();
   const { toast } = useToast();
+  const t = useTranslations("place");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [photos, setPhotos] = useState<PhotoPreview[]>([]);
 
@@ -144,8 +146,8 @@ export function ReviewForm({
   const onSubmit = async (data: ReviewFormValues) => {
     if (!isLoggedIn) {
       toast({
-        title: "Sign in required",
-        description: "Please sign in to leave a review",
+        title: t("signInRequired"),
+        description: t("pleaseSignIn"),
         variant: "destructive",
       });
       return;
@@ -178,18 +180,18 @@ export function ReviewForm({
         const photosUploaded = await uploadPhotos(result.review.id);
         if (!photosUploaded) {
           toast({
-            title: "Review submitted, but some photos failed",
-            description: "Your review was saved. Some photos could not be uploaded.",
+            title: t("reviewSubmitted"),
+            description: t("photosFailedPartial"),
             variant: "destructive",
           });
         }
       }
 
       toast({
-        title: "Review submitted!",
+        title: t("reviewSubmitted"),
         description: hasPhotos
-          ? "Your review and photos are pending moderation."
-          : "Your review is pending moderation and will be published soon.",
+          ? t("pendingModerationFull")
+          : t("pendingModeration"),
       });
 
       form.reset();
@@ -211,21 +213,21 @@ export function ReviewForm({
     return (
       <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
         <CardHeader>
-          <CardTitle className="text-lg text-foreground dark:text-cpCream">Write a Review</CardTitle>
+          <CardTitle className="text-lg text-foreground dark:text-cpCream">{t("writeReviewTitle")}</CardTitle>
           <CardDescription className="dark:text-cpCream/70">
-            Share your experience at {placeName}
+            {t("shareExperience", { placeName })}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center py-4">
             <p className="text-muted-foreground dark:text-cpCream/70 mb-4">
-              Please sign in to leave a review
+              {t("pleaseSignIn")}
             </p>
             <Button
               onClick={() => router.push("/handler/sign-in")}
               className="bg-cpCoral hover:bg-cpCoral/90"
             >
-              Sign In to Review
+              {t("signInToReview")}
             </Button>
           </div>
         </CardContent>
@@ -236,9 +238,9 @@ export function ReviewForm({
   return (
     <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
       <CardHeader>
-        <CardTitle className="text-lg text-foreground dark:text-cpCream">Write a Review</CardTitle>
+        <CardTitle className="text-lg text-foreground dark:text-cpCream">{t("writeReviewTitle")}</CardTitle>
         <CardDescription className="dark:text-cpCream/70">
-          Share your experience at {placeName}
+          {t("shareExperience", { placeName })}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -250,7 +252,7 @@ export function ReviewForm({
               name="rating"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Your Rating *</FormLabel>
+                  <FormLabel>{t("yourRating")} *</FormLabel>
                   <FormControl>
                     <div className="flex items-center gap-3">
                       <RatingStars
@@ -277,14 +279,14 @@ export function ReviewForm({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Review Title</FormLabel>
+                  <FormLabel>{t("reviewTitle")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Summarize your experience"
+                      placeholder={t("summarizeExperience")}
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>Optional headline for your review</FormDescription>
+                  <FormDescription>{t("optionalHeadline")}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -296,16 +298,16 @@ export function ReviewForm({
               name="body"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Your Review *</FormLabel>
+                  <FormLabel>{t("yourReviewLabel")} *</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Tell others about your experience..."
+                      placeholder={t("tellOthers")}
                       rows={5}
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    {(field.value ?? "").length}/5000 characters (minimum 10)
+                    {t("charactersMinMax", { count: (field.value ?? "").length })}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -318,7 +320,7 @@ export function ReviewForm({
               name="visitDate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>When did you visit?</FormLabel>
+                  <FormLabel>{t("whenVisit")}</FormLabel>
                   <FormControl>
                     <Input
                       type="date"
@@ -326,7 +328,7 @@ export function ReviewForm({
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>Optional - helps others understand context</FormDescription>
+                  <FormDescription>{t("optionalContext")}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -334,14 +336,14 @@ export function ReviewForm({
 
             {/* Photos */}
             <div className="space-y-2">
-              <FormLabel>Add Photos</FormLabel>
+              <FormLabel>{t("addPhotos")}</FormLabel>
               <PhotoUploader
                 photos={photos}
                 onPhotosChange={handlePhotosChange}
                 disabled={isSubmitting}
               />
               <FormDescription>
-                Optional - share photos of your experience (max 5)
+                {t("optionalPhotos")}
               </FormDescription>
             </div>
 
@@ -354,17 +356,17 @@ export function ReviewForm({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Submitting...
+                    {t("submitting")}
                   </>
                 ) : (
                   <>
                     <Send className="h-4 w-4 mr-2" />
-                    Submit Review
+                    {t("submitReview")}
                   </>
                 )}
               </Button>
               <p className="text-xs text-muted-foreground dark:text-cpCream/60 mt-2">
-                Your review will be published after moderation
+                {t("pendingModeration")}
               </p>
             </div>
           </form>

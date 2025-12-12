@@ -7,6 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useTranslations } from "next-intl";
 
 interface Badge {
   key: string;
@@ -27,6 +28,8 @@ interface BadgeDisplayProps {
 }
 
 export function BadgeDisplay({ badges, locale, showDates, dimmed }: BadgeDisplayProps) {
+  const t = useTranslations("profile");
+
   if (badges.length === 0) return null;
 
   return (
@@ -58,7 +61,7 @@ export function BadgeDisplay({ badges, locale, showDates, dimmed }: BadgeDisplay
                   <p className="text-sm text-slate-500">{description}</p>
                   {showDates && badge.awardedAt && (
                     <p className="text-xs text-slate-400">
-                      {locale === "nl" ? "Verdiend op" : "Earned on"}{" "}
+                      {t("earnedOn")}{" "}
                       {new Date(badge.awardedAt).toLocaleDateString(locale === "nl" ? "nl-NL" : "en-US", {
                         year: "numeric",
                         month: "short",

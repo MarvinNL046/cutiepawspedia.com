@@ -19,6 +19,7 @@ import { getCategoryMetadata, getLocalizedCategoryName, type ContentLocale } fro
 import { generateContent } from "@/lib/ai/generateContent";
 import { extractFaqsFromAiContent, generateDefaultFaqs } from "@/lib/ai/faq";
 import { getInternalLinksForPage } from "@/lib/internalLinks";
+import { getTranslations } from "next-intl/server";
 import { PlaceCard, CategoryCard, getCategoryIcon } from "@/components/directory";
 import { CategoryAffiliateBlockLazy as CategoryAffiliateBlock } from "@/components/affiliate";
 import { PageHeader, SectionHeader } from "@/components/layout";
@@ -68,6 +69,8 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { locale, countrySlug, provinceSlug, citySlug, categorySlug } = await params;
 
+  const t = await getTranslations("categoryPages");
+
   const [province, category] = await Promise.all([
     getProvinceBySlugAndCountry(provinceSlug, countrySlug),
     getCategoryBySlug(categorySlug),
@@ -76,7 +79,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   if (!province) {
     return (
       <div className="container mx-auto max-w-6xl px-4 py-12 text-center">
-        <p className="text-slate-500">{locale === "nl" ? "Provincie niet gevonden." : "Province not found."}</p>
+        <p className="text-slate-500">{t("notFound", { category: "Province", location: "" }).replace(" in ", "")}</p>
       </div>
     );
   }
@@ -86,7 +89,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   if (!city) {
     return (
       <div className="container mx-auto max-w-6xl px-4 py-12 text-center">
-        <p className="text-slate-500">{locale === "nl" ? "Stad niet gevonden." : "City not found."}</p>
+        <p className="text-slate-500">{t("notFound", { category: "City", location: "" }).replace(" in ", "")}</p>
       </div>
     );
   }
@@ -152,7 +155,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         icon={<span className="text-3xl">{categoryIcon}</span>}
         variant="gradient-yellow"
         breadcrumbs={[
-          { label: locale === "nl" ? "Overzicht" : "Directory", href: `/${locale}` },
+          { label: t("directory"), href: `/${locale}` },
           { label: countryName, href: `/${locale}/${countrySlug}` },
           { label: provinceName, href: `/${locale}/${countrySlug}/p/${provinceSlug}` },
           { label: cityName, href: baseUrl },
@@ -209,15 +212,13 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           <div className="text-center py-16 bg-white rounded-xl border">
             <div className="text-5xl mb-4">{categoryIcon}</div>
             <p className="text-xl text-slate-600 mb-2">
-              {locale === "nl"
-                ? `Geen ${categoryName.toLowerCase()} gevonden in ${cityName}`
-                : `No ${categoryName.toLowerCase()} found in ${cityName}`}
+              {t("notFound", { category: categoryName.toLowerCase(), location: cityName })}
             </p>
             <Link
               href={`/${locale}/for-businesses`}
               className="inline-block px-6 py-3 bg-cpCoral hover:bg-cpCoral/90 text-white font-medium rounded-lg transition-colors mt-4"
             >
-              {locale === "nl" ? "Voeg je Bedrijf Toe" : "Add Your Business"}
+              {t("addYourBusiness")}
             </Link>
           </div>
         )}
@@ -250,7 +251,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       {/* Other Categories */}
       <section className="bg-slate-50/50">
         <div className="container mx-auto max-w-6xl px-4 py-12">
-          <SectionHeader title={locale === "nl" ? `Andere Categorieën in ${cityName}` : `Other Categories in ${cityName}`} />
+          <SectionHeader title={t("otherCategories", { location: cityName })} />
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {defaultCategories
               .filter((c) => c.slug !== categorySlug)

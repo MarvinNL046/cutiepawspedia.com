@@ -12,6 +12,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Sparkles, MapPin, Star, CheckCircle2 } from "lucide-react";
 import type { AiContentStructure } from "@/db/schema/ai";
+import { getTranslations } from "next-intl/server";
 
 interface ContentSectionsProps {
   content: AiContentStructure;
@@ -24,28 +25,29 @@ interface ContentSectionsProps {
 function getSectionIcon(heading: string) {
   const headingLower = heading.toLowerCase();
 
-  if (headingLower.includes("expect") || headingLower.includes("verwacht")) {
+  if (headingLower.includes("expect") || headingLower.includes("verwacht") || headingLower.includes("erwarten") || headingLower.includes("attendre")) {
     return <Sparkles className="h-5 w-5 text-cpAmber" />;
   }
-  if (headingLower.includes("service") || headingLower.includes("dienst")) {
+  if (headingLower.includes("service") || headingLower.includes("dienst") || headingLower.includes("dienstleistung")) {
     return <CheckCircle2 className="h-5 w-5 text-cpCoral" />;
   }
-  if (headingLower.includes("why") || headingLower.includes("waarom") || headingLower.includes("choose") || headingLower.includes("kies")) {
+  if (headingLower.includes("why") || headingLower.includes("waarom") || headingLower.includes("choose") || headingLower.includes("kies") || headingLower.includes("warum") || headingLower.includes("pourquoi")) {
     return <Star className="h-5 w-5 text-cpYellow" />;
   }
-  if (headingLower.includes("local") || headingLower.includes("location") || headingLower.includes("locatie") || headingLower.includes("bereik")) {
+  if (headingLower.includes("local") || headingLower.includes("location") || headingLower.includes("locatie") || headingLower.includes("bereik") || headingLower.includes("standort") || headingLower.includes("localisation")) {
     return <MapPin className="h-5 w-5 text-cpAqua" />;
   }
   return <Sparkles className="h-5 w-5 text-cpAmber" />;
 }
 
-export function ContentSections({
+export async function ContentSections({
   content,
   placeName,
   locale = "en",
   className = ""
 }: ContentSectionsProps) {
   const { sections } = content;
+  const t = await getTranslations("place");
 
   // Don't render if no sections
   if (!sections || sections.length === 0) {
@@ -83,7 +85,7 @@ export function ContentSections({
             <div className="flex items-center gap-2 mb-3">
               <MapPin className="h-5 w-5 text-cpAqua" />
               <h3 className="font-semibold text-foreground dark:text-cpCream">
-                {locale === "nl" ? "Locatie & Bereikbaarheid" : "Location & Accessibility"}
+                {t("locationAccessibility")}
               </h3>
             </div>
             <p className="text-muted-foreground dark:text-cpCream/70 leading-relaxed">

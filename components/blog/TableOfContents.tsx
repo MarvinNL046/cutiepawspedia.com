@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { List } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export interface TocItem {
   id: string;
@@ -16,6 +17,7 @@ interface TableOfContentsProps {
 
 export function TableOfContents({ items, locale }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>("");
+  const t = useTranslations("blog");
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -61,7 +63,7 @@ export function TableOfContents({ items, locale }: TableOfContentsProps) {
     <nav className="bg-card dark:bg-cpSurface/30 rounded-xl border border-border dark:border-cpAmber/10 p-4">
       <h3 className="flex items-center gap-2 font-semibold text-foreground dark:text-cpCream mb-3">
         <List className="w-4 h-4 text-cpCoral" />
-        {locale === "nl" ? "Inhoud" : "Contents"}
+        {t("tableOfContents")}
       </h3>
       <ul className="space-y-2">
         {items.map((item) => (

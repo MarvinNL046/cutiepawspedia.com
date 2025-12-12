@@ -10,6 +10,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 import { getCityBySlugAndCountry, getCategories, getTopRatedPlacesByCity, getPlaceCountByCity } from "@/db/queries";
 import {
@@ -50,6 +51,10 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
 
 export default async function CityPage({ params }: CityPageProps) {
   const { locale, countrySlug, citySlug } = await params;
+
+  const t = await getTranslations("city");
+  const tCommon = await getTranslations("common");
+  const tCategory = await getTranslations("categoryPages");
 
   const [city, categories] = await Promise.all([
     getCityBySlugAndCountry(citySlug, countrySlug),
@@ -109,12 +114,12 @@ export default async function CityPage({ params }: CityPageProps) {
   return (
     <>
       <PageHeader
-        title={locale === "nl" ? `Huisdierdiensten in ${cityName}` : `Pet Services in ${cityName}`}
+        title={t("petServicesIn", { cityName })}
         icon={<MapPin className="h-7 w-7 text-cpCoral" />}
-        badge={!city ? <Badge variant="secondary">{locale === "nl" ? "Binnenkort" : "Coming Soon"}</Badge> : undefined}
+        badge={!city ? <Badge variant="secondary">{t("comingSoon")}</Badge> : undefined}
         variant="gradient-pink"
         breadcrumbs={[
-          { label: locale === "nl" ? "Overzicht" : "Directory", href: `/${locale}` },
+          { label: tCommon("directory"), href: `/${locale}` },
           { label: countryName, href: `/${locale}/${countrySlug}` },
           { label: cityName },
         ]}
@@ -124,7 +129,7 @@ export default async function CityPage({ params }: CityPageProps) {
       <PageIntro content={content} variant="pink" showBullets={false} />
 
       <section className="container mx-auto max-w-6xl px-4 py-12">
-        <SectionHeader title={locale === "nl" ? "Bekijk per Categorie" : "Browse by Category"} />
+        <SectionHeader title={t("browseByCategory")} />
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {displayCategories.map((cat) => (
             <CategoryCard
@@ -152,7 +157,7 @@ export default async function CityPage({ params }: CityPageProps) {
               locale={locale}
               countrySlug={countrySlug}
               citySlug={citySlug}
-              title={locale === "nl" ? `Alle locaties in ${cityName}` : `All locations in ${cityName}`}
+              title={t("allLocationsIn", { cityName })}
             />
           </div>
         </section>
@@ -162,13 +167,13 @@ export default async function CityPage({ params }: CityPageProps) {
         <section className="container mx-auto max-w-6xl px-4 py-12">
           <div className="text-center py-16 bg-white rounded-xl border">
             <p className="text-xl text-slate-600 mb-2">
-              {locale === "nl" ? `Nog geen listings in ${cityName}` : `No listings yet in ${cityName}`}
+              {t("noListingsYet", { cityName })}
             </p>
             <Link
               href={`/${locale}/for-businesses`}
               className="inline-block px-6 py-3 bg-cpCoral hover:bg-cpCoral/90 text-white font-medium rounded-lg transition-colors mt-4"
             >
-              {locale === "nl" ? "Voeg je Bedrijf Toe" : "Add Your Business"}
+              {tCategory("addYourBusiness")}
             </Link>
           </div>
         </section>

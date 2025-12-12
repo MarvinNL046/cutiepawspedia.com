@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ChevronDown, ChevronUp, Info } from "lucide-react";
@@ -9,11 +10,12 @@ import { getBestAboutText, type PlaceData, type AIContent } from "@/lib/enrichme
 interface AboutSectionProps {
   place: PlaceData;
   aiContent?: AIContent;
-  locale?: string;
 }
 
-export function AboutSection({ place, aiContent, locale = "en" }: AboutSectionProps) {
+export function AboutSection({ place, aiContent }: AboutSectionProps) {
   const [expanded, setExpanded] = useState(false);
+  const t = useTranslations("place");
+  const tCommon = useTranslations("common");
 
   const { text, source } = getBestAboutText(place, aiContent);
 
@@ -30,10 +32,10 @@ export function AboutSection({ place, aiContent, locale = "en" }: AboutSectionPr
     <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
-          {locale === "nl" ? `Over ${place.name}` : `About ${place.name}`}
+          {t("about", { name: place.name })}
           {source === "enriched" && (
             <span className="text-xs font-normal text-cpCoral bg-cpCoral/10 dark:bg-cpCoral/20 px-2 py-0.5 rounded-full">
-              {locale === "nl" ? "Van website" : "From website"}
+              {t("fromWebsite")}
             </span>
           )}
         </CardTitle>
@@ -59,12 +61,12 @@ export function AboutSection({ place, aiContent, locale = "en" }: AboutSectionPr
           >
             {expanded ? (
               <>
-                {locale === "nl" ? "Minder tonen" : "Show less"}
+                {t("showLess")}
                 <ChevronUp className="h-4 w-4" />
               </>
             ) : (
               <>
-                {locale === "nl" ? "Lees meer" : "Read more"}
+                {tCommon("readMore")}
                 <ChevronDown className="h-4 w-4" />
               </>
             )}
@@ -87,9 +89,7 @@ export function AboutSection({ place, aiContent, locale = "en" }: AboutSectionPr
         {source === "enriched" && (
           <p className="text-xs text-muted-foreground dark:text-cpCream/60 flex items-center gap-1 pt-2">
             <Info className="h-3 w-3" />
-            {locale === "nl"
-              ? "Gebaseerd op informatie van de website van het bedrijf"
-              : "Based on information from the business website"}
+            {t("basedOnWebsite")}
           </p>
         )}
       </CardContent>

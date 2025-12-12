@@ -1,0 +1,185 @@
+#!/bin/bash
+# ═══════════════════════════════════════════════════════════════
+# 🌙 FULL OVERNIGHT PIPELINE - GERMANY
+# ═══════════════════════════════════════════════════════════════
+#
+# COMPLETE PIPELINE voor 's nachts draaien:
+#
+#   STAP 0: BrightData Discovery (nieuwe places vinden)
+#   STAP 1: Jina Website Scraping (aboutUs, facts, services)
+#   STAP 2: GPT Content Generation (descriptions, highlights)
+#
+# Alle stappen hebben loops en draaien automatisch door tot klaar.
+#
+# Gebruik: ./scripts/overnight-full-de.sh
+# Stop:    Ctrl+C
+#
+# TIP: Draai met nohup voor onbeheerd draaien:
+#      nohup ./scripts/overnight-full-de.sh > overnight-de.log 2>&1 &
+# ═══════════════════════════════════════════════════════════════
+
+cd /home/marvin/Documenten/cutiepawspedia
+
+LOG_FILE="overnight-de-$(date '+%Y%m%d-%H%M').log"
+
+echo ""
+echo "╔═══════════════════════════════════════════════════════════════╗"
+echo "║  🌙 FULL OVERNIGHT PIPELINE - GERMANY                        ║"
+echo "║                                                               ║"
+echo "║  Dit script draait AUTOMATISCH door tot alles klaar is.       ║"
+echo "║  Perfect om 's nachts aan te laten staan!                     ║"
+echo "╚═══════════════════════════════════════════════════════════════╝"
+echo ""
+echo "Start: $(date)"
+echo "Log: $LOG_FILE"
+echo ""
+echo "Pipeline:"
+echo "  [0] BrightData Discovery  → Nieuwe places vinden in alle Bundesländer"
+echo "  [1] Jina Website Scraping → aboutUs, facts, services"
+echo "  [2] GPT Content           → descriptions, highlights, SEO"
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+# ═══════════════════════════════════════════════════════════════
+# STAP 0: BRIGHTDATA DISCOVERY
+# ═══════════════════════════════════════════════════════════════
+
+echo ""
+echo ""
+echo "╔═══════════════════════════════════════════════════════════════╗"
+echo "║  STAP 0/2: BRIGHTDATA DISCOVERY - GERMANY                     ║"
+echo "╚═══════════════════════════════════════════════════════════════╝"
+echo ""
+echo "Zoekt nieuwe huisdierenbedrijven in alle Duitse Bundesländer..."
+echo ""
+
+CATEGORIES="veterinary grooming dog-training dog-walking pet-hotel pet-store cat-grooming pet-sitting emergency-vet dog-daycare exotic-vet shelter dog-park"
+LIMIT=20
+
+for CATEGORY in $CATEGORIES; do
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "📦 Discovery: $CATEGORY ($(date '+%H:%M:%S'))"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+    npx tsx scripts/discover-places-de.ts --category=$CATEGORY --all-states --limit=$LIMIT 2>&1 | tail -20
+
+    echo ""
+    echo "⏳ 5s pauze..."
+    sleep 5
+done
+
+echo ""
+echo "✅ STAP 0 KLAAR: Discovery voltooid!"
+echo ""
+
+# ═══════════════════════════════════════════════════════════════
+# STAP 1: JINA WEBSITE SCRAPING
+# ═══════════════════════════════════════════════════════════════
+
+echo ""
+echo "╔═══════════════════════════════════════════════════════════════╗"
+echo "║  STAP 1/2: JINA WEBSITE SCRAPING - GERMANY                    ║"
+echo "╚═══════════════════════════════════════════════════════════════╝"
+echo ""
+echo "Scraped extra info van websites (aboutUs, facts, services, hours)"
+echo ""
+
+BATCH_SIZE=50
+OFFSET=0
+
+while true; do
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "📦 JINA Batch offset=$OFFSET ($(date '+%H:%M:%S'))"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+    OUTPUT=$(npx tsx scripts/enrich-jina-de.ts --offset=$OFFSET --batch-size=$BATCH_SIZE 2>&1)
+    echo "$OUTPUT"
+
+    # Check of we klaar zijn (alleen als er GEEN "Next batch command" staat)
+    if echo "$OUTPUT" | grep -q "No more places to process"; then
+        echo ""
+        echo "✅ STAP 1 KLAAR: Alle websites gescraped!"
+        break
+    fi
+
+    # Check ook of alle places klaar zijn (alleen eindmelding ZONDER next batch)
+    if echo "$OUTPUT" | grep -q "🎉" && ! echo "$OUTPUT" | grep -q "Next batch command"; then
+        echo ""
+        echo "✅ STAP 1 KLAAR: Alle websites gescraped!"
+        break
+    fi
+
+    OFFSET=$((OFFSET + BATCH_SIZE))
+    echo ""
+    echo "⏳ 15s pauze voor Jina rate limiting..."
+    sleep 15
+done
+
+# ═══════════════════════════════════════════════════════════════
+# STAP 2: GPT CONTENT GENERATION
+# ═══════════════════════════════════════════════════════════════
+
+echo ""
+echo "╔═══════════════════════════════════════════════════════════════╗"
+echo "║  STAP 2/2: GPT CONTENT GENERATION - GERMANY                   ║"
+echo "╚═══════════════════════════════════════════════════════════════╝"
+echo ""
+echo "Genereert Beschreibungen, Highlights, Services mit GPT-4o-mini"
+echo ""
+
+BATCH_SIZE=50
+OFFSET=0
+
+while true; do
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "📦 GPT Batch offset=$OFFSET ($(date '+%H:%M:%S'))"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+    OUTPUT=$(npx tsx scripts/enrich-content-de.ts --offset=$OFFSET --batch-size=$BATCH_SIZE 2>&1)
+    echo "$OUTPUT"
+
+    # Check of we klaar zijn (alleen als er GEEN "Next batch command" staat)
+    if echo "$OUTPUT" | grep -q "No more places to process"; then
+        echo ""
+        echo "✅ STAP 2 KLAAR: Alle content gegenereerd!"
+        break
+    fi
+
+    # Check ook of alle places klaar zijn (alleen eindmelding ZONDER next batch)
+    if echo "$OUTPUT" | grep -q "🎉" && ! echo "$OUTPUT" | grep -q "Next batch command"; then
+        echo ""
+        echo "✅ STAP 2 KLAAR: Alle content gegenereerd!"
+        break
+    fi
+
+    OFFSET=$((OFFSET + BATCH_SIZE))
+    echo ""
+    echo "⏳ 30s pauze voor OpenAI rate limiting..."
+    sleep 30
+done
+
+# ═══════════════════════════════════════════════════════════════
+# KLAAR
+# ═══════════════════════════════════════════════════════════════
+
+echo ""
+echo ""
+echo "╔═══════════════════════════════════════════════════════════════╗"
+echo "║                                                               ║"
+echo "║  🎉🎉🎉 GERMANY PIPELINE KLAAR! 🎉🎉🎉                        ║"
+echo "║                                                               ║"
+echo "╚═══════════════════════════════════════════════════════════════╝"
+echo ""
+echo "End: $(date)"
+echo ""
+echo "Alle Germany places zijn nu verrijkt met:"
+echo ""
+echo "  ✅ BrightData: naam, adres, rating, reviews, opening hours"
+echo "  ✅ Jina:       aboutUs, facts, services van websites"
+echo "  ✅ GPT:        descriptions, highlights, SEO content"
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""

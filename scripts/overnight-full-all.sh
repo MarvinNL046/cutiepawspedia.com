@@ -76,7 +76,12 @@ while true; do
     OUTPUT=$(npx tsx scripts/enrich-jina-be.ts --offset=$OFFSET --batch-size=$BATCH_SIZE 2>&1)
     echo "$OUTPUT" | tail -15
 
-    if echo "$OUTPUT" | grep -qE "No more places|0 places|All.*scraped|have been scraped"; then
+    # Check of we klaar zijn (alleen als er GEEN "Next batch command" staat)
+    if echo "$OUTPUT" | grep -q "No more places to process"; then
+        echo "✅ Belgium Jina klaar!"
+        break
+    fi
+    if echo "$OUTPUT" | grep -q "🎉" && ! echo "$OUTPUT" | grep -q "Next batch command"; then
         echo "✅ Belgium Jina klaar!"
         break
     fi
@@ -101,7 +106,12 @@ while true; do
     OUTPUT=$(npx tsx scripts/enrich-content-be.ts --offset=$OFFSET --batch-size=$BATCH_SIZE 2>&1)
     echo "$OUTPUT" | tail -15
 
-    if echo "$OUTPUT" | grep -qE "No more places|0 places|All.*enriched|have been enriched"; then
+    # Check of we klaar zijn (alleen als er GEEN "Next batch command" staat)
+    if echo "$OUTPUT" | grep -q "No more places to process"; then
+        echo "✅ Belgium GPT klaar!"
+        break
+    fi
+    if echo "$OUTPUT" | grep -q "🎉" && ! echo "$OUTPUT" | grep -q "Next batch command"; then
         echo "✅ Belgium GPT klaar!"
         break
     fi
@@ -126,7 +136,12 @@ while true; do
     OUTPUT=$(npx tsx scripts/enrich-jina-nl.ts --offset=$OFFSET --batch-size=$BATCH_SIZE 2>&1)
     echo "$OUTPUT" | tail -15
 
-    if echo "$OUTPUT" | grep -qE "No more places|0 places|All.*scraped|have been scraped"; then
+    # Check of we klaar zijn (alleen als er GEEN "Next batch command" staat)
+    if echo "$OUTPUT" | grep -q "No more places to process"; then
+        echo "✅ Netherlands Jina klaar!"
+        break
+    fi
+    if echo "$OUTPUT" | grep -q "🎉" && ! echo "$OUTPUT" | grep -q "Next batch command"; then
         echo "✅ Netherlands Jina klaar!"
         break
     fi
@@ -151,7 +166,12 @@ while true; do
     OUTPUT=$(npx tsx scripts/enrich-content-nl.ts --offset=$OFFSET --batch-size=$BATCH_SIZE 2>&1)
     echo "$OUTPUT" | tail -15
 
-    if echo "$OUTPUT" | grep -qE "No more places|0 places|All.*enriched|have been enriched"; then
+    # Check of we klaar zijn (alleen als er GEEN "Next batch command" staat)
+    if echo "$OUTPUT" | grep -q "No more places to process"; then
+        echo "✅ Netherlands GPT klaar!"
+        break
+    fi
+    if echo "$OUTPUT" | grep -q "🎉" && ! echo "$OUTPUT" | grep -q "Next batch command"; then
         echo "✅ Netherlands GPT klaar!"
         break
     fi

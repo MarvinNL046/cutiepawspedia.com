@@ -33,6 +33,7 @@ import {
   type ContentLocale,
 } from "@/lib/seo";
 import { generateContent } from "@/lib/ai/generateContent";
+import { getTranslations } from "next-intl/server";
 
 interface BestInCountryPageProps {
   params: Promise<{ locale: string; countrySlug: string; categorySlug: string }>;
@@ -147,6 +148,8 @@ export async function generateMetadata({ params }: BestInCountryPageProps): Prom
 export default async function BestInCountryPage({ params }: BestInCountryPageProps) {
   const { locale, countrySlug, categorySlug } = await params;
 
+  const t = await getTranslations("categoryPages");
+
   const [country, category, places] = await Promise.all([
     getCountryBySlug(countrySlug),
     getCategoryBySlug(categorySlug),
@@ -200,22 +203,20 @@ export default async function BestInCountryPage({ params }: BestInCountryPagePro
       />
 
       <PageHeader
-        title={locale === "nl" ? `Beste ${categoryLabel} in ${countryName}` : `Best ${categoryLabel} in ${countryName}`}
+        title={t("bestIn", { category: categoryLabel, location: countryName })}
         subtitle={
           <span className="flex items-center gap-2">
             <Award className="h-5 w-5 text-cpYellow" />
-            {locale === "nl"
-              ? `Top ${places.length} gesorteerd op reviews`
-              : `Top ${places.length} sorted by reviews`}
+            {t("topRanked", { count: places.length })}
           </span>
         }
         icon={<span className="text-3xl">{categoryIcon}</span>}
         variant="gradient-yellow"
         breadcrumbs={[
-          { label: "Directory", href: `/${locale}` },
+          { label: t("directory"), href: `/${locale}` },
           { label: countryName, href: `/${locale}/${countrySlug}` },
           { label: categoryLabel, href: `/${locale}/${countrySlug}/c/${categorySlug}` },
-          { label: locale === "nl" ? "Beste" : "Best" },
+          { label: t("best") },
         ]}
       />
 
@@ -229,9 +230,7 @@ export default async function BestInCountryPage({ params }: BestInCountryPagePro
           <div className="flex items-center gap-3 text-sm text-muted-foreground mt-3">
             <TrendingUp className="h-4 w-4 text-cpYellow" />
             <span>
-              {locale === "nl"
-                ? "Ranking gebaseerd op gemiddelde beoordelingen en aantal reviews."
-                : "Ranking based on average ratings and number of reviews."}
+              {t("rankingBased")}
             </span>
           </div>
         </div>
@@ -275,7 +274,7 @@ export default async function BestInCountryPage({ params }: BestInCountryPagePro
                     {index < 3 && (
                       <Badge variant="secondary" className="bg-cpYellow/20 text-cpYellow">
                         <Star className="h-3 w-3 mr-1 fill-current" />
-                        {locale === "nl" ? "Top Keuze" : "Top Pick"}
+                        {t("topPick")}
                       </Badge>
                     )}
                   </div>
@@ -308,12 +307,10 @@ export default async function BestInCountryPage({ params }: BestInCountryPagePro
           <div className="text-center py-12">
             <span className="text-6xl block mb-4">🔍</span>
             <h2 className="text-xl font-semibold mb-2">
-              {locale === "nl" ? "Geen resultaten gevonden" : "No results found"}
+              {t("noResults")}
             </h2>
             <p className="text-muted-foreground">
-              {locale === "nl"
-                ? `Er zijn nog geen ${categoryLabel.toLowerCase()} in ${countryName} met reviews.`
-                : `No ${categoryLabel.toLowerCase()} in ${countryName} have reviews yet.`}
+              {t("notEnoughReviews", { category: categoryLabel.toLowerCase(), location: countryName })}
             </p>
           </div>
         )}
@@ -322,16 +319,16 @@ export default async function BestInCountryPage({ params }: BestInCountryPagePro
       {/* Related Links */}
       <section className="bg-slate-50 py-12">
         <div className="container mx-auto max-w-6xl px-4">
-          <SectionHeader title={locale === "nl" ? "Bekijk ook" : "See also"} />
+          <SectionHeader title={t("seeAlso")} />
           <div className="flex flex-wrap gap-2">
             <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10">
               <a href={`/${locale}/${countrySlug}/c/${categorySlug}`}>
-                {locale === "nl" ? `Alle ${categoryLabel} in ${countryName}` : `All ${categoryLabel} in ${countryName}`}
+                {t("allIn", { category: categoryLabel, location: countryName })}
               </a>
             </Badge>
             <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10">
               <a href={`/${locale}/${countrySlug}/top/${categorySlug}`}>
-                {locale === "nl" ? `Top 10 ${categoryLabel}` : `Top 10 ${categoryLabel}`}
+                {t("top10In", { category: categoryLabel, location: "" }).replace(" in ", "")}
               </a>
             </Badge>
           </div>

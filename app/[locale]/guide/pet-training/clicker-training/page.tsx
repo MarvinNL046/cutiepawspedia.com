@@ -7,7 +7,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Zap, Target, CheckCircle, Star, Clock, TrendingUp } from "lucide-react";
+import { Zap, Target, CheckCircle, Star, Clock, TrendingUp, Brain, AlertCircle } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Clicker Training for Dogs: Complete Step-by-Step Guide 2025",

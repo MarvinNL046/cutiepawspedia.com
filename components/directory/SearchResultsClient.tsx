@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { PlaceCard } from "./PlaceCard";
 import type { SearchResult } from "@/db/queries/search";
+import { useTranslations } from "next-intl";
 
 type Place = SearchResult["places"][number];
 
@@ -34,6 +35,7 @@ export function SearchResultsClient({
   const [page, setPage] = useState(1);
   const [isPending, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(false);
+  const t = useTranslations("search");
 
   const loadMore = async () => {
     if (isLoading || !hasMore) return;
@@ -87,15 +89,13 @@ export function SearchResultsClient({
     return country?.slug || searchParams.countrySlug || "";
   };
 
-  const isNl = locale === "nl";
-
   return (
     <>
       {/* Results count */}
       <p className="text-sm text-muted-foreground dark:text-cpCream/70 mb-4">
-        {totalCount} {isNl ? "resultaten" : "results"}
+        {totalCount} {t("results")}
         {searchParams.citySlug && (
-          <span> {isNl ? "in" : "in"} <span className="capitalize">{searchParams.citySlug.replace(/-/g, " ")}</span></span>
+          <span> {t("in")} <span className="capitalize">{searchParams.citySlug.replace(/-/g, " ")}</span></span>
         )}
         {searchParams.categorySlug && (
           <span> • <span className="capitalize">{searchParams.categorySlug.replace(/-/g, " ")}</span></span>
@@ -138,10 +138,10 @@ export function SearchResultsClient({
             {isLoading || isPending ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Loading...
+                {t("loading")}
               </>
             ) : (
-              "Load More Results"
+              t("loadMore")
             )}
           </Button>
         </div>

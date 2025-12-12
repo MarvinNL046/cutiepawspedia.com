@@ -32,6 +32,7 @@ import {
   type ContentLocale,
 } from "@/lib/seo";
 import { generateContent } from "@/lib/ai/generateContent";
+import { getTranslations } from "next-intl/server";
 
 interface CountryCategoryPageProps {
   params: Promise<{ locale: string; countrySlug: string; categorySlug: string }>;
@@ -145,6 +146,8 @@ export default async function CountryCategoryPage({ params, searchParams }: Coun
   const { locale, countrySlug, categorySlug } = await params;
   const { sort: sortBy } = await searchParams;
 
+  const t = await getTranslations("categoryPages");
+
   const [country, category, places] = await Promise.all([
     getCountryBySlug(countrySlug),
     getCategoryBySlug(categorySlug),
@@ -201,11 +204,11 @@ export default async function CountryCategoryPage({ params, searchParams }: Coun
 
       <PageHeader
         title={`${categoryLabel} in ${countryName}`}
-        subtitle={`${places.length} ${locale === "nl" ? "locaties gevonden" : "locations found"}`}
+        subtitle={`${places.length} ${t("locationsFound")}`}
         icon={<span className="text-3xl">{categoryIcon}</span>}
         variant="gradient-aqua"
         breadcrumbs={[
-          { label: "Directory", href: `/${locale}` },
+          { label: t("directory"), href: `/${locale}` },
           { label: countryName, href: `/${locale}/${countrySlug}` },
           { label: categoryLabel },
         ]}
@@ -228,21 +231,21 @@ export default async function CountryCategoryPage({ params, searchParams }: Coun
             <div className="flex items-center gap-2">
               <Badge variant="secondary" className="inline-flex gap-1 dark:bg-cpAmber/10 dark:text-cpCream">
                 <MapPin className="h-3 w-3" />
-                {locale === "nl" ? "Landelijk" : "Nationwide"}
+                {t("nationwide")}
               </Badge>
               <span className="text-sm text-muted-foreground dark:text-cpCream/70">
-                {places.length} {locale === "nl" ? "resultaten" : "results"}
+                {places.length} {t("results")}
               </span>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm text-muted-foreground dark:text-cpCream/70 hidden sm:inline">
-                {locale === "nl" ? "Sorteren:" : "Sort:"}
+                {t("sort")}:
               </span>
               {[
-                { value: "rating", labelNl: "Beoordeling", labelEn: "Rating" },
-                { value: "reviews", labelNl: "Reviews", labelEn: "Reviews" },
-                { value: "name", labelNl: "Naam", labelEn: "Name" },
-                { value: "newest", labelNl: "Nieuwste", labelEn: "Newest" },
+                { value: "rating", label: t("rating") },
+                { value: "reviews", label: t("reviews") },
+                { value: "name", label: t("name") },
+                { value: "newest", label: t("newest") },
               ].map((option) => (
                 <Badge
                   key={option.value}
@@ -258,7 +261,7 @@ export default async function CountryCategoryPage({ params, searchParams }: Coun
                     href={`/${locale}/${countrySlug}/c/${categorySlug}${option.value !== "rating" ? `?sort=${option.value}` : ""}`}
                     prefetch={false}
                   >
-                    {locale === "nl" ? option.labelNl : option.labelEn}
+                    {option.label}
                   </Link>
                 </Badge>
               ))}
@@ -287,12 +290,10 @@ export default async function CountryCategoryPage({ params, searchParams }: Coun
             <div className="text-center py-12">
               <span className="text-6xl block mb-4">🔍</span>
               <h2 className="text-xl font-semibold text-foreground dark:text-cpCream mb-2">
-                {locale === "nl" ? "Geen resultaten gevonden" : "No results found"}
+                {t("noResults")}
               </h2>
               <p className="text-muted-foreground dark:text-cpCream/70">
-                {locale === "nl"
-                  ? `Er zijn nog geen ${categoryLabel.toLowerCase()} in ${countryName} geregistreerd.`
-                  : `No ${categoryLabel.toLowerCase()} have been registered in ${countryName} yet.`}
+                {t("notRegisteredYet", { category: categoryLabel.toLowerCase(), location: countryName })}
               </p>
             </div>
           )}
@@ -303,17 +304,17 @@ export default async function CountryCategoryPage({ params, searchParams }: Coun
       <section className="bg-muted/50 dark:bg-cpCharcoal/80 py-12 border-t border-border dark:border-cpAmber/20">
         <div className="container mx-auto max-w-6xl px-4">
           <SectionHeader
-            title={locale === "nl" ? "Bekijk ook" : "See also"}
+            title={t("seeAlso")}
           />
           <div className="flex flex-wrap gap-2">
             <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10 dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpCoral/20">
               <a href={`/${locale}/${countrySlug}/best/${categorySlug}`}>
-                {locale === "nl" ? `Beste ${categoryLabel} in ${countryName}` : `Best ${categoryLabel} in ${countryName}`}
+                {t("bestIn", { category: categoryLabel, location: countryName })}
               </a>
             </Badge>
             <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10 dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpCoral/20">
               <a href={`/${locale}/${countrySlug}/top/${categorySlug}`}>
-                {locale === "nl" ? `Top 10 ${categoryLabel} in ${countryName}` : `Top 10 ${categoryLabel} in ${countryName}`}
+                {t("top10In", { category: categoryLabel, location: countryName })}
               </a>
             </Badge>
           </div>

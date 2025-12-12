@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -53,6 +54,7 @@ export function BusinessStep({
   onClaimPlace,
   labels,
 }: BusinessStepProps) {
+  const t = useTranslations("onboarding.businessStep");
   const [countries, setCountries] = useState<Country[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -130,94 +132,20 @@ export function BusinessStep({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const translations = {
-    en: {
-      title: "Tell Us About Your Business",
-      description: "This information will be shown on your business profile.",
-      businessName: "Business Name",
-      businessNamePlaceholder: "e.g., Happy Paws Pet Hotel",
-      businessNameRequired: "Business name is required",
-      searchHint: "Type to search for your existing listing",
-      alreadyClaimed: "Already claimed",
-      claimThis: "Claim this listing",
-      businessDescription: "Description",
-      businessDescriptionPlaceholder: "Tell pet owners about your services...",
-      businessDescriptionRequired: "Description is required",
-      businessPhone: "Phone Number",
-      businessPhonePlaceholder: "+31 6 12345678",
-      businessEmail: "Email Address",
-      businessEmailPlaceholder: "contact@yourbusiness.com",
-      businessEmailRequired: "Email is required",
-      businessWebsite: "Website (optional)",
-      businessWebsitePlaceholder: "https://www.yourbusiness.com",
-      country: "Country",
-      countryPlaceholder: "Select country",
-      countryRequired: "Please select a country",
-    },
-    nl: {
-      title: "Vertel Ons Over Je Bedrijf",
-      description: "Deze informatie wordt getoond op je bedrijfsprofiel.",
-      businessName: "Bedrijfsnaam",
-      businessNamePlaceholder: "bijv. Happy Paws Dierenpension",
-      businessNameRequired: "Bedrijfsnaam is verplicht",
-      searchHint: "Typ om te zoeken naar je bestaande vermelding",
-      alreadyClaimed: "Al geclaimd",
-      claimThis: "Claim deze vermelding",
-      businessDescription: "Beschrijving",
-      businessDescriptionPlaceholder: "Vertel huisdiereigenaren over je diensten...",
-      businessDescriptionRequired: "Beschrijving is verplicht",
-      businessPhone: "Telefoonnummer",
-      businessPhonePlaceholder: "+31 6 12345678",
-      businessEmail: "E-mailadres",
-      businessEmailPlaceholder: "contact@jouwbedrijf.nl",
-      businessEmailRequired: "E-mail is verplicht",
-      businessWebsite: "Website (optioneel)",
-      businessWebsitePlaceholder: "https://www.jouwbedrijf.nl",
-      country: "Land",
-      countryPlaceholder: "Selecteer land",
-      countryRequired: "Selecteer een land",
-    },
-    de: {
-      title: "Erzähle Uns Von Deinem Unternehmen",
-      description: "Diese Informationen werden auf deinem Unternehmensprofil angezeigt.",
-      businessName: "Unternehmensname",
-      businessNamePlaceholder: "z.B. Happy Paws Tierhotel",
-      businessNameRequired: "Unternehmensname ist erforderlich",
-      searchHint: "Tippe, um nach deinem bestehenden Eintrag zu suchen",
-      alreadyClaimed: "Bereits beansprucht",
-      claimThis: "Diesen Eintrag beanspruchen",
-      businessDescription: "Beschreibung",
-      businessDescriptionPlaceholder: "Erzähle Tierbesitzern von deinen Dienstleistungen...",
-      businessDescriptionRequired: "Beschreibung ist erforderlich",
-      businessPhone: "Telefonnummer",
-      businessPhonePlaceholder: "+49 123 456789",
-      businessEmail: "E-Mail-Adresse",
-      businessEmailPlaceholder: "kontakt@deinunternehmen.de",
-      businessEmailRequired: "E-Mail ist erforderlich",
-      businessWebsite: "Website (optional)",
-      businessWebsitePlaceholder: "https://www.deinunternehmen.de",
-      country: "Land",
-      countryPlaceholder: "Land auswählen",
-      countryRequired: "Bitte wähle ein Land",
-    },
-  };
-
-  const t = translations[locale as keyof typeof translations] || translations.en;
-
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
 
     if (!data.businessName.trim()) {
-      newErrors.businessName = t.businessNameRequired;
+      newErrors.businessName = t("businessNameRequired");
     }
     if (!data.businessDescription.trim()) {
-      newErrors.businessDescription = t.businessDescriptionRequired;
+      newErrors.businessDescription = t("businessDescriptionRequired");
     }
     if (!data.businessEmail.trim()) {
-      newErrors.businessEmail = t.businessEmailRequired;
+      newErrors.businessEmail = t("businessEmailRequired");
     }
     if (!data.countryId) {
-      newErrors.country = t.countryRequired;
+      newErrors.country = t("countryRequired");
     }
 
     setErrors(newErrors);
@@ -245,17 +173,17 @@ export function BusinessStep({
           <Building2 className="w-6 h-6 text-cpCoral" />
         </div>
         <h2 className="text-xl font-semibold text-cpDark dark:text-white mb-2">
-          {t.title}
+          {t("title")}
         </h2>
         <p className="text-slate-600 dark:text-slate-400">
-          {t.description}
+          {t("description")}
         </p>
       </div>
 
       <div className="space-y-4">
         {/* Business Name with Search */}
         <div className="relative" ref={inputRef}>
-          <Label htmlFor="businessName">{t.businessName} *</Label>
+          <Label htmlFor="businessName">{t("businessName")} *</Label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input
@@ -263,14 +191,14 @@ export function BusinessStep({
               value={data.businessName}
               onChange={(e) => handleBusinessNameChange(e.target.value)}
               onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
-              placeholder={t.businessNamePlaceholder}
+              placeholder={t("businessNamePlaceholder")}
               className={cn("pl-10", errors.businessName ? "border-red-500" : "")}
             />
             {isSearching && (
               <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-slate-400" />
             )}
           </div>
-          <p className="text-xs text-slate-500 mt-1">{t.searchHint}</p>
+          <p className="text-xs text-slate-500 mt-1">{t("searchHint")}</p>
           {errors.businessName && (
             <p className="text-sm text-red-500 mt-1">{errors.businessName}</p>
           )}
@@ -279,7 +207,7 @@ export function BusinessStep({
           {showSuggestions && suggestions.length > 0 && (
             <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg max-h-64 overflow-y-auto">
               <div className="p-2 text-xs text-slate-500 border-b border-slate-100 dark:border-slate-700">
-                {locale === "nl" ? "Bestaande vermeldingen gevonden:" : locale === "de" ? "Bestehende Einträge gefunden:" : "Existing listings found:"}
+                {t("existingListingsFound")}
               </div>
               {suggestions.map((place) => (
                 <button
@@ -305,11 +233,11 @@ export function BusinessStep({
                   </div>
                   {place.hasOwner ? (
                     <span className="text-xs text-slate-500 px-2 py-1 bg-slate-200 dark:bg-slate-700 rounded shrink-0">
-                      {t.alreadyClaimed}
+                      {t("alreadyClaimed")}
                     </span>
                   ) : (
                     <span className="text-xs text-cpCoral font-medium px-2 py-1 bg-cpCoral/10 rounded shrink-0">
-                      {t.claimThis}
+                      {t("claimThis")}
                     </span>
                   )}
                 </button>
@@ -320,14 +248,14 @@ export function BusinessStep({
 
         {/* Country */}
         <div>
-          <Label htmlFor="country">{t.country} *</Label>
+          <Label htmlFor="country">{t("country")} *</Label>
           <Select
             value={data.countryId?.toString()}
             onValueChange={handleCountryChange}
             disabled={isLoading}
           >
             <SelectTrigger className={errors.country ? "border-red-500" : ""}>
-              <SelectValue placeholder={t.countryPlaceholder} />
+              <SelectValue placeholder={t("countryPlaceholder")} />
             </SelectTrigger>
             <SelectContent>
               {countries.map((country) => (
@@ -344,12 +272,12 @@ export function BusinessStep({
 
         {/* Description */}
         <div>
-          <Label htmlFor="businessDescription">{t.businessDescription} *</Label>
+          <Label htmlFor="businessDescription">{t("businessDescription")} *</Label>
           <Textarea
             id="businessDescription"
             value={data.businessDescription}
             onChange={(e) => updateData({ businessDescription: e.target.value })}
-            placeholder={t.businessDescriptionPlaceholder}
+            placeholder={t("businessDescriptionPlaceholder")}
             rows={4}
             className={errors.businessDescription ? "border-red-500" : ""}
           />
@@ -361,23 +289,23 @@ export function BusinessStep({
         {/* Phone & Email */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <Label htmlFor="businessPhone">{t.businessPhone}</Label>
+            <Label htmlFor="businessPhone">{t("businessPhone")}</Label>
             <Input
               id="businessPhone"
               type="tel"
               value={data.businessPhone}
               onChange={(e) => updateData({ businessPhone: e.target.value })}
-              placeholder={t.businessPhonePlaceholder}
+              placeholder={t("businessPhonePlaceholder")}
             />
           </div>
           <div>
-            <Label htmlFor="businessEmail">{t.businessEmail} *</Label>
+            <Label htmlFor="businessEmail">{t("businessEmail")} *</Label>
             <Input
               id="businessEmail"
               type="email"
               value={data.businessEmail}
               onChange={(e) => updateData({ businessEmail: e.target.value })}
-              placeholder={t.businessEmailPlaceholder}
+              placeholder={t("businessEmailPlaceholder")}
               className={errors.businessEmail ? "border-red-500" : ""}
             />
             {errors.businessEmail && (
@@ -388,13 +316,13 @@ export function BusinessStep({
 
         {/* Website */}
         <div>
-          <Label htmlFor="businessWebsite">{t.businessWebsite}</Label>
+          <Label htmlFor="businessWebsite">{t("businessWebsite")}</Label>
           <Input
             id="businessWebsite"
             type="url"
             value={data.businessWebsite}
             onChange={(e) => updateData({ businessWebsite: e.target.value })}
-            placeholder={t.businessWebsitePlaceholder}
+            placeholder={t("businessWebsitePlaceholder")}
           />
         </div>
       </div>

@@ -5,6 +5,7 @@ import { PlaceCard } from "./PlaceCard";
 import { Button } from "@/components/ui/button";
 import { Loader2, ChevronDown } from "lucide-react";
 import type { PlanKey } from "@/lib/plans/config";
+import { useTranslations } from "next-intl";
 
 interface Place {
   id: number;
@@ -53,6 +54,8 @@ export function CityPlacesSection({
   const [places, setPlaces] = useState<Place[]>(initialPlaces);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialPlaces.length < totalPlaces);
+  const t = useTranslations("place");
+  const tCommon = useTranslations("common");
 
   const loadMore = async () => {
     if (isLoading || !hasMore) return;
@@ -75,12 +78,8 @@ export function CityPlacesSection({
     }
   };
 
-  const showingText =
-    locale === "nl"
-      ? `${places.length} van ${totalPlaces} locaties`
-      : `${places.length} of ${totalPlaces} locations`;
-
-  const loadMoreText = locale === "nl" ? "Meer laden" : "Load more";
+  const showingText = t("showingCount", { showing: places.length, total: totalPlaces });
+  const loadMoreText = t("loadMore");
 
   return (
     <div>
@@ -114,7 +113,7 @@ export function CityPlacesSection({
             {isLoading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                {locale === "nl" ? "Laden..." : "Loading..."}
+                {tCommon("loading")}
               </>
             ) : (
               <>

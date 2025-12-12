@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, MapPin, Loader2 } from "lucide-react";
@@ -17,12 +18,13 @@ interface SearchBarProps {
 
 export function SearchBar({
   locale,
-  placeholder = "Search pet services...",
+  placeholder,
   className = "",
   initialQuery = "",
   initialLocation = "",
   compact = false,
 }: SearchBarProps) {
+  const t = useTranslations("search");
   const router = useRouter();
   const [query, setQuery] = useState(initialQuery);
   const [location, setLocation] = useState(initialLocation);
@@ -48,7 +50,7 @@ export function SearchBar({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-cpAmber/60" aria-hidden="true" />
           <Input
             type="text"
-            placeholder={placeholder}
+            placeholder={placeholder || t("placeholder")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="pl-10 rounded-xl bg-white dark:bg-cpSurface border-slate-200 dark:border-cpAmber/20 focus:border-cpCoral dark:focus:border-cpAmber"
@@ -68,7 +70,7 @@ export function SearchBar({
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 dark:text-cpAmber/60" aria-hidden="true" />
         <Input
           type="text"
-          placeholder={placeholder}
+          placeholder={placeholder || t("placeholder")}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="pl-12 py-3 rounded-2xl bg-white dark:bg-cpSurface border-slate-200 dark:border-cpAmber/20 focus:border-cpCoral dark:focus:border-cpAmber focus:ring-cpCoral/20 dark:focus:ring-cpAmber/20"
@@ -79,7 +81,7 @@ export function SearchBar({
         <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 dark:text-cpAmber/60" aria-hidden="true" />
         <Input
           type="text"
-          placeholder="City or region..."
+          placeholder={t("cityPlaceholder")}
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           className="pl-12 py-3 rounded-2xl bg-white dark:bg-cpSurface border-slate-200 dark:border-cpAmber/20 focus:border-cpCoral dark:focus:border-cpAmber focus:ring-cpCoral/20 dark:focus:ring-cpAmber/20"
@@ -90,10 +92,10 @@ export function SearchBar({
         {isPending ? (
           <>
             <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
-            Searching...
+            {t("searching")}
           </>
         ) : (
-          "Search"
+          t("searchButton")
         )}
       </Button>
     </form>

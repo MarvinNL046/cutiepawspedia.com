@@ -22,6 +22,7 @@ import {
 import { CityCard, CategoryCard, getCategoryIcon, getCountryFlag } from "@/components/directory";
 import { PageHeader, SectionHeader } from "@/components/layout";
 import { MapPin, Building2 } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 interface ProvincePageProps {
   params: Promise<{ locale: string; countrySlug: string; provinceSlug: string }>;
@@ -77,6 +78,7 @@ export async function generateMetadata({ params }: ProvincePageProps): Promise<M
 
 export default async function ProvincePage({ params }: ProvincePageProps) {
   const { locale, countrySlug, provinceSlug } = await params;
+  const t = await getTranslations("province");
 
   const [country, province, categories] = await Promise.all([
     getCountryBySlug(countrySlug),
@@ -96,43 +98,14 @@ export default async function ProvincePage({ params }: ProvincePageProps) {
 
   const displayCategories = categories.length > 0 ? categories : defaultCategories;
 
-  const labels = {
-    en: {
-      citiesTitle: `Cities in ${provinceName}`,
-      browseByCategory: "Browse by Category",
-      noCities: "No cities available yet.",
-      directory: "Directory",
-      totalCities: `${cities.length} cities`,
-      totalPlaces: `${province.placeCount || 0} places`,
-    },
-    nl: {
-      citiesTitle: `Steden in ${provinceName}`,
-      browseByCategory: "Bekijk per Categorie",
-      noCities: "Nog geen steden beschikbaar.",
-      directory: "Overzicht",
-      totalCities: `${cities.length} steden`,
-      totalPlaces: `${province.placeCount || 0} locaties`,
-    },
-    de: {
-      citiesTitle: `Städte in ${provinceName}`,
-      browseByCategory: "Nach Kategorie durchsuchen",
-      noCities: "Noch keine Städte verfügbar.",
-      directory: "Verzeichnis",
-      totalCities: `${cities.length} Städte`,
-      totalPlaces: `${province.placeCount || 0} Orte`,
-    },
-  };
-
-  const t = labels[locale as keyof typeof labels] || labels.en;
-
   return (
     <>
       <PageHeader
-        title={locale === "nl" ? `Huisdierdiensten in ${provinceName}` : `Pet Services in ${provinceName}`}
+        title={`${t("petServicesIn")} ${provinceName}`}
         icon={<span className="text-4xl">{getCountryFlag(countryCode)}</span>}
         variant="gradient-aqua"
         breadcrumbs={[
-          { label: t.directory, href: `/${locale}` },
+          { label: t("directory"), href: `/${locale}` },
           { label: countryName, href: `/${locale}/${countrySlug}` },
           { label: provinceName },
         ]}
@@ -143,11 +116,11 @@ export default async function ProvincePage({ params }: ProvincePageProps) {
         <div className="flex flex-wrap gap-4 justify-center">
           <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border">
             <Building2 className="h-4 w-4 text-cpCoral" />
-            <span className="text-sm font-medium">{t.totalCities}</span>
+            <span className="text-sm font-medium">{cities.length} {t("cities")}</span>
           </div>
           <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border">
             <MapPin className="h-4 w-4 text-cpAqua" />
-            <span className="text-sm font-medium">{t.totalPlaces}</span>
+            <span className="text-sm font-medium">{province.placeCount || 0} {t("places")}</span>
           </div>
           {province.code && (
             <Badge variant="outline" className="text-sm">
@@ -160,7 +133,7 @@ export default async function ProvincePage({ params }: ProvincePageProps) {
       {/* Cities Grid */}
       <section className="container mx-auto max-w-6xl px-4 py-8">
         <SectionHeader
-          title={t.citiesTitle}
+          title={`${t("citiesIn")} ${provinceName}`}
           icon={<MapPin className="h-5 w-5 text-cpCoral" />}
         />
 
@@ -176,7 +149,7 @@ export default async function ProvincePage({ params }: ProvincePageProps) {
           </div>
         ) : (
           <div className="text-center py-12 bg-white rounded-xl border">
-            <p className="text-slate-500">{t.noCities}</p>
+            <p className="text-slate-500">{t("noCitiesAvailable")}</p>
           </div>
         )}
       </section>
@@ -184,7 +157,7 @@ export default async function ProvincePage({ params }: ProvincePageProps) {
       {/* Categories Section */}
       <section className="bg-slate-50/50">
         <div className="container mx-auto max-w-6xl px-4 py-12">
-          <SectionHeader title={t.browseByCategory} />
+          <SectionHeader title={t("browseByCategory")} />
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {displayCategories.map((cat) => (
               <CategoryCard

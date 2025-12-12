@@ -5,9 +5,12 @@
  * Designed to showcase what makes this business special.
  */
 
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, Award, Zap, Target } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface ServiceHighlightsSectionProps {
   highlights: string[];
@@ -30,6 +33,7 @@ export function ServiceHighlightsSection({
   locale = "en",
   className = "",
 }: ServiceHighlightsSectionProps) {
+  const t = useTranslations("place");
   // Don't render if no highlights
   if (!highlights || highlights.length === 0) {
     return null;
@@ -40,7 +44,7 @@ export function ServiceHighlightsSection({
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
           <Sparkles className="h-5 w-5 text-cpAmber" />
-          {locale === "nl" ? "Waarom Kiezen" : "Why Choose Us"}
+          {t("whyChooseUs")}
         </CardTitle>
       </CardHeader>
       <CardContent>

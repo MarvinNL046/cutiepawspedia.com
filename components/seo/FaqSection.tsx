@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import type { FAQItem } from "@/lib/ai/faq";
 import { buildFaqJsonLd } from "@/lib/seo/faqSchema";
 import { JsonLd } from "./JsonLd";
+import { useTranslations } from "next-intl";
 
 // =============================================================================
 // TYPES
@@ -220,14 +221,11 @@ export function FaqSection({
   // Build JSON-LD schema
   const jsonLd = includeJsonLd ? buildFaqJsonLd(faqs) : null;
 
-  // Default heading based on locale
-  const defaultHeading =
-    locale === "nl"
-      ? "Veelgestelde vragen"
-      : locale === "de"
-      ? "Häufig gestellte Fragen"
-      : "Frequently Asked Questions";
+  // Get translations
+  const t = useTranslations("faq");
 
+  // Default heading
+  const defaultHeading = t("frequentlyAskedQuestions");
   const displayHeading = heading || defaultHeading;
 
   return (
@@ -243,17 +241,17 @@ export function FaqSection({
             <button
               onClick={expandAll}
               className="text-muted-foreground dark:text-cpCream/60 hover:text-cpCoral transition-colors"
-              aria-label={locale === "nl" ? "Alles uitklappen" : "Expand all"}
+              aria-label={t("expandAll")}
             >
-              {locale === "nl" ? "Alles uitklappen" : "Expand all"}
+              {t("expandAll")}
             </button>
             <span className="text-muted dark:text-cpCream/30">|</span>
             <button
               onClick={collapseAll}
               className="text-muted-foreground dark:text-cpCream/60 hover:text-cpCoral transition-colors"
-              aria-label={locale === "nl" ? "Alles inklappen" : "Collapse all"}
+              aria-label={t("collapseAll")}
             >
-              {locale === "nl" ? "Alles inklappen" : "Collapse all"}
+              {t("collapseAll")}
             </button>
           </div>
         )}
@@ -299,10 +297,12 @@ export function FaqCompact({
   includeJsonLd = false,
   locale = "en",
 }: FaqCompactProps) {
+  const t = useTranslations("faq");
+
   return (
     <FaqSection
       faqs={faqs}
-      heading={heading}
+      heading={heading || t("frequentlyAskedQuestions")}
       className={className}
       includeJsonLd={includeJsonLd}
       variant="compact"
@@ -334,17 +334,14 @@ export function FaqStatic({
   includeJsonLd = true,
   locale = "en",
 }: FaqStaticProps) {
+  const t = useTranslations("faq");
+
   if (!faqs || faqs.length === 0) {
     return null;
   }
 
   const jsonLd = includeJsonLd ? buildFaqJsonLd(faqs) : null;
-  const defaultHeading =
-    locale === "nl"
-      ? "Veelgestelde vragen"
-      : locale === "de"
-      ? "Häufig gestellte Fragen"
-      : "Frequently Asked Questions";
+  const defaultHeading = t("frequentlyAskedQuestions");
 
   return (
     <section className={cn("faq-section", className)} aria-label={heading || defaultHeading}>

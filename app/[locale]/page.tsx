@@ -25,6 +25,7 @@ import {
 } from "@/lib/seo";
 import { getLocaleForCountryCode } from "@/lib/geo/localeCountryMap";
 import { Search, Star, CheckCircle } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 interface HomePageProps {
   params: Promise<{ locale: string }>;
@@ -63,6 +64,7 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
 
 export default async function HomePage({ params }: HomePageProps) {
   const { locale } = await params;
+  const t = await getTranslations("homepage");
 
   const [countries, categories, totalPlaces, totalCities, latestPosts, homepageSponsorAd, popularPlaces, featuredReviews] = await Promise.all([
     getCountries(),
@@ -111,44 +113,38 @@ export default async function HomePage({ params }: HomePageProps) {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cpCoral/10 dark:bg-cpCharcoal/60 backdrop-blur-sm border border-cpCoral/30 dark:border-cpAmber/20 mb-6 animate-fade-in">
               <span className="text-lg">🐾</span>
               <span className="text-sm font-medium text-foreground dark:text-cpCream">
-                {locale === "nl" ? "De #1 Huisdierdiensten Gids" : "The #1 Pet Services Directory"}
+                {t("badge")}
               </span>
             </div>
 
             {/* Main heading */}
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground dark:text-cpCream mb-6 tracking-tight animate-slide-up">
-              {locale === "nl" ? (
-                <>Vind <span className="text-cpCoral">Perfecte Zorg</span> voor je Huisdier</>
-              ) : (
-                <>Find <span className="text-cpCoral">Perfect Care</span> for Your Pet</>
-              )}
+              {t("heroTitlePart1")}<span className="text-cpCoral">{t("heroTitleHighlight")}</span>{t("heroTitlePart2")}
             </h1>
 
             {/* Subtitle */}
             <p className="text-lg md:text-xl text-muted-foreground dark:text-cpCream/80 mb-10 max-w-xl mx-auto animate-slide-up" style={{ animationDelay: '0.1s' }}>
-              {locale === "nl"
-                ? "Ontdek vertrouwde dierenpensions, dierenartsen, trimsalons en trainers bij jou in de buurt."
-                : "Discover trusted pet hotels, veterinarians, groomers and trainers in your area."}
+              {t("heroSubtitle")}
             </p>
 
             {/* Search box with cozy styling */}
             <div className="cozy-card rounded-3xl p-4 md:p-6 shadow-xl animate-slide-up" style={{ animationDelay: '0.2s' }}>
-              <SearchBar locale={locale} placeholder={locale === "nl" ? "Waar zoek je naar?" : "What are you looking for?"} />
+              <SearchBar locale={locale} placeholder={t("searchPlaceholder")} />
             </div>
 
             {/* Trust indicators */}
             <div className="flex flex-wrap items-center justify-center gap-6 mt-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
               <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-cpCream/70">
                 <span className="w-2 h-2 rounded-full bg-green-500" />
-                <span>{locale === "nl" ? "Gratis te gebruiken" : "Free to use"}</span>
+                <span>{t("freeToUse")}</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-cpCream/70">
                 <span className="w-2 h-2 rounded-full bg-cpCoral" />
-                <span>217+ {locale === "nl" ? "locaties" : "locations"}</span>
+                <span>217+ {t("locations")}</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-cpCream/70">
                 <span className="w-2 h-2 rounded-full bg-cpAmber" />
-                <span>4.8★ {locale === "nl" ? "gemiddelde rating" : "average rating"}</span>
+                <span>4.8★ {t("averageRating")}</span>
               </div>
             </div>
             </div>
@@ -163,7 +159,7 @@ export default async function HomePage({ params }: HomePageProps) {
         <section className="container mx-auto max-w-6xl px-4 py-16">
           <div className="text-center mb-10">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
-              {locale === "nl" ? "Ontdek Categorieën" : "Explore Categories"}
+              {t("exploreCategories")}
             </h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -182,10 +178,10 @@ export default async function HomePage({ params }: HomePageProps) {
         <section className="container mx-auto max-w-6xl px-4 py-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { value: totalPlaces.toLocaleString() || "10,000+", label: locale === "nl" ? "Bedrijven" : "Businesses" },
-              { value: countries.length.toString() || "50+", label: locale === "nl" ? "Landen" : "Countries" },
-              { value: totalCities.toLocaleString() || "500+", label: locale === "nl" ? "Steden" : "Cities" },
-              { value: "4.8", label: locale === "nl" ? "Gem. Rating" : "Avg Rating" },
+              { value: totalPlaces.toLocaleString() || "10,000+", label: t("businesses") },
+              { value: countries.length.toString() || "50+", label: t("countries") },
+              { value: totalCities.toLocaleString() || "500+", label: t("cities") },
+              { value: "4.8", label: t("avgRating") },
             ].map((stat, i) => (
               <div key={stat.label} className="bg-card dark:bg-cpSurface/50 rounded-2xl p-4 md:p-6 text-center border border-border dark:border-cpAmber/20 shadow-sm">
                 <div className={`text-2xl md:text-3xl font-bold mb-1 ${i % 2 === 0 ? 'text-cpCoral' : 'text-cpAmber'}`}>
@@ -208,7 +204,7 @@ export default async function HomePage({ params }: HomePageProps) {
         <section className="container mx-auto max-w-6xl px-4 py-16">
           <div className="text-center mb-10">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
-              {locale === "nl" ? "Zoek per Land" : "Browse by Country"}
+              {t("browseByCountry")}
             </h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -233,27 +229,27 @@ export default async function HomePage({ params }: HomePageProps) {
         <section className="container mx-auto max-w-6xl px-4 py-16">
           <div className="text-center mb-10">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
-              {locale === "nl" ? "Aanbevolen Diensten" : "Recommended Services"}
+              {t("recommendedServices")}
             </h2>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {[
               {
                 icon: "🩺",
-                title: locale === "nl" ? "Dierenartsen" : "Veterinarians",
-                desc: locale === "nl" ? "Vind betrouwbare dierenartsen bij jou in de buurt voor de beste zorg." : "Find trusted veterinarians near you for the best care.",
+                title: t("veterinarians"),
+                desc: t("veterinariansDesc"),
                 href: `/${locale}/search?category=veterinary`
               },
               {
                 icon: "✂️",
-                title: locale === "nl" ? "Trimsalons" : "Groomers",
-                desc: locale === "nl" ? "Professionele trimsalons voor een stralende vacht en gezonde huid." : "Professional grooming salons for a shiny coat and healthy skin.",
+                title: t("groomers"),
+                desc: t("groomersDesc"),
                 href: `/${locale}/search?category=grooming`
               },
               {
                 icon: "🏠",
-                title: locale === "nl" ? "Dierenpensions" : "Pet Hotels",
-                desc: locale === "nl" ? "Liefdevolle opvang voor je huisdier wanneer je op reis bent." : "Loving care for your pet while you're away.",
+                title: t("petHotels"),
+                desc: t("petHotelsDesc"),
                 href: `/${locale}/search?category=boarding`
               },
             ].map((service) => (
@@ -264,7 +260,7 @@ export default async function HomePage({ params }: HomePageProps) {
                 <h3 className="text-lg font-bold text-foreground dark:text-cpCream mb-2 group-hover:text-cpCoral transition-colors">{service.title}</h3>
                 <p className="text-sm text-muted-foreground dark:text-slate-400 mb-4">{service.desc}</p>
                 <span className="btn-coral w-full py-2.5 rounded-xl text-sm font-medium inline-block">
-                  {locale === "nl" ? "Bekijk alle" : "View all"} →
+                  {t("viewAll")} →
                 </span>
               </Link>
             ))}
@@ -275,15 +271,15 @@ export default async function HomePage({ params }: HomePageProps) {
         <section className="container mx-auto max-w-6xl px-4 py-16">
           <div className="text-center mb-10">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
-              {locale === "nl" ? "Hoe werkt het?" : "How It Works"}
+              {t("howItWorks")}
             </h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { step: 1, icon: Search, title: locale === "nl" ? "Zoek" : "Search", desc: locale === "nl" ? "Zoek naar huisdierdiensten bij jou in de buurt." : "Search for nearby pet services in your area." },
-              { step: 2, icon: Star, title: locale === "nl" ? "Vergelijk" : "Compare", desc: locale === "nl" ? "Vergelijk beoordelingen en reviews van andere baasjes." : "Compare ratings and reviews from pet owners." },
-              { step: 3, icon: CheckCircle, title: locale === "nl" ? "Boek" : "Book", desc: locale === "nl" ? "Boek eenvoudig een afspraak met je favoriete dienst." : "Book your appointment with ease." },
+              { step: 1, icon: Search, title: t("search"), desc: t("searchDesc") },
+              { step: 2, icon: Star, title: t("compare"), desc: t("compareDesc") },
+              { step: 3, icon: CheckCircle, title: t("book"), desc: t("bookDesc") },
             ].map((item) => (
               <div key={item.step} className="text-center">
                 <div className="category-circle mx-auto mb-4">
@@ -300,7 +296,7 @@ export default async function HomePage({ params }: HomePageProps) {
         <section className="container mx-auto max-w-6xl px-4 py-16">
           <div className="text-center mb-10">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
-              {locale === "nl" ? "Laatste Tips & Advies" : "Latest Tips & Advice"}
+              {t("latestTips")}
             </h2>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
@@ -327,7 +323,7 @@ export default async function HomePage({ params }: HomePageProps) {
                       {post.excerpt && (
                         <p className="text-sm text-muted-foreground dark:text-slate-400 mb-3 line-clamp-2">{post.excerpt}</p>
                       )}
-                      <span className="text-cpCoral text-sm font-medium">{locale === "nl" ? "Lees meer →" : "Read more →"}</span>
+                      <span className="text-cpCoral text-sm font-medium">{t("readMore")} →</span>
                     </div>
                   </article>
                 </Link>
@@ -335,8 +331,8 @@ export default async function HomePage({ params }: HomePageProps) {
             ) : (
               // Fallback to placeholder content if no blog posts
               [
-                { img: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=250&fit=crop", title: locale === "nl" ? "5 Tips voor een gezonde pup" : "5 Tips for a healthy puppy", desc: locale === "nl" ? "Ontdek hoe je je puppy gezond en gelukkig houdt met deze praktische tips." : "5 Tips for a healthy puppy can help your furry friend thrive." },
-                { img: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=400&h=250&fit=crop", title: locale === "nl" ? "Hoe kies je de beste trimmer?" : "How to choose the best groomer?", desc: locale === "nl" ? "Vergelijk reviews en beoordelingen om de perfecte trimmer te vinden." : "How to choose the best groomer? Compare reviews and ratings..." },
+                { img: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=250&fit=crop", title: t("tipHealthyPuppy"), desc: t("tipHealthyPuppyDesc") },
+                { img: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=400&h=250&fit=crop", title: t("tipBestGroomer"), desc: t("tipBestGroomerDesc") },
               ].map((tip) => (
                 <article key={tip.title} className="group bg-card dark:bg-cpSurface/50 rounded-3xl overflow-hidden border border-border dark:border-cpAmber/20 shadow-sm hover:shadow-lg transition-all">
                   <div className="relative h-48">
@@ -345,7 +341,7 @@ export default async function HomePage({ params }: HomePageProps) {
                   <div className="p-5">
                     <h3 className="font-bold text-foreground dark:text-cpCream mb-2">{tip.title}</h3>
                     <p className="text-sm text-muted-foreground dark:text-slate-400 mb-3">{tip.desc}</p>
-                    <span className="text-cpCoral text-sm font-medium">{locale === "nl" ? "Lees meer →" : "Read more →"}</span>
+                    <span className="text-cpCoral text-sm font-medium">{t("readMore")} →</span>
                   </div>
                 </article>
               ))
@@ -357,7 +353,7 @@ export default async function HomePage({ params }: HomePageProps) {
                 href={`/${locale}/blog`}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-cpCoral/10 dark:bg-cpCoral/20 text-cpCoral rounded-2xl font-medium hover:bg-cpCoral/20 dark:hover:bg-cpCoral/30 transition-colors"
               >
-                {locale === "nl" ? "Bekijk alle artikelen" : "View all articles"}
+                {t("viewAllArticles")}
                 <span>→</span>
               </Link>
             </div>
@@ -369,7 +365,7 @@ export default async function HomePage({ params }: HomePageProps) {
         <section className="container mx-auto max-w-6xl px-4 py-16">
           <div className="text-center mb-10">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
-              {locale === "nl" ? "Wat baasjes zeggen" : "What owners say"}
+              {t("whatOwnersSay")}
             </h2>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
@@ -401,12 +397,12 @@ export default async function HomePage({ params }: HomePageProps) {
                   </p>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground dark:text-cpCream/60">
-                      {review.user?.name || (locale === "nl" ? "Anoniem" : "Anonymous")}
+                      {review.user?.name || t("anonymous")}
                       {place?.name && <span className="text-cpCoral"> • {place.name}</span>}
                     </span>
                     {reviewUrl && (
                       <Link href={reviewUrl} className="text-cpCoral text-sm font-medium hover:underline">
-                        {locale === "nl" ? "Bekijk →" : "View →"}
+                        {t("view")} →
                       </Link>
                     )}
                   </div>
@@ -422,7 +418,7 @@ export default async function HomePage({ params }: HomePageProps) {
         <section className="container mx-auto max-w-6xl px-4 py-16">
           <div className="text-center mb-10">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
-              {locale === "nl" ? "Populaire Locaties" : "Popular Places"}
+              {t("popularPlaces")}
             </h2>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
@@ -461,7 +457,7 @@ export default async function HomePage({ params }: HomePageProps) {
                       <h3 className="font-bold text-foreground dark:text-cpCream group-hover:text-cpCoral transition-colors">{place.name}</h3>
                       <p className="text-sm text-muted-foreground dark:text-slate-400">{locationText}</p>
                       <p className="text-xs text-muted-foreground dark:text-slate-500 mt-1">
-                        {place.reviewCount} {locale === "nl" ? "reviews" : "reviews"}
+                        {place.reviewCount} {t("reviews")}
                       </p>
                     </div>
                   </div>
@@ -476,17 +472,23 @@ export default async function HomePage({ params }: HomePageProps) {
         <section className="container mx-auto max-w-4xl px-4 py-16">
           <div className="text-center mb-10">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
-              {locale === "nl" ? "Veelgestelde Vragen" : "Frequently Asked Questions"}
+              {t("faq")}
             </h2>
           </div>
           <div className="space-y-4">
-            {faqs.map((faq, index) => (
+            {[
+              { question: t("faqFreeQuestion"), answer: t("faqFreeAnswer") },
+              { question: t("faqVerifyQuestion"), answer: t("faqVerifyAnswer") },
+              { question: t("faqReviewQuestion"), answer: t("faqReviewAnswer") },
+              { question: t("faqListQuestion"), answer: t("faqListAnswer") },
+              { question: t("faqCountriesQuestion"), answer: t("faqCountriesAnswer") },
+            ].map((faq, index) => (
               <details key={index} className="group bg-card dark:bg-cpSurface/50 rounded-2xl border border-border dark:border-cpAmber/20 shadow-sm">
                 <summary className="flex items-center justify-between cursor-pointer p-5 font-medium text-foreground dark:text-cpCream">
-                  {faq.question[locale as 'en' | 'nl']}
+                  {faq.question}
                   <span className="text-cpCoral dark:text-cpAmber group-open:rotate-90 transition-transform">→</span>
                 </summary>
-                <div className="px-5 pb-5 text-muted-foreground dark:text-slate-400">{faq.answer[locale as 'en' | 'nl']}</div>
+                <div className="px-5 pb-5 text-muted-foreground dark:text-slate-400">{faq.answer}</div>
               </details>
             ))}
           </div>
@@ -516,30 +518,28 @@ export default async function HomePage({ params }: HomePageProps) {
             <div className="flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="text-center md:text-left">
                 <span className="inline-block px-3 py-1 rounded-full bg-white/20 text-white/90 text-sm font-medium mb-4">
-                  {locale === "nl" ? "🚀 Voor Bedrijven" : "🚀 For Businesses"}
+                  🚀 {t("forBusinesses")}
                 </span>
                 <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
-                  {locale === "nl" ? "Heb je een huisdierenbedrijf?" : "Own a pet business?"}
+                  {t("ownPetBusiness")}
                 </h2>
                 <p className="text-white/80 text-lg max-w-md">
-                  {locale === "nl"
-                    ? "Word gevonden door duizenden huisdiereigenaren. Registreer vandaag nog."
-                    : "Get found by thousands of pet owners. List your business today."}
+                  {t("getFoundByOwners")}
                 </p>
 
                 {/* Benefits list */}
                 <div className="flex flex-wrap gap-4 mt-6 justify-center md:justify-start">
                   <div className="flex items-center gap-2 text-white/90 text-sm">
                     <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">✓</span>
-                    {locale === "nl" ? "Gratis vermelding" : "Free listing"}
+                    {t("freeListing")}
                   </div>
                   <div className="flex items-center gap-2 text-white/90 text-sm">
                     <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">✓</span>
-                    {locale === "nl" ? "Meer klanten" : "More customers"}
+                    {t("moreCustomers")}
                   </div>
                   <div className="flex items-center gap-2 text-white/90 text-sm">
                     <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">✓</span>
-                    {locale === "nl" ? "Premium opties" : "Premium options"}
+                    {t("premiumOptions")}
                   </div>
                 </div>
               </div>
@@ -550,7 +550,7 @@ export default async function HomePage({ params }: HomePageProps) {
                 asChild
               >
                 <Link href={`/${locale}/for-businesses`}>
-                  {locale === "nl" ? "Registreer je Bedrijf →" : "List Your Business →"}
+                  {t("listYourBusiness")} →
                 </Link>
               </Button>
             </div>
@@ -578,45 +578,5 @@ const defaultCategories = [
   { slug: "training", icon: "training", labelKey: "Training" },
   { slug: "pet-shops", icon: "shop", labelKey: "Pet Shops" },
   { slug: "dog-walking", icon: "walking", labelKey: "Dog Walking" },
-];
-
-
-// FAQ data
-const faqs = [
-  {
-    question: { en: "Is CutiePawsPedia free to use?", nl: "Is CutiePawsPedia gratis te gebruiken?" },
-    answer: {
-      en: "Yes! CutiePawsPedia is completely free for pet owners. You can search, compare, and read reviews of pet services without any cost. Business owners can also list their services for free, with optional premium features available.",
-      nl: "Ja! CutiePawsPedia is volledig gratis voor huisdiereigenaren. Je kunt zoeken, vergelijken en reviews lezen van huisdierdiensten zonder kosten. Bedrijfseigenaren kunnen ook gratis hun diensten vermelden, met optionele premium functies beschikbaar."
-    },
-  },
-  {
-    question: { en: "How do you verify the businesses listed?", nl: "Hoe verifiëren jullie de vermelde bedrijven?" },
-    answer: {
-      en: "We verify business information through multiple sources including official registrations, customer reviews, and periodic checks. Our community also helps flag any inaccurate information, which we investigate promptly.",
-      nl: "We verifiëren bedrijfsinformatie via meerdere bronnen, waaronder officiële registraties, klantreviews en periodieke controles. Onze community helpt ook bij het signaleren van onjuiste informatie, die we snel onderzoeken."
-    },
-  },
-  {
-    question: { en: "Can I leave a review for a business?", nl: "Kan ik een review achterlaten voor een bedrijf?" },
-    answer: {
-      en: "Absolutely! We encourage honest reviews from pet owners who have used the services. Simply visit the business page and click on 'Write a Review'. Your feedback helps other pet owners make informed decisions.",
-      nl: "Absoluut! We moedigen eerlijke reviews aan van huisdiereigenaren die de diensten hebben gebruikt. Bezoek gewoon de bedrijfspagina en klik op 'Schrijf een Review'. Jouw feedback helpt andere huisdiereigenaren weloverwogen beslissingen te nemen."
-    },
-  },
-  {
-    question: { en: "How do I list my pet business on CutiePawsPedia?", nl: "Hoe kan ik mijn huisdierenbedrijf op CutiePawsPedia vermelden?" },
-    answer: {
-      en: "Listing your business is easy! Click on 'List Your Business' in the navigation, fill out your business details, and submit for review. Once approved, your business will be visible to thousands of pet owners searching for services.",
-      nl: "Je bedrijf vermelden is eenvoudig! Klik op 'Vermeld je Bedrijf' in de navigatie, vul je bedrijfsgegevens in en dien in voor review. Na goedkeuring is je bedrijf zichtbaar voor duizenden huisdiereigenaren die op zoek zijn naar diensten."
-    },
-  },
-  {
-    question: { en: "What countries does CutiePawsPedia cover?", nl: "Welke landen bestrijkt CutiePawsPedia?" },
-    answer: {
-      en: "We currently cover pet services across Europe and North America, including the Netherlands, Belgium, Germany, France, UK, Spain, Italy, and the United States. We're constantly expanding to new regions!",
-      nl: "We bestrijken momenteel huisdierdiensten in heel Europa en Noord-Amerika, waaronder Nederland, België, Duitsland, Frankrijk, VK, Spanje, Italië en de Verenigde Staten. We breiden constant uit naar nieuwe regio's!"
-    },
-  },
 ];
 

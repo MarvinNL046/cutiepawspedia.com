@@ -21,6 +21,7 @@ import { CityCard, ProvinceCard, CategoryCard, getCategoryIcon, getCountryFlag }
 import { PageHeader, SectionHeader } from "@/components/layout";
 import { PageIntro } from "@/components/seo";
 import { MapPin, Map } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 interface CountryPageProps {
   params: Promise<{ locale: string; countrySlug: string }>;
@@ -47,6 +48,7 @@ export async function generateMetadata({ params }: CountryPageProps): Promise<Me
 
 export default async function CountryPage({ params }: CountryPageProps) {
   const { locale, countrySlug } = await params;
+  const t = await getTranslations("country");
 
   const [country, cities, provinces, categories, totalPlaces] = await Promise.all([
     getCountryBySlug(countrySlug),
@@ -81,12 +83,12 @@ export default async function CountryPage({ params }: CountryPageProps) {
   return (
     <>
       <PageHeader
-        title={locale === "nl" ? `Huisdierdiensten in ${countryName}` : `Pet Services in ${countryName}`}
+        title={`${t("petServicesIn")} ${countryName}`}
         icon={<span className="text-4xl">{getCountryFlag(countryCode)}</span>}
-        badge={!country ? <Badge variant="secondary">{locale === "nl" ? "Binnenkort" : "Coming Soon"}</Badge> : undefined}
+        badge={!country ? <Badge variant="secondary">{t("comingSoon")}</Badge> : undefined}
         variant="gradient-aqua"
         breadcrumbs={[
-          { label: locale === "nl" ? "Overzicht" : "Directory", href: `/${locale}` },
+          { label: t("directory"), href: `/${locale}` },
           { label: countryName },
         ]}
       />
@@ -98,7 +100,7 @@ export default async function CountryPage({ params }: CountryPageProps) {
       {provinces.length > 0 && (
         <section className="container mx-auto max-w-6xl px-4 py-12">
           <SectionHeader
-            title={locale === "nl" ? `Provincies in ${countryName}` : `Provinces in ${countryName}`}
+            title={`${t("provincesIn")} ${countryName}`}
             icon={<Map className="h-5 w-5 text-cpAqua" />}
           />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -119,7 +121,7 @@ export default async function CountryPage({ params }: CountryPageProps) {
       {/* Cities Section */}
       <section className="container mx-auto max-w-6xl px-4 py-12">
         <SectionHeader
-          title={locale === "nl" ? `Steden in ${countryName}` : `Cities in ${countryName}`}
+          title={`${t("citiesIn")} ${countryName}`}
           icon={<MapPin className="h-5 w-5 text-cpCoral" />}
         />
 
@@ -135,14 +137,14 @@ export default async function CountryPage({ params }: CountryPageProps) {
           </div>
         ) : (
           <div className="text-center py-12 bg-white rounded-xl border">
-            <p className="text-slate-500">{locale === "nl" ? "Nog geen steden beschikbaar." : "No cities available yet."}</p>
+            <p className="text-slate-500">{t("noCitiesAvailable")}</p>
           </div>
         )}
       </section>
 
       <section className="bg-slate-50/50">
         <div className="container mx-auto max-w-6xl px-4 py-12">
-          <SectionHeader title={locale === "nl" ? "Bekijk per Categorie" : "Browse by Category"} />
+          <SectionHeader title={t("browseByCategory")} />
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {displayCategories.map((cat) => (
               <CategoryCard

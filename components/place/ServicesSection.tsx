@@ -1,17 +1,19 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { getServiceBadges } from "@/lib/enrichment/ui";
 
 interface ServicesSectionProps {
   categories?: Array<{ slug: string; labelKey: string }>;
   description?: string | null;
-  locale?: string;
 }
 
 export function ServicesSection({
   categories,
   description,
-  locale = "en",
 }: ServicesSectionProps) {
+  const t = useTranslations("place");
   const services = getServiceBadges(categories, description);
 
   // Don't render if no services
@@ -20,7 +22,7 @@ export function ServicesSection({
   return (
     <section className="mt-4">
       <h3 className="text-sm font-semibold text-foreground dark:text-cpCream mb-3">
-        {locale === "nl" ? "Diensten & Aanbod" : "Services & Offerings"}
+        {t("services")}
       </h3>
       <div className="flex flex-wrap gap-2">
         {services.map((service) => (

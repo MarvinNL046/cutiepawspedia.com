@@ -18,42 +18,15 @@ import { BadgeDisplay } from "./BadgeDisplay";
 import { TrustLevelBadge } from "@/components/profile/TrustLevelBadge";
 import { User, Award, Star } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { getTranslations } from "next-intl/server";
 
 interface ProfilePageProps {
   params: Promise<{ locale: string }>;
 }
 
-// Translations
-const t = {
-  en: {
-    title: "Profile Settings",
-    subtitle: "Manage your public profile and personal information",
-    badgesTitle: "Your Badges",
-    badgesSubtitle: "Achievements you've earned",
-    noBadges: "You haven't earned any badges yet. Start reviewing places to earn your first badge!",
-    earnedBadges: "Earned",
-    availableBadges: "Available to earn",
-    trustLevelTitle: "Trust Level & Karma",
-    trustLevelSubtitle: "Your reputation in the community",
-    karmaPoints: "karma points",
-  },
-  nl: {
-    title: "Profiel Instellingen",
-    subtitle: "Beheer je openbare profiel en persoonlijke informatie",
-    badgesTitle: "Jouw Badges",
-    badgesSubtitle: "Behaalde prestaties",
-    noBadges: "Je hebt nog geen badges verdiend. Begin met het reviewen van plekken om je eerste badge te verdienen!",
-    earnedBadges: "Verdiend",
-    availableBadges: "Beschikbaar om te verdienen",
-    trustLevelTitle: "Trust Level & Karma",
-    trustLevelSubtitle: "Jouw reputatie in de community",
-    karmaPoints: "karma punten",
-  },
-};
-
 export default async function ProfilePage({ params }: ProfilePageProps) {
   const { locale } = await params;
-  const text = locale === "nl" ? t.nl : t.en;
+  const t = await getTranslations("profile");
 
   // Check authentication
   if (!stackServerApp) {
@@ -118,10 +91,10 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
       <div>
         <div className="flex items-center gap-3 mb-6">
           <User className="h-6 w-6 text-cpCoral" />
-          <h1 className="text-2xl font-bold text-foreground dark:text-cpCream">{text.title}</h1>
+          <h1 className="text-2xl font-bold text-foreground dark:text-cpCream">{t("title")}</h1>
         </div>
 
-        <p className="text-muted-foreground dark:text-cpCream/70 mb-8">{text.subtitle}</p>
+        <p className="text-muted-foreground dark:text-cpCream/70 mb-8">{t("subtitle")}</p>
 
         <ProfileSettingsForm
           profile={{
@@ -143,9 +116,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
             <Star className="h-5 w-5 text-cpCoral" />
-            {text.trustLevelTitle}
+            {t("trustLevelTitle")}
           </CardTitle>
-          <CardDescription className="dark:text-cpCream/60">{text.trustLevelSubtitle}</CardDescription>
+          <CardDescription className="dark:text-cpCream/60">{t("trustLevelSubtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-4">
@@ -159,7 +132,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               size="lg"
             />
             <div className="text-sm text-muted-foreground dark:text-cpCream/60">
-              {karmaSummary?.totalKarma ?? 0} {text.karmaPoints}
+              {karmaSummary?.totalKarma ?? 0} {t("karmaPoints")}
             </div>
           </div>
         </CardContent>
@@ -170,20 +143,20 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-foreground dark:text-cpCream">
             <Award className="h-5 w-5 text-cpAmber" />
-            {text.badgesTitle}
+            {t("badgesTitle")}
           </CardTitle>
-          <CardDescription className="dark:text-cpCream/60">{text.badgesSubtitle}</CardDescription>
+          <CardDescription className="dark:text-cpCream/60">{t("badgesSubtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
           {earnedBadges.length === 0 && unearnedBadges.length === 0 ? (
-            <p className="text-muted-foreground dark:text-cpCream/60 text-sm">{text.noBadges}</p>
+            <p className="text-muted-foreground dark:text-cpCream/60 text-sm">{t("noBadgesYet")}</p>
           ) : (
             <div className="space-y-6">
               {/* Earned Badges */}
               {earnedBadges.length > 0 && (
                 <div>
                   <h3 className="text-sm font-medium text-foreground/80 dark:text-cpCream/80 mb-3">
-                    {text.earnedBadges} ({earnedBadges.length})
+                    {t("earnedBadges")} ({earnedBadges.length})
                   </h3>
                   <BadgeDisplay
                     badges={earnedBadges}
@@ -197,7 +170,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               {unearnedBadges.length > 0 && (
                 <div>
                   <h3 className="text-sm font-medium text-foreground/80 dark:text-cpCream/80 mb-3">
-                    {text.availableBadges} ({unearnedBadges.length})
+                    {t("availableBadges")} ({unearnedBadges.length})
                   </h3>
                   <BadgeDisplay
                     badges={unearnedBadges}

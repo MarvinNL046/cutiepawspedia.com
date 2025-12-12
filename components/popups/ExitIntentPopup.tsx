@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { X, Gift, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NewsletterForm } from "@/components/forms";
+import { useTranslations } from "next-intl";
 
 interface ExitIntentPopupProps {
   locale: string;
@@ -12,8 +13,7 @@ interface ExitIntentPopupProps {
 export function ExitIntentPopup({ locale }: ExitIntentPopupProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [hasShown, setHasShown] = useState(false);
-
-  const isNl = locale === "nl";
+  const t = useTranslations("newsletter");
 
   const handleMouseLeave = useCallback(
     (e: MouseEvent) => {
@@ -88,12 +88,10 @@ export function ExitIntentPopup({ locale }: ExitIntentPopupProps) {
               <Gift className="w-8 h-8 text-white" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
-              {isNl ? "Wacht even!" : "Wait a moment!"}
+              {t("waitMoment")}
             </h2>
             <p className="text-white/90">
-              {isNl
-                ? "Mis geen tips voor de beste zorg voor je huisdier"
-                : "Don't miss tips for the best care for your pet"}
+              {t("dontMissTips")}
             </p>
           </div>
         </div>
@@ -102,14 +100,10 @@ export function ExitIntentPopup({ locale }: ExitIntentPopupProps) {
         <div className="p-6 md:p-8">
           <div className="text-center mb-6">
             <h3 className="text-lg font-semibold text-foreground dark:text-cpCream mb-2">
-              {isNl
-                ? "Schrijf je in voor onze nieuwsbrief"
-                : "Subscribe to our newsletter"}
+              {t("subscribeNewsletter")}
             </h3>
             <p className="text-sm text-muted-foreground">
-              {isNl
-                ? "Ontvang de beste tips, nieuwe listings en exclusieve aanbiedingen."
-                : "Get the best tips, new listings and exclusive offers."}
+              {t("receiveOffers")}
             </p>
           </div>
 
@@ -127,15 +121,15 @@ export function ExitIntentPopup({ locale }: ExitIntentPopupProps) {
           <div className="grid grid-cols-3 gap-4 text-center text-xs text-muted-foreground">
             <div>
               <span className="block text-lg mb-1">📧</span>
-              {isNl ? "Wekelijkse tips" : "Weekly tips"}
+              {t("weeklyTips")}
             </div>
             <div>
               <span className="block text-lg mb-1">🎁</span>
-              {isNl ? "Exclusieve deals" : "Exclusive deals"}
+              {t("exclusiveDeals")}
             </div>
             <div>
               <span className="block text-lg mb-1">🚫</span>
-              {isNl ? "Geen spam" : "No spam"}
+              {t("noSpam")}
             </div>
           </div>
 
@@ -145,7 +139,7 @@ export function ExitIntentPopup({ locale }: ExitIntentPopupProps) {
               onClick={handleClose}
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              {isNl ? "Nee bedankt, misschien later" : "No thanks, maybe later"}
+              {t("noThanks")}
             </button>
           </div>
         </div>

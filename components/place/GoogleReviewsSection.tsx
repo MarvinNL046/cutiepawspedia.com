@@ -5,9 +5,12 @@
  * social proof and real customer feedback.
  */
 
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, ThumbsUp, ExternalLink } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface GoogleReview {
   text: string;
@@ -32,6 +35,7 @@ export function GoogleReviewsSection({
   locale = "en",
   className = "",
 }: GoogleReviewsSectionProps) {
+  const t = useTranslations("place");
   // Don't render if no reviews
   if (!reviews || reviews.length === 0) {
     return null;
@@ -47,7 +51,13 @@ export function GoogleReviewsSection({
     if (!dateStr) return null;
     try {
       const date = new Date(dateStr);
-      return date.toLocaleDateString(locale === "nl" ? "nl-NL" : "en-US", {
+      const localeMap: Record<string, string> = {
+        en: "en-US",
+        nl: "nl-NL",
+        de: "de-DE",
+        fr: "fr-FR",
+      };
+      return date.toLocaleDateString(localeMap[locale] || "en-US", {
         year: "numeric",
         month: "short",
       });
@@ -79,7 +89,7 @@ export function GoogleReviewsSection({
                 fill="#EA4335"
               />
             </svg>
-            {locale === "nl" ? "Google Reviews" : "Google Reviews"}
+            {t("googleReviews")}
           </CardTitle>
           {googleMapsUrl && (
             <a
@@ -88,7 +98,7 @@ export function GoogleReviewsSection({
               rel="noopener noreferrer"
               className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 transition-colors"
             >
-              {locale === "nl" ? "Bekijk alle reviews" : "View all reviews"}
+              {t("viewAllReviews")}
               <ExternalLink className="h-3 w-3" />
             </a>
           )}
@@ -117,7 +127,7 @@ export function GoogleReviewsSection({
               </div>
               {/* Author */}
               <span className="text-sm font-medium text-slate-700">
-                {review.author || (locale === "nl" ? "Anoniem" : "Anonymous")}
+                {review.author || t("anonymous")}
               </span>
               {/* Date */}
               {review.date && (
@@ -147,9 +157,7 @@ export function GoogleReviewsSection({
 
         {/* Attribution */}
         <p className="text-xs text-slate-400 pt-2 text-center">
-          {locale === "nl"
-            ? "Reviews van Google Maps"
-            : "Reviews from Google Maps"}
+          {t("reviewsFromGoogleMaps")}
         </p>
       </CardContent>
     </Card>

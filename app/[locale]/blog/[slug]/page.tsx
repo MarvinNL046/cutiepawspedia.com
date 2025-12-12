@@ -29,6 +29,7 @@ import { Calendar, Clock, ArrowLeft, ArrowRight, Tag } from "lucide-react";
 import { TableOfContents, extractTocItems, PhotoCredit } from "@/components/blog";
 import { BlogSidebarAd, BetweenContentAd } from "@/components/ads";
 import { EditorialByline } from "@/components/seo";
+import { getTranslations } from "next-intl/server";
 
 interface BlogPostPageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -56,8 +57,9 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   const seo = await getPostSeoBySlug(slug, locale as Locale);
 
   if (!seo) {
+    const t = await getTranslations({ locale, namespace: "blog" });
     return {
-      title: locale === "nl" ? "Artikel niet gevonden" : "Article not found",
+      title: t("articleNotFound"),
     };
   }
 
@@ -267,6 +269,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound();
   }
 
+  const t = await getTranslations({ locale, namespace: "blog" });
+
   // Increment view count (fire and forget)
   incrementPostViewCount(post.id).catch(() => {});
 
@@ -317,7 +321,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           className="inline-flex items-center gap-2 text-muted-foreground dark:text-cpCream/70 hover:text-cpCoral dark:hover:text-cpCoral transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          {locale === "nl" ? "Terug naar blog" : "Back to blog"}
+          {t("backToBlog")}
         </Link>
       </div>
 
@@ -346,7 +350,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           {post.readingTimeMinutes && (
             <span className="flex items-center gap-2">
               <Clock className="w-4 h-4" />
-              {post.readingTimeMinutes} min {locale === "nl" ? "leestijd" : "read"}
+              {post.readingTimeMinutes} min {t("readTime")}
             </span>
           )}
         </div>
@@ -443,7 +447,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <section className="bg-secondary/50 dark:bg-cpSurface/20 py-12">
           <div className="container mx-auto max-w-6xl px-4">
             <h2 className="text-2xl font-bold text-foreground dark:text-cpCream mb-8 text-center">
-              {locale === "nl" ? "Gerelateerde Artikelen" : "Related Articles"}
+              {t("relatedArticles")}
             </h2>
 
             <div className="grid md:grid-cols-3 gap-6">
@@ -475,7 +479,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                         {relatedPost.title}
                       </h3>
                       <span className="inline-flex items-center gap-1 text-cpCoral text-sm font-medium">
-                        {locale === "nl" ? "Lees meer" : "Read more"}
+                        {t("readMore")}
                         <ArrowRight className="w-3 h-3" />
                       </span>
                     </div>
@@ -495,7 +499,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             className="inline-flex items-center gap-2 px-6 py-3 bg-cpCoral text-white rounded-2xl font-medium hover:bg-cpCoral/90 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            {locale === "nl" ? "Bekijk alle artikelen" : "View all articles"}
+            {t("viewAllArticles")}
           </Link>
         </div>
       </section>

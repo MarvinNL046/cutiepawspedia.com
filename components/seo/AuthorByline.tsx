@@ -5,6 +5,8 @@
  * Supports both editorial content and user-generated reviews.
  */
 
+"use client";
+
 import { GraduationCap, BadgeCheck, Calendar, Clock, PenLine } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +16,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useTranslations } from "next-intl";
 
 export interface Author {
   name: string;
@@ -65,7 +68,7 @@ export function AuthorByline({
   variant = "default",
   className = "",
 }: AuthorBylineProps) {
-  const isNl = locale === "nl";
+  const t = useTranslations("seo.author");
   const initial = author.name.charAt(0).toUpperCase();
   const hasCredentials = author.credentials && author.credentials.length > 0;
 
@@ -74,7 +77,7 @@ export function AuthorByline({
       <div className={`flex items-center gap-2 text-sm text-muted-foreground ${className}`}>
         <PenLine className="h-3.5 w-3.5" />
         <span>
-          {isNl ? "Door" : "By"}{" "}
+          {t("by")}{" "}
           <span className="font-medium text-foreground">{author.name}</span>
           {author.title && (
             <span className="hidden sm:inline">, {author.title}</span>
@@ -87,7 +90,7 @@ export function AuthorByline({
           <>
             <span className="text-muted-foreground/50">·</span>
             <span>
-              {isNl ? "Bijgewerkt" : "Updated"} {formatDate(updatedAt, locale)}
+              {t("updated")} {formatDate(updatedAt, locale)}
             </span>
           </>
         )}
@@ -119,13 +122,11 @@ export function AuthorByline({
                         className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 gap-1"
                       >
                         <BadgeCheck className="h-3 w-3" />
-                        {isNl ? "Geverifieerd" : "Verified"}
+                        {t("verified")}
                       </Badge>
                     </TooltipTrigger>
                     <TooltipContent>
-                      {isNl
-                        ? "Geverifieerde expert met gecontroleerde referenties"
-                        : "Verified expert with confirmed credentials"}
+                      {t("verifiedTooltip")}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -135,7 +136,7 @@ export function AuthorByline({
               <p className="text-sm text-muted-foreground mt-0.5">
                 {author.title}
                 {author.yearsExperience && author.yearsExperience > 0 && (
-                  <span> · {author.yearsExperience}+ {isNl ? "jaar ervaring" : "years experience"}</span>
+                  <span> · {author.yearsExperience}+ {t("yearsExperience")}</span>
                 )}
               </p>
             )}
@@ -164,13 +165,13 @@ export function AuthorByline({
                 {publishedAt && (
                   <div className="flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
-                    <span>{isNl ? "Gepubliceerd" : "Published"}: {formatDate(publishedAt, locale)}</span>
+                    <span>{t("published")}: {formatDate(publishedAt, locale)}</span>
                   </div>
                 )}
                 {updatedAt && (
                   <div className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />
-                    <span>{isNl ? "Bijgewerkt" : "Updated"}: {formatDate(updatedAt, locale)}</span>
+                    <span>{t("updated")}: {formatDate(updatedAt, locale)}</span>
                   </div>
                 )}
               </div>
@@ -201,7 +202,7 @@ export function AuthorByline({
               className="text-xs bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 gap-1"
             >
               <BadgeCheck className="h-3 w-3" />
-              {isNl ? "Expert" : "Expert"}
+              {t("expert")}
             </Badge>
           )}
         </div>
@@ -209,7 +210,7 @@ export function AuthorByline({
           {author.title && <span>{author.title}</span>}
           {author.title && updatedAt && <span>·</span>}
           {updatedAt && (
-            <span>{isNl ? "Bijgewerkt" : "Updated"} {formatDate(updatedAt, locale)}</span>
+            <span>{t("updated")} {formatDate(updatedAt, locale)}</span>
           )}
         </div>
       </div>
@@ -231,7 +232,7 @@ export function EditorialByline({
   locale = "en",
   className = "",
 }: EditorialBylineProps) {
-  const isNl = locale === "nl";
+  const t = useTranslations("seo.editorial");
 
   return (
     <div className={`flex items-center gap-2 text-sm text-muted-foreground ${className}`}>
@@ -245,11 +246,11 @@ export function EditorialByline({
       </div>
       <div>
         <span className="font-medium text-foreground">
-          {isNl ? "CutiePawsPedia Redactie" : "CutiePawsPedia Editorial"}
+          {t("name")}
         </span>
         <span className="mx-1">·</span>
         <span>
-          {isNl ? "Geverifieerde Informatie" : "Verified Information"}
+          {t("verifiedInfo")}
         </span>
         {updatedAt && (
           <>
@@ -265,9 +266,7 @@ export function EditorialByline({
           </TooltipTrigger>
           <TooltipContent className="max-w-xs">
             <p className="text-sm">
-              {isNl
-                ? "Deze informatie is gecontroleerd door ons redactieteam van huisdierexperts."
-                : "This information has been reviewed by our editorial team of pet care experts."}
+              {t("tooltip")}
             </p>
           </TooltipContent>
         </Tooltip>
@@ -294,15 +293,15 @@ export function SourceCitation({
   locale = "en",
   className = "",
 }: SourceCitationProps) {
-  const isNl = locale === "nl";
+  const t = useTranslations("seo.sources");
 
   if (!sources || sources.length === 0) return null;
 
   const typeLabels = {
-    official: isNl ? "Officieel" : "Official",
-    research: isNl ? "Onderzoek" : "Research",
-    expert: isNl ? "Expert" : "Expert",
-    community: isNl ? "Community" : "Community",
+    official: t("official"),
+    research: t("research"),
+    expert: t("expert"),
+    community: t("community"),
   };
 
   const typeColors = {
@@ -315,7 +314,7 @@ export function SourceCitation({
   return (
     <div className={`border-t pt-4 mt-4 ${className}`}>
       <h4 className="text-sm font-medium text-muted-foreground mb-2">
-        {isNl ? "Bronnen" : "Sources"}
+        {t("title")}
       </h4>
       <ul className="space-y-1.5">
         {sources.map((source, i) => (

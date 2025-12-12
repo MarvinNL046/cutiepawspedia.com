@@ -7,6 +7,7 @@
 
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -124,6 +125,9 @@ export async function generateMetadata({ params }: PlacePageProps): Promise<Meta
 
 export default async function PlacePage({ params }: PlacePageProps) {
   const { locale, countrySlug, provinceSlug, citySlug, categorySlug, placeSlug } = await params;
+
+  const t = await getTranslations("place");
+  const tCommon = await getTranslations("common");
 
   const province = await getProvinceBySlugAndCountry(provinceSlug, countrySlug);
   if (!province) notFound();
@@ -260,7 +264,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
   const baseUrl = `/${locale}/${countrySlug}/p/${provinceSlug}/${citySlug}`;
 
   const breadcrumbsData = [
-    { name: locale === "nl" ? "Overzicht" : "Directory", url: `${BASE_URL}/${locale}` },
+    { name: tCommon("directory"), url: `${BASE_URL}/${locale}` },
     { name: countryName, url: `${BASE_URL}/${locale}/${countrySlug}` },
     { name: provinceName, url: `${BASE_URL}/${locale}/${countrySlug}/p/${provinceSlug}` },
     { name: cityName, url: `${BASE_URL}${baseUrl}` },
@@ -323,7 +327,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
           {/* Breadcrumbs */}
           <Breadcrumbs
             items={[
-              { label: locale === "nl" ? "Overzicht" : "Directory", href: `/${locale}` },
+              { label: tCommon("directory"), href: `/${locale}` },
               { label: countryName, href: `/${locale}/${countrySlug}` },
               { label: provinceName, href: `/${locale}/${countrySlug}/p/${provinceSlug}` },
               { label: cityName, href: baseUrl },
@@ -358,7 +362,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 {placeFeatures.hasVerifiedBadge && (
                   <Badge className="bg-purple-100 text-purple-700 border-purple-300 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-500 gap-1">
                     <Shield className="h-3 w-3" />
-                    {locale === "nl" ? "Geverifieerd" : "Verified"}
+                    {t("verified")}
                   </Badge>
                 )}
                 {place.isVerified && !placeFeatures.hasVerifiedBadge && (
@@ -393,20 +397,20 @@ export default async function PlacePage({ params }: PlacePageProps) {
               <FavoriteButton placeId={place.id} initialIsFavorite={isPlaceFavorited} variant="default" />
               {place.phone && placeFeatures.canShowPhone ? (
                 <Button asChild className="bg-cpCoral hover:bg-cpCoral/90 gap-2">
-                  <a href={`tel:${place.phone}`}><Phone className="h-4 w-4" />{locale === "nl" ? "Bel Nu" : "Call Now"}</a>
+                  <a href={`tel:${place.phone}`}><Phone className="h-4 w-4" />{t("callNow")}</a>
                 </Button>
               ) : place.phone && !placeFeatures.canShowPhone ? (
                 <Button variant="outline" className="gap-2 text-muted-foreground dark:text-cpCream/50 dark:border-cpAmber/20" disabled>
-                  <Lock className="h-4 w-4" />{locale === "nl" ? "Telefoon verborgen" : "Phone hidden"}
+                  <Lock className="h-4 w-4" />{t("phoneHidden")}
                 </Button>
               ) : null}
               <Button asChild variant="outline" className="gap-2 dark:border-cpAmber/30 dark:text-cpCream dark:hover:bg-cpAmber/10">
-                <a href="#inquiry-form"><MessageSquare className="h-4 w-4" />{locale === "nl" ? "Stuur Bericht" : "Send Inquiry"}</a>
+                <a href="#inquiry-form"><MessageSquare className="h-4 w-4" />{t("sendInquiry")}</a>
               </Button>
               {placeFeatures.hasVerifiedBadge && (
                 <Badge className="justify-center bg-purple-100 text-purple-700 border-purple-300 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-500 gap-1">
                   <Shield className="h-3 w-3" />
-                  {locale === "nl" ? "Geverifieerd Bedrijf" : "Verified Business"}
+                  {t("verifiedBusiness")}
                 </Badge>
               )}
             </div>
@@ -494,7 +498,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
           <div className="space-y-6">
             <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
               <CardHeader>
-                <CardTitle className="text-foreground dark:text-cpCream">{locale === "nl" ? "Contactgegevens" : "Contact Information"}</CardTitle>
+                <CardTitle className="text-foreground dark:text-cpCream">{t("contactInformation")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {place.address && (
@@ -521,7 +525,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                     <Phone className="h-5 w-5" />
                     <span className="flex items-center gap-1">
                       <Lock className="h-3 w-3" />
-                      {locale === "nl" ? "Upgrade voor telefoonnummer" : "Upgrade to see phone"}
+                      {t("upgradeToSeePhone")}
                     </span>
                   </div>
                 ) : null}
@@ -538,7 +542,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                     <Mail className="h-5 w-5" />
                     <span className="flex items-center gap-1">
                       <Lock className="h-3 w-3" />
-                      {locale === "nl" ? "Upgrade voor e-mail" : "Upgrade to see email"}
+                      {t("upgradeToSeeEmail")}
                     </span>
                   </div>
                 ) : null}
@@ -547,7 +551,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                   <div className="flex items-center gap-3">
                     <Globe className="h-5 w-5 text-cpCoral" />
                     <a href={place.website} target="_blank" rel="noopener noreferrer" className="text-foreground dark:text-cpCream hover:text-cpCoral transition-colors">
-                      {locale === "nl" ? "Bezoek Website" : "Visit Website"}
+                      {t("visitWebsite")}
                     </a>
                   </div>
                 ) : place.website && !placeFeatures.canShowWebsite ? (
@@ -555,7 +559,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                     <Globe className="h-5 w-5" />
                     <span className="flex items-center gap-1">
                       <Lock className="h-3 w-3" />
-                      {locale === "nl" ? "Upgrade voor website" : "Upgrade to see website"}
+                      {t("upgradeToSeeWebsite")}
                     </span>
                   </div>
                 ) : null}
@@ -566,7 +570,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                     <Button asChild size="sm" variant="outline" className="w-full gap-1 text-cpCoral border-cpCoral/30 hover:bg-cpCoral/5 dark:hover:bg-cpCoral/10">
                       <a href={`/${locale}/for-businesses`}>
                         <Crown className="h-3 w-3" />
-                        {locale === "nl" ? "Bekijk Abonnementen" : "View Plans"}
+                        {t("viewPlans")}
                       </a>
                     </Button>
                   </div>
@@ -595,7 +599,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
             {place.lat && place.lng && (
               <Card className="bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20">
                 <CardHeader>
-                  <CardTitle className="text-foreground dark:text-cpCream">{locale === "nl" ? "Locatie" : "Location"}</CardTitle>
+                  <CardTitle className="text-foreground dark:text-cpCream">{t("location")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <StaticMap
@@ -615,7 +619,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                       className="flex items-center justify-center gap-2 mt-3 text-sm text-cpCoral hover:text-cpCoral/80 transition-colors"
                     >
                       <MapPin className="h-4 w-4" />
-                      {locale === "nl" ? "Open in Google Maps" : "Open in Google Maps"}
+                      {t("openInGoogleMaps")}
                     </a>
                   )}
                 </CardContent>

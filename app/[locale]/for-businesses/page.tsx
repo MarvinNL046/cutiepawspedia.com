@@ -32,11 +32,17 @@ import {
   Heart,
 } from "lucide-react";
 import { getActivePlans, formatPlanPrice, FEATURE_COMPARISONS, type PlanDefinition } from "@/lib/plans/config";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { locales } from "@/i18n/config";
 
 // Static page with daily revalidation - pricing rarely changes
 export const dynamic = "force-static";
 export const revalidate = 86400;
+
+// Generate static params for all locales
+export function generateStaticParams() {
+  return locales.map((locale) => ({ locale }));
+}
 
 interface ForBusinessesPageProps {
   params: Promise<{ locale: string }>;
@@ -75,6 +81,10 @@ function getPlanIcon(planKey: string) {
 
 export default async function ForBusinessesPage({ params }: ForBusinessesPageProps) {
   const { locale } = await params;
+
+  // Enable static rendering for this locale
+  setRequestLocale(locale);
+
   const t = await getTranslations("business");
 
   // Get active plans from config

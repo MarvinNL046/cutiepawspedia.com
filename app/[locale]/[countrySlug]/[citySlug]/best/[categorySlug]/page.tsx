@@ -34,6 +34,7 @@ import {
   type ContentLocale,
 } from "@/lib/seo";
 import { generateContent } from "@/lib/ai/generateContent";
+import { getTranslations } from "next-intl/server";
 
 interface BestInCityPageProps {
   params: Promise<{ locale: string; countrySlug: string; citySlug: string; categorySlug: string }>;
@@ -42,7 +43,9 @@ interface BestInCityPageProps {
 // ISR: City-level data, 5-minute revalidation
 export const revalidate = 300;
 
-// Pre-generate pages for all country/city/category combinations
+// Pre-generate pages for key country/city/category combinations
+// Skip countries with many cities (like Germany) to avoid build timeouts
+// Those pages will be generated on-demand with ISR
 export async function generateStaticParams() {
   const [countries, categories] = await Promise.all([
     getCountries(),
@@ -52,8 +55,16 @@ export async function generateStaticParams() {
   const params: { locale: string; countrySlug: string; citySlug: string; categorySlug: string }[] = [];
   const locales = DEFAULT_SEO_CONFIG.supportedLocales;
 
+  // Only pre-generate for countries with < 30 cities to avoid build timeouts
+  const PRERENDER_COUNTRY_CODES = ["BE", "NL"];
+
   for (const locale of locales) {
     for (const country of countries) {
+      // Skip countries not in the prerender list
+      if (!PRERENDER_COUNTRY_CODES.includes(country.code)) {
+        continue;
+      }
+
       const cities = await getCitiesByCountrySlug(country.slug);
       for (const city of cities) {
         for (const category of categories) {
@@ -156,6 +167,8 @@ export async function generateMetadata({ params }: BestInCityPageProps): Promise
 export default async function BestInCityPage({ params }: BestInCityPageProps) {
   const { locale, countrySlug, citySlug, categorySlug } = await params;
 
+  const t = await getTranslations("categoryPages");
+
   const [city, category, places] = await Promise.all([
     getCityBySlugAndCountry(citySlug, countrySlug),
     getCategoryBySlug(categorySlug),
@@ -212,23 +225,21 @@ export default async function BestInCityPage({ params }: BestInCityPageProps) {
       />
 
       <PageHeader
-        title={locale === "nl" ? `Beste ${categoryLabel} in ${cityName}` : `Best ${categoryLabel} in ${cityName}`}
+        title={t("bestIn", { category: categoryLabel, location: cityName })}
         subtitle={
           <span className="flex items-center gap-2">
             <Award className="h-5 w-5 text-cpYellow" />
-            {locale === "nl"
-              ? `Top ${places.length} gesorteerd op reviews`
-              : `Top ${places.length} sorted by reviews`}
+            {t("topRanked", { count: places.length })}
           </span>
         }
         icon={<span className="text-3xl">{categoryIcon}</span>}
         variant="gradient-yellow"
         breadcrumbs={[
-          { label: "Directory", href: `/${locale}` },
+          { label: t("directory"), href: `/${locale}` },
           { label: countryName, href: `/${locale}/${countrySlug}` },
           { label: cityName, href: `/${locale}/${countrySlug}/${citySlug}` },
           { label: categoryLabel, href: `/${locale}/${countrySlug}/${citySlug}/${categorySlug}` },
-          { label: locale === "nl" ? "Beste" : "Best" },
+          { label: t("best") },
         ]}
       />
 
@@ -242,9 +253,7 @@ export default async function BestInCityPage({ params }: BestInCityPageProps) {
           <div className="flex items-center gap-3 text-sm text-muted-foreground mt-3">
             <TrendingUp className="h-4 w-4 text-cpYellow" />
             <span>
-              {locale === "nl"
-                ? "Ranking gebaseerd op gemiddelde beoordelingen en aantal reviews."
-                : "Ranking based on average ratings and number of reviews."}
+              {t("rankingBased")}
             </span>
           </div>
         </div>
@@ -289,7 +298,7 @@ export default async function BestInCityPage({ params }: BestInCityPageProps) {
                       {index < 3 && (
                         <Badge variant="secondary" className="ml-2 bg-cpYellow/20 text-cpYellow">
                           <Star className="h-3 w-3 mr-1 fill-current" />
-                          {locale === "nl" ? "Top Keuze" : "Top Pick"}
+                          {t("topPick")}
                         </Badge>
                       )}
 
@@ -320,7 +329,7 @@ export default async function BestInCityPage({ params }: BestInCityPageProps) {
                         href={`/${locale}/${countrySlug}/${citySlug}/${categorySlug}/${place.slug}`}
                         className="mt-2 inline-flex items-center gap-1 px-3 py-1.5 bg-cpCoral text-white rounded-lg hover:bg-cpCoral/90 transition-colors text-sm font-medium"
                       >
-                        {locale === "nl" ? "Bekijk" : "View"}
+                        {t("view")}
                         <ExternalLink className="h-3 w-3" />
                       </Link>
                     </div>
@@ -333,12 +342,10 @@ export default async function BestInCityPage({ params }: BestInCityPageProps) {
           <div className="text-center py-12">
             <span className="text-6xl block mb-4">🔍</span>
             <h2 className="text-xl font-semibold mb-2">
-              {locale === "nl" ? "Geen resultaten gevonden" : "No results found"}
+              {t("noResults")}
             </h2>
             <p className="text-muted-foreground">
-              {locale === "nl"
-                ? `Er zijn nog geen ${categoryLabel.toLowerCase()} in ${cityName} met reviews.`
-                : `No ${categoryLabel.toLowerCase()} in ${cityName} have reviews yet.`}
+              {t("notEnoughReviews", { category: categoryLabel.toLowerCase(), location: cityName })}
             </p>
           </div>
         )}
@@ -347,21 +354,21 @@ export default async function BestInCityPage({ params }: BestInCityPageProps) {
       {/* Related Links */}
       <section className="bg-slate-50 py-12">
         <div className="container mx-auto max-w-6xl px-4">
-          <SectionHeader title={locale === "nl" ? "Bekijk ook" : "See also"} />
+          <SectionHeader title={t("seeAlso")} />
           <div className="flex flex-wrap gap-2">
             <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10">
               <a href={`/${locale}/${countrySlug}/${citySlug}/${categorySlug}`}>
-                {locale === "nl" ? `Alle ${categoryLabel} in ${cityName}` : `All ${categoryLabel} in ${cityName}`}
+                {t("allIn", { category: categoryLabel, location: cityName })}
               </a>
             </Badge>
             <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10">
               <a href={`/${locale}/${countrySlug}/best/${categorySlug}`}>
-                {locale === "nl" ? `Beste ${categoryLabel} in ${countryName}` : `Best ${categoryLabel} in ${countryName}`}
+                {t("bestIn", { category: categoryLabel, location: countryName })}
               </a>
             </Badge>
             <Badge variant="outline" className="cursor-pointer hover:bg-cpCoral/10">
               <a href={`/${locale}/${countrySlug}/${citySlug}`}>
-                {locale === "nl" ? `Alle services in ${cityName}` : `All services in ${cityName}`}
+                {t("allServices", { location: cityName })}
               </a>
             </Badge>
           </div>

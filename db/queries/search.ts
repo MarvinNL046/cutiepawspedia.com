@@ -104,7 +104,7 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
   // Filter by city if provided
   let resolvedCityId = cityId;
   if (citySlug && !resolvedCityId) {
-    // Try to find city by slug first
+    // Try to find city by slug first (exact match)
     let city = await db.query.cities.findFirst({
       where: eq(cities.slug, citySlug),
       with: { country: true },
@@ -118,10 +118,28 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
       }
     }
 
-    // If no city found by slug, try searching by name (case-insensitive)
+    // If no city found by slug, try searching by name (exact, case-insensitive)
     if (!city) {
       city = await db.query.cities.findFirst({
         where: ilike(cities.name, citySlug.replace(/-/g, " ")),
+        with: { country: true },
+      });
+    }
+
+    // If still no city found, try partial match (starts with)
+    if (!city) {
+      const searchName = citySlug.replace(/-/g, " ");
+      city = await db.query.cities.findFirst({
+        where: ilike(cities.name, `${searchName}%`),
+        with: { country: true },
+      });
+    }
+
+    // If still no city found, try contains match
+    if (!city) {
+      const searchName = citySlug.replace(/-/g, " ");
+      city = await db.query.cities.findFirst({
+        where: ilike(cities.name, `%${searchName}%`),
         with: { country: true },
       });
     }
@@ -130,6 +148,10 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
       resolvedCityId = city.id;
     }
   }
+
+  // If citySlug was provided but no city found, and there's no text query,
+  // return empty results instead of searching all cities
+  const cityNotFound = citySlug && !resolvedCityId;
 
   if (resolvedCityId) {
     conditions.push(eq(places.cityId, resolvedCityId));
@@ -158,6 +180,12 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
     if (categoryPlaceIds.length === 0) {
       return { places: [], total: 0, hasMore: false };
     }
+  }
+
+  // If city was specified but not found, return empty results
+  // (User searched for a city that doesn't exist in our database)
+  if (cityNotFound) {
+    return { places: [], total: 0, hasMore: false };
   }
 
   // Build the search query

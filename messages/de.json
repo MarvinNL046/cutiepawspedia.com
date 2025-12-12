@@ -721,11 +721,13 @@
     "features": {
       "noPhotos": "Keine Fotos",
       "photos": "{count, plural, one {# Foto} other {# Fotos}}",
+      "photoIncluded": "1 Foto inklusive",
       "websiteLink": "Website-Link",
       "phoneEmail": "Telefon & E-Mail",
       "businessDescription": "Unternehmensbeschreibung",
+      "shortDescription": "Kurzbeschreibung",
       "categories": "{count, plural, one {# Kategorie} other {# Kategorien}}",
-      "searchPriorityStandard": "Standard-Suchpriorität",
+      "searchPriorityStandard": "Sichtbar im Verzeichnis",
       "searchPriorityHigher": "Höhere Suchpriorität",
       "searchPriorityHigh": "Hohe Suchpriorität",
       "searchPriorityHighest": "Höchste Suchpriorität",
@@ -735,6 +737,7 @@
       "locations": "{count, plural, one {# Standort} other {# Standorte}}",
       "locationsUnlimited": "Unbegrenzte Standorte",
       "analyticsNone": "Keine Analysen",
+      "analyticsViews": "Aufrufe-Einblicke",
       "analyticsBasic": "Basis-Analysen",
       "analyticsAdvanced": "Erweiterte Analysen",
       "reviewsIncluded": "Bewertungen inklusive"

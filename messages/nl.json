@@ -721,11 +721,13 @@
     "features": {
       "noPhotos": "Geen foto's",
       "photos": "{count, plural, one {# foto} other {# foto's}}",
+      "photoIncluded": "1 foto inbegrepen",
       "websiteLink": "Website link",
       "phoneEmail": "Telefoon & e-mail",
       "businessDescription": "Bedrijfsomschrijving",
+      "shortDescription": "Korte omschrijving",
       "categories": "{count, plural, one {# categorie} other {# categorieën}}",
-      "searchPriorityStandard": "Standaard zoekprioriteit",
+      "searchPriorityStandard": "Zichtbaar in directory",
       "searchPriorityHigher": "Hogere zoekprioriteit",
       "searchPriorityHigh": "Hoge zoekprioriteit",
       "searchPriorityHighest": "Hoogste zoekprioriteit",
@@ -735,6 +737,7 @@
       "locations": "{count, plural, one {# locatie} other {# locaties}}",
       "locationsUnlimited": "Onbeperkt locaties",
       "analyticsNone": "Geen statistieken",
+      "analyticsViews": "Weergaven inzicht",
       "analyticsBasic": "Basis statistieken",
       "analyticsAdvanced": "Geavanceerde statistieken",
       "reviewsIncluded": "Reviews inbegrepen"

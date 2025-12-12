@@ -204,7 +204,9 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
                         <span className={plan.features.maxPhotos > 0 ? "text-foreground" : "text-muted-foreground"}>
                           {plan.features.maxPhotos === 0
                             ? t("features.noPhotos")
-                            : t("features.photos", { count: plan.features.maxPhotos })
+                            : plan.features.maxPhotos === 1
+                              ? t("features.photoIncluded")
+                              : t("features.photos", { count: plan.features.maxPhotos })
                           }
                         </span>
                       </li>
@@ -333,9 +335,11 @@ export default async function ForBusinessesPage({ params }: ForBusinessesPagePro
                         <span className={plan.features.hasBasicAnalytics ? "text-foreground" : "text-muted-foreground"}>
                           {plan.features.hasAdvancedAnalytics
                             ? t("features.analyticsAdvanced")
-                            : plan.features.hasBasicAnalytics
-                              ? t("features.analyticsBasic")
-                              : t("features.analyticsNone")
+                            : plan.key === "FREE"
+                              ? t("features.analyticsViews")
+                              : plan.features.hasBasicAnalytics
+                                ? t("features.analyticsBasic")
+                                : t("features.analyticsNone")
                           }
                         </span>
                       </li>

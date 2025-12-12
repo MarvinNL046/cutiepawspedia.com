@@ -72,8 +72,8 @@ export const PLAN_CONFIG: Record<PlanKey, PlanDefinition> = {
     key: "FREE",
     name: "Free",
     nameNl: "Gratis",
-    description: "Basic listing to get started",
-    descriptionNl: "Basis vermelding om te beginnen",
+    description: "Start collecting reviews today",
+    descriptionNl: "Begin vandaag met reviews verzamelen",
     monthlyPriceCents: 0,
     yearlyPriceCents: null,
     stripePriceIdMonthly: null, // Free plan has no Stripe price
@@ -81,22 +81,18 @@ export const PLAN_CONFIG: Record<PlanKey, PlanDefinition> = {
     isActive: true,
     sortOrder: 1,
     features: {
-      maxPhotos: 0, // Only UGC photos allowed
-      // GATING DISABLED FOR ADSENSE - show all contact info for better user experience
-      // Original values (can be re-enabled for premium gating):
-      // canShowWebsite: false,
-      // canShowEmail: false,
-      // canShowPhone: false,
+      // FREE tier now includes essentials to make listing feel "real"
+      maxPhotos: 1, // 1 photo (logo or storefront)
       canShowWebsite: true,
       canShowEmail: true,
       canShowPhone: true,
       canShowSocialLinks: false,
       maxCategories: 1,
-      canShowDescription: false,
+      canShowDescription: true, // Short description (enforced at 300 chars in UI)
       priorityRank: 1,
       hasFeaturedStyling: false,
       hasEnhancedStyling: false,
-      hasBasicAnalytics: false,
+      hasBasicAnalytics: true, // Basic view count only (no click analytics)
       hasAdvancedAnalytics: false,
       showPlanBadge: false,
       badgeText: null,
@@ -327,7 +323,7 @@ export const FEATURE_COMPARISONS: FeatureComparison[] = [
   {
     name: "Business photos",
     nameNl: "Bedrijfsfoto's",
-    free: "0",
+    free: "1",
     starter: "3",
     pro: "10",
     elite: "20 + HD",
@@ -335,7 +331,7 @@ export const FEATURE_COMPARISONS: FeatureComparison[] = [
   {
     name: "Business description",
     nameNl: "Bedrijfsomschrijving",
-    free: false,
+    free: "Short",
     starter: true,
     pro: true,
     elite: true,
@@ -394,7 +390,7 @@ export const FEATURE_COMPARISONS: FeatureComparison[] = [
   {
     name: "Basic analytics",
     nameNl: "Basis statistieken",
-    free: false,
+    free: "Views only",
     starter: true,
     pro: true,
     elite: true,

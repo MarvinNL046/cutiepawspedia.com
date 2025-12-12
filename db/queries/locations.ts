@@ -8,9 +8,14 @@ import { countries, cities, provinces } from "../schema";
 
 export async function getCountries() {
   if (!db) return [];
-  return db.query.countries.findMany({
-    orderBy: (countries, { asc }) => [asc(countries.name)],
-  });
+  try {
+    return await db.query.countries.findMany({
+      orderBy: (countries, { asc }) => [asc(countries.name)],
+    });
+  } catch (error) {
+    console.error("Failed to get countries:", error);
+    return [];
+  }
 }
 
 export async function getCountryBySlug(slug: string) {

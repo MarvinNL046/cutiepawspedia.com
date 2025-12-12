@@ -12,9 +12,14 @@ import { getCityBySlugAndCountry } from "./locations";
  */
 export async function getCategories() {
   if (!db) return [];
-  return db.query.categories.findMany({
-    orderBy: (categories, { asc }) => [asc(categories.labelKey)],
-  });
+  try {
+    return await db.query.categories.findMany({
+      orderBy: (categories, { asc }) => [asc(categories.labelKey)],
+    });
+  } catch (error) {
+    console.error("Failed to get categories:", error);
+    return [];
+  }
 }
 
 /**
@@ -444,24 +449,29 @@ export async function getTopPlacesByCitySlugAndCategorySlug(
  */
 export async function getPopularPlaces(limit = 6) {
   if (!db) return [];
-  return db.query.places.findMany({
-    where: (places, { gt }) => gt(places.reviewCount, 0),
-    orderBy: (places, { desc }) => [desc(places.reviewCount), desc(places.avgRating)],
-    limit,
-    with: {
-      city: {
-        with: {
-          country: true,
-          province: true,
+  try {
+    return await db.query.places.findMany({
+      where: (places, { gt }) => gt(places.reviewCount, 0),
+      orderBy: (places, { desc }) => [desc(places.reviewCount), desc(places.avgRating)],
+      limit,
+      with: {
+        city: {
+          with: {
+            country: true,
+            province: true,
+          },
+        },
+        placeCategories: {
+          with: {
+            category: true,
+          },
         },
       },
-      placeCategories: {
-        with: {
-          category: true,
-        },
-      },
-    },
-  });
+    });
+  } catch (error) {
+    console.error("Failed to get popular places:", error);
+    return [];
+  }
 }
 
 // ============================================================================

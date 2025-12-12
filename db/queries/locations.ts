@@ -20,9 +20,14 @@ export async function getCountries() {
 
 export async function getCountryBySlug(slug: string) {
   if (!db) return null;
-  return db.query.countries.findFirst({
-    where: eq(countries.slug, slug),
-  });
+  try {
+    return await db.query.countries.findFirst({
+      where: eq(countries.slug, slug),
+    });
+  } catch (error) {
+    console.error("Failed to get country by slug:", error);
+    return null;
+  }
 }
 
 export async function getCountryByCode(code: string) {
@@ -93,13 +98,18 @@ export async function getProvinceWithCities(provinceSlug: string, countrySlug: s
 
 export async function getCitiesByCountryId(countryId: number) {
   if (!db) return [];
-  return db.query.cities.findMany({
-    where: eq(cities.countryId, countryId),
-    orderBy: (cities, { asc }) => [asc(cities.name)],
-    with: {
-      province: true,
-    },
-  });
+  try {
+    return await db.query.cities.findMany({
+      where: eq(cities.countryId, countryId),
+      orderBy: (cities, { asc }) => [asc(cities.name)],
+      with: {
+        province: true,
+      },
+    });
+  } catch (error) {
+    console.error("Failed to get cities by country:", error);
+    return [];
+  }
 }
 
 export async function getCitiesByProvinceId(provinceId: number) {
@@ -124,14 +134,19 @@ export async function getCityBySlugAndCountry(citySlug: string, countrySlug: str
   const country = await getCountryBySlug(countrySlug);
   if (!country || !db) return null;
 
-  return db.query.cities.findFirst({
-    where: (cities, { and, eq }) =>
-      and(eq(cities.slug, citySlug), eq(cities.countryId, country.id)),
-    with: {
-      country: true,
-      province: true,
-    },
-  });
+  try {
+    return await db.query.cities.findFirst({
+      where: (cities, { and, eq }) =>
+        and(eq(cities.slug, citySlug), eq(cities.countryId, country.id)),
+      with: {
+        country: true,
+        province: true,
+      },
+    });
+  } catch (error) {
+    console.error("Failed to get city by slug and country:", error);
+    return null;
+  }
 }
 
 export async function getCityBySlugAndProvince(

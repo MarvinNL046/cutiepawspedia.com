@@ -469,6 +469,7 @@
     "petFriendly": "Pet Friendly"
   },
   "place": {
+    "about": "À propos de {name}",
     "verified": "Vérifié",
     "callNow": "Appeler Maintenant",
     "phoneHidden": "Téléphone masqué",
@@ -663,7 +664,9 @@
   "leadForm": {
     "title": "Contacter Cette Entreprise",
     "name": "Votre Nom",
+    "yourName": "Votre Nom",
     "email": "Votre Email",
+    "emailAddress": "Votre Adresse Email",
     "phone": "Votre Téléphone (facultatif)",
     "message": "Votre Message",
     "submit": "Envoyer le Message",

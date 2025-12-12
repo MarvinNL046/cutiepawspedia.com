@@ -468,6 +468,7 @@
     "petFriendly": "Huisdiervriendelijk"
   },
   "place": {
+    "about": "Over {name}",
     "verified": "Geverifieerd",
     "callNow": "Bel Nu",
     "phoneHidden": "Telefoon verborgen",
@@ -662,7 +663,9 @@
   "leadForm": {
     "title": "Neem Contact Op",
     "name": "Je Naam",
+    "yourName": "Je Naam",
     "email": "Je E-mail",
+    "emailAddress": "Je E-mailadres",
     "phone": "Je Telefoon (optioneel)",
     "message": "Je Bericht",
     "submit": "Bericht Versturen",

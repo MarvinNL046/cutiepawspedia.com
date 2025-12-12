@@ -468,6 +468,7 @@
     "petFriendly": "Pet Friendly"
   },
   "place": {
+    "about": "About {name}",
     "verified": "Verified",
     "callNow": "Call Now",
     "phoneHidden": "Phone hidden",
@@ -662,7 +663,9 @@
   "leadForm": {
     "title": "Contact This Business",
     "name": "Your Name",
+    "yourName": "Your Name",
     "email": "Your Email",
+    "emailAddress": "Your Email Address",
     "phone": "Your Phone (optional)",
     "message": "Your Message",
     "submit": "Send Message",

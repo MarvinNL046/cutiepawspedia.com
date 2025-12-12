@@ -468,6 +468,7 @@
     "petFriendly": "Haustierfreundlich"
   },
   "place": {
+    "about": "Über {name}",
     "verified": "Verifiziert",
     "callNow": "Jetzt Anrufen",
     "phoneHidden": "Telefon verborgen",
@@ -662,7 +663,9 @@
   "leadForm": {
     "title": "Dieses Unternehmen Kontaktieren",
     "name": "Ihr Name",
+    "yourName": "Ihr Name",
     "email": "Ihre E-Mail",
+    "emailAddress": "Ihre E-Mail-Adresse",
     "phone": "Ihr Telefon (optional)",
     "message": "Ihre Nachricht",
     "submit": "Nachricht Senden",

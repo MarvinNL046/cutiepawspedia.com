@@ -138,8 +138,8 @@ export function StickyBottomBanner({ className, locale = "nl" }: StickyBottomBan
         className
       )}
     >
-      {/* Glass effect background */}
-      <div className="relative bg-gradient-to-r from-cpNavy/95 via-cpNavy/90 to-cpNavy/95 backdrop-blur-md border-t border-cpCoral/20 shadow-lg shadow-black/20">
+      {/* Solid background for good contrast in all themes */}
+      <div className="relative bg-cpNavy border-t border-cpCoral/30 shadow-lg shadow-black/30">
         {/* Decorative top line */}
         <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-cpCoral to-transparent" />
 

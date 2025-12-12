@@ -5,6 +5,8 @@ import { JsonLd } from "@/components/seo";
 import { AdVisibilityProvider } from "@/components/ads";
 import { CookieConsentBanner } from "@/components/consent";
 import { ExitIntentPopup } from "@/components/popups";
+import { TopBanner } from "@/components/ui/TopBanner";
+import { StickyBottomBanner } from "@/components/ui/StickyBottomBanner";
 import { websiteSchema, organizationSchema } from "@/lib/seo";
 import { getAdVisibilityContext } from "@/lib/ads/visibility";
 import { locales } from "@/i18n/config";
@@ -44,6 +46,8 @@ export default async function LocaleLayout({
           </a>
           {/* Global JSON-LD structured data */}
           <JsonLd data={[websiteSchema(), organizationSchema()]} />
+          {/* Growing database announcement banner */}
+          <TopBanner />
           <Header locale={locale} variant="directory" />
           <main id="main-content" className="flex-1" tabIndex={-1}>{children}</main>
           <Footer locale={locale} />
@@ -52,6 +56,8 @@ export default async function LocaleLayout({
         <CookieConsentBanner locale={locale} />
         {/* Exit Intent Popup for newsletter signup */}
         <ExitIntentPopup locale={locale} />
+        {/* Sticky bottom banner - appears on scroll */}
+        <StickyBottomBanner locale={locale} />
       </AdVisibilityProvider>
     </NextIntlClientProvider>
   );

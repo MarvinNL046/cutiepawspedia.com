@@ -23,27 +23,43 @@ import { db } from "@/db";
 import { auditLogs } from "@/db/schema/directory";
 
 const REVALIDATION_SECRET = process.env.REVALIDATION_SECRET;
+const CRON_SECRET = process.env.CRON_SECRET;
+
+function verifyCronAuth(request: NextRequest): boolean {
+  // Check Vercel cron header (automatic for Vercel crons)
+  if (request.headers.get("x-vercel-cron") === "true") {
+    return true;
+  }
+  // Check Authorization header (Bearer token)
+  const authHeader = request.headers.get("authorization");
+  if (authHeader === `Bearer ${CRON_SECRET}` || authHeader === `Bearer ${REVALIDATION_SECRET}`) {
+    return true;
+  }
+  // Check query param (legacy/manual triggers)
+  const { searchParams } = new URL(request.url);
+  const secret = searchParams.get("secret");
+  if (secret && (secret === REVALIDATION_SECRET || secret === CRON_SECRET)) {
+    return true;
+  }
+  // Allow in development
+  if (process.env.NODE_ENV === "development") {
+    return true;
+  }
+  return false;
+}
 
 export async function GET(request: NextRequest) {
   const startTime = Date.now();
 
   try {
     // Authenticate
-    const { searchParams } = new URL(request.url);
-    const secret = searchParams.get("secret");
-    const limit = parseInt(searchParams.get("limit") || "100", 10);
-    const dryRun = searchParams.get("dryRun") === "true";
-
-    if (!REVALIDATION_SECRET) {
-      return NextResponse.json(
-        { error: "Revalidation secret not configured" },
-        { status: 500 }
-      );
-    }
-
-    if (secret !== REVALIDATION_SECRET) {
+    if (!verifyCronAuth(request)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const { searchParams } = new URL(request.url);
+    const limit = parseInt(searchParams.get("limit") || "100", 10);
+    const dryRun = searchParams.get("dryRun") === "true";
 
     // Get businesses that should receive digest
     const businesses = await getBusinessesForDigest();

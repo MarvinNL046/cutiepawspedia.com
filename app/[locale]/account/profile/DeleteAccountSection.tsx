@@ -16,7 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Loader2, Trash2, AlertTriangle, ShieldAlert } from "lucide-react";
+import { Loader2, Trash2, AlertTriangle, ShieldAlert, CreditCard } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 interface DeleteAccountSectionProps {
@@ -85,6 +85,15 @@ export function DeleteAccountSection({ userEmail }: DeleteAccountSectionProps) {
               <li>{t("deleteAccount.warning3")}</li>
               <li>{t("deleteAccount.warning4")}</li>
             </ul>
+          </AlertDescription>
+        </Alert>
+
+        {/* Subscription warning */}
+        <Alert className="mb-4 border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30">
+          <CreditCard className="h-4 w-4 text-amber-600" />
+          <AlertTitle className="text-amber-700 dark:text-amber-400">{t("deleteAccount.subscriptionTitle")}</AlertTitle>
+          <AlertDescription className="mt-1 text-sm text-amber-600 dark:text-amber-400/80">
+            {t("deleteAccount.subscriptionWarning")}
           </AlertDescription>
         </Alert>
 

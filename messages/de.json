@@ -468,7 +468,9 @@
       "cancel": "Abbrechen",
       "deleting": "Wird gelöscht...",
       "confirmButton": "Konto Dauerhaft Löschen",
-      "error": "Konto konnte nicht gelöscht werden. Bitte versuchen Sie es erneut."
+      "error": "Konto konnte nicht gelöscht werden. Bitte versuchen Sie es erneut.",
+      "subscriptionTitle": "Aktives Abonnement?",
+      "subscriptionWarning": "Wenn Sie ein aktives Geschäftsabonnement haben, kündigen Sie es bitte zuerst in Ihrem Business-Dashboard unter 'Abo Verwalten', bevor Sie Ihr Konto löschen. Andernfalls werden Sie möglicherweise weiterhin belastet."
     }
   },
   "favorites": {

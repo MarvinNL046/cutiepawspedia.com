@@ -469,7 +469,9 @@
       "cancel": "Annuler",
       "deleting": "Suppression...",
       "confirmButton": "Supprimer Définitivement le Compte",
-      "error": "Échec de la suppression du compte. Veuillez réessayer."
+      "error": "Échec de la suppression du compte. Veuillez réessayer.",
+      "subscriptionTitle": "Abonnement Actif ?",
+      "subscriptionWarning": "Si vous avez un abonnement professionnel actif, veuillez d'abord l'annuler dans votre Tableau de Bord Entreprise sous 'Gérer l'Abonnement' avant de supprimer votre compte. Sinon, vous pourriez continuer à être facturé."
     }
   },
   "favorites": {

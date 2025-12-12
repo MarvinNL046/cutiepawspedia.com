@@ -468,7 +468,9 @@
       "cancel": "Annuleren",
       "deleting": "Verwijderen...",
       "confirmButton": "Account Permanent Verwijderen",
-      "error": "Verwijderen van account mislukt. Probeer het opnieuw."
+      "error": "Verwijderen van account mislukt. Probeer het opnieuw.",
+      "subscriptionTitle": "Actief Abonnement?",
+      "subscriptionWarning": "Als je een actief zakelijk abonnement hebt, annuleer dit dan eerst in je Business Dashboard onder 'Abonnement Beheren' voordat je je account verwijdert. Anders kun je blijven betalen."
     }
   },
   "favorites": {

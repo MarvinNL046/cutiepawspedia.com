@@ -468,7 +468,9 @@
       "cancel": "Cancel",
       "deleting": "Deleting...",
       "confirmButton": "Permanently Delete Account",
-      "error": "Failed to delete account. Please try again."
+      "error": "Failed to delete account. Please try again.",
+      "subscriptionTitle": "Active Subscription?",
+      "subscriptionWarning": "If you have an active business subscription, please cancel it first in your Business Dashboard under 'Manage Plan' before deleting your account. Otherwise, you may continue to be charged."
     }
   },
   "favorites": {

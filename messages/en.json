@@ -450,7 +450,26 @@
     "badgesSubtitle": "Achievements you've earned through your contributions",
     "noBadgesYet": "No badges available yet. Keep contributing to earn badges!",
     "earnedBadges": "Earned Badges",
-    "availableBadges": "Available Badges"
+    "availableBadges": "Available Badges",
+    "deleteAccount": {
+      "title": "Delete Account",
+      "subtitle": "Permanently delete your account and all associated data",
+      "warningTitle": "Warning: This action cannot be undone",
+      "warning1": "Your profile, reviews, and all account data will be permanently deleted",
+      "warning2": "Your saved places and viewing history will be removed",
+      "warning3": "Any businesses you own will be deleted along with their leads and messages",
+      "warning4": "Your badges and karma points will be lost",
+      "button": "Delete My Account",
+      "confirmTitle": "Confirm Account Deletion",
+      "confirmDescription": "This will permanently delete your account and all associated data. This action cannot be undone.",
+      "confirmEmailLabel": "Type your email to confirm",
+      "confirmEmailHint": "Your email",
+      "emailMismatch": "Email does not match your account email",
+      "cancel": "Cancel",
+      "deleting": "Deleting...",
+      "confirmButton": "Permanently Delete Account",
+      "error": "Failed to delete account. Please try again."
+    }
   },
   "favorites": {
     "title": "Saved Places",

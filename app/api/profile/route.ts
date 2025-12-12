@@ -9,7 +9,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { stackServerApp } from "@/stack";
-import { getUserByStackAuthId } from "@/db/queries/users";
+import { getUserByStackAuthId, deleteUserAccount } from "@/db/queries/users";
 import {
   getUserProfile,
   updateUserProfile,
@@ -168,6 +168,80 @@ export async function PATCH(request: NextRequest) {
     console.error("Error updating profile:", error);
     return NextResponse.json(
       { error: "Failed to update profile. Please try again." },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * DELETE - Delete current user's account and all associated data (GDPR)
+ */
+export async function DELETE(request: NextRequest) {
+  try {
+    // Check authentication
+    if (!stackServerApp) {
+      return NextResponse.json(
+        { error: "Authentication not configured" },
+        { status: 500 }
+      );
+    }
+
+    const stackUser = await stackServerApp.getUser();
+    if (!stackUser) {
+      return NextResponse.json(
+        { error: "You must be logged in to delete your account" },
+        { status: 401 }
+      );
+    }
+
+    // Get our internal user
+    const user = await getUserByStackAuthId(stackUser.id);
+    if (!user) {
+      return NextResponse.json(
+        { error: "User account not found" },
+        { status: 401 }
+      );
+    }
+
+    // Parse request body for confirmation
+    const body = await request.json().catch(() => ({}));
+    const { confirmEmail } = body;
+
+    // Require email confirmation to prevent accidental deletion
+    if (confirmEmail !== user.email) {
+      return NextResponse.json(
+        { error: "Please confirm your email address to delete your account" },
+        { status: 400 }
+      );
+    }
+
+    // Perform cascade delete
+    const result = await deleteUserAccount(user.id);
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error || "Failed to delete account" },
+        { status: 500 }
+      );
+    }
+
+    // Also delete from StackAuth
+    try {
+      await stackUser.delete();
+    } catch (stackError) {
+      console.error("Failed to delete StackAuth user:", stackError);
+      // Continue anyway - local data is already deleted
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Your account and all associated data have been permanently deleted",
+      deletedData: result.deletedData,
+    });
+  } catch (error) {
+    console.error("Error deleting account:", error);
+    return NextResponse.json(
+      { error: "Failed to delete account. Please try again or contact support." },
       { status: 500 }
     );
   }

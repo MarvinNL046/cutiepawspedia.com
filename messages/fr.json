@@ -451,7 +451,26 @@
     "badgesSubtitle": "Réalisations que vous avez obtenues grâce à vos contributions",
     "noBadgesYet": "Pas encore de badges disponibles. Continuez à contribuer pour gagner des badges !",
     "earnedBadges": "Badges Obtenus",
-    "availableBadges": "Badges Disponibles"
+    "availableBadges": "Badges Disponibles",
+    "deleteAccount": {
+      "title": "Supprimer le Compte",
+      "subtitle": "Supprimer définitivement votre compte et toutes les données associées",
+      "warningTitle": "Avertissement : Cette action est irréversible",
+      "warning1": "Votre profil, avis et toutes les données du compte seront définitivement supprimés",
+      "warning2": "Vos lieux sauvegardés et l'historique de consultation seront supprimés",
+      "warning3": "Les entreprises que vous possédez seront supprimées avec leurs prospects et messages",
+      "warning4": "Vos badges et points karma seront perdus",
+      "button": "Supprimer Mon Compte",
+      "confirmTitle": "Confirmer la Suppression du Compte",
+      "confirmDescription": "Ceci supprimera définitivement votre compte et toutes les données associées. Cette action est irréversible.",
+      "confirmEmailLabel": "Saisissez votre e-mail pour confirmer",
+      "confirmEmailHint": "Votre e-mail",
+      "emailMismatch": "L'e-mail ne correspond pas à l'e-mail de votre compte",
+      "cancel": "Annuler",
+      "deleting": "Suppression...",
+      "confirmButton": "Supprimer Définitivement le Compte",
+      "error": "Échec de la suppression du compte. Veuillez réessayer."
+    }
   },
   "favorites": {
     "title": "Lieux Sauvegardés",

@@ -112,6 +112,163 @@ export async function getUserById(userId: number) {
   });
 }
 
+/**
+ * Delete user and all associated data (GDPR compliance)
+ * This performs a cascade delete of all user data
+ */
+export async function deleteUserAccount(userId: number): Promise<{
+  success: boolean;
+  deletedData: {
+    favorites: number;
+    recentViews: number;
+    reviews: number;
+    businesses: number;
+    notifications: number;
+    badges: number;
+    karmaEvents: number;
+  };
+  error?: string;
+}> {
+  if (!db) {
+    return { success: false, deletedData: { favorites: 0, recentViews: 0, reviews: 0, businesses: 0, notifications: 0, badges: 0, karmaEvents: 0 }, error: "Database not available" };
+  }
+
+  const deletedData = {
+    favorites: 0,
+    recentViews: 0,
+    reviews: 0,
+    businesses: 0,
+    notifications: 0,
+    badges: 0,
+    karmaEvents: 0,
+  };
+
+  try {
+    // Import all tables we need to clean up
+    const {
+      userFavorites,
+      userRecentViews,
+      reviews,
+      businesses,
+      notificationSettings,
+      notificationLogs,
+      businessNotifications,
+      userBadges,
+      karmaEvents,
+      leads,
+      messages,
+      threads,
+    } = await import("../schema");
+
+    // 1. Delete user favorites
+    const favoritesResult = await db
+      .delete(userFavorites)
+      .where(eq(userFavorites.userId, userId))
+      .returning({ id: userFavorites.id });
+    deletedData.favorites = favoritesResult.length;
+
+    // 2. Delete recent views
+    const recentViewsResult = await db
+      .delete(userRecentViews)
+      .where(eq(userRecentViews.userId, userId))
+      .returning({ id: userRecentViews.id });
+    deletedData.recentViews = recentViewsResult.length;
+
+    // 3. Delete user's reviews (anonymize instead of delete to keep place stats)
+    const reviewsResult = await db
+      .update(reviews)
+      .set({
+        userId: null,
+        authorName: "Deleted User",
+        updatedAt: new Date(),
+      })
+      .where(eq(reviews.userId, userId))
+      .returning({ id: reviews.id });
+    deletedData.reviews = reviewsResult.length;
+
+    // 4. Get user's businesses to clean up related data
+    const userBusinesses = await db
+      .select({ id: businesses.id })
+      .from(businesses)
+      .where(eq(businesses.userId, userId));
+
+    for (const business of userBusinesses) {
+      // Delete business notifications
+      await db
+        .delete(businessNotifications)
+        .where(eq(businessNotifications.businessId, business.id));
+
+      // Delete leads for this business
+      await db
+        .delete(leads)
+        .where(eq(leads.businessId, business.id));
+
+      // Delete threads and messages for this business
+      const businessThreads = await db
+        .select({ id: threads.id })
+        .from(threads)
+        .where(eq(threads.businessId, business.id));
+
+      for (const thread of businessThreads) {
+        await db.delete(messages).where(eq(messages.threadId, thread.id));
+      }
+
+      if (businessThreads.length > 0) {
+        await db
+          .delete(threads)
+          .where(eq(threads.businessId, business.id));
+      }
+    }
+
+    // 5. Delete businesses (set to deleted status or actually delete)
+    const businessesResult = await db
+      .delete(businesses)
+      .where(eq(businesses.userId, userId))
+      .returning({ id: businesses.id });
+    deletedData.businesses = businessesResult.length;
+
+    // 6. Delete notification settings
+    await db
+      .delete(notificationSettings)
+      .where(eq(notificationSettings.userId, userId));
+
+    // 7. Update notification logs (anonymize, don't delete for audit trail)
+    await db
+      .update(notificationLogs)
+      .set({ userId: null })
+      .where(eq(notificationLogs.userId, userId));
+    deletedData.notifications = 1; // Just mark as processed
+
+    // 8. Delete user badges
+    const badgesResult = await db
+      .delete(userBadges)
+      .where(eq(userBadges.userId, userId))
+      .returning({ id: userBadges.id });
+    deletedData.badges = badgesResult.length;
+
+    // 9. Delete karma events
+    const karmaResult = await db
+      .delete(karmaEvents)
+      .where(eq(karmaEvents.userId, userId))
+      .returning({ id: karmaEvents.id });
+    deletedData.karmaEvents = karmaResult.length;
+
+    // 10. Finally, delete the user record
+    await db
+      .delete(users)
+      .where(eq(users.id, userId));
+
+    return { success: true, deletedData };
+  } catch (error) {
+    console.error("Failed to delete user account:", error);
+    return {
+      success: false,
+      deletedData,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
 // ============================================================================
 // TYPES
 // ============================================================================

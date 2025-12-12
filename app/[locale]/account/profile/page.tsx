@@ -15,6 +15,7 @@ import { getBadgesForUser, getAllBadgeDefinitions } from "@/db/queries/badges";
 import { getUserKarmaSummary } from "@/db/queries/karma";
 import { ProfileSettingsForm } from "./ProfileSettingsForm";
 import { BadgeDisplay } from "./BadgeDisplay";
+import { DeleteAccountSection } from "./DeleteAccountSection";
 import { TrustLevelBadge } from "@/components/profile/TrustLevelBadge";
 import { User, Award, Star } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -183,6 +184,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           )}
         </CardContent>
       </Card>
+
+      {/* Delete Account Section */}
+      <DeleteAccountSection userEmail={user.email} />
     </div>
   );
 }

@@ -450,7 +450,26 @@
     "badgesSubtitle": "Prestaties die je hebt behaald door je bijdragen",
     "noBadgesYet": "Nog geen badges beschikbaar. Blijf bijdragen om badges te verdienen!",
     "earnedBadges": "Behaalde Badges",
-    "availableBadges": "Beschikbare Badges"
+    "availableBadges": "Beschikbare Badges",
+    "deleteAccount": {
+      "title": "Account Verwijderen",
+      "subtitle": "Verwijder je account en alle bijbehorende gegevens permanent",
+      "warningTitle": "Waarschuwing: Deze actie kan niet ongedaan worden gemaakt",
+      "warning1": "Je profiel, reviews en alle accountgegevens worden permanent verwijderd",
+      "warning2": "Je opgeslagen plekken en bekijkgeschiedenis worden verwijderd",
+      "warning3": "Bedrijven die je bezit worden verwijderd samen met leads en berichten",
+      "warning4": "Je badges en karmapunten gaan verloren",
+      "button": "Mijn Account Verwijderen",
+      "confirmTitle": "Bevestig Accountverwijdering",
+      "confirmDescription": "Dit verwijdert je account en alle bijbehorende gegevens permanent. Deze actie kan niet ongedaan worden gemaakt.",
+      "confirmEmailLabel": "Typ je e-mail om te bevestigen",
+      "confirmEmailHint": "Je e-mail",
+      "emailMismatch": "E-mail komt niet overeen met je account e-mail",
+      "cancel": "Annuleren",
+      "deleting": "Verwijderen...",
+      "confirmButton": "Account Permanent Verwijderen",
+      "error": "Verwijderen van account mislukt. Probeer het opnieuw."
+    }
   },
   "favorites": {
     "title": "Opgeslagen Plekken",

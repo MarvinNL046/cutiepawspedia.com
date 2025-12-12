@@ -450,7 +450,26 @@
     "badgesSubtitle": "Errungenschaften, die Sie durch Ihre Beiträge verdient haben",
     "noBadgesYet": "Noch keine Abzeichen verfügbar. Tragen Sie weiter bei, um Abzeichen zu verdienen!",
     "earnedBadges": "Verdiente Abzeichen",
-    "availableBadges": "Verfügbare Abzeichen"
+    "availableBadges": "Verfügbare Abzeichen",
+    "deleteAccount": {
+      "title": "Konto Löschen",
+      "subtitle": "Löschen Sie Ihr Konto und alle zugehörigen Daten dauerhaft",
+      "warningTitle": "Warnung: Diese Aktion kann nicht rückgängig gemacht werden",
+      "warning1": "Ihr Profil, Bewertungen und alle Kontodaten werden dauerhaft gelöscht",
+      "warning2": "Ihre gespeicherten Orte und Ansichtshistorie werden entfernt",
+      "warning3": "Unternehmen, die Sie besitzen, werden zusammen mit Leads und Nachrichten gelöscht",
+      "warning4": "Ihre Abzeichen und Karma-Punkte gehen verloren",
+      "button": "Mein Konto Löschen",
+      "confirmTitle": "Kontolöschung Bestätigen",
+      "confirmDescription": "Dies löscht Ihr Konto und alle zugehörigen Daten dauerhaft. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "confirmEmailLabel": "Geben Sie Ihre E-Mail zur Bestätigung ein",
+      "confirmEmailHint": "Ihre E-Mail",
+      "emailMismatch": "E-Mail stimmt nicht mit Ihrer Konto-E-Mail überein",
+      "cancel": "Abbrechen",
+      "deleting": "Wird gelöscht...",
+      "confirmButton": "Konto Dauerhaft Löschen",
+      "error": "Konto konnte nicht gelöscht werden. Bitte versuchen Sie es erneut."
+    }
   },
   "favorites": {
     "title": "Gespeicherte Orte",

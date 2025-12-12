@@ -5,6 +5,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { updateNotificationSettingsAction } from "./actions";
+import { useTranslations } from "next-intl";
 import {
   Mail,
   MessageSquare,
@@ -30,46 +31,46 @@ interface NotificationSettingsFormProps {
 
 interface SettingItem {
   key: keyof Omit<NotificationSettingsFormProps["initialSettings"], "locale">;
-  label: string;
-  description: string;
+  labelKey: string;
+  descriptionKey: string;
   icon: typeof Mail;
 }
 
 const settingItems: SettingItem[] = [
   {
     key: "emailGeneral",
-    label: "General Updates",
-    description: "Platform announcements and important updates",
+    labelKey: "generalUpdates",
+    descriptionKey: "generalUpdatesDesc",
     icon: Mail,
   },
   {
     key: "emailReviews",
-    label: "Reviews & Replies",
-    description: "Notifications when you receive reviews or replies",
+    labelKey: "reviewsReplies",
+    descriptionKey: "reviewsRepliesDesc",
     icon: MessageSquare,
   },
   {
     key: "emailFavorites",
-    label: "Saved Places",
-    description: "Updates about places you've saved",
+    labelKey: "savedPlaces",
+    descriptionKey: "savedPlacesDesc",
     icon: Heart,
   },
   {
     key: "emailLeads",
-    label: "Leads & Inquiries",
-    description: "New customer inquiries for your business",
+    labelKey: "leadsInquiries",
+    descriptionKey: "leadsInquiriesDesc",
     icon: Users,
   },
   {
     key: "emailBusiness",
-    label: "Business Updates",
-    description: "Claim status, verification, and business-related emails",
+    labelKey: "businessUpdates",
+    descriptionKey: "businessUpdatesDesc",
     icon: Briefcase,
   },
   {
     key: "emailDigest",
-    label: "Weekly Digest",
-    description: "Weekly summary of your business activity",
+    labelKey: "weeklyDigest",
+    descriptionKey: "weeklyDigestDesc",
     icon: CalendarDays,
   },
 ];
@@ -77,6 +78,7 @@ const settingItems: SettingItem[] = [
 export function NotificationSettingsForm({
   initialSettings,
 }: NotificationSettingsFormProps) {
+  const t = useTranslations("notifications");
   const [settings, setSettings] = useState(initialSettings);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -109,7 +111,7 @@ export function NotificationSettingsForm({
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     } else {
-      setError(result.error || "Failed to save settings");
+      setError(result.error || t("error"));
     }
   };
 
@@ -135,9 +137,9 @@ export function NotificationSettingsForm({
               </div>
               <div>
                 <Label htmlFor={item.key} className="text-sm font-medium text-cpDark cursor-pointer">
-                  {item.label}
+                  {t(item.labelKey)}
                 </Label>
-                <p className="text-sm text-slate-500 mt-0.5">{item.description}</p>
+                <p className="text-sm text-slate-500 mt-0.5">{t(item.descriptionKey)}</p>
               </div>
             </div>
             <Switch
@@ -158,13 +160,13 @@ export function NotificationSettingsForm({
       {showSuccess && (
         <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-600 flex items-center gap-2">
           <Check className="h-4 w-4" />
-          Settings saved successfully!
+          {t("saved")}
         </div>
       )}
 
       <div className="flex items-center justify-end gap-4">
         {hasChanges && (
-          <span className="text-sm text-slate-500">You have unsaved changes</span>
+          <span className="text-sm text-slate-500">{t("unsavedChanges")}</span>
         )}
         <Button
           type="submit"
@@ -174,10 +176,10 @@ export function NotificationSettingsForm({
           {isSubmitting ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Saving...
+              {t("saving")}
             </>
           ) : (
-            "Save Preferences"
+            t("savePreferences")
           )}
         </Button>
       </div>

@@ -4,6 +4,7 @@ import { getUserByStackAuthId, upsertUserFromStackAuth } from "@/db/queries/user
 import { getOrCreateNotificationSettings, DEFAULT_NOTIFICATION_SETTINGS } from "@/db/queries/notifications";
 import { NotificationSettingsForm } from "./NotificationSettingsForm";
 import { Bell } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 interface NotificationsPageProps {
   params: Promise<{ locale: string }>;
@@ -11,6 +12,7 @@ interface NotificationsPageProps {
 
 export default async function NotificationsPage({ params }: NotificationsPageProps) {
   const { locale } = await params;
+  const t = await getTranslations("notifications");
 
   // Check authentication (already checked in layout, but double-check)
   if (!stackServerApp) {
@@ -59,11 +61,11 @@ export default async function NotificationsPage({ params }: NotificationsPagePro
     <div className="max-w-2xl">
       <div className="flex items-center gap-3 mb-6">
         <Bell className="h-6 w-6 text-cpCoral" />
-        <h1 className="text-2xl font-bold text-foreground dark:text-cpCream">Email Notifications</h1>
+        <h1 className="text-2xl font-bold text-foreground dark:text-cpCream">{t("title")}</h1>
       </div>
 
       <p className="text-muted-foreground dark:text-cpCream/70 mb-8">
-        Manage your email preferences. Choose which types of emails you want to receive.
+        {t("subtitle")}
       </p>
 
       <NotificationSettingsForm

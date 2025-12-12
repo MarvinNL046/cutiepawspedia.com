@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MapPin, Star, CheckCircle, Crown } from "lucide-react";
 import { FavoriteButton } from "@/components/favorites/FavoriteButton";
+import { getTranslations } from "next-intl/server";
 
 export const metadata: Metadata = {
   title: "Saved Places | CutiePawsPedia",
@@ -19,6 +20,7 @@ interface FavoritesPageProps {
 
 export default async function FavoritesPage({ params }: FavoritesPageProps) {
   const { locale } = await params;
+  const t = await getTranslations("favorites");
 
   // Get authenticated user
   const stackUser = await stackServerApp?.getUser();
@@ -42,12 +44,10 @@ export default async function FavoritesPage({ params }: FavoritesPageProps) {
           <div className="p-2 bg-cpCoral/10 rounded-lg">
             <Heart className="h-6 w-6 text-cpCoral" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground dark:text-cpCream">Saved Places</h1>
+          <h1 className="text-2xl font-bold text-foreground dark:text-cpCream">{t("title")}</h1>
         </div>
         <p className="text-muted-foreground dark:text-cpCream/70">
-          {favorites.length === 0
-            ? "You haven't saved any places yet. Browse our directory and click the heart icon to save your favorites!"
-            : `You have ${favorites.length} saved place${favorites.length === 1 ? "" : "s"}.`}
+          {t("description", { count: favorites.length })}
         </p>
       </div>
 
@@ -59,17 +59,16 @@ export default async function FavoritesPage({ params }: FavoritesPageProps) {
               <Heart className="h-8 w-8 text-muted-foreground dark:text-cpCream/60" />
             </div>
             <h3 className="text-lg font-semibold text-foreground dark:text-cpCream mb-2">
-              No saved places yet
+              {t("emptyTitle")}
             </h3>
             <p className="text-muted-foreground dark:text-cpCream/70 mb-6 max-w-md">
-              Start exploring pet care places and save your favorites by clicking
-              the heart icon on any listing.
+              {t("emptyDescription")}
             </p>
             <Link
               href={`/${locale}`}
               className="inline-flex items-center gap-2 px-6 py-3 bg-cpCoral text-white rounded-lg hover:bg-cpCoral/90 transition-colors font-medium"
             >
-              Browse Places
+              {t("browseButton")}
             </Link>
           </CardContent>
         </Card>
@@ -98,7 +97,7 @@ export default async function FavoritesPage({ params }: FavoritesPageProps) {
                   <div className="absolute top-0 right-0 z-10">
                     <div className="bg-gradient-to-r from-cpAmber to-amber-400 text-cpCharcoal text-xs font-bold px-3 py-1 flex items-center gap-1 rounded-bl-lg shadow-sm">
                       <Crown className="h-3 w-3" />
-                      Featured
+                      {t("featured")}
                     </div>
                   </div>
                 )}
@@ -129,7 +128,7 @@ export default async function FavoritesPage({ params }: FavoritesPageProps) {
                               className="bg-cpCoral/10 text-cpCoral border-cpCoral/30 text-xs gap-0.5"
                             >
                               <CheckCircle className="h-3 w-3" />
-                              Verified
+                              {t("verified")}
                             </Badge>
                           )}
                         </div>
@@ -180,7 +179,7 @@ export default async function FavoritesPage({ params }: FavoritesPageProps) {
 
                     {/* Saved date */}
                     <div className="mt-3 pt-3 border-t border-border dark:border-cpAmber/10 text-xs text-muted-foreground dark:text-cpCream/60">
-                      Saved{" "}
+                      {t("savedOn")}{" "}
                       {new Date(place.favoritedAt).toLocaleDateString(locale, {
                         month: "short",
                         day: "numeric",

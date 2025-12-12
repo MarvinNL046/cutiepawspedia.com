@@ -75,17 +75,48 @@ export type BlogTag = {
 // ============================================================================
 
 /**
- * Get locale-aware field value with fallback to English
+ * Get locale-aware field value with fallback chain: requested locale -> EN -> first available
  */
 function getLocalizedField<T>(
+  values: {
+    en?: T | null;
+    nl?: T | null;
+    de?: T | null;
+    fr?: T | null;
+  },
+  locale: Locale
+): T | null {
+  // Try requested locale first
+  const localeValue = values[locale];
+  if (localeValue !== null && localeValue !== undefined) {
+    return localeValue;
+  }
+
+  // Fallback to English
+  if (values.en !== null && values.en !== undefined) {
+    return values.en;
+  }
+
+  // Fallback to any available value
+  for (const val of Object.values(values)) {
+    if (val !== null && val !== undefined) {
+      return val as T;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Legacy helper for backwards compatibility (2-locale version)
+ * @deprecated Use getLocalizedField with values object instead
+ */
+function getLocalizedFieldLegacy<T>(
   enValue: T | null | undefined,
   nlValue: T | null | undefined,
   locale: Locale
 ): T | null {
-  if (locale === "nl" && nlValue) {
-    return nlValue;
-  }
-  return enValue ?? null;
+  return getLocalizedField({ en: enValue, nl: nlValue }, locale);
 }
 
 // ============================================================================
@@ -111,14 +142,20 @@ export async function getPublishedPosts(
       slug: blogPosts.slug,
       titleEn: blogPosts.titleEn,
       titleNl: blogPosts.titleNl,
+      titleDe: blogPosts.titleDe,
+      titleFr: blogPosts.titleFr,
       excerptEn: blogPosts.excerptEn,
       excerptNl: blogPosts.excerptNl,
+      excerptDe: blogPosts.excerptDe,
+      excerptFr: blogPosts.excerptFr,
       featuredImage: blogPosts.featuredImage,
       featuredImageAlt: blogPosts.featuredImageAlt,
       authorName: blogPosts.authorName,
       categorySlug: blogCategories.slug,
       categoryNameEn: blogCategories.nameEn,
       categoryNameNl: blogCategories.nameNl,
+      categoryNameDe: blogCategories.nameDe,
+      categoryNameFr: blogCategories.nameFr,
       readingTimeMinutes: blogPosts.readingTimeMinutes,
       publishedAt: blogPosts.publishedAt,
     })
@@ -140,13 +177,13 @@ export async function getPublishedPosts(
   return results.map((row) => ({
     id: row.id,
     slug: row.slug,
-    title: getLocalizedField(row.titleEn, row.titleNl, locale) ?? row.titleEn,
-    excerpt: getLocalizedField(row.excerptEn, row.excerptNl, locale),
+    title: getLocalizedField({ en: row.titleEn, nl: row.titleNl, de: row.titleDe, fr: row.titleFr }, locale) ?? row.titleEn,
+    excerpt: getLocalizedField({ en: row.excerptEn, nl: row.excerptNl, de: row.excerptDe, fr: row.excerptFr }, locale),
     featuredImage: row.featuredImage,
     featuredImageAlt: row.featuredImageAlt,
     authorName: row.authorName,
     categorySlug: row.categorySlug,
-    categoryName: getLocalizedField(row.categoryNameEn, row.categoryNameNl, locale),
+    categoryName: getLocalizedField({ en: row.categoryNameEn, nl: row.categoryNameNl, de: row.categoryNameDe, fr: row.categoryNameFr }, locale),
     readingTimeMinutes: row.readingTimeMinutes,
     publishedAt: row.publishedAt,
   }));
@@ -165,10 +202,16 @@ export async function getPostBySlug(
       slug: blogPosts.slug,
       titleEn: blogPosts.titleEn,
       titleNl: blogPosts.titleNl,
+      titleDe: blogPosts.titleDe,
+      titleFr: blogPosts.titleFr,
       excerptEn: blogPosts.excerptEn,
       excerptNl: blogPosts.excerptNl,
+      excerptDe: blogPosts.excerptDe,
+      excerptFr: blogPosts.excerptFr,
       contentEn: blogPosts.contentEn,
       contentNl: blogPosts.contentNl,
+      contentDe: blogPosts.contentDe,
+      contentFr: blogPosts.contentFr,
       featuredImage: blogPosts.featuredImage,
       featuredImageAlt: blogPosts.featuredImageAlt,
       authorName: blogPosts.authorName,
@@ -176,6 +219,8 @@ export async function getPostBySlug(
       categorySlug: blogCategories.slug,
       categoryNameEn: blogCategories.nameEn,
       categoryNameNl: blogCategories.nameNl,
+      categoryNameDe: blogCategories.nameDe,
+      categoryNameFr: blogCategories.nameFr,
       readingTimeMinutes: blogPosts.readingTimeMinutes,
       viewCount: blogPosts.viewCount,
       publishedAt: blogPosts.publishedAt,
@@ -196,15 +241,15 @@ export async function getPostBySlug(
   return {
     id: row.id,
     slug: row.slug,
-    title: getLocalizedField(row.titleEn, row.titleNl, locale) ?? row.titleEn,
-    excerpt: getLocalizedField(row.excerptEn, row.excerptNl, locale),
-    content: getLocalizedField(row.contentEn, row.contentNl, locale) ?? row.contentEn,
+    title: getLocalizedField({ en: row.titleEn, nl: row.titleNl, de: row.titleDe, fr: row.titleFr }, locale) ?? row.titleEn,
+    excerpt: getLocalizedField({ en: row.excerptEn, nl: row.excerptNl, de: row.excerptDe, fr: row.excerptFr }, locale),
+    content: getLocalizedField({ en: row.contentEn, nl: row.contentNl, de: row.contentDe, fr: row.contentFr }, locale) ?? row.contentEn,
     featuredImage: row.featuredImage,
     featuredImageAlt: row.featuredImageAlt,
     authorName: row.authorName,
     categoryId: row.categoryId,
     categorySlug: row.categorySlug,
-    categoryName: getLocalizedField(row.categoryNameEn, row.categoryNameNl, locale),
+    categoryName: getLocalizedField({ en: row.categoryNameEn, nl: row.categoryNameNl, de: row.categoryNameDe, fr: row.categoryNameFr }, locale),
     readingTimeMinutes: row.readingTimeMinutes,
     viewCount: row.viewCount,
     publishedAt: row.publishedAt,
@@ -228,10 +273,16 @@ export async function getPostSeoBySlug(
     .select({
       titleEn: blogPosts.titleEn,
       titleNl: blogPosts.titleNl,
+      titleDe: blogPosts.titleDe,
+      titleFr: blogPosts.titleFr,
       metaTitleEn: blogPosts.metaTitleEn,
       metaTitleNl: blogPosts.metaTitleNl,
+      metaTitleDe: blogPosts.metaTitleDe,
+      metaTitleFr: blogPosts.metaTitleFr,
       metaDescriptionEn: blogPosts.metaDescriptionEn,
       metaDescriptionNl: blogPosts.metaDescriptionNl,
+      metaDescriptionDe: blogPosts.metaDescriptionDe,
+      metaDescriptionFr: blogPosts.metaDescriptionFr,
       featuredImage: blogPosts.featuredImage,
     })
     .from(blogPosts)
@@ -242,9 +293,9 @@ export async function getPostSeoBySlug(
   if (!row) return null;
 
   return {
-    title: getLocalizedField(row.titleEn, row.titleNl, locale) ?? row.titleEn,
-    metaTitle: getLocalizedField(row.metaTitleEn, row.metaTitleNl, locale),
-    metaDescription: getLocalizedField(row.metaDescriptionEn, row.metaDescriptionNl, locale),
+    title: getLocalizedField({ en: row.titleEn, nl: row.titleNl, de: row.titleDe, fr: row.titleFr }, locale) ?? row.titleEn,
+    metaTitle: getLocalizedField({ en: row.metaTitleEn, nl: row.metaTitleNl, de: row.metaTitleDe, fr: row.metaTitleFr }, locale),
+    metaDescription: getLocalizedField({ en: row.metaDescriptionEn, nl: row.metaDescriptionNl, de: row.metaDescriptionDe, fr: row.metaDescriptionFr }, locale),
     featuredImage: row.featuredImage,
   };
 }
@@ -275,14 +326,20 @@ export async function getPostsByCategory(
       slug: blogPosts.slug,
       titleEn: blogPosts.titleEn,
       titleNl: blogPosts.titleNl,
+      titleDe: blogPosts.titleDe,
+      titleFr: blogPosts.titleFr,
       excerptEn: blogPosts.excerptEn,
       excerptNl: blogPosts.excerptNl,
+      excerptDe: blogPosts.excerptDe,
+      excerptFr: blogPosts.excerptFr,
       featuredImage: blogPosts.featuredImage,
       featuredImageAlt: blogPosts.featuredImageAlt,
       authorName: blogPosts.authorName,
       categorySlug: blogCategories.slug,
       categoryNameEn: blogCategories.nameEn,
       categoryNameNl: blogCategories.nameNl,
+      categoryNameDe: blogCategories.nameDe,
+      categoryNameFr: blogCategories.nameFr,
       readingTimeMinutes: blogPosts.readingTimeMinutes,
       publishedAt: blogPosts.publishedAt,
     })
@@ -303,13 +360,13 @@ export async function getPostsByCategory(
   return results.map((row) => ({
     id: row.id,
     slug: row.slug,
-    title: getLocalizedField(row.titleEn, row.titleNl, locale) ?? row.titleEn,
-    excerpt: getLocalizedField(row.excerptEn, row.excerptNl, locale),
+    title: getLocalizedField({ en: row.titleEn, nl: row.titleNl, de: row.titleDe, fr: row.titleFr }, locale) ?? row.titleEn,
+    excerpt: getLocalizedField({ en: row.excerptEn, nl: row.excerptNl, de: row.excerptDe, fr: row.excerptFr }, locale),
     featuredImage: row.featuredImage,
     featuredImageAlt: row.featuredImageAlt,
     authorName: row.authorName,
     categorySlug: row.categorySlug,
-    categoryName: getLocalizedField(row.categoryNameEn, row.categoryNameNl, locale),
+    categoryName: getLocalizedField({ en: row.categoryNameEn, nl: row.categoryNameNl, de: row.categoryNameDe, fr: row.categoryNameFr }, locale),
     readingTimeMinutes: row.readingTimeMinutes,
     publishedAt: row.publishedAt,
   }));
@@ -371,8 +428,12 @@ export async function getAllBlogCategories(locale: Locale): Promise<BlogCategory
       slug: blogCategories.slug,
       nameEn: blogCategories.nameEn,
       nameNl: blogCategories.nameNl,
+      nameDe: blogCategories.nameDe,
+      nameFr: blogCategories.nameFr,
       descriptionEn: blogCategories.descriptionEn,
       descriptionNl: blogCategories.descriptionNl,
+      descriptionDe: blogCategories.descriptionDe,
+      descriptionFr: blogCategories.descriptionFr,
       icon: blogCategories.icon,
       color: blogCategories.color,
     })
@@ -383,8 +444,8 @@ export async function getAllBlogCategories(locale: Locale): Promise<BlogCategory
   return results.map((row) => ({
     id: row.id,
     slug: row.slug,
-    name: getLocalizedField(row.nameEn, row.nameNl, locale) ?? row.nameEn,
-    description: getLocalizedField(row.descriptionEn, row.descriptionNl, locale),
+    name: getLocalizedField({ en: row.nameEn, nl: row.nameNl, de: row.nameDe, fr: row.nameFr }, locale) ?? row.nameEn,
+    description: getLocalizedField({ en: row.descriptionEn, nl: row.descriptionNl, de: row.descriptionDe, fr: row.descriptionFr }, locale),
     icon: row.icon,
     color: row.color,
   }));
@@ -403,8 +464,12 @@ export async function getBlogCategoryBySlug(
       slug: blogCategories.slug,
       nameEn: blogCategories.nameEn,
       nameNl: blogCategories.nameNl,
+      nameDe: blogCategories.nameDe,
+      nameFr: blogCategories.nameFr,
       descriptionEn: blogCategories.descriptionEn,
       descriptionNl: blogCategories.descriptionNl,
+      descriptionDe: blogCategories.descriptionDe,
+      descriptionFr: blogCategories.descriptionFr,
       icon: blogCategories.icon,
       color: blogCategories.color,
     })
@@ -418,8 +483,8 @@ export async function getBlogCategoryBySlug(
   return {
     id: row.id,
     slug: row.slug,
-    name: getLocalizedField(row.nameEn, row.nameNl, locale) ?? row.nameEn,
-    description: getLocalizedField(row.descriptionEn, row.descriptionNl, locale),
+    name: getLocalizedField({ en: row.nameEn, nl: row.nameNl, de: row.nameDe, fr: row.nameFr }, locale) ?? row.nameEn,
+    description: getLocalizedField({ en: row.descriptionEn, nl: row.descriptionNl, de: row.descriptionDe, fr: row.descriptionFr }, locale),
     icon: row.icon,
     color: row.color,
   };
@@ -440,10 +505,16 @@ export async function getBlogCategorySeoBySlug(
     .select({
       nameEn: blogCategories.nameEn,
       nameNl: blogCategories.nameNl,
+      nameDe: blogCategories.nameDe,
+      nameFr: blogCategories.nameFr,
       metaTitleEn: blogCategories.metaTitleEn,
       metaTitleNl: blogCategories.metaTitleNl,
+      metaTitleDe: blogCategories.metaTitleDe,
+      metaTitleFr: blogCategories.metaTitleFr,
       metaDescriptionEn: blogCategories.metaDescriptionEn,
       metaDescriptionNl: blogCategories.metaDescriptionNl,
+      metaDescriptionDe: blogCategories.metaDescriptionDe,
+      metaDescriptionFr: blogCategories.metaDescriptionFr,
     })
     .from(blogCategories)
     .where(eq(blogCategories.slug, slug))
@@ -453,9 +524,9 @@ export async function getBlogCategorySeoBySlug(
   if (!row) return null;
 
   return {
-    name: getLocalizedField(row.nameEn, row.nameNl, locale) ?? row.nameEn,
-    metaTitle: getLocalizedField(row.metaTitleEn, row.metaTitleNl, locale),
-    metaDescription: getLocalizedField(row.metaDescriptionEn, row.metaDescriptionNl, locale),
+    name: getLocalizedField({ en: row.nameEn, nl: row.nameNl, de: row.nameDe, fr: row.nameFr }, locale) ?? row.nameEn,
+    metaTitle: getLocalizedField({ en: row.metaTitleEn, nl: row.metaTitleNl, de: row.metaTitleDe, fr: row.metaTitleFr }, locale),
+    metaDescription: getLocalizedField({ en: row.metaDescriptionEn, nl: row.metaDescriptionNl, de: row.metaDescriptionDe, fr: row.metaDescriptionFr }, locale),
   };
 }
 
@@ -485,6 +556,8 @@ export async function getAllBlogTags(locale: Locale): Promise<BlogTag[]> {
       slug: blogTags.slug,
       nameEn: blogTags.nameEn,
       nameNl: blogTags.nameNl,
+      nameDe: blogTags.nameDe,
+      nameFr: blogTags.nameFr,
       postCount: blogTags.postCount,
     })
     .from(blogTags)
@@ -493,7 +566,7 @@ export async function getAllBlogTags(locale: Locale): Promise<BlogTag[]> {
   return results.map((row) => ({
     id: row.id,
     slug: row.slug,
-    name: getLocalizedField(row.nameEn, row.nameNl, locale) ?? row.nameEn,
+    name: getLocalizedField({ en: row.nameEn, nl: row.nameNl, de: row.nameDe, fr: row.nameFr }, locale) ?? row.nameEn,
     postCount: row.postCount,
   }));
 }
@@ -511,6 +584,8 @@ export async function getTagsForPost(
       slug: blogTags.slug,
       nameEn: blogTags.nameEn,
       nameNl: blogTags.nameNl,
+      nameDe: blogTags.nameDe,
+      nameFr: blogTags.nameFr,
       postCount: blogTags.postCount,
     })
     .from(blogTags)
@@ -520,7 +595,7 @@ export async function getTagsForPost(
   return results.map((row) => ({
     id: row.id,
     slug: row.slug,
-    name: getLocalizedField(row.nameEn, row.nameNl, locale) ?? row.nameEn,
+    name: getLocalizedField({ en: row.nameEn, nl: row.nameNl, de: row.nameDe, fr: row.nameFr }, locale) ?? row.nameEn,
     postCount: row.postCount,
   }));
 }
@@ -538,25 +613,47 @@ export async function getRelatedPosts(
   locale: Locale,
   limit: number = 3
 ): Promise<BlogPostCard[]> {
+  const selectFields = {
+    id: blogPosts.id,
+    slug: blogPosts.slug,
+    titleEn: blogPosts.titleEn,
+    titleNl: blogPosts.titleNl,
+    titleDe: blogPosts.titleDe,
+    titleFr: blogPosts.titleFr,
+    excerptEn: blogPosts.excerptEn,
+    excerptNl: blogPosts.excerptNl,
+    excerptDe: blogPosts.excerptDe,
+    excerptFr: blogPosts.excerptFr,
+    featuredImage: blogPosts.featuredImage,
+    featuredImageAlt: blogPosts.featuredImageAlt,
+    authorName: blogPosts.authorName,
+    categorySlug: blogCategories.slug,
+    categoryNameEn: blogCategories.nameEn,
+    categoryNameNl: blogCategories.nameNl,
+    categoryNameDe: blogCategories.nameDe,
+    categoryNameFr: blogCategories.nameFr,
+    readingTimeMinutes: blogPosts.readingTimeMinutes,
+    publishedAt: blogPosts.publishedAt,
+  };
+
+  const mapRow = (row: typeof selectFields extends Record<string, infer T> ? { [K in keyof typeof selectFields]: any } : never) => ({
+    id: row.id,
+    slug: row.slug,
+    title: getLocalizedField({ en: row.titleEn, nl: row.titleNl, de: row.titleDe, fr: row.titleFr }, locale) ?? row.titleEn,
+    excerpt: getLocalizedField({ en: row.excerptEn, nl: row.excerptNl, de: row.excerptDe, fr: row.excerptFr }, locale),
+    featuredImage: row.featuredImage,
+    featuredImageAlt: row.featuredImageAlt,
+    authorName: row.authorName,
+    categorySlug: row.categorySlug,
+    categoryName: getLocalizedField({ en: row.categoryNameEn, nl: row.categoryNameNl, de: row.categoryNameDe, fr: row.categoryNameFr }, locale),
+    readingTimeMinutes: row.readingTimeMinutes,
+    publishedAt: row.publishedAt,
+  });
+
   if (!categoryId) {
     // If no category, just get latest posts excluding current
     const results = await db
-      .select({
-        id: blogPosts.id,
-        slug: blogPosts.slug,
-        titleEn: blogPosts.titleEn,
-        titleNl: blogPosts.titleNl,
-        excerptEn: blogPosts.excerptEn,
-        excerptNl: blogPosts.excerptNl,
-        featuredImage: blogPosts.featuredImage,
-        featuredImageAlt: blogPosts.featuredImageAlt,
-        authorName: blogPosts.authorName,
-        categorySlug: blogCategories.slug,
-        categoryNameEn: blogCategories.nameEn,
-        categoryNameNl: blogCategories.nameNl,
-        readingTimeMinutes: blogPosts.readingTimeMinutes,
-        publishedAt: blogPosts.publishedAt,
-      })
+      .select(selectFields)
       .from(blogPosts)
       .leftJoin(blogCategories, eq(blogPosts.categoryId, blogCategories.id))
       .where(
@@ -570,38 +667,11 @@ export async function getRelatedPosts(
       .orderBy(desc(blogPosts.publishedAt))
       .limit(limit);
 
-    return results.map((row) => ({
-      id: row.id,
-      slug: row.slug,
-      title: getLocalizedField(row.titleEn, row.titleNl, locale) ?? row.titleEn,
-      excerpt: getLocalizedField(row.excerptEn, row.excerptNl, locale),
-      featuredImage: row.featuredImage,
-      featuredImageAlt: row.featuredImageAlt,
-      authorName: row.authorName,
-      categorySlug: row.categorySlug,
-      categoryName: getLocalizedField(row.categoryNameEn, row.categoryNameNl, locale),
-      readingTimeMinutes: row.readingTimeMinutes,
-      publishedAt: row.publishedAt,
-    }));
+    return results.map(mapRow);
   }
 
   const results = await db
-    .select({
-      id: blogPosts.id,
-      slug: blogPosts.slug,
-      titleEn: blogPosts.titleEn,
-      titleNl: blogPosts.titleNl,
-      excerptEn: blogPosts.excerptEn,
-      excerptNl: blogPosts.excerptNl,
-      featuredImage: blogPosts.featuredImage,
-      featuredImageAlt: blogPosts.featuredImageAlt,
-      authorName: blogPosts.authorName,
-      categorySlug: blogCategories.slug,
-      categoryNameEn: blogCategories.nameEn,
-      categoryNameNl: blogCategories.nameNl,
-      readingTimeMinutes: blogPosts.readingTimeMinutes,
-      publishedAt: blogPosts.publishedAt,
-    })
+    .select(selectFields)
     .from(blogPosts)
     .leftJoin(blogCategories, eq(blogPosts.categoryId, blogCategories.id))
     .where(
@@ -616,17 +686,5 @@ export async function getRelatedPosts(
     .orderBy(desc(blogPosts.publishedAt))
     .limit(limit);
 
-  return results.map((row) => ({
-    id: row.id,
-    slug: row.slug,
-    title: getLocalizedField(row.titleEn, row.titleNl, locale) ?? row.titleEn,
-    excerpt: getLocalizedField(row.excerptEn, row.excerptNl, locale),
-    featuredImage: row.featuredImage,
-    featuredImageAlt: row.featuredImageAlt,
-    authorName: row.authorName,
-    categorySlug: row.categorySlug,
-    categoryName: getLocalizedField(row.categoryNameEn, row.categoryNameNl, locale),
-    readingTimeMinutes: row.readingTimeMinutes,
-    publishedAt: row.publishedAt,
-  }));
+  return results.map(mapRow);
 }

@@ -34,19 +34,30 @@ export const blogCategories = pgTable("blog_categories", {
   // Localized names
   nameEn: varchar("name_en", { length: 100 }).notNull(),
   nameNl: varchar("name_nl", { length: 100 }),
+  nameDe: varchar("name_de", { length: 100 }),
+  nameFr: varchar("name_fr", { length: 100 }),
   // Localized descriptions
   descriptionEn: text("description_en"),
   descriptionNl: text("description_nl"),
+  descriptionDe: text("description_de"),
+  descriptionFr: text("description_fr"),
   // Display
   icon: varchar("icon", { length: 50 }), // Emoji or icon name
   color: varchar("color", { length: 20 }), // Tailwind color class
   sortOrder: integer("sort_order").default(0).notNull(),
   isActive: boolean("is_active").default(true).notNull(),
-  // SEO
+  // SEO - English
   metaTitleEn: varchar("meta_title_en", { length: 60 }),
-  metaTitleNl: varchar("meta_title_nl", { length: 60 }),
   metaDescriptionEn: varchar("meta_description_en", { length: 160 }),
+  // SEO - Dutch
+  metaTitleNl: varchar("meta_title_nl", { length: 60 }),
   metaDescriptionNl: varchar("meta_description_nl", { length: 160 }),
+  // SEO - German
+  metaTitleDe: varchar("meta_title_de", { length: 60 }),
+  metaDescriptionDe: varchar("meta_description_de", { length: 160 }),
+  // SEO - French
+  metaTitleFr: varchar("meta_title_fr", { length: 60 }),
+  metaDescriptionFr: varchar("meta_description_fr", { length: 160 }),
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -63,6 +74,8 @@ export const blogTags = pgTable("blog_tags", {
   // Localized names
   nameEn: varchar("name_en", { length: 100 }).notNull(),
   nameNl: varchar("name_nl", { length: 100 }),
+  nameDe: varchar("name_de", { length: 100 }),
+  nameFr: varchar("name_fr", { length: 100 }),
   // Stats
   postCount: integer("post_count").default(0).notNull(),
   // Timestamps
@@ -97,12 +110,26 @@ export const blogPosts = pgTable(
     titleNl: varchar("title_nl", { length: 255 }),
     excerptNl: text("excerpt_nl"),
     contentNl: text("content_nl"),
+    // German content
+    titleDe: varchar("title_de", { length: 255 }),
+    excerptDe: text("excerpt_de"),
+    contentDe: text("content_de"),
+    // French content
+    titleFr: varchar("title_fr", { length: 255 }),
+    excerptFr: text("excerpt_fr"),
+    contentFr: text("content_fr"),
     // SEO - English
     metaTitleEn: varchar("meta_title_en", { length: 60 }),
     metaDescriptionEn: varchar("meta_description_en", { length: 160 }),
     // SEO - Dutch
     metaTitleNl: varchar("meta_title_nl", { length: 60 }),
     metaDescriptionNl: varchar("meta_description_nl", { length: 160 }),
+    // SEO - German
+    metaTitleDe: varchar("meta_title_de", { length: 60 }),
+    metaDescriptionDe: varchar("meta_description_de", { length: 160 }),
+    // SEO - French
+    metaTitleFr: varchar("meta_title_fr", { length: 60 }),
+    metaDescriptionFr: varchar("meta_description_fr", { length: 160 }),
     // Reading stats
     readingTimeMinutes: integer("reading_time_minutes").default(5),
     viewCount: integer("view_count").default(0).notNull(),

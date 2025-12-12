@@ -882,5 +882,52 @@
       "description": "Vous gérez plusieurs emplacements ou avez besoin de solutions personnalisées ? Parlons-en.",
       "button": "Contacter les Ventes"
     }
+  },
+  "dogFoodCalculator": {
+    "title": "Calculateur de Nourriture pour Chien",
+    "subtitle": "Calculez la quantité de nourriture dont votre chien a besoin par jour",
+    "description": "Ce calculateur détermine les besoins caloriques quotidiens de votre chien sur la base de formules scientifiquement prouvées (RER/MER) utilisées par les vétérinaires du monde entier.",
+    "weight": "Poids de votre chien",
+    "weightUnit": "kg",
+    "weightPlaceholder": "Ex. 15",
+    "activityLevel": "Niveau d'activité",
+    "activityLevels": {
+      "sedentary": "Peu actif (courtes promenades)",
+      "normal": "Normalement actif (promenades quotidiennes)",
+      "active": "Actif (beaucoup d'exercice, jeux)",
+      "veryActive": "Très actif (chien de travail, sport)"
+    },
+    "lifeStage": "Étape de vie",
+    "lifeStages": {
+      "puppy4": "Chiot (jusqu'à 4 mois)",
+      "puppy12": "Chiot (4-12 mois)",
+      "adult": "Chien adulte",
+      "senior": "Chien senior (7+ ans)"
+    },
+    "neutered": "Castré/Stérilisé",
+    "neuteredOptions": {
+      "yes": "Oui",
+      "no": "Non"
+    },
+    "calculate": "Calculer",
+    "results": {
+      "title": "Résultat",
+      "dailyCalories": "Besoins caloriques quotidiens",
+      "kcalPerDay": "kcal par jour",
+      "dryFood": "Croquettes (moyenne)",
+      "wetFood": "Pâtée (moyenne)",
+      "gramsPerDay": "grammes par jour",
+      "note": "Ceci est une estimation basée sur des valeurs moyennes. Vérifiez toujours l'emballage de votre nourriture spécifique."
+    },
+    "disclaimer": {
+      "title": "Information importante",
+      "text": "Ce calculateur fournit une estimation basée sur des formules scientifiques. Les besoins individuels peuvent varier jusqu'à 50%. Consultez toujours un vétérinaire pour des conseils nutritionnels spécifiques, surtout en cas de problèmes de santé ou d'obésité.",
+      "sources": "Sources"
+    },
+    "sources": {
+      "purina": "Purina Institute - MER Calculator",
+      "wsava": "WSAVA Nutrition Assessment Guidelines",
+      "petmd": "PetMD - Dog Calorie Needs"
+    }
   }
 }

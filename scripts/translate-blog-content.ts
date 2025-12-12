@@ -40,6 +40,7 @@ const MODEL = "gpt-4o-mini"; // User requirement: "4o-mini geen andere"
 const DELAY_MS = 500; // Delay between API calls to avoid rate limits
 
 type TargetLocale = "en" | "de" | "fr";
+const TARGET_LOCALES: TargetLocale[] = ["en", "de", "fr"];
 
 // ============================================================================
 // OPENAI CLIENT
@@ -76,6 +77,13 @@ Répondez UNIQUEMENT avec le texte traduit.`,
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function truncateText(text: string | null, maxLength: number): string | null {
+  if (!text) return null;
+  if (text.length <= maxLength) return text;
+  // Truncate and add ellipsis, ensuring we stay within limit
+  return text.slice(0, maxLength - 3) + "...";
 }
 
 async function translateText(
@@ -135,19 +143,46 @@ async function translateBlogCategories(dryRun: boolean): Promise<void> {
 
   for (const category of categories) {
     // Check which translations are missing
+    const needsEn = !category.nameEn && category.nameNl;
     const needsDe = !category.nameDe && category.nameNl;
     const needsFr = !category.nameFr && category.nameNl;
 
-    if (!needsDe && !needsFr) {
+    if (!needsEn && !needsDe && !needsFr) {
       console.log(`✅ ${category.slug} - all translations present`);
       continue;
     }
 
-    const needs = [needsDe ? "de" : "", needsFr ? "fr" : ""].filter(Boolean);
+    const needs = [needsEn ? "en" : "", needsDe ? "de" : "", needsFr ? "fr" : ""].filter(Boolean);
     console.log(`🔄 ${category.slug} - needs: ${needs.join(", ")}`);
 
     if (dryRun) {
       continue;
+    }
+
+    // Translate to English
+    if (needsEn) {
+      console.log(`   Translating to EN...`);
+      const nameEn = category.nameNl ? await translateText(category.nameNl, "en") : null;
+      await sleep(DELAY_MS);
+      const descriptionEn = category.descriptionNl ? await translateText(category.descriptionNl, "en") : null;
+      await sleep(DELAY_MS);
+      const metaTitleEnRaw = category.metaTitleNl ? await translateText(category.metaTitleNl, "en") : null;
+      const metaTitleEn = truncateText(metaTitleEnRaw, 60);
+      await sleep(DELAY_MS);
+      const metaDescriptionEnRaw = category.metaDescriptionNl ? await translateText(category.metaDescriptionNl, "en") : null;
+      const metaDescriptionEn = truncateText(metaDescriptionEnRaw, 160);
+      await sleep(DELAY_MS);
+
+      await db
+        .update(blogCategories)
+        .set({
+          nameEn: nameEn || category.nameNl, // nameEn is required, fallback to NL
+          descriptionEn,
+          metaTitleEn,
+          metaDescriptionEn,
+        })
+        .where(eq(blogCategories.id, category.id));
+      console.log(`   ✅ EN translated`);
     }
 
     // Translate to German
@@ -157,9 +192,11 @@ async function translateBlogCategories(dryRun: boolean): Promise<void> {
       await sleep(DELAY_MS);
       const descriptionDe = category.descriptionNl ? await translateText(category.descriptionNl, "de") : null;
       await sleep(DELAY_MS);
-      const metaTitleDe = category.metaTitleNl ? await translateText(category.metaTitleNl, "de") : null;
+      const metaTitleDeRaw = category.metaTitleNl ? await translateText(category.metaTitleNl, "de") : null;
+      const metaTitleDe = truncateText(metaTitleDeRaw, 60);
       await sleep(DELAY_MS);
-      const metaDescriptionDe = category.metaDescriptionNl ? await translateText(category.metaDescriptionNl, "de") : null;
+      const metaDescriptionDeRaw = category.metaDescriptionNl ? await translateText(category.metaDescriptionNl, "de") : null;
+      const metaDescriptionDe = truncateText(metaDescriptionDeRaw, 160);
       await sleep(DELAY_MS);
 
       await db
@@ -181,9 +218,11 @@ async function translateBlogCategories(dryRun: boolean): Promise<void> {
       await sleep(DELAY_MS);
       const descriptionFr = category.descriptionNl ? await translateText(category.descriptionNl, "fr") : null;
       await sleep(DELAY_MS);
-      const metaTitleFr = category.metaTitleNl ? await translateText(category.metaTitleNl, "fr") : null;
+      const metaTitleFrRaw = category.metaTitleNl ? await translateText(category.metaTitleNl, "fr") : null;
+      const metaTitleFr = truncateText(metaTitleFrRaw, 60);
       await sleep(DELAY_MS);
-      const metaDescriptionFr = category.metaDescriptionNl ? await translateText(category.metaDescriptionNl, "fr") : null;
+      const metaDescriptionFrRaw = category.metaDescriptionNl ? await translateText(category.metaDescriptionNl, "fr") : null;
+      const metaDescriptionFr = truncateText(metaDescriptionFrRaw, 160);
       await sleep(DELAY_MS);
 
       await db
@@ -229,19 +268,31 @@ async function translateBlogTags(dryRun: boolean): Promise<void> {
   let translatedCount = 0;
 
   for (const tag of tags) {
+    const needsEn = !tag.nameEn && tag.nameNl;
     const needsDe = !tag.nameDe && tag.nameNl;
     const needsFr = !tag.nameFr && tag.nameNl;
 
-    if (!needsDe && !needsFr) {
+    if (!needsEn && !needsDe && !needsFr) {
       console.log(`✅ ${tag.slug} - all translations present`);
       continue;
     }
 
-    const needs = [needsDe ? "de" : "", needsFr ? "fr" : ""].filter(Boolean);
+    const needs = [needsEn ? "en" : "", needsDe ? "de" : "", needsFr ? "fr" : ""].filter(Boolean);
     console.log(`🔄 ${tag.slug} - needs: ${needs.join(", ")}`);
 
     if (dryRun) {
       continue;
+    }
+
+    // Translate to English
+    if (needsEn && tag.nameNl) {
+      const nameEn = await translateText(tag.nameNl, "en");
+      await db
+        .update(blogTags)
+        .set({ nameEn: nameEn || tag.nameNl }) // nameEn is required, fallback to NL
+        .where(eq(blogTags.id, tag.id));
+      console.log(`   ✅ EN: "${nameEn}"`);
+      await sleep(DELAY_MS);
     }
 
     // Translate to German
@@ -297,18 +348,23 @@ async function translateBlogPosts(
       id: blogPosts.id,
       slug: blogPosts.slug,
       titleNl: blogPosts.titleNl,
+      titleEn: blogPosts.titleEn,
       titleDe: blogPosts.titleDe,
       titleFr: blogPosts.titleFr,
       excerptNl: blogPosts.excerptNl,
+      excerptEn: blogPosts.excerptEn,
       excerptDe: blogPosts.excerptDe,
       excerptFr: blogPosts.excerptFr,
       contentNl: blogPosts.contentNl,
+      contentEn: blogPosts.contentEn,
       contentDe: blogPosts.contentDe,
       contentFr: blogPosts.contentFr,
       metaTitleNl: blogPosts.metaTitleNl,
+      metaTitleEn: blogPosts.metaTitleEn,
       metaTitleDe: blogPosts.metaTitleDe,
       metaTitleFr: blogPosts.metaTitleFr,
       metaDescriptionNl: blogPosts.metaDescriptionNl,
+      metaDescriptionEn: blogPosts.metaDescriptionEn,
       metaDescriptionDe: blogPosts.metaDescriptionDe,
       metaDescriptionFr: blogPosts.metaDescriptionFr,
     })
@@ -321,19 +377,49 @@ async function translateBlogPosts(
 
   for (const post of posts) {
     // Check which translations are missing
+    const needsEn = !post.contentEn && post.contentNl;
     const needsDe = !post.contentDe && post.contentNl;
     const needsFr = !post.contentFr && post.contentNl;
 
-    if (!needsDe && !needsFr) {
+    if (!needsEn && !needsDe && !needsFr) {
       console.log(`✅ ${post.slug} - all translations present`);
       continue;
     }
 
-    const needs = [needsDe ? "de" : "", needsFr ? "fr" : ""].filter(Boolean);
+    const needs = [needsEn ? "en" : "", needsDe ? "de" : "", needsFr ? "fr" : ""].filter(Boolean);
     console.log(`🔄 ${post.slug} - needs: ${needs.join(", ")}`);
 
     if (dryRun) {
       continue;
+    }
+
+    // Translate to English
+    if (needsEn) {
+      console.log(`   Translating to EN...`);
+      const titleEn = post.titleNl ? await translateText(post.titleNl, "en") : null;
+      await sleep(DELAY_MS);
+      const excerptEn = post.excerptNl ? await translateText(post.excerptNl, "en") : null;
+      await sleep(DELAY_MS);
+      const contentEn = post.contentNl ? await translateText(post.contentNl, "en") : null;
+      await sleep(DELAY_MS);
+      const metaTitleEnRaw = post.metaTitleNl ? await translateText(post.metaTitleNl, "en") : null;
+      const metaTitleEn = truncateText(metaTitleEnRaw, 60);
+      await sleep(DELAY_MS);
+      const metaDescriptionEnRaw = post.metaDescriptionNl ? await translateText(post.metaDescriptionNl, "en") : null;
+      const metaDescriptionEn = truncateText(metaDescriptionEnRaw, 160);
+      await sleep(DELAY_MS);
+
+      await db
+        .update(blogPosts)
+        .set({
+          titleEn: titleEn || post.titleNl, // titleEn is required, fallback to NL
+          excerptEn,
+          contentEn: contentEn || post.contentNl, // contentEn is required, fallback to NL
+          metaTitleEn,
+          metaDescriptionEn,
+        })
+        .where(eq(blogPosts.id, post.id));
+      console.log(`   ✅ EN translated`);
     }
 
     // Translate to German
@@ -345,9 +431,11 @@ async function translateBlogPosts(
       await sleep(DELAY_MS);
       const contentDe = post.contentNl ? await translateText(post.contentNl, "de") : null;
       await sleep(DELAY_MS);
-      const metaTitleDe = post.metaTitleNl ? await translateText(post.metaTitleNl, "de") : null;
+      const metaTitleDeRaw = post.metaTitleNl ? await translateText(post.metaTitleNl, "de") : null;
+      const metaTitleDe = truncateText(metaTitleDeRaw, 60);
       await sleep(DELAY_MS);
-      const metaDescriptionDe = post.metaDescriptionNl ? await translateText(post.metaDescriptionNl, "de") : null;
+      const metaDescriptionDeRaw = post.metaDescriptionNl ? await translateText(post.metaDescriptionNl, "de") : null;
+      const metaDescriptionDe = truncateText(metaDescriptionDeRaw, 160);
       await sleep(DELAY_MS);
 
       await db
@@ -372,9 +460,11 @@ async function translateBlogPosts(
       await sleep(DELAY_MS);
       const contentFr = post.contentNl ? await translateText(post.contentNl, "fr") : null;
       await sleep(DELAY_MS);
-      const metaTitleFr = post.metaTitleNl ? await translateText(post.metaTitleNl, "fr") : null;
+      const metaTitleFrRaw = post.metaTitleNl ? await translateText(post.metaTitleNl, "fr") : null;
+      const metaTitleFr = truncateText(metaTitleFrRaw, 60);
       await sleep(DELAY_MS);
-      const metaDescriptionFr = post.metaDescriptionNl ? await translateText(post.metaDescriptionNl, "fr") : null;
+      const metaDescriptionFrRaw = post.metaDescriptionNl ? await translateText(post.metaDescriptionNl, "fr") : null;
+      const metaDescriptionFr = truncateText(metaDescriptionFrRaw, 160);
       await sleep(DELAY_MS);
 
       await db

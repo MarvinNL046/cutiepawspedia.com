@@ -881,5 +881,52 @@
       "description": "Beheer je meerdere locaties of heb je maatwerkoplossingen nodig? Laten we praten.",
       "button": "Neem Contact Op"
     }
+  },
+  "dogFoodCalculator": {
+    "title": "Hondenvoer Calculator",
+    "subtitle": "Bereken hoeveel voer jouw hond per dag nodig heeft",
+    "description": "Deze calculator berekent de dagelijkse caloriebehoefte van je hond op basis van wetenschappelijk onderbouwde formules (RER/MER) die door dierenartsen wereldwijd worden gebruikt.",
+    "weight": "Gewicht van je hond",
+    "weightUnit": "kg",
+    "weightPlaceholder": "Bijv. 15",
+    "activityLevel": "Activiteitsniveau",
+    "activityLevels": {
+      "sedentary": "Weinig actief (korte wandelingen)",
+      "normal": "Normaal actief (dagelijkse wandelingen)",
+      "active": "Actief (veel beweging, spelen)",
+      "veryActive": "Zeer actief (werkhond, sport)"
+    },
+    "lifeStage": "Levensfase",
+    "lifeStages": {
+      "puppy4": "Puppy (tot 4 maanden)",
+      "puppy12": "Puppy (4-12 maanden)",
+      "adult": "Volwassen hond",
+      "senior": "Senior hond (7+ jaar)"
+    },
+    "neutered": "Gecastreerd/Gesteriliseerd",
+    "neuteredOptions": {
+      "yes": "Ja",
+      "no": "Nee"
+    },
+    "calculate": "Bereken",
+    "results": {
+      "title": "Resultaat",
+      "dailyCalories": "Dagelijkse caloriebehoefte",
+      "kcalPerDay": "kcal per dag",
+      "dryFood": "Droogvoer (gemiddeld)",
+      "wetFood": "Natvoer (gemiddeld)",
+      "gramsPerDay": "gram per dag",
+      "note": "Dit is een schatting op basis van gemiddelde voerwaarden. Controleer altijd de verpakking van je specifieke voer."
+    },
+    "disclaimer": {
+      "title": "Belangrijke informatie",
+      "text": "Deze calculator geeft een schatting op basis van wetenschappelijke formules. Individuele behoeften kunnen tot 50% afwijken. Raadpleeg altijd een dierenarts voor specifiek voedingsadvies, vooral bij gezondheidsproblemen of overgewicht.",
+      "sources": "Bronnen"
+    },
+    "sources": {
+      "purina": "Purina Institute - MER Calculator",
+      "wsava": "WSAVA Nutrition Assessment Guidelines",
+      "petmd": "PetMD - Dog Calorie Needs"
+    }
   }
 }

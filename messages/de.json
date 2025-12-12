@@ -881,5 +881,52 @@
       "description": "Verwalten Sie mehrere Standorte oder benötigen Sie individuelle Lösungen?",
       "button": "Vertrieb Kontaktieren"
     }
+  },
+  "dogFoodCalculator": {
+    "title": "Hundefutter Rechner",
+    "subtitle": "Berechnen Sie, wie viel Futter Ihr Hund pro Tag braucht",
+    "description": "Dieser Rechner ermittelt den täglichen Kalorienbedarf Ihres Hundes auf Basis wissenschaftlich fundierter Formeln (RER/MER), die von Tierärzten weltweit verwendet werden.",
+    "weight": "Gewicht Ihres Hundes",
+    "weightUnit": "kg",
+    "weightPlaceholder": "z.B. 15",
+    "activityLevel": "Aktivitätsniveau",
+    "activityLevels": {
+      "sedentary": "Wenig aktiv (kurze Spaziergänge)",
+      "normal": "Normal aktiv (tägliche Spaziergänge)",
+      "active": "Aktiv (viel Bewegung, Spielen)",
+      "veryActive": "Sehr aktiv (Arbeitshund, Sport)"
+    },
+    "lifeStage": "Lebensphase",
+    "lifeStages": {
+      "puppy4": "Welpe (bis 4 Monate)",
+      "puppy12": "Welpe (4-12 Monate)",
+      "adult": "Erwachsener Hund",
+      "senior": "Senior Hund (7+ Jahre)"
+    },
+    "neutered": "Kastriert/Sterilisiert",
+    "neuteredOptions": {
+      "yes": "Ja",
+      "no": "Nein"
+    },
+    "calculate": "Berechnen",
+    "results": {
+      "title": "Ergebnis",
+      "dailyCalories": "Täglicher Kalorienbedarf",
+      "kcalPerDay": "kcal pro Tag",
+      "dryFood": "Trockenfutter (Durchschnitt)",
+      "wetFood": "Nassfutter (Durchschnitt)",
+      "gramsPerDay": "Gramm pro Tag",
+      "note": "Dies ist eine Schätzung basierend auf durchschnittlichen Futterwerten. Überprüfen Sie immer die Verpackung Ihres spezifischen Futters."
+    },
+    "disclaimer": {
+      "title": "Wichtige Information",
+      "text": "Dieser Rechner liefert eine Schätzung auf Basis wissenschaftlicher Formeln. Individuelle Bedürfnisse können um bis zu 50% abweichen. Konsultieren Sie immer einen Tierarzt für spezifische Ernährungsberatung, besonders bei Gesundheitsproblemen oder Übergewicht.",
+      "sources": "Quellen"
+    },
+    "sources": {
+      "purina": "Purina Institute - MER Calculator",
+      "wsava": "WSAVA Nutrition Assessment Guidelines",
+      "petmd": "PetMD - Dog Calorie Needs"
+    }
   }
 }

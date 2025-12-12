@@ -881,5 +881,52 @@
       "description": "Managing multiple locations or need custom solutions? Let's talk.",
       "button": "Contact Sales"
     }
+  },
+  "dogFoodCalculator": {
+    "title": "Dog Food Calculator",
+    "subtitle": "Calculate how much food your dog needs per day",
+    "description": "This calculator determines your dog's daily calorie needs based on scientifically-backed formulas (RER/MER) used by veterinarians worldwide.",
+    "weight": "Your dog's weight",
+    "weightUnit": "kg",
+    "weightPlaceholder": "E.g. 15",
+    "activityLevel": "Activity level",
+    "activityLevels": {
+      "sedentary": "Sedentary (short walks)",
+      "normal": "Normal (daily walks)",
+      "active": "Active (lots of exercise, play)",
+      "veryActive": "Very active (working dog, sports)"
+    },
+    "lifeStage": "Life stage",
+    "lifeStages": {
+      "puppy4": "Puppy (up to 4 months)",
+      "puppy12": "Puppy (4-12 months)",
+      "adult": "Adult dog",
+      "senior": "Senior dog (7+ years)"
+    },
+    "neutered": "Neutered/Spayed",
+    "neuteredOptions": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "calculate": "Calculate",
+    "results": {
+      "title": "Results",
+      "dailyCalories": "Daily calorie needs",
+      "kcalPerDay": "kcal per day",
+      "dryFood": "Dry food (average)",
+      "wetFood": "Wet food (average)",
+      "gramsPerDay": "grams per day",
+      "note": "This is an estimate based on average food values. Always check the packaging of your specific food."
+    },
+    "disclaimer": {
+      "title": "Important information",
+      "text": "This calculator provides an estimate based on scientific formulas. Individual needs can vary by up to 50%. Always consult a veterinarian for specific dietary advice, especially with health issues or obesity.",
+      "sources": "Sources"
+    },
+    "sources": {
+      "purina": "Purina Institute - MER Calculator",
+      "wsava": "WSAVA Nutrition Assessment Guidelines",
+      "petmd": "PetMD - Dog Calorie Needs"
+    }
   }
 }

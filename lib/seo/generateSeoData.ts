@@ -32,6 +32,9 @@ import {
   getPlaceCountByCity,
 } from "@/db/queries/listings";
 import type { ContentLocale } from "./aiContent";
+
+// Locale type for SEO templates (all supported locales)
+type SeoLocale = "nl" | "en" | "de" | "fr";
 import {
   generateHomeContent,
   generateCountryContent,
@@ -72,27 +75,43 @@ const TITLE_TEMPLATES = {
   home: {
     nl: "CutiePawsPedia - Vind de beste huisdierservices bij jou in de buurt",
     en: "CutiePawsPedia - Find the best pet services near you",
+    de: "CutiePawsPedia - Finden Sie die besten Haustierservices in Ihrer Nähe",
+    fr: "CutiePawsPedia - Trouvez les meilleurs services pour animaux près de chez vous",
   },
   country: {
     nl: (country: string) => `Huisdierservices in ${country} | CutiePawsPedia`,
     en: (country: string) => `Pet Services in ${country} | CutiePawsPedia`,
+    de: (country: string) => `Haustierservices in ${country} | CutiePawsPedia`,
+    fr: (country: string) => `Services pour animaux en ${country} | CutiePawsPedia`,
   },
   city: {
     nl: (city: string, country: string) =>
       `Huisdierservices in ${city}, ${country} | CutiePawsPedia`,
     en: (city: string, country: string) =>
       `Pet Services in ${city}, ${country} | CutiePawsPedia`,
+    de: (city: string, country: string) =>
+      `Haustierservices in ${city}, ${country} | CutiePawsPedia`,
+    fr: (city: string, country: string) =>
+      `Services pour animaux à ${city}, ${country} | CutiePawsPedia`,
   },
   category: {
     nl: (category: string, city: string) =>
       `${category} in ${city} | CutiePawsPedia`,
     en: (category: string, city: string) =>
       `${category} in ${city} | CutiePawsPedia`,
+    de: (category: string, city: string) =>
+      `${category} in ${city} | CutiePawsPedia`,
+    fr: (category: string, city: string) =>
+      `${category} à ${city} | CutiePawsPedia`,
   },
   place: {
     nl: (place: string, city: string) =>
       `${place} - ${city} | CutiePawsPedia`,
     en: (place: string, city: string) =>
+      `${place} - ${city} | CutiePawsPedia`,
+    de: (place: string, city: string) =>
+      `${place} - ${city} | CutiePawsPedia`,
+    fr: (place: string, city: string) =>
       `${place} - ${city} | CutiePawsPedia`,
   },
 };
@@ -105,24 +124,38 @@ const DESCRIPTION_TEMPLATES = {
   home: {
     nl: "Ontdek de beste dierenartsen, trimsalons, dierenwinkels en meer in Nederland, België en Duitsland. Vind en vergelijk huisdierservices bij jou in de buurt.",
     en: "Discover the best veterinarians, pet groomers, pet stores and more in the Netherlands, Belgium and Germany. Find and compare pet services near you.",
+    de: "Entdecken Sie die besten Tierärzte, Hundefriseure, Tierhandlungen und mehr in Deutschland. Finden und vergleichen Sie Haustierservices in Ihrer Nähe.",
+    fr: "Découvrez les meilleurs vétérinaires, toiletteurs, animaleries et plus en Belgique et en France. Trouvez et comparez les services pour animaux près de chez vous.",
   },
   country: {
     nl: (country: string, cityCount: number) =>
       `Vind huisdierservices in ${country}. Ontdek dierenartsen, trimsalons en dierenwinkels in ${cityCount} steden.`,
     en: (country: string, cityCount: number) =>
       `Find pet services in ${country}. Discover veterinarians, pet groomers and pet stores in ${cityCount} cities.`,
+    de: (country: string, cityCount: number) =>
+      `Finden Sie Haustierservices in ${country}. Entdecken Sie Tierärzte, Hundefriseure und Tierhandlungen in ${cityCount} Städten.`,
+    fr: (country: string, cityCount: number) =>
+      `Trouvez des services pour animaux en ${country}. Découvrez vétérinaires, toiletteurs et animaleries dans ${cityCount} villes.`,
   },
   city: {
     nl: (city: string, placeCount: number) =>
       `Ontdek ${placeCount}+ huisdierservices in ${city}. Vind dierenartsen, trimsalons, dierenwinkels en meer.`,
     en: (city: string, placeCount: number) =>
       `Discover ${placeCount}+ pet services in ${city}. Find veterinarians, pet groomers, pet stores and more.`,
+    de: (city: string, placeCount: number) =>
+      `Entdecken Sie ${placeCount}+ Haustierservices in ${city}. Finden Sie Tierärzte, Hundefriseure, Tierhandlungen und mehr.`,
+    fr: (city: string, placeCount: number) =>
+      `Découvrez ${placeCount}+ services pour animaux à ${city}. Trouvez vétérinaires, toiletteurs, animaleries et plus.`,
   },
   category: {
     nl: (category: string, city: string, count: number) =>
       `Vergelijk ${count} ${category.toLowerCase()} in ${city}. Bekijk reviews, openingstijden en contactgegevens.`,
     en: (category: string, city: string, count: number) =>
       `Compare ${count} ${category.toLowerCase()} in ${city}. View reviews, opening hours and contact details.`,
+    de: (category: string, city: string, count: number) =>
+      `Vergleichen Sie ${count} ${category.toLowerCase()} in ${city}. Sehen Sie Bewertungen, Öffnungszeiten und Kontaktdaten.`,
+    fr: (category: string, city: string, count: number) =>
+      `Comparez ${count} ${category.toLowerCase()} à ${city}. Voir avis, horaires et coordonnées.`,
   },
   place: {
     nl: (place: string, category: string, city: string, description?: string) =>
@@ -131,6 +164,12 @@ const DESCRIPTION_TEMPLATES = {
     en: (place: string, category: string, city: string, description?: string) =>
       description ||
       `${place} is a ${category.toLowerCase()} in ${city}. View reviews, opening hours and contact details.`,
+    de: (place: string, category: string, city: string, description?: string) =>
+      description ||
+      `${place} ist ein ${category.toLowerCase()} in ${city}. Sehen Sie Bewertungen, Öffnungszeiten und Kontaktdaten.`,
+    fr: (place: string, category: string, city: string, description?: string) =>
+      description ||
+      `${place} est un ${category.toLowerCase()} à ${city}. Voir avis, horaires et coordonnées.`,
   },
 };
 
@@ -138,21 +177,22 @@ const DESCRIPTION_TEMPLATES = {
 // CATEGORY TRANSLATIONS
 // =============================================================================
 
-const CATEGORY_LABELS: Record<string, { nl: string; en: string }> = {
-  veterinary: { nl: "Dierenartsen", en: "Veterinarians" },
-  "pet-store": { nl: "Dierenwinkels", en: "Pet Stores" },
-  grooming: { nl: "Trimsalons", en: "Pet Groomers" },
-  "animal-shelter": { nl: "Dierenopvang", en: "Animal Shelters" },
-  boarding: { nl: "Dierenpensions", en: "Pet Boarding" },
-  "dog-park": { nl: "Hondenuitlaatgebieden", en: "Dog Parks" },
-  "pet-cafe": { nl: "Huisdiervriendelijke cafés", en: "Pet-friendly Cafes" },
-  cemetery: { nl: "Dierenbegraafplaatsen", en: "Pet Cemeteries" },
+const CATEGORY_LABELS: Record<string, { nl: string; en: string; de: string; fr: string }> = {
+  veterinary: { nl: "Dierenartsen", en: "Veterinarians", de: "Tierärzte", fr: "Vétérinaires" },
+  "pet-store": { nl: "Dierenwinkels", en: "Pet Stores", de: "Tierhandlungen", fr: "Animaleries" },
+  grooming: { nl: "Trimsalons", en: "Pet Groomers", de: "Hundefriseure", fr: "Toiletteurs" },
+  "animal-shelter": { nl: "Dierenopvang", en: "Animal Shelters", de: "Tierheime", fr: "Refuges" },
+  boarding: { nl: "Dierenpensions", en: "Pet Boarding", de: "Tierpensionen", fr: "Pensions" },
+  "dog-park": { nl: "Hondenuitlaatgebieden", en: "Dog Parks", de: "Hundeparks", fr: "Parcs canins" },
+  "pet-cafe": { nl: "Huisdiervriendelijke cafés", en: "Pet-friendly Cafes", de: "Tierfreundliche Cafés", fr: "Cafés accueillants" },
+  cemetery: { nl: "Dierenbegraafplaatsen", en: "Pet Cemeteries", de: "Tierfriedhöfe", fr: "Cimetières" },
 };
 
 function getCategoryLabel(slug: string, locale: string): string {
   const labels = CATEGORY_LABELS[slug];
   if (!labels) return slug;
-  return locale === "nl" ? labels.nl : labels.en;
+  const loc = locale as SeoLocale;
+  return labels[loc] || labels.en;
 }
 
 // =============================================================================
@@ -172,9 +212,9 @@ export async function generateSeoData(
 
   // Base SEO data
   const seoData: SeoData = {
-    title: TITLE_TEMPLATES.home[locale as "nl" | "en"] || TITLE_TEMPLATES.home.nl,
+    title: TITLE_TEMPLATES.home[locale as SeoLocale] || TITLE_TEMPLATES.home.nl,
     description:
-      DESCRIPTION_TEMPLATES.home[locale as "nl" | "en"] ||
+      DESCRIPTION_TEMPLATES.home[locale as SeoLocale] ||
       DESCRIPTION_TEMPLATES.home.nl,
     canonicalUrl,
     robots: "index, follow",
@@ -222,7 +262,7 @@ export async function generateSeoData(
 // =============================================================================
 
 function generateHomeSeo(seoData: SeoData, locale: string): SeoData {
-  const loc = locale as "nl" | "en";
+  const loc = locale as SeoLocale;
 
   // Use content generator for enhanced meta description
   const content = generateHomeContent({
@@ -269,7 +309,7 @@ async function generateCountrySeo(
   const country = await getCountryBySlug(ctx.countrySlug);
   if (!country) return seoData;
 
-  const loc = locale as "nl" | "en";
+  const loc = locale as SeoLocale;
   const cityCount = await getCityCountByCountry(country.id);
 
   // Use content generator for enhanced meta description
@@ -315,7 +355,7 @@ async function generateCitySeo(
   const city = await getCityBySlugAndCountry(ctx.citySlug, ctx.countrySlug);
   if (!city) return seoData;
 
-  const loc = locale as "nl" | "en";
+  const loc = locale as SeoLocale;
   const placeCount = await getPlaceCountByCity(city.id);
 
   // Use content generator for enhanced meta description
@@ -372,7 +412,7 @@ async function generateCategorySeo(
   );
   const placeCount = places.length;
 
-  const loc = locale as "nl" | "en";
+  const loc = locale as SeoLocale;
   const categoryLabel = getCategoryLabel(ctx.categorySlug, locale);
 
   // Use content generator for enhanced meta description
@@ -433,7 +473,7 @@ async function generatePlaceSeo(
   );
   if (!place) return seoData;
 
-  const loc = locale as "nl" | "en";
+  const loc = locale as SeoLocale;
   const categoryLabel = getCategoryLabel(ctx.categorySlug, locale);
   const cityName = place.city?.name || ctx.citySlug;
   const countryName = place.city?.country?.name || ctx.countrySlug;
@@ -578,10 +618,10 @@ export async function getPlaceMetadata(
     const primaryCategory = place.placeCategories?.[0]?.category;
     const categoryLabel = getCategoryLabel(categorySlug, locale);
 
-    const title = TITLE_TEMPLATES.place[locale as "nl" | "en"](place.name, cityName);
+    const title = TITLE_TEMPLATES.place[locale as SeoLocale](place.name, cityName);
     const description = place.description
       ? place.description.slice(0, 160)
-      : DESCRIPTION_TEMPLATES.place[locale as "nl" | "en"](
+      : DESCRIPTION_TEMPLATES.place[locale as SeoLocale](
           place.name,
           categoryLabel,
           cityName,
@@ -672,7 +712,7 @@ export function getCategoryMetadata(
   if (city !== undefined && locale !== undefined) {
     const category = categoryOrParams as Record<string, unknown>;
     const countryData = (city.country || {}) as Record<string, unknown>;
-    const loc = locale as "nl" | "en";
+    const loc = locale as SeoLocale;
     const categoryLabel = getCategoryLabel(category.slug as string, locale);
 
     const title = TITLE_TEMPLATES.category[loc](categoryLabel, city.name as string);
@@ -766,7 +806,7 @@ export function getCityMetadata(
   if (locale !== undefined) {
     const city = cityOrParams as Record<string, unknown>;
     const countryData = (city.country || {}) as Record<string, unknown>;
-    const loc = locale as "nl" | "en";
+    const loc = locale as SeoLocale;
 
     const title = TITLE_TEMPLATES.city[loc](city.name as string, countryData.name as string || "");
     const description = DESCRIPTION_TEMPLATES.city[loc](city.name as string, placeCount || 0);
@@ -818,7 +858,7 @@ export function getCountryMetadata(
   // Legacy signature: getCountryMetadata(country, locale, cityCount)
   if (locale !== undefined) {
     const country = countryOrParams as Record<string, unknown>;
-    const loc = locale as "nl" | "en";
+    const loc = locale as SeoLocale;
 
     const title = TITLE_TEMPLATES.country[loc](country.name as string);
     const description = DESCRIPTION_TEMPLATES.country[loc](country.name as string, cityCount || 0);

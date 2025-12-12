@@ -5,6 +5,7 @@
  */
 
 import type { SeoContext } from "./types";
+import { getLocalesForCountry, DEFAULT_SEO_CONFIG } from "./types";
 
 // =============================================================================
 // BASE URL
@@ -120,20 +121,36 @@ export function buildPlaceUrl(
 
 /**
  * Build alternate language URLs for hreflang tags
+ * Automatically filters to only locales valid for the country if countrySlug is present
  */
 export function buildAlternateUrls(
   ctx: SeoContext,
-  supportedLocales: string[]
+  supportedLocales?: string[]
 ): Record<string, string> {
   const alternates: Record<string, string> = {};
 
-  for (const locale of supportedLocales) {
+  // If we have a country context, only use locales valid for that country
+  // Otherwise use provided locales or default to all supported locales
+  let locales = supportedLocales || DEFAULT_SEO_CONFIG.supportedLocales;
+  if (ctx.countrySlug) {
+    const countryLocales = getLocalesForCountry(ctx.countrySlug);
+    // If supportedLocales was explicitly provided, intersect with country locales
+    // Otherwise just use country locales
+    if (supportedLocales) {
+      locales = supportedLocales.filter(l => countryLocales.includes(l));
+    } else {
+      locales = countryLocales;
+    }
+  }
+
+  for (const locale of locales) {
     const altCtx = { ...ctx, locale };
     alternates[locale] = buildCanonicalUrl(altCtx);
   }
 
-  // Add x-default pointing to default locale (nl)
-  alternates["x-default"] = buildCanonicalUrl({ ...ctx, locale: "nl" });
+  // Add x-default pointing to first available locale for this context
+  const defaultLocale = locales.includes("nl") ? "nl" : locales[0];
+  alternates["x-default"] = buildCanonicalUrl({ ...ctx, locale: defaultLocale });
 
   return alternates;
 }

@@ -25,7 +25,10 @@ export type {
 export {
   CATEGORY_SCHEMA_TYPES,
   DEFAULT_SEO_CONFIG,
+  COUNTRY_LOCALES,
   getSchemaTypeForCategory,
+  getLocalesForCountry,
+  isLocaleValidForCountry,
 } from "./types";
 
 // URL Helpers

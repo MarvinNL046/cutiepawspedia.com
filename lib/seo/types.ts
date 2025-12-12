@@ -255,7 +255,35 @@ export interface SeoConfig {
 export const DEFAULT_SEO_CONFIG: SeoConfig = {
   siteName: "CutiePawsPedia",
   defaultLocale: "nl",
-  supportedLocales: ["nl", "en"],
+  supportedLocales: ["nl", "en", "de", "fr"],
   twitterHandle: "@cutiepawspedia",
   defaultImage: "/images/og-default.jpg",
 };
+
+/**
+ * Country-to-locale mapping
+ * Each country only supports specific locales relevant to that market
+ */
+export const COUNTRY_LOCALES: Record<string, string[]> = {
+  belgium: ["nl", "en", "fr"],      // Dutch, English, French
+  netherlands: ["nl", "en"],         // Dutch, English
+  germany: ["de"],                   // German only
+  france: ["fr"],                    // French only
+  "united-kingdom": ["en"],          // English only
+};
+
+/**
+ * Get locales supported for a specific country
+ * Falls back to all supported locales if country not found
+ */
+export function getLocalesForCountry(countrySlug: string): string[] {
+  return COUNTRY_LOCALES[countrySlug] || DEFAULT_SEO_CONFIG.supportedLocales;
+}
+
+/**
+ * Check if a locale is valid for a country
+ */
+export function isLocaleValidForCountry(locale: string, countrySlug: string): boolean {
+  const validLocales = getLocalesForCountry(countrySlug);
+  return validLocales.includes(locale);
+}

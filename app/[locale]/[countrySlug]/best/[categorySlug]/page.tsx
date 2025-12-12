@@ -30,6 +30,7 @@ import {
   buildCanonicalUrl,
   itemListSchema,
   getLocalizedCategoryName,
+  getLocalesForCountry,
   type ContentLocale,
 } from "@/lib/seo";
 import { generateContent } from "@/lib/ai/generateContent";
@@ -43,6 +44,7 @@ interface BestInCountryPageProps {
 export const revalidate = 600;
 
 // Pre-generate pages for all country/category combinations
+// Each country only gets locales relevant to that market (DE=de, NL=nl/en, BE=nl/en/fr)
 export async function generateStaticParams() {
   const [countries, categories] = await Promise.all([
     getCountries(),
@@ -50,10 +52,12 @@ export async function generateStaticParams() {
   ]);
 
   const params: { locale: string; countrySlug: string; categorySlug: string }[] = [];
-  const locales = DEFAULT_SEO_CONFIG.supportedLocales;
 
-  for (const locale of locales) {
-    for (const country of countries) {
+  for (const country of countries) {
+    // Get only the locales valid for this country
+    const countryLocales = getLocalesForCountry(country.slug);
+
+    for (const locale of countryLocales) {
       for (const category of categories) {
         params.push({
           locale,

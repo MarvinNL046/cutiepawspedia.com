@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import NextLink from "next/link";
+import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 // Wrapper to disable prefetch for performance
@@ -36,8 +37,17 @@ const locales: { code: Locale; label: string }[] = [
 export function Header({ locale, variant = "marketing" }: HeaderProps) {
   const user = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
   const t = useTranslations("common");
   const tHeader = useTranslations("header");
+
+  // Helper function to get current path with new locale
+  const getLocalizedPath = (newLocale: string) => {
+    // Replace the current locale in the pathname with the new one
+    const segments = pathname.split("/");
+    segments[1] = newLocale; // The locale is the first segment after the root
+    return segments.join("/");
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -125,7 +135,10 @@ export function Header({ locale, variant = "marketing" }: HeaderProps) {
             <DropdownMenuContent align="end">
               {locales.map((l) => (
                 <DropdownMenuItem key={l.code} asChild>
-                  <Link href={`/${l.code}`}>{l.label}</Link>
+                  <Link href={getLocalizedPath(l.code)}>
+                    {l.label}
+                    {l.code === locale && <span className="ml-auto text-cpCoral">✓</span>}
+                  </Link>
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>

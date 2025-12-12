@@ -139,7 +139,7 @@ export function StickyBottomBanner({ className, locale = "nl" }: StickyBottomBan
       )}
     >
       {/* Solid background for good contrast in all themes */}
-      <div className="relative bg-cpNavy border-t border-cpCoral/30 shadow-lg shadow-black/30">
+      <div className="relative bg-cpCharcoal dark:bg-cpCharcoal border-t border-cpCoral/30 shadow-lg shadow-black/30">
         {/* Decorative top line */}
         <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-cpCoral to-transparent" />
 
@@ -156,9 +156,9 @@ export function StickyBottomBanner({ className, locale = "nl" }: StickyBottomBan
                 )}
               </div>
 
-              {/* Text */}
+              {/* Text - Always light text on dark background */}
               <div className="min-w-0">
-                <p className="text-white font-semibold text-sm sm:text-base truncate">
+                <p className="text-cpCream font-semibold text-sm sm:text-base truncate">
                   {currentContent.title}
                 </p>
                 <p className="text-cpCream/70 text-xs sm:text-sm truncate">
@@ -170,7 +170,7 @@ export function StickyBottomBanner({ className, locale = "nl" }: StickyBottomBan
             {/* CTA Button */}
             <LinkComponent
               {...linkProps}
-              className="flex items-center gap-2 px-4 py-2 bg-cpCoral hover:bg-cpCoral/90 text-white font-semibold rounded-full transition-all duration-200 hover:scale-105 flex-shrink-0 text-sm sm:text-base"
+              className="flex items-center gap-2 px-4 py-2 bg-cpCoral hover:bg-cpCoral/90 text-cpCharcoal font-semibold rounded-full transition-all duration-200 hover:scale-105 flex-shrink-0 text-sm sm:text-base"
             >
               <span>{currentContent.cta}</span>
               <ArrowRight className="h-4 w-4" />
@@ -179,10 +179,10 @@ export function StickyBottomBanner({ className, locale = "nl" }: StickyBottomBan
             {/* Dismiss button */}
             <button
               onClick={handleDismiss}
-              className="p-2 hover:bg-white/10 rounded-full transition-colors flex-shrink-0"
+              className="p-2 hover:bg-cpCream/10 rounded-full transition-colors flex-shrink-0"
               aria-label="Dismiss banner"
             >
-              <X className="h-4 w-4 text-cpCream/70" />
+              <X className="h-4 w-4 text-cpCream/70 hover:text-cpCream" />
             </button>
           </div>
         </div>

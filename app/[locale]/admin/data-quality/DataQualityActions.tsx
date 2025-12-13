@@ -21,10 +21,11 @@ import { toast } from "sonner";
 
 interface DataQualityActionsProps {
   placeId: number;
+  slug: string;
   showRefreshButton?: boolean;
 }
 
-export function DataQualityActions({ placeId, showRefreshButton = true }: DataQualityActionsProps) {
+export function DataQualityActions({ placeId, slug, showRefreshButton = true }: DataQualityActionsProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -145,9 +146,9 @@ export function DataQualityActions({ placeId, showRefreshButton = true }: DataQu
             Recalculate Score
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <a href={`/admin/places/${placeId}`} target="_blank" rel="noopener noreferrer">
+            <a href={`/nl/place/${slug}`} target="_blank" rel="noopener noreferrer">
               <Eye className="h-4 w-4 mr-2" />
-              View Details
+              View Place
             </a>
           </DropdownMenuItem>
         </DropdownMenuContent>

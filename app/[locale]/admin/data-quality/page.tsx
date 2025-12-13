@@ -520,7 +520,7 @@ export default async function AdminDataQualityPage({
                               : "Never"}
                           </TableCell>
                           <TableCell className="text-right">
-                            <DataQualityActions placeId={place.id} />
+                            <DataQualityActions placeId={place.id} slug={place.slug} />
                           </TableCell>
                         </TableRow>
                       );

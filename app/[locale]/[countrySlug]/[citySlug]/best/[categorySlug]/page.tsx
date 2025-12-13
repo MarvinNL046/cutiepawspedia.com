@@ -15,9 +15,6 @@ import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import {
-  getCountries,
-  getCategories,
-  getCitiesByCountrySlug,
   getCityBySlugAndCountry,
   getCategoryBySlug,
   getTopPlacesByCitySlugAndCategorySlug,
@@ -31,7 +28,6 @@ import {
   buildCanonicalUrl,
   itemListSchema,
   getLocalizedCategoryName,
-  getLocalesForCountry,
   type ContentLocale,
 } from "@/lib/seo";
 import { generateContent } from "@/lib/ai/generateContent";
@@ -42,49 +38,8 @@ interface BestInCityPageProps {
 }
 
 // ISR: City-level data, 5-minute revalidation
+// Pages are generated on-demand and cached - no static generation to avoid build timeouts
 export const revalidate = 300;
-
-// Pre-generate pages for key country/city/category combinations
-// Skip countries with many cities (like Germany) to avoid build timeouts
-// Those pages will be generated on-demand with ISR
-// Each country only gets locales relevant to that market (DE=de, NL=nl/en, BE=nl/en/fr)
-export async function generateStaticParams() {
-  const [countries, categories] = await Promise.all([
-    getCountries(),
-    getCategories(),
-  ]);
-
-  const params: { locale: string; countrySlug: string; citySlug: string; categorySlug: string }[] = [];
-
-  // Only pre-generate for countries with < 30 cities to avoid build timeouts
-  const PRERENDER_COUNTRY_CODES = ["BE", "NL"];
-
-  for (const country of countries) {
-    // Skip countries not in the prerender list
-    if (!PRERENDER_COUNTRY_CODES.includes(country.code)) {
-      continue;
-    }
-
-    // Get only the locales valid for this country
-    const countryLocales = getLocalesForCountry(country.slug);
-    const cities = await getCitiesByCountrySlug(country.slug);
-
-    for (const locale of countryLocales) {
-      for (const city of cities) {
-        for (const category of categories) {
-          params.push({
-            locale,
-            countrySlug: country.slug,
-            citySlug: city.slug,
-            categorySlug: category.slug,
-          });
-        }
-      }
-    }
-  }
-
-  return params;
-}
 
 export async function generateMetadata({ params }: BestInCityPageProps): Promise<Metadata> {
   const { locale, countrySlug, citySlug, categorySlug } = await params;

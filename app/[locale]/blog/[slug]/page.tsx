@@ -20,7 +20,6 @@ import {
   getPostSeoBySlug,
   getTagsForPost,
   getRelatedPosts,
-  getAllPostSlugs,
   incrementPostViewCount,
   type Locale,
 } from "@/db/queries";
@@ -36,20 +35,8 @@ interface BlogPostPageProps {
 }
 
 // ISR: Revalidate every 5 minutes
+// Pages are generated on-demand and cached - no static generation to avoid build timeouts
 export const revalidate = 300;
-
-// Generate static paths for all published posts
-export async function generateStaticParams() {
-  const slugs = await getAllPostSlugs();
-  const locales = ["en", "nl"];
-
-  return locales.flatMap((locale) =>
-    slugs.map((slug) => ({
-      locale,
-      slug,
-    }))
-  );
-}
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const { locale, slug } = await params;

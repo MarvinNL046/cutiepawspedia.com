@@ -14,8 +14,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import {
-  getCountries,
-  getCategories,
   getCountryBySlug,
   getCategoryBySlug,
   getTopPlacesByCountrySlugAndCategorySlug,
@@ -30,7 +28,6 @@ import {
   buildCanonicalUrl,
   itemListSchema,
   getLocalizedCategoryName,
-  getLocalesForCountry,
   type ContentLocale,
 } from "@/lib/seo";
 import { generateContent } from "@/lib/ai/generateContent";
@@ -41,35 +38,8 @@ interface BestInCountryPageProps {
 }
 
 // ISR: Rankings data, 10-minute revalidation
+// Pages are generated on-demand and cached - no static generation to avoid build timeouts
 export const revalidate = 600;
-
-// Pre-generate pages for all country/category combinations
-// Each country only gets locales relevant to that market (DE=de, NL=nl/en, BE=nl/en/fr)
-export async function generateStaticParams() {
-  const [countries, categories] = await Promise.all([
-    getCountries(),
-    getCategories(),
-  ]);
-
-  const params: { locale: string; countrySlug: string; categorySlug: string }[] = [];
-
-  for (const country of countries) {
-    // Get only the locales valid for this country
-    const countryLocales = getLocalesForCountry(country.slug);
-
-    for (const locale of countryLocales) {
-      for (const category of categories) {
-        params.push({
-          locale,
-          countrySlug: country.slug,
-          categorySlug: category.slug,
-        });
-      }
-    }
-  }
-
-  return params;
-}
 
 export async function generateMetadata({ params }: BestInCountryPageProps): Promise<Metadata> {
   const { locale, countrySlug, categorySlug } = await params;

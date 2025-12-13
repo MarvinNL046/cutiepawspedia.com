@@ -15,7 +15,6 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  getCountries,
   getCategories,
   getCountryBySlug,
   getRecentlyAddedPlaces,
@@ -28,7 +27,6 @@ import {
   buildAlternateUrls,
   buildCanonicalUrl,
   itemListSchema,
-  getLocalesForCountry,
   type ContentLocale,
 } from "@/lib/seo";
 import { getTranslations } from "next-intl/server";
@@ -39,26 +37,8 @@ interface NewAdditionsPageProps {
 }
 
 // ISR: 1-hour revalidation for fresh content
+// Pages are generated on-demand and cached - no static generation to avoid build timeouts
 export const revalidate = 3600;
-
-// Pre-generate pages for all countries
-export async function generateStaticParams() {
-  const countries = await getCountries();
-
-  const params: { locale: string; countrySlug: string }[] = [];
-
-  for (const country of countries) {
-    const countryLocales = getLocalesForCountry(country.slug);
-    for (const locale of countryLocales) {
-      params.push({
-        locale,
-        countrySlug: country.slug,
-      });
-    }
-  }
-
-  return params;
-}
 
 export async function generateMetadata({ params, searchParams }: NewAdditionsPageProps): Promise<Metadata> {
   const { locale, countrySlug } = await params;

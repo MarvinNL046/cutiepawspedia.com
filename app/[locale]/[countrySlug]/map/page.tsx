@@ -12,7 +12,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
-  getCountries,
   getCountryBySlug,
 } from "@/db/queries";
 import {
@@ -26,7 +25,6 @@ import {
   DEFAULT_SEO_CONFIG,
   buildCanonicalUrl,
   buildAlternateUrls,
-  getLocalesForCountry,
   getLocalizedCategoryName,
   type ContentLocale,
 } from "@/lib/seo";
@@ -39,26 +37,8 @@ interface CountryMapPageProps {
 }
 
 // ISR: Map data, 10-minute revalidation
+// Pages are generated on-demand and cached - no static generation to avoid build timeouts
 export const revalidate = 600;
-
-// Pre-generate pages for all countries with relevant locales
-export async function generateStaticParams() {
-  const countries = await getCountries();
-
-  const params: { locale: string; countrySlug: string }[] = [];
-
-  for (const country of countries) {
-    const countryLocales = getLocalesForCountry(country.slug);
-    for (const locale of countryLocales) {
-      params.push({
-        locale,
-        countrySlug: country.slug,
-      });
-    }
-  }
-
-  return params;
-}
 
 export async function generateMetadata({ params }: CountryMapPageProps): Promise<Metadata> {
   const { locale, countrySlug } = await params;

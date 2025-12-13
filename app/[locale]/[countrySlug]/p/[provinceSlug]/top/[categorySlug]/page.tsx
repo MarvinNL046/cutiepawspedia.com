@@ -13,12 +13,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import {
-  getCountries,
-  getCategories,
   getCountryBySlug,
   getCategoryBySlug,
   getProvinceBySlugAndCountry,
-  getProvincesByCountrySlug,
   getTopPlacesByProvinceSlugAndCategorySlug,
 } from "@/db/queries";
 import { getCategoryIcon } from "@/components/directory";
@@ -31,7 +28,6 @@ import {
   buildCanonicalUrl,
   itemListSchema,
   getLocalizedCategoryName,
-  getLocalesForCountry,
   type ContentLocale,
 } from "@/lib/seo";
 import { generateContent } from "@/lib/ai/generateContent";
@@ -48,48 +44,10 @@ interface TopInProvincePageProps {
 }
 
 // ISR: Rankings data, 10-minute revalidation
+// Pages are generated on-demand and cached - no static generation to avoid build timeouts
 export const revalidate = 600;
 
 const TOP_COUNT = 10;
-
-// Pre-generate pages for all province/category combinations
-// Each country only gets locales relevant to that market (DE=de, NL=nl/en, BE=nl/en/fr)
-export async function generateStaticParams() {
-  const [countries, categories] = await Promise.all([
-    getCountries(),
-    getCategories(),
-  ]);
-
-  const params: {
-    locale: string;
-    countrySlug: string;
-    provinceSlug: string;
-    categorySlug: string;
-  }[] = [];
-
-  for (const country of countries) {
-    // Get provinces for this country
-    const provinces = await getProvincesByCountrySlug(country.slug);
-
-    // Get only the locales valid for this country
-    const countryLocales = getLocalesForCountry(country.slug);
-
-    for (const locale of countryLocales) {
-      for (const province of provinces) {
-        for (const category of categories) {
-          params.push({
-            locale,
-            countrySlug: country.slug,
-            provinceSlug: province.slug,
-            categorySlug: category.slug,
-          });
-        }
-      }
-    }
-  }
-
-  return params;
-}
 
 export async function generateMetadata({ params }: TopInProvincePageProps): Promise<Metadata> {
   const { locale, countrySlug, provinceSlug, categorySlug } = await params;

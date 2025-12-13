@@ -38,8 +38,6 @@ import { PageHeader, SectionHeader } from "@/components/layout";
 import { getCategoryIcon } from "@/components/directory";
 
 import {
-  getCountries,
-  getCategories,
   getCountryBySlug,
   getCategoryBySlug,
   getCategoryStatistics,
@@ -49,7 +47,6 @@ import {
   buildCanonicalUrl,
   buildAlternateUrls,
   getLocalizedCategoryName,
-  getLocalesForCountry,
   type ContentLocale,
 } from "@/lib/seo";
 
@@ -58,33 +55,8 @@ interface StatsPageProps {
 }
 
 // ISR: Statistics change slowly, 24-hour revalidation
+// Pages are generated on-demand and cached - no static generation to avoid build timeouts
 export const revalidate = 86400;
-
-// Pre-generate pages for all country/category combinations
-export async function generateStaticParams() {
-  const [countries, categories] = await Promise.all([
-    getCountries(),
-    getCategories(),
-  ]);
-
-  const params: { locale: string; countrySlug: string; categorySlug: string }[] = [];
-
-  for (const country of countries) {
-    const countryLocales = getLocalesForCountry(country.slug);
-
-    for (const locale of countryLocales) {
-      for (const category of categories) {
-        params.push({
-          locale,
-          countrySlug: country.slug,
-          categorySlug: category.slug,
-        });
-      }
-    }
-  }
-
-  return params;
-}
 
 export async function generateMetadata({ params }: StatsPageProps): Promise<Metadata> {
   const { locale, countrySlug, categorySlug } = await params;

@@ -18,8 +18,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   getCityComparisonData,
-  getPopularCityCombinations,
-  getCategories,
 } from "@/db/queries";
 import { getLocalizedCategoryName, type ContentLocale, getBaseUrl } from "@/lib/seo";
 import { PageHeader, SectionHeader } from "@/components/layout";
@@ -46,6 +44,7 @@ interface ComparisonPageProps {
 }
 
 // ISR: Comparison data doesn't change frequently, 1-hour revalidation
+// Pages are generated on-demand and cached - no static generation to avoid build timeouts
 export const revalidate = 3600;
 
 /**
@@ -55,49 +54,6 @@ function parseCitySlugs(param: string): { city1Slug: string; city2Slug: string }
   const parts = param.split("-vs-");
   if (parts.length !== 2) return null;
   return { city1Slug: parts[0], city2Slug: parts[1] };
-}
-
-/**
- * Generate static params for popular city combinations
- */
-export async function generateStaticParams(): Promise<Array<{
-  locale: string;
-  countrySlug: string;
-  comparison: string;
-  categorySlug: string;
-}>> {
-  const locales = ["nl", "en", "de", "fr"];
-  const countries = ["netherlands", "belgium", "germany"];
-  const categories = await getCategories();
-  const categoryTargets = categories.length > 0
-    ? categories.map(c => c.slug)
-    : ["veterinarians", "grooming", "pet-hotels", "pet-shops", "training", "dog-walking"];
-
-  const params: Array<{
-    locale: string;
-    countrySlug: string;
-    comparison: string;
-    categorySlug: string;
-  }> = [];
-
-  for (const countrySlug of countries) {
-    const combinations = await getPopularCityCombinations(countrySlug);
-
-    for (const { city1Slug, city2Slug } of combinations) {
-      for (const locale of locales) {
-        for (const categorySlug of categoryTargets) {
-          params.push({
-            locale,
-            countrySlug,
-            comparison: `${city1Slug}-vs-${city2Slug}`,
-            categorySlug,
-          });
-        }
-      }
-    }
-  }
-
-  return params;
 }
 
 /**

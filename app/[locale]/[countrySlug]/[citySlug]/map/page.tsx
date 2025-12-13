@@ -12,8 +12,6 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import {
-  getCountries,
-  getCitiesByCountrySlug,
   getCountryBySlug,
   getCityBySlugAndCountry,
 } from "@/db/queries";
@@ -27,7 +25,6 @@ import {
   DEFAULT_SEO_CONFIG,
   buildCanonicalUrl,
   buildAlternateUrls,
-  getLocalesForCountry,
   type ContentLocale,
 } from "@/lib/seo";
 import { getTranslations } from "next-intl/server";
@@ -38,31 +35,8 @@ interface CityMapPageProps {
 }
 
 // ISR: Map data, 10-minute revalidation
+// Pages are generated on-demand and cached - no static generation to avoid build timeouts
 export const revalidate = 600;
-
-// Pre-generate pages for all city combinations
-export async function generateStaticParams() {
-  const countries = await getCountries();
-
-  const params: { locale: string; countrySlug: string; citySlug: string }[] = [];
-
-  for (const country of countries) {
-    const cities = await getCitiesByCountrySlug(country.slug);
-    const countryLocales = getLocalesForCountry(country.slug);
-
-    for (const locale of countryLocales) {
-      for (const city of cities) {
-        params.push({
-          locale,
-          countrySlug: country.slug,
-          citySlug: city.slug,
-        });
-      }
-    }
-  }
-
-  return params;
-}
 
 export async function generateMetadata({ params }: CityMapPageProps): Promise<Metadata> {
   const { locale, countrySlug, citySlug } = await params;

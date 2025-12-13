@@ -220,9 +220,16 @@ export async function deleteUserAccount(userId: number): Promise<{
       }
     }
 
-    // 5. Delete businesses (set to deleted status or actually delete)
+    // 5. Soft-delete businesses (set status to "suspended" and remove user link)
+    // This preserves business data for admin visibility while marking as inactive
     const businessesResult = await db
-      .delete(businesses)
+      .update(businesses)
+      .set({
+        status: "suspended",
+        userId: null, // Remove user association
+        notes: `Account deleted by user on ${new Date().toISOString()}. Previous userId: ${userId}`,
+        updatedAt: new Date(),
+      })
       .where(eq(businesses.userId, userId))
       .returning({ id: businesses.id });
     deletedData.businesses = businessesResult.length;

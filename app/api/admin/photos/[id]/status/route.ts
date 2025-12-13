@@ -5,11 +5,10 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAdminUser } from "@/lib/auth/admin";
 import { db } from "@/db";
 import { eq } from "drizzle-orm";
-import { reviewPhotos, places } from "@/db/schema/directory";
+import { reviewPhotos } from "@/db/schema/directory";
 import { updateBadgesForPlace } from "@/lib/trustBadges";
 import { awardKarma } from "@/db/queries/karma";
 
@@ -21,9 +20,9 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Auth check
-    const session = await getServerSession(authOptions);
-    if (!session?.user || session.user.role !== "admin") {
+    // Auth check with StackAuth
+    const authResult = await getAdminUser();
+    if (!authResult.authorized) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

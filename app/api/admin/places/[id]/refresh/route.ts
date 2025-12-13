@@ -5,8 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAdminUser } from "@/lib/auth/admin";
 import { enqueuePlaceRefresh } from "@/db/queries/refreshJobs";
 
 export async function POST(
@@ -14,9 +13,9 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Auth check
-    const session = await getServerSession(authOptions);
-    if (!session?.user || session.user.role !== "admin") {
+    // Auth check with StackAuth
+    const authResult = await getAdminUser();
+    if (!authResult.authorized) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

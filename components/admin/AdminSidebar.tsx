@@ -19,6 +19,7 @@ import {
   Brain,
   Camera,
   Activity,
+  Star,
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -60,6 +61,11 @@ const navItems = [
     href: "/admin/photos",
     label: "Photos",
     icon: Camera,
+  },
+  {
+    href: "/admin/reviews",
+    label: "Reviews",
+    icon: Star,
   },
   {
     href: "/admin/data-quality",

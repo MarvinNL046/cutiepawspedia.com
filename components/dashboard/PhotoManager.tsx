@@ -230,25 +230,36 @@ export function PhotoManager({
     if (!deletePhotoId) return;
 
     setIsDeleting(true);
+    const photoIdToDelete = deletePhotoId;
+    // Clear any previous error
+    setUploadError(null);
 
     try {
       const response = await fetch(
-        `/api/dashboard/business/${businessId}/places/${placeId}/photos?photoId=${deletePhotoId}`,
+        `/api/dashboard/business/${businessId}/places/${placeId}/photos?photoId=${photoIdToDelete}`,
         {
           method: "DELETE",
         }
       );
 
+      const result = await response.json();
+
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Delete failed");
+        throw new Error(result.error || "Delete failed");
       }
 
-      // Remove from local state
-      setPhotos((prev) => prev.filter((p) => p.id !== deletePhotoId));
-      router.refresh();
+      if (result.success) {
+        // Remove from local state first for immediate UI feedback
+        setPhotos((prev) => prev.filter((p) => p.id !== photoIdToDelete));
+        // Trigger server-side refresh to sync with database
+        router.refresh();
+      } else {
+        throw new Error("Delete failed - no success response");
+      }
     } catch (error) {
       console.error("Delete error:", error);
+      // Show error to user - the photo wasn't actually deleted
+      setUploadError(error instanceof Error ? error.message : "Failed to delete photo");
     } finally {
       setIsDeleting(false);
       setDeletePhotoId(null);

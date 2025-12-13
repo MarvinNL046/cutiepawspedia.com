@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GidsBreadcrumbs } from '@/components/gids';
 import Link from "next/link";
 import { Droplet, Calendar, CheckCircle2, AlertTriangle } from "lucide-react";
 
@@ -41,6 +42,13 @@ export default function HondBadenTipsPage() {
             "dateModified": "2024-01-15"
           })
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Hondenverzorging", href: "/nl/gids/hondenverzorging" },
+          { label: "Je hond baden: tips en frequentie" }
+        ]}
       />
 
       {/* Hero Section */}

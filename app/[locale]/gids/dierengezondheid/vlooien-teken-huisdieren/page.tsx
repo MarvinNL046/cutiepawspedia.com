@@ -5,6 +5,7 @@
  */
 
 import type { Metadata } from "next";
+import { GidsBreadcrumbs } from '@/components/gids';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Bug, Shield, AlertTriangle, Calendar, Droplets } from "lucide-react";
@@ -526,6 +527,13 @@ export default function VlooienTekenPage() {
             }
           })
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Dierengezondheid", href: "/nl/gids/dierengezondheid" },
+          { label: "Vlooien en teken bij huisdieren" }
+        ]}
       />
     </div>
   );

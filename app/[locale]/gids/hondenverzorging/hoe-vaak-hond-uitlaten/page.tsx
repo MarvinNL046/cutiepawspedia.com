@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GidsBreadcrumbs } from '@/components/gids';
 import Link from "next/link";
 import { MapPin, Clock, Heart, CheckCircle2 } from "lucide-react";
 
@@ -41,6 +42,13 @@ export default function HoeVaakHondUitlatenPage() {
             "dateModified": "2024-01-15"
           })
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Hondenverzorging", href: "/nl/gids/hondenverzorging" },
+          { label: "Hoe vaak moet je een hond uitlaten?" }
+        ]}
       />
 
       {/* Hero Section */}

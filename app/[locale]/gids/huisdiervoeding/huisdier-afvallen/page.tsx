@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GidsBreadcrumbs } from '@/components/gids';
 import Link from "next/link";
 import { CheckCircle2, TrendingDown, Activity, AlertTriangle, Scale } from "lucide-react";
 

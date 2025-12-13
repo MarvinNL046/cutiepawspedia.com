@@ -5,6 +5,7 @@
  */
 
 import type { Metadata } from "next";
+import { GidsBreadcrumbs } from '@/components/gids';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Heart, Clock, Phone, ThermometerIcon, Activity } from "lucide-react";
@@ -536,6 +537,13 @@ export default function WanneerNaarDierenarts() {
             }
           })
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Dierengezondheid", href: "/nl/gids/dierengezondheid" },
+          { label: "Wanneer naar de dierenarts" }
+        ]}
       />
     </div>
   );

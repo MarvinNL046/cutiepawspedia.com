@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { GidsBreadcrumbs } from '@/components/gids';
 
 export const metadata: Metadata = {
   title: 'Kattenbak Training voor Kittens: Complete Gids 2024',
@@ -399,6 +400,13 @@ export default function KattenbakTrainingKittenPage() {
             dateModified: '2024-01-15',
           }),
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Kattenverzorging", href: "/nl/gids/kattenverzorging" },
+          { label: "Kattenbak training voor kittens" }
+        ]}
       />
     </div>
   );

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { GidsBreadcrumbs } from '@/components/gids';
 
 export const metadata: Metadata = {
   title: 'Kattenborstelen: Hoe Vaak en Met Welke Borstel? [Gids]',
@@ -12,6 +13,13 @@ export const metadata: Metadata = {
 export default function KattenBorstelenPage() {
   return (
     <div className="min-h-screen bg-background">
+      <GidsBreadcrumbs
+        items={[
+          { label: "Kattenverzorging", href: "/nl/gids/kattenverzorging" },
+          { label: "Katten borstelen" }
+        ]}
+      />
+
       {/* Hero Section */}
       <section className="py-16 bg-gradient-to-br from-cpAqua/10 to-cpPink/10">
         <div className="max-w-4xl mx-auto px-4">

@@ -444,6 +444,13 @@ export default function DierengedragstherapeутPage() {
           })
         }}
       />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Professionele Diensten", href: "/nl/gids/professionele-diensten" },
+          { label: "Dierengedragstherapeut" }
+        ]}
+      />
     </main>
   );
 }

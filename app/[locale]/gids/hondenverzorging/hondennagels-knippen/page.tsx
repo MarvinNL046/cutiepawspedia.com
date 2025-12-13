@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GidsBreadcrumbs } from '@/components/gids';
 import Link from "next/link";
 import { Scissors, AlertTriangle, CheckCircle2, Lightbulb } from "lucide-react";
 
@@ -41,6 +42,13 @@ export default function HondennagelskNippenPage() {
             "dateModified": "2024-01-15"
           })
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Hondenverzorging", href: "/nl/gids/hondenverzorging" },
+          { label: "Hondennagels knippen: stappenplan voor beginners" }
+        ]}
       />
 
       {/* Hero Section */}

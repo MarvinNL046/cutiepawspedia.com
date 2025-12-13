@@ -446,6 +446,13 @@ export default function HondenuitlaatservicePage() {
           })
         }}
       />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Professionele Diensten", href: "/nl/gids/professionele-diensten" },
+          { label: "Hondenuitlaatservice" }
+        ]}
+      />
     </main>
   );
 }

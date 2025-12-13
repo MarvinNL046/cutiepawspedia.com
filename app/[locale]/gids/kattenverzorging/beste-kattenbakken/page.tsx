@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { GidsBreadcrumbs } from '@/components/gids';
 
 export const metadata: Metadata = {
   title: 'De Beste Kattenbakken Vergelijken: Welke Past Bij Jouw Kat?',
@@ -12,6 +13,13 @@ export const metadata: Metadata = {
 export default function BesteKattenbakkenPage() {
   return (
     <div className="min-h-screen bg-background">
+      <GidsBreadcrumbs
+        items={[
+          { label: "Kattenverzorging", href: "/nl/gids/kattenverzorging" },
+          { label: "De beste kattenbakken" }
+        ]}
+      />
+
       {/* Hero Section */}
       <section className="py-16 bg-gradient-to-br from-cpPink/10 to-cpAqua/10">
         <div className="max-w-4xl mx-auto px-4">

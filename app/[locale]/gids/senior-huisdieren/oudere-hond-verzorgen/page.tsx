@@ -4,6 +4,7 @@
  */
 
 import type { Metadata } from "next";
+import { GidsBreadcrumbs } from '@/components/gids';
 import Link from "next/link";
 import { CheckCircle2, Heart, Calendar, Stethoscope } from "lucide-react";
 
@@ -435,6 +436,13 @@ export default function OudereHondVerzorgenPage() {
             dateModified: "2024-01-15",
           }),
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Senior Huisdieren", href: "/nl/gids/senior-huisdieren" },
+          { label: "Een oudere hond verzorgen" }
+        ]}
       />
     </div>
   );

@@ -4,6 +4,7 @@
  */
 
 import type { Metadata } from "next";
+import { GidsBreadcrumbs } from '@/components/gids';
 import Link from "next/link";
 import { CheckCircle2, Waves, MapPin, Sun, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -522,6 +523,13 @@ export default function HondenstrandenNederlandPage() {
             "dateModified": "2025-01-15"
           })
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Reizen met Huisdieren", href: "/nl/gids/reizen-met-huisdieren" },
+          { label: "Hondenstranden in Nederland" }
+        ]}
       />
     </div>
   );

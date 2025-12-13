@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GidsBreadcrumbs } from '@/components/gids';
 import Link from "next/link";
 import { AlertTriangle, CheckCircle, Brain, Heart } from "lucide-react";
 
@@ -608,6 +609,13 @@ export default function HondengedragsProblemenPage() {
             }
           })
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Huisdiertraining", href: "/nl/gids/huisdiertraining" },
+          { label: "Hondengedragsproblemen" }
+        ]}
       />
     </div>
   );

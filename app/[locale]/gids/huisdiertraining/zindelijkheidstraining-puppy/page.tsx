@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GidsBreadcrumbs } from '@/components/gids';
 import Link from "next/link";
 import { Clock, CheckCircle, AlertCircle, Award } from "lucide-react";
 
@@ -569,6 +570,13 @@ export default function ZindelijkheidstrainingPage() {
             }
           })
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Huisdiertraining", href: "/nl/gids/huisdiertraining" },
+          { label: "Zindelijkheidstraining voor puppy's" }
+        ]}
       />
     </div>
   );

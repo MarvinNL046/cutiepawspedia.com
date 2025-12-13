@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { GidsBreadcrumbs } from '@/components/gids';
 
 export const metadata: Metadata = {
   title: 'Kattennagels Knippen: Veilig en Stressvrij [Stappenplan]',
@@ -582,6 +583,13 @@ export default function KattennagelsKnippenPage() {
             dateModified: '2024-01-15',
           }),
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Kattenverzorging", href: "/nl/gids/kattenverzorging" },
+          { label: "Kattennagels knippen" }
+        ]}
       />
     </div>
   );

@@ -5,6 +5,7 @@
  */
 
 import type { Metadata } from "next";
+import { GidsBreadcrumbs } from '@/components/gids';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, AlertTriangle, Calendar, Pill, Info, Shield } from "lucide-react";
@@ -496,6 +497,13 @@ export default function OntwormenPage() {
             }
           })
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Dierengezondheid", href: "/nl/gids/dierengezondheid" },
+          { label: "Ontwormen van hond en kat" }
+        ]}
       />
     </div>
   );

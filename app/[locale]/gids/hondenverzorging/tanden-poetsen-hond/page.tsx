@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GidsBreadcrumbs } from '@/components/gids';
 import Link from "next/link";
 import { Sparkles, AlertCircle, CheckCircle2, Heart } from "lucide-react";
 
@@ -41,6 +42,13 @@ export default function TandenPoetsenHondPage() {
             "dateModified": "2024-01-15"
           })
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Hondenverzorging", href: "/nl/gids/hondenverzorging" },
+          { label: "Tanden poetsen bij honden" }
+        ]}
       />
 
       {/* Hero Section */}

@@ -323,6 +323,13 @@ export default function TrimsalonKiezenPage() {
           })
         }}
       />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Professionele Diensten", href: "/nl/gids/professionele-diensten" },
+          { label: "Een trimsalon kiezen" }
+        ]}
+      />
     </main>
   );
 }

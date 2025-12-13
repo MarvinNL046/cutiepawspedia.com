@@ -4,6 +4,7 @@
  */
 
 import type { Metadata } from "next";
+import { GidsBreadcrumbs } from '@/components/gids';
 import Link from "next/link";
 import { CheckCircle2, Car, Shield, AlertTriangle, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -409,6 +410,13 @@ export default function ReizenHondAutoPage() {
             "dateModified": "2025-01-15"
           })
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Reizen met Huisdieren", href: "/nl/gids/reizen-met-huisdieren" },
+          { label: "Reizen met hond in de auto" }
+        ]}
       />
     </div>
   );

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GidsBreadcrumbs } from '@/components/gids';
 import Link from "next/link";
 import { Heart, AlertTriangle, CheckCircle, Clock } from "lucide-react";
 
@@ -743,6 +744,13 @@ export default function HondAlleenThuisPage() {
             }
           })
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Huisdiertraining", href: "/nl/gids/huisdiertraining" },
+          { label: "Hond alleen thuis laten" }
+        ]}
       />
     </div>
   );

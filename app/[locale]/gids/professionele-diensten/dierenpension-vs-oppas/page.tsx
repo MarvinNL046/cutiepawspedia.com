@@ -464,6 +464,13 @@ export default function DierenpensionVsOppasPage() {
           })
         }}
       />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Professionele Diensten", href: "/nl/gids/professionele-diensten" },
+          { label: "Dierenpension vs. oppas" }
+        ]}
+      />
     </main>
   );
 }

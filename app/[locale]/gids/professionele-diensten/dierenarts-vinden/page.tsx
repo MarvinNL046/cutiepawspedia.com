@@ -359,6 +359,13 @@ export default function DierenartVindenPage() {
           })
         }}
       />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Professionele Diensten", href: "/nl/gids/professionele-diensten" },
+          { label: "Een goede dierenarts vinden" }
+        ]}
+      />
     </main>
   );
 }

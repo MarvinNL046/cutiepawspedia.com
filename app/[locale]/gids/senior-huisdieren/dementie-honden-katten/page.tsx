@@ -4,6 +4,7 @@
  */
 
 import type { Metadata } from "next";
+import { GidsBreadcrumbs } from '@/components/gids';
 import Link from "next/link";
 import { CheckCircle2, Brain, Moon, AlertTriangle } from "lucide-react";
 
@@ -605,6 +606,13 @@ export default function DementieHondenKattenPage() {
             dateModified: "2024-01-15",
           }),
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Senior Huisdieren", href: "/nl/gids/senior-huisdieren" },
+          { label: "Dementie bij honden en katten" }
+        ]}
       />
     </div>
   );

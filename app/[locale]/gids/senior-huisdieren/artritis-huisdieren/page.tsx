@@ -4,6 +4,7 @@
  */
 
 import type { Metadata } from "next";
+import { GidsBreadcrumbs } from '@/components/gids';
 import Link from "next/link";
 import { CheckCircle2, AlertCircle, Activity, Sparkles } from "lucide-react";
 
@@ -523,6 +524,13 @@ export default function ArtritisHuisdierenPage() {
             dateModified: "2024-01-15",
           }),
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Senior Huisdieren", href: "/nl/gids/senior-huisdieren" },
+          { label: "Artritis bij huisdieren" }
+        ]}
       />
     </div>
   );

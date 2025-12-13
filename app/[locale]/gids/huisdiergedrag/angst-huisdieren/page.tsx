@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GidsBreadcrumbs } from '@/components/gids';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -409,6 +410,13 @@ export default function AngstHuisdierenPage() {
             }
           })
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Huisdiergedrag", href: "/nl/gids/huisdiergedrag" },
+          { label: "Angst bij huisdieren" }
+        ]}
       />
     </div>
   );

@@ -4,6 +4,7 @@
  */
 
 import type { Metadata } from "next";
+import { GidsBreadcrumbs } from '@/components/gids';
 import Link from "next/link";
 import { CheckCircle2, Heart, Clock, Flower } from "lucide-react";
 
@@ -620,6 +621,13 @@ export default function AfscheidHuisdierPage() {
             dateModified: "2024-01-15",
           }),
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Senior Huisdieren", href: "/nl/gids/senior-huisdieren" },
+          { label: "Afscheid nemen van je huisdier" }
+        ]}
       />
     </div>
   );

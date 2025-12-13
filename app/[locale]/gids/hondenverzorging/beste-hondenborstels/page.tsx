@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GidsBreadcrumbs } from '@/components/gids';
 import Link from "next/link";
 import { Brush, Star, CheckCircle2, Info } from "lucide-react";
 
@@ -41,6 +42,13 @@ export default function BesteHondenborstelsPage() {
             "dateModified": "2024-01-15"
           })
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Hondenverzorging", href: "/nl/gids/hondenverzorging" },
+          { label: "De beste hondenborstels per vachttype" }
+        ]}
       />
 
       {/* Hero Section */}

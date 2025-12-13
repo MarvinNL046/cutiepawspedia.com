@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GidsBreadcrumbs } from '@/components/gids';
 import Link from "next/link";
 import { Zap, CheckCircle, Target, Award } from "lucide-react";
 
@@ -652,6 +653,13 @@ export default function ClickerTrainingPage() {
             }
           })
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Huisdiertraining", href: "/nl/gids/huisdiertraining" },
+          { label: "Clicker training" }
+        ]}
       />
     </div>
   );

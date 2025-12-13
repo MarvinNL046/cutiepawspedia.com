@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GidsBreadcrumbs } from '@/components/gids';
 import Link from "next/link";
 import Image from "next/image";
 import { CheckCircle, Star, Award } from "lucide-react";
@@ -462,6 +463,13 @@ export default function PuppytrainingBasisPage() {
             }
           })
         }}
+      />
+
+      <GidsBreadcrumbs
+        items={[
+          { label: "Huisdiertraining", href: "/nl/gids/huisdiertraining" },
+          { label: "Puppytraining basis" }
+        ]}
       />
     </div>
   );

@@ -73,9 +73,8 @@ async function getSitemapSections(): Promise<SitemapSection[]> {
 
   // Add paginated place sitemaps
   // e.g., /sitemap-places-1.xml, /sitemap-places-2.xml, etc.
-  // We pre-create 3 pages (supports up to 135K places)
-  // Empty pages return valid empty sitemaps
-  for (let i = 1; i <= Math.max(placePageCount, 3); i++) {
+  // Only include pages that actually have content (minimum 1 page)
+  for (let i = 1; i <= Math.max(placePageCount, 1); i++) {
     sections.push({
       id: `places-${i}`,
       path: `/sitemap-places-${i}.xml`,

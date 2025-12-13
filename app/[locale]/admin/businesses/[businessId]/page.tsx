@@ -2,11 +2,10 @@ import { requireAdmin } from "@/lib/auth/admin";
 import { AdminHeader } from "@/components/admin";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getBusinessById, getBusinessStats, getBusinessListings, getBusinessLeads } from "@/db/queries/businesses";
-import { getImpersonation, startImpersonation } from "@/lib/auth/impersonation";
-import { notFound, redirect } from "next/navigation";
+import { getImpersonation } from "@/lib/auth/impersonation";
+import { notFound } from "next/navigation";
 import {
   Building2,
   Mail,
@@ -17,7 +16,6 @@ import {
   Package,
   CreditCard,
   FileText,
-  UserCheck,
 } from "lucide-react";
 import {
   BusinessOverviewTab,
@@ -26,16 +24,14 @@ import {
   BusinessBillingTab,
   BusinessNotesTab,
 } from "@/components/admin/businesses/tabs";
-import Link from "next/link";
+import { ImpersonateButton } from "@/components/admin/businesses/ImpersonateButton";
 
 interface BusinessDetailPageProps {
   params: Promise<{ locale: string; businessId: string }>;
-  searchParams: Promise<{ impersonate?: string }>;
 }
 
-export default async function BusinessDetailPage({ params, searchParams }: BusinessDetailPageProps) {
+export default async function BusinessDetailPage({ params }: BusinessDetailPageProps) {
   const { locale, businessId } = await params;
-  const { impersonate } = await searchParams;
   const user = await requireAdmin(locale);
 
   const id = parseInt(businessId, 10);
@@ -54,13 +50,6 @@ export default async function BusinessDetailPage({ params, searchParams }: Busin
     notFound();
   }
 
-  // Handle impersonation request
-  if (impersonate === "true") {
-    await startImpersonation(user.id, business.id, business.name);
-    // Redirect to remove the query param
-    redirect(`/${locale}/admin/businesses/${businessId}`);
-  }
-
   // Get current impersonation status
   const impersonationData = await getImpersonation();
 
@@ -70,11 +59,23 @@ export default async function BusinessDetailPage({ params, searchParams }: Busin
     suspended: "bg-red-100 text-red-700",
   };
 
+  // Plan colors for UPPERCASE keys (FREE, STARTER, PRO, ENTERPRISE)
   const planColors: Record<string, string> = {
-    free: "bg-slate-100 text-slate-600",
-    starter: "bg-blue-100 text-blue-700",
-    pro: "bg-cpAqua/20 text-cpAqua",
-    enterprise: "bg-cpYellow/20 text-cpYellow",
+    FREE: "bg-slate-100 text-slate-600",
+    STARTER: "bg-cpCoral/20 text-cpCoral",
+    PRO: "bg-cpAqua/20 text-cpAqua",
+    ENTERPRISE: "bg-cpYellow/20 text-cpYellow",
+  };
+
+  // Format plan key to display name
+  const formatPlanName = (planKey: string): string => {
+    const planNames: Record<string, string> = {
+      FREE: "Starter",
+      STARTER: "Starter",
+      PRO: "Pro",
+      ENTERPRISE: "Enterprise",
+    };
+    return planNames[planKey] || planKey;
   };
 
   return (
@@ -104,7 +105,7 @@ export default async function BusinessDetailPage({ params, searchParams }: Busin
                       {business.status}
                     </Badge>
                     <Badge className={planColors[business.plan] || "bg-slate-100"}>
-                      {business.plan}
+                      {formatPlanName(business.plan)}
                     </Badge>
                     <Badge variant="outline">{business.billingStatus}</Badge>
                   </div>
@@ -131,12 +132,7 @@ export default async function BusinessDetailPage({ params, searchParams }: Busin
                   {/* Impersonate Button */}
                   {!impersonationData && (
                     <div className="mt-4">
-                      <Link href={`/${locale}/admin/businesses/${businessId}?impersonate=true`}>
-                        <Button variant="outline" size="sm" className="gap-2">
-                          <UserCheck className="h-4 w-4" />
-                          View as Business
-                        </Button>
-                      </Link>
+                      <ImpersonateButton businessId={business.id} locale={locale} />
                     </div>
                   )}
                 </div>

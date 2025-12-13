@@ -17,7 +17,8 @@ export default async function BusinessesPage({ params }: BusinessesPageProps) {
 
   // Calculate stats
   const activeBusinesses = businesses.filter((b) => b.status === "active").length;
-  const paidBusinesses = businesses.filter((b) => b.billingStatus === "paid").length;
+  // Use planStatus ACTIVE for paid accounts (new UPPERCASE enum value)
+  const paidBusinesses = businesses.filter((b) => b.billingStatus === "ACTIVE").length;
   const totalListings = businesses.reduce((sum, b) => sum + b.placesCount, 0);
   const totalLeads = businesses.reduce((sum, b) => sum + b.leadsCount, 0);
 

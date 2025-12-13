@@ -154,6 +154,27 @@ export function BusinessesTable({
     setPage(0);
   };
 
+  const handleImpersonate = async (businessId: number) => {
+    try {
+      const res = await fetch("/api/admin/impersonate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ businessId }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to start impersonation");
+      }
+
+      // Refresh to show impersonation status
+      router.refresh();
+    } catch (error) {
+      console.error("Impersonation error:", error);
+      alert(error instanceof Error ? error.message : "Failed to start impersonation");
+    }
+  };
+
   const totalPages = Math.ceil(total / pageSize);
 
   const statusColors: Record<string, string> = {
@@ -393,13 +414,11 @@ export function BusinessesTable({
                             Open Dashboard
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link
-                            href={`/en/admin/businesses/${business.id}?impersonate=true`}
-                          >
-                            <UserCheck className="h-4 w-4 mr-2" />
-                            Impersonate
-                          </Link>
+                        <DropdownMenuItem
+                          onClick={() => handleImpersonate(business.id)}
+                        >
+                          <UserCheck className="h-4 w-4 mr-2" />
+                          Impersonate
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         {business.status !== "active" && (

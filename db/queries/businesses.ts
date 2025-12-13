@@ -76,10 +76,12 @@ export async function getBusinesses(options: {
     conditions.push(eq(businesses.status, status));
   }
   if (plan) {
-    conditions.push(eq(businesses.plan, plan));
+    // Use planKey (UPPERCASE) instead of deprecated plan field
+    conditions.push(eq(businesses.planKey, plan.toUpperCase()));
   }
   if (billingStatus) {
-    conditions.push(eq(businesses.billingStatus, billingStatus));
+    // Use planStatus (UPPERCASE) instead of deprecated billingStatus field
+    conditions.push(eq(businesses.planStatus, billingStatus.toUpperCase()));
   }
   if (search) {
     conditions.push(
@@ -112,8 +114,8 @@ export async function getBusinesses(options: {
       contactEmail: businesses.contactEmail,
       contactPhone: businesses.contactPhone,
       status: businesses.status,
-      plan: businesses.plan,
-      billingStatus: businesses.billingStatus,
+      plan: businesses.planKey, // Use planKey instead of deprecated plan field
+      billingStatus: businesses.planStatus, // Use planStatus instead of deprecated billingStatus field
       leadPriceCents: businesses.leadPriceCents,
       notes: businesses.notes,
       createdAt: businesses.createdAt,

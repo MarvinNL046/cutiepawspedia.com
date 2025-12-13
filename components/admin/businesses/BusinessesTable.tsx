@@ -162,14 +162,32 @@ export function BusinessesTable({
     suspended: "bg-red-100 text-red-700",
   };
 
+  // Plan colors for UPPERCASE keys (FREE, STARTER, PRO, ENTERPRISE)
   const planColors: Record<string, string> = {
-    free: "bg-slate-100 text-slate-600",
-    starter: "bg-blue-100 text-blue-700",
-    pro: "bg-cpAqua/20 text-cpAqua",
-    enterprise: "bg-cpYellow/20 text-cpYellow",
+    FREE: "bg-slate-100 text-slate-600",
+    STARTER: "bg-cpCoral/20 text-cpCoral",
+    PRO: "bg-cpAqua/20 text-cpAqua",
+    ENTERPRISE: "bg-cpYellow/20 text-cpYellow",
   };
 
+  // Format plan key to display name
+  const formatPlanName = (planKey: string): string => {
+    const planNames: Record<string, string> = {
+      FREE: "Starter",
+      STARTER: "Starter",
+      PRO: "Pro",
+      ENTERPRISE: "Enterprise",
+    };
+    return planNames[planKey] || planKey;
+  };
+
+  // Billing/Plan status colors for UPPERCASE keys (TRIAL, ACTIVE, EXPIRED, CANCELLED)
   const billingColors: Record<string, string> = {
+    TRIAL: "bg-slate-100 text-slate-600",
+    ACTIVE: "bg-green-100 text-green-700",
+    EXPIRED: "bg-orange-100 text-orange-700",
+    CANCELLED: "bg-red-100 text-red-700",
+    // Legacy lowercase keys (for backwards compatibility)
     trial: "bg-slate-100 text-slate-600",
     paid: "bg-green-100 text-green-700",
     overdue: "bg-orange-100 text-orange-700",
@@ -220,10 +238,9 @@ export function BusinessesTable({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Plans</SelectItem>
-            <SelectItem value="free">Free</SelectItem>
-            <SelectItem value="starter">Starter</SelectItem>
-            <SelectItem value="pro">Pro</SelectItem>
-            <SelectItem value="enterprise">Enterprise</SelectItem>
+            <SelectItem value="FREE">Starter</SelectItem>
+            <SelectItem value="PRO">Pro</SelectItem>
+            <SelectItem value="ENTERPRISE">Enterprise</SelectItem>
           </SelectContent>
         </Select>
 
@@ -235,14 +252,14 @@ export function BusinessesTable({
           }}
         >
           <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Billing Status" />
+            <SelectValue placeholder="Plan Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Billing</SelectItem>
-            <SelectItem value="trial">Trial</SelectItem>
-            <SelectItem value="paid">Paid</SelectItem>
-            <SelectItem value="overdue">Overdue</SelectItem>
-            <SelectItem value="cancelled">Cancelled</SelectItem>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="TRIAL">Trial</SelectItem>
+            <SelectItem value="ACTIVE">Active</SelectItem>
+            <SelectItem value="EXPIRED">Expired</SelectItem>
+            <SelectItem value="CANCELLED">Cancelled</SelectItem>
           </SelectContent>
         </Select>
 
@@ -334,7 +351,7 @@ export function BusinessesTable({
                       variant="secondary"
                       className={planColors[business.plan] || "bg-slate-100"}
                     >
-                      {business.plan}
+                      {formatPlanName(business.plan)}
                     </Badge>
                   </TableCell>
                   <TableCell>

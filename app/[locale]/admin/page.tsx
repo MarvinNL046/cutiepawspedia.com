@@ -325,14 +325,16 @@ export default async function AdminDashboard({ params }: AdminDashboardProps) {
                           <Badge
                             variant="secondary"
                             className={
-                              business.plan === "enterprise"
+                              business.plan === "ENTERPRISE"
                                 ? "bg-cpYellow/20 text-cpYellow border-0"
-                                : business.plan === "pro"
+                                : business.plan === "PRO"
                                   ? "bg-cpAqua/20 text-cpAqua border-0"
-                                  : "bg-slate-100"
+                                  : business.plan === "STARTER"
+                                    ? "bg-cpCoral/20 text-cpCoral border-0"
+                                    : "bg-slate-100"
                             }
                           >
-                            {business.plan}
+                            {formatPlanName(business.plan)}
                           </Badge>
                         </TableCell>
                         <TableCell>
@@ -390,6 +392,17 @@ function StatCard({ title, value, icon: Icon, color, subtitle }: StatCardProps) 
       </CardContent>
     </Card>
   );
+}
+
+// Format plan name for display
+function formatPlanName(planKey: string): string {
+  const planNames: Record<string, string> = {
+    FREE: "Starter",
+    STARTER: "Starter",
+    PRO: "Pro",
+    ENTERPRISE: "Enterprise",
+  };
+  return planNames[planKey] || planKey;
 }
 
 // Format date helper

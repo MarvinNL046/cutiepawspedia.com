@@ -224,7 +224,7 @@ export async function getLatestBusinesses(limit: number = 10): Promise<LatestBus
       name: businesses.name,
       ownerEmail: users.email,
       status: businesses.status,
-      plan: businesses.plan,
+      plan: businesses.planKey, // Use planKey instead of deprecated plan field
       createdAt: businesses.createdAt,
     })
     .from(businesses)
@@ -318,8 +318,8 @@ export async function getBusinessesWithStats() {
       name: businesses.name,
       ownerEmail: users.email,
       status: businesses.status,
-      plan: businesses.plan,
-      billingStatus: businesses.billingStatus,
+      plan: businesses.planKey, // Use planKey instead of deprecated plan field
+      billingStatus: businesses.planStatus, // Use planStatus instead of deprecated billingStatus
       createdAt: businesses.createdAt,
     })
     .from(businesses)

@@ -224,12 +224,32 @@ export const emailTemplates = {
   }),
 };
 
+/**
+ * Strip HTML tags to create plain text version
+ * Important for email deliverability - multipart emails (HTML + text) are preferred by spam filters
+ */
+function htmlToText(html: string): string {
+  return html
+    .replace(/<style[^>]*>.*?<\/style>/gis, '')
+    .replace(/<script[^>]*>.*?<\/script>/gis, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 // Helper function to send emails
 export async function sendEmail(options: {
   from: string;
   to: string;
   subject: string;
   html: string;
+  replyTo?: string;
   tags?: { name: string; value: string }[];
 }) {
   if (!resend) {
@@ -238,8 +258,19 @@ export async function sendEmail(options: {
   }
 
   try {
+    // Create plain text version for better deliverability
+    const text = htmlToText(options.html);
+
     const { data, error } = await resend.emails.send({
-      ...options,
+      from: options.from,
+      to: options.to,
+      subject: options.subject,
+      html: options.html,
+      text, // Plain text version - critical for spam filters
+      replyTo: options.replyTo, // Proper reply-to header
+      headers: {
+        'X-Entity-Ref-ID': `cutiepawspedia-${Date.now()}`, // Unique ID for tracking
+      },
       tags: [
         { name: "platform", value: "cutiepawspedia" },
         ...(options.tags || []),

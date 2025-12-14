@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
     const emailResult = await sendEmail({
       from: "CutiePawsPedia <noreply@cutiepawspedia.com>",
       to: adminEmail,
+      replyTo: email, // Allow direct reply to the sender
       subject: `[Contact] ${subject}`,
       html: `
         <!DOCTYPE html>

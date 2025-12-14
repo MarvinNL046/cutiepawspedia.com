@@ -65,6 +65,8 @@ export default function RootLayout({
    */
   const preconnectLinks = (
     <head>
+      {/* Impact Radius affiliate verification */}
+      <meta name="impact-site-verification" content="d42c3876-e6c1-4548-8e00-7e6c6886b0df" />
       {/* Mapbox API - used for static maps */}
       <link rel="preconnect" href="https://api.mapbox.com" />
       <link rel="dns-prefetch" href="https://api.mapbox.com" />

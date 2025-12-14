@@ -292,7 +292,8 @@ interface LocalResult {
   website?: string;
   rating?: number;
   reviews?: number;
-  placeId?: string;
+  cid?: string;           // Google CID (numeric, e.g., "16143688583717815530")
+  placeId?: string;       // Google Place ID (e.g., "ChIJ...")
   category?: string;
   latitude?: number;
   longitude?: number;
@@ -373,7 +374,8 @@ function parseSerpResults(data: object): LocalResult[] {
       website: String(r.site || r.website || r.link || r.url || ""),
       rating: rating > 0 ? rating : undefined,
       reviews: reviews > 0 ? reviews : undefined,
-      placeId: String(r.cid || r.place_id || r.data_id || ""),
+      cid: String(r.cid || r.data_id || ""),
+      placeId: String(r.place_id || ""),
       category: String(r.type || r.category || r.business_type || ""),
       latitude: lat > 0 ? lat : undefined,
       longitude: lng > 0 ? lng : undefined,
@@ -410,7 +412,8 @@ async function createPlace(
 
   try {
     const scrapedContent: Record<string, unknown> = {
-      googlePlaceId: result.placeId,
+      googleCid: result.cid || null,
+      googlePlaceId: result.placeId || null,
       googleRating: result.rating,
       googleReviewCount: result.reviews,
       category: result.category,
@@ -438,6 +441,8 @@ async function createPlace(
         lng: result.longitude?.toString() || null,
         avgRating: result.rating?.toString() || "0",
         reviewCount: result.reviews || 0,
+        googleCid: result.cid || null,           // Store CID in dedicated column
+        googlePlaceId: result.placeId || null,   // Store Place ID in dedicated column
         scrapedContent: scrapedContent,
         isVerified: false,
         isPremium: false,

@@ -6,7 +6,7 @@
  */
 
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect, permanentRedirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -110,9 +110,43 @@ async function getPlaceBySlugWithProvince(
   });
 }
 
+/**
+ * Find place by slug only (ignoring location) - used for auto-redirects
+ * When a place URL has the wrong city/province, we look up the correct location
+ */
+async function findPlaceBySlugOnly(placeSlug: string) {
+  if (!db) return null;
+
+  return db.query.places.findFirst({
+    where: eq(places.slug, placeSlug),
+    with: {
+      city: {
+        with: {
+          country: true,
+          province: true,
+        },
+      },
+      placeCategories: {
+        with: {
+          category: true,
+        },
+        limit: 1,
+      },
+    },
+  });
+}
+
 export async function generateMetadata({ params }: PlacePageProps): Promise<Metadata> {
   const { locale, countrySlug, provinceSlug, citySlug, categorySlug, placeSlug } = await params;
-  const place = await getPlaceBySlugWithProvince(placeSlug, citySlug, provinceSlug, countrySlug);
+  let place = await getPlaceBySlugWithProvince(placeSlug, citySlug, provinceSlug, countrySlug);
+
+  // If not found here, check if exists elsewhere (for redirect cases)
+  if (!place) {
+    const placeElsewhere = await findPlaceBySlugOnly(placeSlug);
+    if (placeElsewhere) {
+      place = placeElsewhere as typeof place;
+    }
+  }
 
   if (!place) {
     return {
@@ -133,7 +167,27 @@ export default async function PlacePage({ params }: PlacePageProps) {
   if (!province) notFound();
 
   const place = await getPlaceBySlugWithProvince(placeSlug, citySlug, provinceSlug, countrySlug);
-  if (!place) notFound();
+
+  // If place not found at this location, check if it exists elsewhere and redirect
+  if (!place) {
+    const placeElsewhere = await findPlaceBySlugOnly(placeSlug);
+
+    if (placeElsewhere && placeElsewhere.city) {
+      // Place exists but at a different location - build correct URL and 301 redirect
+      const correctCity = placeElsewhere.city;
+      const correctProvince = correctCity.province;
+      const correctCountry = correctCity.country;
+      const correctCategory = placeElsewhere.placeCategories?.[0]?.category;
+
+      if (correctCountry && correctProvince) {
+        const correctUrl = `/${locale}/${correctCountry.slug}/p/${correctProvince.slug}/${correctCity.slug}/${correctCategory?.slug || categorySlug}/${placeSlug}`;
+        permanentRedirect(correctUrl);
+      }
+    }
+
+    // Place truly doesn't exist anywhere
+    notFound();
+  }
 
   const city = Array.isArray(place.city) ? place.city[0] : place.city;
   const cityName = city?.name || citySlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());

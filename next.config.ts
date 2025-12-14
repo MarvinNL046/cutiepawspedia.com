@@ -66,23 +66,6 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === "production",
   },
 
-  // 301 Redirects for moved/incorrect place URLs
-  async redirects() {
-    return [
-      // PawComfort was indexed with wrong city (Sint-Niklaas instead of Willebroek)
-      {
-        source: '/nl/belgie/p/oost-vlaanderen/sint-niklaas/dog-walking/pawcomfort-huisdierenservice',
-        destination: '/nl/belgie/p/antwerpen/willebroek/dog-walking/pawcomfort-huisdierenservice',
-        permanent: true,
-      },
-      {
-        source: '/en/belgium/p/oost-vlaanderen/sint-niklaas/dog-walking/pawcomfort-huisdierenservice',
-        destination: '/en/belgium/p/antwerpen/willebroek/dog-walking/pawcomfort-huisdierenservice',
-        permanent: true,
-      },
-    ];
-  },
-
   // Headers for caching
   async headers() {
     return [

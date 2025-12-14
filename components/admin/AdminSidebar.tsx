@@ -20,6 +20,7 @@ import {
   Camera,
   Activity,
   Star,
+  MessageCircle,
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -86,6 +87,11 @@ const navItems = [
     href: "/admin/analytics",
     label: "Analytics",
     icon: BarChart3,
+  },
+  {
+    href: "/admin/feedback",
+    label: "Feedback",
+    icon: MessageCircle,
   },
 ];
 

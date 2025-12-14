@@ -12,6 +12,7 @@ import {
   LogOut,
   ChevronLeft,
   PawPrint,
+  MessageCircle,
 } from "lucide-react";
 
 interface DashboardSidebarProps {
@@ -38,6 +39,11 @@ const navItems = [
     href: "/dashboard/settings",
     label: "Settings",
     icon: Settings,
+  },
+  {
+    href: "/dashboard/feedback",
+    label: "Feedback",
+    icon: MessageCircle,
   },
 ];
 

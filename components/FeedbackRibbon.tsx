@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { MessageSquare, X, Send, CheckCircle } from "lucide-react";
 
 export function FeedbackRibbon() {
+  const t = useTranslations("feedback");
   const [isOpen, setIsOpen] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [email, setEmail] = useState("");
@@ -48,11 +50,11 @@ export function FeedbackRibbon() {
         onClick={() => setIsOpen(true)}
         className="fixed right-0 top-1/2 -translate-y-1/2 z-40 bg-primary hover:bg-primary/90 text-white px-2 py-4 rounded-l-lg shadow-lg transition-all duration-200 hover:px-3 group"
         style={{ writingMode: "vertical-rl", textOrientation: "mixed" }}
-        aria-label="Give feedback"
+        aria-label={t("ariaLabel")}
       >
         <span className="flex items-center gap-2 text-sm font-medium">
           <MessageSquare className="w-4 h-4 rotate-90" />
-          Feedback
+          {t("button")}
         </span>
       </button>
 
@@ -79,10 +81,10 @@ export function FeedbackRibbon() {
               <div className="text-center py-8">
                 <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                  Bedankt! 🎉
+                  {t("thankYou")}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Je feedback is verzonden.
+                  {t("submitted")}
                 </p>
               </div>
             ) : (
@@ -90,10 +92,10 @@ export function FeedbackRibbon() {
                 <div className="mb-6">
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                     <MessageSquare className="w-5 h-5 text-primary" />
-                    Geef feedback
+                    {t("title")}
                   </h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Help ons CutiePawsPedia te verbeteren!
+                    {t("subtitle")}
                   </p>
                 </div>
 
@@ -101,9 +103,9 @@ export function FeedbackRibbon() {
                   {/* Type selector */}
                   <div className="flex gap-2">
                     {[
-                      { value: "bug", label: "🐛 Bug", color: "red" },
-                      { value: "idea", label: "💡 Idee", color: "yellow" },
-                      { value: "other", label: "💬 Anders", color: "blue" },
+                      { value: "bug", label: t("types.bug") },
+                      { value: "idea", label: t("types.idea") },
+                      { value: "other", label: t("types.other") },
                     ].map((option) => (
                       <button
                         key={option.value}
@@ -125,7 +127,7 @@ export function FeedbackRibbon() {
                     <textarea
                       value={feedback}
                       onChange={(e) => setFeedback(e.target.value)}
-                      placeholder="Vertel ons wat je denkt..."
+                      placeholder={t("placeholder")}
                       rows={4}
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
                       required
@@ -138,7 +140,7 @@ export function FeedbackRibbon() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Email (optioneel, voor follow-up)"
+                      placeholder={t("emailPlaceholder")}
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                     />
                   </div>
@@ -154,7 +156,7 @@ export function FeedbackRibbon() {
                     ) : (
                       <>
                         <Send className="w-4 h-4" />
-                        Versturen
+                        {t("submit")}
                       </>
                     )}
                   </button>

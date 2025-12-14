@@ -1110,5 +1110,21 @@
       "wsava": "WSAVA Nutrition Assessment Guidelines",
       "petmd": "PetMD - Dog Calorie Needs"
     }
+  },
+  "feedback": {
+    "button": "Feedback",
+    "ariaLabel": "Donner votre avis",
+    "title": "Donner votre avis",
+    "subtitle": "Aidez-nous a ameliorer CutiePawsPedia!",
+    "thankYou": "Merci!",
+    "submitted": "Votre avis a ete envoye.",
+    "placeholder": "Dites-nous ce que vous pensez...",
+    "emailPlaceholder": "E-mail (optionnel, pour suivi)",
+    "submit": "Envoyer",
+    "types": {
+      "bug": "Bug",
+      "idea": "Idee",
+      "other": "Autre"
+    }
   }
 }

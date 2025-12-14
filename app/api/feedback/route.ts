@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { sendEmail } from "@/lib/email/resend";
+import { db } from "@/db";
+import { feedback } from "@/db/schema";
 import {
   getClientIP,
   createRateLimiter,
@@ -52,7 +54,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { feedback, email, type } = result.data;
+    const { feedback: feedbackText, email, type } = result.data;
 
     // Get user agent and page info from headers
     const userAgent = request.headers.get("user-agent") || "Unknown";
@@ -60,6 +62,21 @@ export async function POST(request: NextRequest) {
 
     // Send email to admin
     const adminEmail = process.env.FEEDBACK_EMAIL || process.env.CONTACT_EMAIL || "hello@cutiepawspedia.com";
+
+    // Save feedback to database
+    try {
+      await db.insert(feedback).values({
+        type,
+        message: feedbackText,
+        email: email || null,
+        page: referer,
+        userAgent,
+        ipAddress: clientIP,
+      });
+    } catch (dbError) {
+      console.error("Failed to save feedback to database:", dbError);
+      // Continue anyway - email is the primary delivery method
+    }
 
     const emailResult = await sendEmail({
       from: "CutiePawsPedia <noreply@cutiepawspedia.com>",
@@ -84,7 +101,7 @@ export async function POST(request: NextRequest) {
 
             <h3 style="color: #4B5563; margin-top: 25px;">Feedback</h3>
             <div style="background-color: #F9FAFB; padding: 20px; border-radius: 8px; margin: 10px 0;">
-              <p style="margin: 0; white-space: pre-wrap;">${feedback}</p>
+              <p style="margin: 0; white-space: pre-wrap;">${feedbackText}</p>
             </div>
 
             ${email ? `

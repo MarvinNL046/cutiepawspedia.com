@@ -5,6 +5,7 @@ import { JsonLd } from "@/components/seo";
 import { AdVisibilityProvider } from "@/components/ads";
 import { CookieConsentBanner } from "@/components/consent";
 import { ExitIntentPopup } from "@/components/popups";
+import { FeedbackRibbon } from "@/components/FeedbackRibbon";
 import { TopBanner } from "@/components/ui/TopBanner";
 import { StickyBottomBanner } from "@/components/ui/StickyBottomBanner";
 import { websiteSchema, organizationSchema } from "@/lib/seo";
@@ -58,6 +59,8 @@ export default async function LocaleLayout({
         <ExitIntentPopup locale={locale} />
         {/* Sticky bottom banner - appears on scroll */}
         <StickyBottomBanner locale={locale} />
+        {/* Feedback ribbon on the right side */}
+        <FeedbackRibbon />
       </AdVisibilityProvider>
     </NextIntlClientProvider>
   );

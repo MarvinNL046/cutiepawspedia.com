@@ -638,7 +638,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
               />
             </div>
 
-            <CategoryAffiliateBlock categorySlug={categorySlug} variant="card" />
+            <CategoryAffiliateBlock categorySlug={categorySlug} variant="card" countrySlug={countrySlug} />
 
             <SidebarAd className="hidden lg:block" />
 

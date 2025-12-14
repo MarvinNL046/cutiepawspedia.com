@@ -43,6 +43,171 @@ interface AffiliateBlockProps {
   customLinks?: AffiliateLink[];
   trackingId?: string;
   categoryContext?: string; // For tracking which category page the affiliate was shown on
+  countrySlug?: string; // For locale-aware affiliate links (e.g., "netherlands", "usa", "canada")
+}
+
+// =====================================================
+// LOCALE-AWARE AFFILIATE CONFIGURATION
+// =====================================================
+
+// Country slug to Amazon domain mapping
+const amazonDomains: Record<string, { domain: string; tag: string; searchAlias: string }> = {
+  netherlands: { domain: "amazon.nl", tag: "cutiepawspedi-21", searchAlias: "pets" },
+  belgie: { domain: "amazon.nl", tag: "cutiepawspedi-21", searchAlias: "pets" }, // Belgium uses NL
+  germany: { domain: "amazon.de", tag: "cutiepawspedi-21", searchAlias: "pets" },
+  france: { domain: "amazon.fr", tag: "cutiepawspedi-21", searchAlias: "pets" },
+  usa: { domain: "amazon.com", tag: "cutiepawspedi-21", searchAlias: "pets" },
+  canada: { domain: "amazon.ca", tag: "cutiepawspedi-21", searchAlias: "pets" },
+};
+
+// Chewy is only available in USA and Canada
+const chewyCountries = ["usa", "canada"];
+
+// Helper to generate Amazon affiliate URL
+function getAmazonUrl(countrySlug: string, searchTerm: string = ""): string {
+  const config = amazonDomains[countrySlug] || amazonDomains.netherlands;
+  const baseUrl = `https://www.${config.domain}/s`;
+  const params = new URLSearchParams({
+    k: searchTerm,
+    tag: config.tag,
+    "search-alias": `aps`, // General search
+  });
+  if (!searchTerm) {
+    // Link to pet category
+    return `https://www.${config.domain}/s?url=search-alias%3D${config.searchAlias}&tag=${config.tag}`;
+  }
+  return `${baseUrl}?${params.toString()}`;
+}
+
+// Helper to get Chewy URL (only for US/CA)
+function getChewyUrl(): string {
+  // Using go.cutiepawspedia.com redirect when available, otherwise direct
+  return "https://go.cutiepawspedia.com/chewy";
+}
+
+// Get locale-specific affiliate links based on country
+function getLocaleAwareLinks(type: AffiliateType, countrySlug: string): AffiliateLink[] {
+  const isNorthAmerica = chewyCountries.includes(countrySlug);
+  const amazonConfig = amazonDomains[countrySlug] || amazonDomains.netherlands;
+
+  const localeLinks: Record<AffiliateType, AffiliateLink[]> = {
+    "pet-products": isNorthAmerica ? [
+      {
+        name: "Chewy",
+        url: getChewyUrl(),
+        description: "America's #1 pet store - fast delivery",
+        discount: "35% off first Autoship",
+      },
+      {
+        name: `Amazon ${amazonConfig.domain.split('.')[1]?.toUpperCase() || 'Pet'}`,
+        url: getAmazonUrl(countrySlug, "pet supplies"),
+        description: "Wide selection, fast delivery",
+      },
+    ] : [
+      {
+        name: `Amazon ${amazonConfig.domain.split('.')[1]?.toUpperCase() || 'Pet'}`,
+        url: getAmazonUrl(countrySlug, "huisdier benodigdheden"),
+        description: "Groot assortiment, snelle levering",
+      },
+    ],
+    "vet-health": isNorthAmerica ? [
+      {
+        name: "Chewy Pharmacy",
+        url: getChewyUrl(),
+        description: "Pet medications & prescriptions",
+        discount: "35% off first Autoship",
+      },
+      {
+        name: `Amazon ${amazonConfig.domain.split('.')[1]?.toUpperCase() || ''} Pet Health`,
+        url: getAmazonUrl(countrySlug, "pet vitamins supplements"),
+        description: "Supplements & health products",
+      },
+    ] : [
+      {
+        name: `Amazon ${amazonConfig.domain.split('.')[1]?.toUpperCase() || ''} Pet Health`,
+        url: getAmazonUrl(countrySlug, "huisdier vitaminen supplementen"),
+        description: "Supplementen & gezondheidsproducten",
+      },
+    ],
+    "food-subscriptions": isNorthAmerica ? [
+      {
+        name: "Chewy Autoship",
+        url: getChewyUrl(),
+        description: "Save on recurring pet food delivery",
+        discount: "35% off first order",
+      },
+      {
+        name: `Amazon Subscribe & Save`,
+        url: getAmazonUrl(countrySlug, "dog food"),
+        description: "Regular delivery discounts",
+      },
+    ] : [
+      {
+        name: `Amazon ${amazonConfig.domain.split('.')[1]?.toUpperCase() || ''} Pet Food`,
+        url: getAmazonUrl(countrySlug, "hondenvoer"),
+        description: "Hondenvoer & kattenvoer",
+      },
+    ],
+    // Keep existing configs for non-product types (insurance, etc.)
+    "pet-insurance": [
+      {
+        name: "Lemonade Pet",
+        url: "#",
+        description: "Fast claims, customizable coverage",
+        discount: "Get a free quote",
+      },
+    ],
+    "pet-cremation": [
+      {
+        name: "Local Services",
+        url: "#",
+        description: "Find local pet cremation services",
+      },
+    ],
+    "pet-hotels": isNorthAmerica ? [
+      {
+        name: "Rover Boarding",
+        url: "#",
+        description: "Trusted pet sitters & boarding",
+        discount: "$20 off first booking",
+      },
+    ] : [
+      {
+        name: "Pawshake",
+        url: "#",
+        description: "Vind lokale pet sitters",
+      },
+    ],
+    "pet-sitting": isNorthAmerica ? [
+      {
+        name: "Rover",
+        url: "#",
+        description: "Nation's largest network of pet sitters",
+        discount: "$20 off first booking",
+      },
+    ] : [
+      {
+        name: "Pawshake",
+        url: "#",
+        description: "Vind lokale oppas",
+      },
+    ],
+    "dna-tests": [
+      {
+        name: "Embark",
+        url: getAmazonUrl(countrySlug, "dog DNA test"),
+        description: "Most accurate dog DNA test",
+        discount: "Up to $50 off",
+      },
+      {
+        name: "Wisdom Panel",
+        url: getAmazonUrl(countrySlug, "Wisdom Panel DNA"),
+        description: "350+ breed detection",
+      },
+    ],
+  };
+
+  return localeLinks[type] || [];
 }
 
 // Default affiliate data for each type
@@ -283,9 +448,12 @@ export function AffiliateBlock({
   customLinks,
   trackingId,
   categoryContext,
+  countrySlug = "netherlands", // Default to Netherlands
 }: AffiliateBlockProps) {
   const data = affiliateData[type];
-  const links = customLinks || data.links;
+  // Use locale-aware links if countrySlug is provided, otherwise fall back to custom or default
+  const localeLinks = getLocaleAwareLinks(type, countrySlug);
+  const links = customLinks || (localeLinks.length > 0 ? localeLinks : data.links);
   const Icon = data.icon;
 
   // Add tracking parameter to URLs
@@ -505,10 +673,12 @@ export function CategoryAffiliateBlock({
   categorySlug,
   variant = "card",
   className = "",
+  countrySlug = "netherlands", // For locale-aware affiliate links
 }: {
   categorySlug: string;
   variant?: "card" | "inline" | "banner" | "compact";
   className?: string;
+  countrySlug?: string;
 }) {
   // Map categories to relevant affiliate types
   const categoryAffiliateMap: Record<string, AffiliateType[]> = {
@@ -539,7 +709,13 @@ export function CategoryAffiliateBlock({
   return (
     <div className={`space-y-4 ${className}`}>
       {matchedTypes.map((type) => (
-        <AffiliateBlock key={type} type={type} variant={variant} categoryContext={categorySlug} />
+        <AffiliateBlock
+          key={type}
+          type={type}
+          variant={variant}
+          categoryContext={categorySlug}
+          countrySlug={countrySlug}
+        />
       ))}
     </div>
   );

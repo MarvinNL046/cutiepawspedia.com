@@ -682,7 +682,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
             </div>
 
             {/* Affiliate Recommendations */}
-            <CategoryAffiliateBlock categorySlug={categorySlug} variant="card" />
+            <CategoryAffiliateBlock categorySlug={categorySlug} variant="card" countrySlug={countrySlug} />
 
             {/* Ad: Sidebar (anonymous users only) */}
             <SidebarAd className="hidden lg:block" />

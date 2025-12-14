@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180">
+  <!-- Apple Touch Icon - Paw print in coral color with rounded background -->
+
+  <!-- Background -->
+  <rect width="180" height="180" rx="40" fill="#FFF5F4"/>
+
+  <!-- Paw print scaled and centered -->
+  <g transform="translate(30, 30) scale(3.75)">
+    <!-- Main pad -->
+    <ellipse cx="16" cy="20" rx="7" ry="6" fill="#F97066"/>
+
+    <!-- Top left toe -->
+    <ellipse cx="7" cy="10" rx="3.5" ry="4" fill="#F97066"/>
+
+    <!-- Top right toe -->
+    <ellipse cx="25" cy="10" rx="3.5" ry="4" fill="#F97066"/>
+
+    <!-- Middle left toe -->
+    <ellipse cx="10" cy="7" rx="3" ry="3.5" fill="#F97066"/>
+
+    <!-- Middle right toe -->
+    <ellipse cx="22" cy="7" rx="3" ry="3.5" fill="#F97066"/>
+  </g>
+</svg>

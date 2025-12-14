@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { Home, Users, CheckCircle2, XCircle, Euro, Calendar, Heart, Shield } from "lucide-react";
+import { GidsBreadcrumbs } from "@/components/gids";
 
 export const metadata: Metadata = {
   title: "Dierenpension of huisdieroppas: wat past bij jou? | CutiePawsPedia",

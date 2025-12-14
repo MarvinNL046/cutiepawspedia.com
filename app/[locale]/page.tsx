@@ -267,6 +267,70 @@ export default async function HomePage({ params }: HomePageProps) {
           </div>
         </section>
 
+        {/* Pet Guide Section */}
+        <section className="container mx-auto max-w-6xl px-4 py-16">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
+              {t("petGuideTitle")}
+            </h2>
+            <p className="text-muted-foreground dark:text-cpCream/70 max-w-2xl mx-auto">
+              {t("petGuideSubtitle")}
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              {
+                icon: "📚",
+                title: t("petGuideAll"),
+                desc: t("petGuideAllDesc"),
+                href: `/${locale}/${locale === "nl" ? "gids" : "guide"}`,
+                highlight: false,
+              },
+              {
+                icon: "🛒",
+                title: t("petGuideDeals"),
+                desc: t("petGuideDealsDesc"),
+                href: `/${locale}/gids/dierenwinkel/hondenvoer-aanbiedingen-zooplus`,
+                highlight: true,
+              },
+              {
+                icon: "🐕",
+                title: t("petGuideDogCare"),
+                desc: t("petGuideDogCareDesc"),
+                href: `/${locale}/${locale === "nl" ? "gids/hondenverzorging" : "guide/dog-care"}`,
+                highlight: false,
+              },
+              {
+                icon: "🐈",
+                title: t("petGuideCatCare"),
+                desc: t("petGuideCatCareDesc"),
+                href: `/${locale}/${locale === "nl" ? "gids/kattenverzorging" : "guide/cat-care"}`,
+                highlight: false,
+              },
+            ].map((guide) => (
+              <Link
+                key={guide.title}
+                href={guide.href}
+                className={`group rounded-2xl p-5 border transition-all hover:-translate-y-1 hover:shadow-lg ${
+                  guide.highlight
+                    ? "bg-gradient-to-br from-[#FF6600]/10 to-cpAmber/10 dark:from-[#FF6600]/20 dark:to-cpAmber/20 border-[#FF6600]/30 hover:border-[#FF6600]/50"
+                    : "bg-card dark:bg-cpSurface/50 border-border dark:border-cpAmber/20 hover:border-cpCoral/40"
+                }`}
+              >
+                <span className="text-3xl mb-3 block">{guide.icon}</span>
+                <h3 className={`font-bold mb-2 group-hover:text-cpCoral transition-colors ${
+                  guide.highlight ? "text-[#FF6600]" : "text-foreground dark:text-cpCream"
+                }`}>
+                  {guide.title}
+                </h3>
+                <p className="text-sm text-muted-foreground dark:text-slate-400">
+                  {guide.desc}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
         {/* How It Works */}
         <section className="container mx-auto max-w-6xl px-4 py-16">
           <div className="text-center mb-10">

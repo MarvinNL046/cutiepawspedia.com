@@ -556,7 +556,10 @@
     "awards": "Awards 2025",
     "newAdditions": "New Additions",
     "interactiveMap": "Map",
-    "compareCities": "Compare Cities"
+    "compareCities": "Compare Cities",
+    "partners": "Our Partners",
+    "affiliatePartner": "Affiliate Partner",
+    "affiliateDisclosure": "CutiePawsPedia may earn a commission from affiliate links. This does not affect our recommendations."
   },
   "categories": {
     "veterinary": "Veterinary",
@@ -740,7 +743,17 @@
     "freeListing": "Free Listing",
     "moreCustomers": "More Customers",
     "premiumOptions": "Premium Options",
-    "listYourBusiness": "List Your Business"
+    "listYourBusiness": "List Your Business",
+    "petGuideTitle": "Pet Care Guides & Tips",
+    "petGuideSubtitle": "Practical tips and advice for the best care of your pet",
+    "petGuideAll": "All Guides",
+    "petGuideAllDesc": "Browse all our care guides",
+    "petGuideDeals": "Deals & Offers",
+    "petGuideDealsDesc": "Best deals on pet food",
+    "petGuideDogCare": "Dog Care",
+    "petGuideDogCareDesc": "Tips for your dog",
+    "petGuideCatCare": "Cat Care",
+    "petGuideCatCareDesc": "Tips for your cat"
   },
   "faq": {
     "frequentlyAskedQuestions": "Frequently Asked Questions",

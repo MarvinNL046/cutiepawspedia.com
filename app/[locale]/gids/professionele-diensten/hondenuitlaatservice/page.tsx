@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { Dog, CheckCircle2, Euro, Clock, Users, MapPin, Heart, Award } from "lucide-react";
+import { GidsBreadcrumbs } from "@/components/gids";
 
 export const metadata: Metadata = {
   title: "Hondenuitlaatservice: kosten, voordelen en tips | CutiePawsPedia",

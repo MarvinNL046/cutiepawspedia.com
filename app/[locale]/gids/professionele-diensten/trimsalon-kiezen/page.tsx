@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { Scissors, CheckCircle2, AlertCircle, Star, MapPin, Euro, Award } from "lucide-react";
+import { GidsBreadcrumbs } from "@/components/gids";
 
 export const metadata: Metadata = {
   title: "Trimsalon kiezen: waar moet je op letten? | CutiePawsPedia",

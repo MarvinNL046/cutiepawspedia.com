@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { Brain, CheckCircle2, AlertCircle, Heart, Users, Award, Shield, TrendingUp } from "lucide-react";
+import { GidsBreadcrumbs } from "@/components/gids";
 
 export const metadata: Metadata = {
   title: "Dierengedragstherapeut: wanneer heb je er een nodig? | CutiePawsPedia",

@@ -244,6 +244,9 @@ export const places = pgTable(
     lastRefreshedAt: timestamp("last_refreshed_at"), // When data was last refreshed
     // Scraped enrichment content (for AI content generation)
     scrapedContent: jsonb("scraped_content"), // { aboutUs?: string, googleRating?: number, googleReviewCount?: number, scrapedAt?: string }
+    // Google Maps identifiers (for BrightData Dataset API)
+    googlePlaceId: varchar("google_place_id", { length: 255 }), // Google Place ID (e.g., ChIJ...)
+    googleCid: varchar("google_cid", { length: 50 }), // Google CID (numeric identifier)
     // Place status (for closed/moved detection)
     status: placeStatusEnum("status").default("active").notNull(),
     statusLastCheckedAt: timestamp("status_last_checked_at"),

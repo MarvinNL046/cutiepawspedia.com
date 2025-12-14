@@ -347,6 +347,7 @@ interface GoogleLocalResult {
   reviews?: number | string;
   review_count?: number | string;
   place_id?: string;
+  cid?: string; // Google CID (numeric identifier)
   type?: string;
   category?: string;
   latitude?: number;
@@ -507,6 +508,11 @@ function parseGoogleSerpResults(data: SerpResponse): GoogleLocalResult[] {
     // Include all results that have a name/title
     const name = resultAny.title || resultAny.name || resultAny.business_name;
     if (name) {
+      // Extract CID separately (numeric Google identifier)
+      const cidValue = resultAny.cid ? String(resultAny.cid) : undefined;
+      // Extract place_id (ChIJ... format)
+      const placeIdValue = resultAny.place_id || resultAny.data_id;
+
       results.push({
         title: String(name),
         name: String(name),
@@ -515,7 +521,8 @@ function parseGoogleSerpResults(data: SerpResponse): GoogleLocalResult[] {
         website: String(resultAny.site || resultAny.website || resultAny.link || resultAny.url || ""),
         rating: rating > 0 ? rating : undefined,
         reviews: reviewCount > 0 ? reviewCount : undefined,
-        place_id: String(resultAny.cid || resultAny.place_id || resultAny.data_id || ""),
+        place_id: placeIdValue ? String(placeIdValue) : cidValue || "",
+        cid: cidValue,
         category: String(resultAny.type || resultAny.category || resultAny.business_type || ""),
       });
     }
@@ -586,12 +593,13 @@ async function createPlace(
       discoverySource: "brightdata_serp_api",
     };
 
-    // Insert place
+    // Insert place (now includes google_place_id and google_cid)
     const insertResult = await sql`
       INSERT INTO places (
         city_id, slug, name, address, phone, website,
         avg_rating, review_count,
-        scraped_content, is_verified, is_premium
+        scraped_content, is_verified, is_premium,
+        google_place_id, google_cid
       ) VALUES (
         ${cityId},
         ${slug},
@@ -603,7 +611,9 @@ async function createPlace(
         ${typeof result.reviews === "number" ? result.reviews : 0},
         ${JSON.stringify(scrapedContent)}::jsonb,
         false,
-        false
+        false,
+        ${result.place_id || null},
+        ${result.cid || null}
       )
       RETURNING id
     `;

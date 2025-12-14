@@ -223,8 +223,39 @@ export function Footer({ locale }: FooterProps) {
           </div>
         </div>
 
+        {/* Partners Section */}
+        <div className="mt-12 pt-8 border-t border-border">
+          <h3 className="text-sm font-semibold text-foreground text-center mb-4">
+            {t("partners")}
+          </h3>
+          <div className="flex flex-wrap items-center justify-center gap-6">
+            <a
+              href={
+                locale === "nl" ? "https://go.cutiepawspedia.com/zooplus.nl" :
+                locale === "fr" ? "https://go.cutiepawspedia.com/zooplus.fr" :
+                locale === "de" ? "https://go.cutiepawspedia.com/zooplus.de" :
+                "https://go.cutiepawspedia.com/zooplus.com"
+              }
+              target="_blank"
+              rel="noopener noreferrer sponsored"
+              className="flex items-center gap-2 px-4 py-2 bg-[#FF6600]/10 hover:bg-[#FF6600]/20 rounded-lg transition-colors group"
+            >
+              <span className="text-xl">🛒</span>
+              <span className="font-semibold text-[#FF6600] group-hover:text-[#FF6600]/80">
+                {locale === "nl" ? "zooplus.nl" : locale === "fr" ? "zooplus.fr" : locale === "de" ? "zooplus.de" : "zooplus.com"}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {t("affiliatePartner")}
+              </span>
+            </a>
+          </div>
+          <p className="text-[10px] text-muted-foreground text-center mt-3">
+            {t("affiliateDisclosure")}
+          </p>
+        </div>
+
         {/* Bottom */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 md:flex-row">
+        <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 md:flex-row">
           <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-muted-foreground">
             <p>© {currentYear} CutiePawsPedia</p>
             <span className="hidden sm:inline">•</span>

@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { Stethoscope, CheckCircle2, Clock, Phone, MapPin, Heart, Shield } from "lucide-react";
+import { GidsBreadcrumbs } from "@/components/gids";
 
 export const metadata: Metadata = {
   title: "Dierenarts vinden in jouw buurt: tips en checklist | CutiePawsPedia",

@@ -556,7 +556,10 @@
     "awards": "Awards 2025",
     "newAdditions": "Nieuw Toegevoegd",
     "interactiveMap": "Kaart",
-    "compareCities": "Vergelijk Steden"
+    "compareCities": "Vergelijk Steden",
+    "partners": "Onze Partners",
+    "affiliatePartner": "Affiliate Partner",
+    "affiliateDisclosure": "CutiePawsPedia kan commissie ontvangen via affiliate links. Dit heeft geen invloed op onze aanbevelingen."
   },
   "categories": {
     "veterinary": "Dierenarts",
@@ -740,7 +743,17 @@
     "freeListing": "Gratis Vermelding",
     "moreCustomers": "Meer Klanten",
     "premiumOptions": "Premium Opties",
-    "listYourBusiness": "Vermeld Je Bedrijf"
+    "listYourBusiness": "Vermeld Je Bedrijf",
+    "petGuideTitle": "Huisdier Gids & Tips",
+    "petGuideSubtitle": "Praktische tips en advies voor de beste zorg voor je huisdier",
+    "petGuideAll": "Alle Gidsen",
+    "petGuideAllDesc": "Bekijk al onze verzorgingsgidsen",
+    "petGuideDeals": "Aanbiedingen",
+    "petGuideDealsDesc": "Beste deals op dierenvoeding",
+    "petGuideDogCare": "Hondenverzorging",
+    "petGuideDogCareDesc": "Tips voor je hond",
+    "petGuideCatCare": "Kattenverzorging",
+    "petGuideCatCareDesc": "Tips voor je kat"
   },
   "faq": {
     "frequentlyAskedQuestions": "Veelgestelde Vragen",

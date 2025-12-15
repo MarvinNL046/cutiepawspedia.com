@@ -8,21 +8,68 @@ import { neon } from "@neondatabase/serverless";
 
 const sql = neon(process.env.DATABASE_URL!);
 
-// Top 30 US cities
+// Top 150 US cities by population
 const usCities = [
+  // Top 50 (largest)
   "New York", "Los Angeles", "Chicago", "Houston", "Phoenix",
   "Philadelphia", "San Antonio", "San Diego", "Dallas", "San Jose",
   "Austin", "Jacksonville", "Fort Worth", "Columbus", "Charlotte",
   "San Francisco", "Indianapolis", "Seattle", "Denver", "Boston",
-  "Nashville", "Portland", "Las Vegas", "Atlanta", "Miami",
-  "Tampa", "Orlando", "Minneapolis", "Raleigh", "Sacramento"
+  "Nashville", "Portland", "Las Vegas", "Detroit", "Oklahoma City",
+  "Memphis", "Louisville", "Baltimore", "Milwaukee", "Albuquerque",
+  "Tucson", "Fresno", "Mesa", "Sacramento", "Atlanta",
+  "Kansas City", "Colorado Springs", "Miami", "Raleigh", "Omaha",
+  "Long Beach", "Virginia Beach", "Oakland", "Minneapolis", "Tulsa",
+  "Tampa", "Arlington", "New Orleans", "Wichita", "Cleveland",
+  // 51-100
+  "Bakersfield", "Aurora", "Anaheim", "Honolulu", "Santa Ana",
+  "Riverside", "Corpus Christi", "Lexington", "Henderson", "Stockton",
+  "Saint Paul", "Cincinnati", "St. Louis", "Pittsburgh", "Greensboro",
+  "Lincoln", "Anchorage", "Plano", "Orlando", "Irvine",
+  "Newark", "Durham", "Chula Vista", "Toledo", "Fort Wayne",
+  "St. Petersburg", "Laredo", "Jersey City", "Chandler", "Madison",
+  "Lubbock", "Scottsdale", "Reno", "Buffalo", "Gilbert",
+  "Glendale", "North Las Vegas", "Winston-Salem", "Chesapeake", "Norfolk",
+  "Fremont", "Garland", "Irving", "Hialeah", "Richmond",
+  "Boise", "Spokane", "Baton Rouge", "Tacoma", "San Bernardino",
+  // 101-150
+  "Modesto", "Fontana", "Des Moines", "Moreno Valley", "Santa Clarita",
+  "Fayetteville", "Birmingham", "Oxnard", "Rochester", "Port St. Lucie",
+  "Grand Rapids", "Huntsville", "Salt Lake City", "Frisco", "Yonkers",
+  "Amarillo", "Glendale", "Huntington Beach", "McKinney", "Montgomery",
+  "Augusta", "Aurora", "Akron", "Little Rock", "Tempe",
+  "Overland Park", "Grand Prairie", "Tallahassee", "Cape Coral", "Mobile",
+  "Knoxville", "Shreveport", "Worcester", "Ontario", "Vancouver",
+  "Sioux Falls", "Chattanooga", "Brownsville", "Fort Lauderdale", "Providence",
+  "Newport News", "Rancho Cucamonga", "Santa Rosa", "Peoria", "Oceanside",
+  "Elk Grove", "Salem", "Pembroke Pines", "Eugene", "Garden Grove"
 ];
 
-// Top 15 Canadian cities
+// Top 100 Canadian cities by population
 const canadaCities = [
+  // Major cities (already have)
   "Toronto", "Montreal", "Vancouver", "Calgary", "Edmonton",
   "Ottawa", "Winnipeg", "Quebec City", "Hamilton", "Kitchener",
-  "London", "Victoria", "Halifax", "Saskatoon", "Regina"
+  "London", "Victoria", "Halifax", "Saskatoon", "Regina",
+  // Additional cities 16-50
+  "St. Catharines", "Kelowna", "Barrie", "Sherbrooke", "Guelph",
+  "Kanata", "Abbotsford", "Trois-Rivières", "Kingston", "Milton",
+  "Thunder Bay", "St. John's", "Moncton", "Nanaimo", "Sudbury",
+  "Brantford", "Fredericton", "Red Deer", "Lethbridge", "Kamloops",
+  "Saint John", "Charlottetown", "Medicine Hat", "Drummondville", "Granby",
+  "Prince George", "Sault Ste. Marie", "Peterborough", "Newmarket", "Sarnia",
+  "Chilliwack", "Belleville", "Woodstock", "Shawinigan", "Airdrie",
+  // 51-100
+  "North Bay", "Cornwall", "Saint-Hyacinthe", "Vernon", "Courtenay",
+  "Brandon", "Chatham-Kent", "Georgetown", "Spruce Grove", "Leamington",
+  "Prince Albert", "Moose Jaw", "Fort McMurray", "Timmins", "Orillia",
+  "Stratford", "Orangeville", "Cochrane", "Okotoks", "Leduc",
+  "Campbell River", "Cranbrook", "Fort Saskatchewan", "Lloydminster", "Yorkton",
+  "Cold Lake", "Brooks", "Whitehorse", "Yellowknife", "Dawson Creek",
+  "Port Coquitlam", "Maple Ridge", "Delta", "Burnaby", "Coquitlam",
+  "Richmond", "North Vancouver", "Surrey", "Langley", "Mississauga",
+  "Brampton", "Markham", "Vaughan", "Oakville", "Burlington",
+  "Oshawa", "Whitby", "Ajax", "Pickering", "Richmond Hill"
 ];
 
 function slugify(name: string): string {

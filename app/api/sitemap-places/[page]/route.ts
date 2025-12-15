@@ -1,7 +1,8 @@
 /**
- * Dynamic Places Sitemap Route (/sitemap-places-[page].xml)
+ * Dynamic Places Sitemap API Route
  *
- * Handles ALL paginated place sitemaps dynamically.
+ * Handles ALL paginated place sitemaps dynamically via rewrite.
+ * - /sitemap-places-1.xml -> /api/sitemap-places/1
  * - Returns proper XML for valid pages with places
  * - Returns empty valid XML for pages beyond data (graceful handling)
  * - Never returns HTML (prevents "Sitemap is HTML" errors)
@@ -13,12 +14,6 @@ import {
   buildPlaceUrls,
   DEFAULT_SITEMAP_CONFIG,
 } from "@/lib/sitemap";
-
-// Force dynamic rendering - no static generation for dynamic sitemap
-export const dynamic = "force-dynamic";
-
-// ISR: Places change occasionally, 5-minute revalidation
-export const revalidate = 300;
 
 // Empty but valid sitemap XML for out-of-range pages
 const EMPTY_SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>

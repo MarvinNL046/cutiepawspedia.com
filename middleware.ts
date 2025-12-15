@@ -19,10 +19,11 @@ export const config = {
   // Match all pathnames except:
   // - API routes (/api/*)
   // - Static files (_next/static/*, _next/image/*, favicon.ico, etc.)
-  // - Sitemap files
+  // - Sitemap files (sitemap.xml, sitemap-*.xml)
   // - Robot.txt
   matcher: [
     // Match all pathnames except for specific patterns
-    '/((?!api|_next/static|_next/image|favicon.ico|sitemap|robots.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|xml|txt)).*)',
+    // Using separate patterns for better clarity
+    '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.*\\.xml$|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)).*)',
   ],
 };

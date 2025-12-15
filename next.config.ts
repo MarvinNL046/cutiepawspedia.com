@@ -66,6 +66,17 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === "production",
   },
 
+  // Rewrites for dynamic sitemaps
+  async rewrites() {
+    return [
+      // Rewrite /sitemap-places-{N}.xml to /api/sitemap-places/{N}
+      {
+        source: "/sitemap-places-:page(\\d+).xml",
+        destination: "/api/sitemap-places/:page",
+      },
+    ];
+  },
+
   // Headers for caching
   async headers() {
     return [

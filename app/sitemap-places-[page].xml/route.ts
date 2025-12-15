@@ -14,6 +14,9 @@ import {
   DEFAULT_SITEMAP_CONFIG,
 } from "@/lib/sitemap";
 
+// Force dynamic rendering - no static generation for dynamic sitemap
+export const dynamic = "force-dynamic";
+
 // ISR: Places change occasionally, 5-minute revalidation
 export const revalidate = 300;
 

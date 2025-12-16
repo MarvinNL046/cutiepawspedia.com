@@ -386,7 +386,7 @@ export function getSearchMetadata(
  * Generate metadata for static pages
  */
 export function getStaticPageMetadata(
-  page: "about" | "contact" | "privacy" | "terms" | "for-businesses",
+  page: "about" | "contact" | "privacy" | "privacy-policy" | "terms" | "for-businesses",
   locale: string
 ): Metadata {
   const pages = {
@@ -399,6 +399,10 @@ export function getStaticPageMetadata(
       description: `Get in touch with ${SITE_NAME}. We're here to help pet owners and businesses connect.`,
     },
     privacy: {
+      title: "Privacy Policy",
+      description: `Read ${SITE_NAME}'s privacy policy. Learn how we collect, use, and protect your personal information.`,
+    },
+    "privacy-policy": {
       title: "Privacy Policy",
       description: `Read ${SITE_NAME}'s privacy policy. Learn how we collect, use, and protect your personal information.`,
     },

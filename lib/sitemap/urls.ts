@@ -402,7 +402,7 @@ export async function buildStaticUrls(
   const staticPages = [
     { path: "about", priority: PAGE_PRIORITIES.about, changefreq: PAGE_CHANGEFREQ.about },
     { path: "contact", priority: PAGE_PRIORITIES.contact, changefreq: PAGE_CHANGEFREQ.contact },
-    { path: "privacy", priority: PAGE_PRIORITIES.privacy, changefreq: PAGE_CHANGEFREQ.privacy },
+    { path: "privacy-policy", priority: PAGE_PRIORITIES.privacy, changefreq: PAGE_CHANGEFREQ.privacy },
     { path: "terms", priority: PAGE_PRIORITIES.terms, changefreq: PAGE_CHANGEFREQ.terms },
     { path: "for-businesses", priority: 0.6, changefreq: "monthly" as const },
   ];

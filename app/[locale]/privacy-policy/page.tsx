@@ -6,6 +6,7 @@
  * - revalidate: 86400 (24 hours)
  */
 
+import type { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Eye, Lock, Database, Cookie, Mail, UserCheck, Globe } from "lucide-react";
@@ -13,8 +14,56 @@ import { Shield, Eye, Lock, Database, Cookie, Mail, UserCheck, Globe } from "luc
 export const dynamic = "force-static";
 export const revalidate = 86400;
 
+const BASE_URL = process.env.APP_BASE_URL || "https://cutiepawspedia.com";
+const SITE_NAME = "CutiePawsPedia";
+
+const metadataTranslations = {
+  en: {
+    title: "Privacy Policy",
+    description: `Read ${SITE_NAME}'s privacy policy. Learn how we collect, use, and protect your personal information when using our pet services directory.`,
+  },
+  nl: {
+    title: "Privacybeleid",
+    description: `Lees het privacybeleid van ${SITE_NAME}. Ontdek hoe we uw persoonlijke gegevens verzamelen, gebruiken en beschermen bij het gebruik van onze huisdierservices directory.`,
+  },
+  de: {
+    title: "Datenschutzrichtlinie",
+    description: `Lesen Sie die Datenschutzrichtlinie von ${SITE_NAME}. Erfahren Sie, wie wir Ihre persönlichen Daten bei der Nutzung unseres Haustierservice-Verzeichnisses sammeln, verwenden und schützen.`,
+  },
+};
+
 interface PrivacyPageProps {
   params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: PrivacyPageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = metadataTranslations[locale as keyof typeof metadataTranslations] || metadataTranslations.en;
+
+  return {
+    title: t.title,
+    description: t.description,
+    openGraph: {
+      title: t.title,
+      description: t.description,
+      url: `${BASE_URL}/${locale}/privacy-policy`,
+      type: "website",
+      locale: locale === "nl" ? "nl_NL" : locale === "de" ? "de_DE" : "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t.title,
+      description: t.description,
+    },
+    alternates: {
+      canonical: `${BASE_URL}/${locale}/privacy-policy`,
+      languages: {
+        en: `${BASE_URL}/en/privacy-policy`,
+        nl: `${BASE_URL}/nl/privacy-policy`,
+        de: `${BASE_URL}/de/privacy-policy`,
+      },
+    },
+  };
 }
 
 const translations = {

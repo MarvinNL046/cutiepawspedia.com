@@ -398,13 +398,13 @@ export async function buildStaticUrls(
   const urls: SitemapUrl[] = [];
   const today = new Date().toISOString().split("T")[0];
 
+  // Note: Search pages are excluded because they have noindex meta tag
   const staticPages = [
     { path: "about", priority: PAGE_PRIORITIES.about, changefreq: PAGE_CHANGEFREQ.about },
     { path: "contact", priority: PAGE_PRIORITIES.contact, changefreq: PAGE_CHANGEFREQ.contact },
     { path: "privacy", priority: PAGE_PRIORITIES.privacy, changefreq: PAGE_CHANGEFREQ.privacy },
     { path: "terms", priority: PAGE_PRIORITIES.terms, changefreq: PAGE_CHANGEFREQ.terms },
     { path: "for-businesses", priority: 0.6, changefreq: "monthly" as const },
-    { path: "search", priority: 0.5, changefreq: "daily" as const },
   ];
 
   for (const page of staticPages) {

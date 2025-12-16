@@ -312,7 +312,20 @@ interface GoogleLocalResult {
   rating?: number;
   reviews?: number;
   place_id?: string;
+  cid?: string;
   category?: string;
+  // New fields from SERP API
+  latitude?: number;
+  longitude?: number;
+  imageUrl?: string;
+  thumbnailUrl?: string;
+  openingHours?: Record<string, string>;
+  workStatus?: string;
+  accessibility?: {
+    wheelchairEntrance?: boolean;
+    parking?: boolean;
+  };
+  serviceOptions?: string[];
 }
 
 interface SerpLocalResult {
@@ -453,6 +466,42 @@ function parseGoogleSerpResults(data: SerpResponse): GoogleLocalResult[] {
       10
     );
 
+    // Parse coordinates
+    const lat = parseFloat(String(resultAny.lat || resultAny.latitude || (resultAny.gps_coordinates as Record<string, unknown>)?.latitude || 0));
+    const lng = parseFloat(String(resultAny.lng || resultAny.longitude || (resultAny.gps_coordinates as Record<string, unknown>)?.longitude || 0));
+
+    // Parse image URLs
+    const imageUrl = resultAny.original_image || resultAny.image || resultAny.photo || resultAny.main_image;
+    const thumbnailUrl = resultAny.thumbnail || resultAny.thumb || resultAny.small_image;
+
+    // Parse work status
+    const workStatus = resultAny.work_status || resultAny.open_state || resultAny.status;
+
+    // Parse opening hours
+    let openingHours: Record<string, string> | undefined;
+    const hoursData = resultAny.hours || resultAny.opening_hours || resultAny.work_hours || resultAny.working_hours;
+    if (hoursData && typeof hoursData === "object") {
+      openingHours = {};
+      const h = hoursData as Record<string, unknown>;
+      for (const [key, val] of Object.entries(h)) {
+        if (val && typeof val === "string") {
+          openingHours[key] = val;
+        }
+      }
+      if (Object.keys(openingHours).length === 0) openingHours = undefined;
+    }
+
+    // Parse accessibility/facilities
+    const accessibilityData = resultAny.accessibility as Record<string, boolean> | undefined;
+    const accessibility = accessibilityData ? {
+      wheelchairEntrance: accessibilityData.wheelchair_entrance || accessibilityData.wheelchair_accessible || false,
+      parking: accessibilityData.parking || accessibilityData.has_parking || false,
+    } : undefined;
+
+    // Parse service options
+    const serviceOptionsRaw = resultAny.service_options || resultAny.services || resultAny.amenities;
+    const serviceOptions = Array.isArray(serviceOptionsRaw) ? serviceOptionsRaw.map(String) : undefined;
+
     const name = resultAny.title || resultAny.name || resultAny.business_name;
     if (name) {
       results.push({
@@ -463,8 +512,17 @@ function parseGoogleSerpResults(data: SerpResponse): GoogleLocalResult[] {
         website: String(resultAny.site || resultAny.website || resultAny.link || resultAny.url || ""),
         rating: rating > 0 ? rating : undefined,
         reviews: reviewCount > 0 ? reviewCount : undefined,
-        place_id: String(resultAny.cid || resultAny.place_id || resultAny.data_id || ""),
+        place_id: String(resultAny.place_id || resultAny.data_id || ""),
+        cid: String(resultAny.cid || ""),
         category: String(resultAny.type || resultAny.category || resultAny.business_type || ""),
+        latitude: lat > 0 ? lat : undefined,
+        longitude: lng > 0 ? lng : undefined,
+        imageUrl: imageUrl ? String(imageUrl) : undefined,
+        thumbnailUrl: thumbnailUrl ? String(thumbnailUrl) : undefined,
+        openingHours,
+        workStatus: workStatus ? String(workStatus) : undefined,
+        accessibility,
+        serviceOptions,
       });
     }
   }
@@ -506,8 +564,9 @@ async function createPlace(
   }
 
   try {
-    const scrapedContent = {
+    const scrapedContent: Record<string, unknown> = {
       googlePlaceId: result.place_id,
+      googleCid: result.cid,
       googleRating: result.rating,
       googleReviewCount: result.reviews,
       category: result.category,
@@ -515,9 +574,46 @@ async function createPlace(
       discoverySource: "brightdata_serp_api_fr",
     };
 
+    // Add GPS coordinates if available
+    if (result.latitude && result.longitude) {
+      scrapedContent.coordinates = {
+        lat: result.latitude,
+        lng: result.longitude,
+      };
+    }
+
+    // Add image URLs if available
+    if (result.imageUrl) {
+      scrapedContent.imageUrl = result.imageUrl;
+    }
+    if (result.thumbnailUrl) {
+      scrapedContent.thumbnailUrl = result.thumbnailUrl;
+    }
+
+    // Add opening hours if available
+    if (result.openingHours) {
+      scrapedContent.openingHours = result.openingHours;
+    }
+
+    // Add work status if available
+    if (result.workStatus) {
+      scrapedContent.workStatus = result.workStatus;
+    }
+
+    // Add accessibility/facilities if available
+    if (result.accessibility) {
+      scrapedContent.accessibility = result.accessibility;
+    }
+
+    // Add service options if available
+    if (result.serviceOptions && result.serviceOptions.length > 0) {
+      scrapedContent.serviceOptions = result.serviceOptions;
+    }
+
     const insertResult = await sql`
       INSERT INTO places (
         city_id, slug, name, address, phone, website,
+        lat, lng,
         avg_rating, review_count,
         scraped_content, is_verified, is_premium
       ) VALUES (
@@ -527,6 +623,8 @@ async function createPlace(
         ${result.address || null},
         ${result.phone || null},
         ${result.website || null},
+        ${result.latitude?.toString() || null},
+        ${result.longitude?.toString() || null},
         ${result.rating?.toString() || "0"},
         ${typeof result.reviews === "number" ? result.reviews : 0},
         ${JSON.stringify(scrapedContent)}::jsonb,

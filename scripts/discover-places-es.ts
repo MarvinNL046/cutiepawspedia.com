@@ -297,6 +297,16 @@ interface LocalResult {
   category?: string;
   latitude?: number;
   longitude?: number;
+  // New fields from SERP API
+  imageUrl?: string;
+  thumbnailUrl?: string;
+  openingHours?: Record<string, string>;
+  workStatus?: string;
+  accessibility?: {
+    wheelchairEntrance?: boolean;
+    parking?: boolean;
+  };
+  serviceOptions?: string[];
 }
 
 async function searchGoogleMaps(
@@ -367,6 +377,38 @@ function parseSerpResults(data: object): LocalResult[] {
     const lat = parseFloat(String(r.lat || r.latitude || (r.gps_coordinates as Record<string, unknown>)?.latitude || 0));
     const lng = parseFloat(String(r.lng || r.longitude || (r.gps_coordinates as Record<string, unknown>)?.longitude || 0));
 
+    // Parse image URLs
+    const imageUrl = r.original_image || r.image || r.photo || r.main_image;
+    const thumbnailUrl = r.thumbnail || r.thumb || r.small_image;
+
+    // Parse work status
+    const workStatus = r.work_status || r.open_state || r.status;
+
+    // Parse opening hours
+    let openingHours: Record<string, string> | undefined;
+    const hoursData = r.hours || r.opening_hours || r.work_hours || r.working_hours;
+    if (hoursData && typeof hoursData === "object") {
+      openingHours = {};
+      const h = hoursData as Record<string, unknown>;
+      for (const [key, val] of Object.entries(h)) {
+        if (val && typeof val === "string") {
+          openingHours[key] = val;
+        }
+      }
+      if (Object.keys(openingHours).length === 0) openingHours = undefined;
+    }
+
+    // Parse accessibility/facilities
+    const accessibilityData = r.accessibility as Record<string, boolean> | undefined;
+    const accessibility = accessibilityData ? {
+      wheelchairEntrance: accessibilityData.wheelchair_entrance || accessibilityData.wheelchair_accessible || false,
+      parking: accessibilityData.parking || accessibilityData.has_parking || false,
+    } : undefined;
+
+    // Parse service options
+    const serviceOptionsRaw = r.service_options || r.services || r.amenities;
+    const serviceOptions = Array.isArray(serviceOptionsRaw) ? serviceOptionsRaw.map(String) : undefined;
+
     results.push({
       name: String(name),
       address: String(r.address || r.location || ""),
@@ -379,6 +421,12 @@ function parseSerpResults(data: object): LocalResult[] {
       category: String(r.type || r.category || r.business_type || ""),
       latitude: lat > 0 ? lat : undefined,
       longitude: lng > 0 ? lng : undefined,
+      imageUrl: imageUrl ? String(imageUrl) : undefined,
+      thumbnailUrl: thumbnailUrl ? String(thumbnailUrl) : undefined,
+      openingHours,
+      workStatus: workStatus ? String(workStatus) : undefined,
+      accessibility,
+      serviceOptions,
     });
   }
 
@@ -418,7 +466,7 @@ async function createPlace(
       googleReviewCount: result.reviews,
       category: result.category,
       discoveredAt: new Date().toISOString(),
-      discoverySource: "brightdata_serp_api_us",
+      discoverySource: "brightdata_serp_api_es",
     };
 
     if (result.latitude && result.longitude) {
@@ -426,6 +474,16 @@ async function createPlace(
         lat: result.latitude,
         lng: result.longitude,
       };
+    }
+
+    // Add new SERP fields to scraped_content
+    if (result.imageUrl) scrapedContent.imageUrl = result.imageUrl;
+    if (result.thumbnailUrl) scrapedContent.thumbnailUrl = result.thumbnailUrl;
+    if (result.openingHours) scrapedContent.openingHours = result.openingHours;
+    if (result.workStatus) scrapedContent.workStatus = result.workStatus;
+    if (result.accessibility) scrapedContent.accessibility = result.accessibility;
+    if (result.serviceOptions && result.serviceOptions.length > 0) {
+      scrapedContent.serviceOptions = result.serviceOptions;
     }
 
     const [inserted] = await db

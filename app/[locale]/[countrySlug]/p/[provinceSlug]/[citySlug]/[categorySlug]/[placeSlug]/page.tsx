@@ -460,7 +460,6 @@ export default async function PlacePage({ params }: PlacePageProps) {
               <PlaceFeatureBadges
                 accessibility={scrapedContent?.accessibility}
                 serviceOptions={scrapedContent?.serviceOptions}
-                workStatus={scrapedContent?.workStatus}
                 className="mt-3"
               />
             </div>

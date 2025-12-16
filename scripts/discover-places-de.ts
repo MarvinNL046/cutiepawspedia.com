@@ -391,12 +391,22 @@ interface LocalResult {
   rating?: number;
   reviews?: number;
   placeId?: string;
+  cid?: string;
   category?: string;
   openingHours?: OpeningHours;
+  workStatus?: string;
   googleReviews?: GoogleReview[];
   latitude?: number;
   longitude?: number;
   priceRange?: string;
+  // New fields from SERP API
+  imageUrl?: string;
+  thumbnailUrl?: string;
+  accessibility?: {
+    wheelchairEntrance?: boolean;
+    parking?: boolean;
+  };
+  serviceOptions?: string[];
 }
 
 async function searchGoogleMaps(
@@ -525,8 +535,11 @@ function parseSerpResults(data: object): LocalResult[] {
     const reviews = parseInt(String(r.reviews_cnt || r.reviews || r.review_count || 0), 10);
 
     const openingHours = parseOpeningHours(
-      r.hours || r.opening_hours || r.work_hours || r.business_hours || r.open_hours
+      r.hours || r.opening_hours || r.work_hours || r.business_hours || r.open_hours || r.working_hours
     );
+
+    // Parse work status (e.g., "Open", "Closed", "Opens at 9 AM")
+    const workStatus = r.work_status || r.open_state || r.status;
 
     const googleReviews = parseGoogleReviews(
       r.reviews_list || r.google_reviews || r.user_reviews || r.review_list
@@ -535,6 +548,23 @@ function parseSerpResults(data: object): LocalResult[] {
     const lat = parseFloat(String(r.lat || r.latitude || (r.gps_coordinates as Record<string, unknown>)?.latitude || 0));
     const lng = parseFloat(String(r.lng || r.longitude || (r.gps_coordinates as Record<string, unknown>)?.longitude || 0));
 
+    // Parse image URLs
+    const imageUrl = r.original_image || r.image || r.photo || r.main_image;
+    const thumbnailUrl = r.thumbnail || r.thumb || r.small_image;
+
+    // Parse accessibility/facilities
+    const accessibilityData = r.accessibility as Record<string, boolean> | undefined;
+    const accessibility = accessibilityData ? {
+      wheelchairEntrance: accessibilityData.wheelchair_entrance || accessibilityData.wheelchair_accessible || false,
+      parking: accessibilityData.parking || accessibilityData.has_parking || false,
+    } : undefined;
+
+    // Parse service options (array of strings)
+    const serviceOptionsRaw = r.service_options || r.services || r.amenities;
+    const serviceOptions = Array.isArray(serviceOptionsRaw)
+      ? serviceOptionsRaw.map(String)
+      : undefined;
+
     results.push({
       name: String(name),
       address: String(r.address || r.location || ""),
@@ -542,13 +572,19 @@ function parseSerpResults(data: object): LocalResult[] {
       website: String(r.site || r.website || r.link || r.url || ""),
       rating: rating > 0 ? rating : undefined,
       reviews: reviews > 0 ? reviews : undefined,
-      placeId: String(r.cid || r.place_id || r.data_id || ""),
+      placeId: String(r.place_id || r.data_id || ""),
+      cid: String(r.cid || ""),
       category: String(r.type || r.category || r.business_type || ""),
       openingHours,
+      workStatus: workStatus ? String(workStatus) : undefined,
       googleReviews,
       latitude: lat > 0 ? lat : undefined,
       longitude: lng > 0 ? lng : undefined,
       priceRange: r.price_range ? String(r.price_range) : undefined,
+      imageUrl: imageUrl ? String(imageUrl) : undefined,
+      thumbnailUrl: thumbnailUrl ? String(thumbnailUrl) : undefined,
+      accessibility,
+      serviceOptions,
     });
   }
 
@@ -583,6 +619,7 @@ async function createPlace(
   try {
     const scrapedContent: Record<string, unknown> = {
       googlePlaceId: result.placeId,
+      googleCid: result.cid,
       googleRating: result.rating,
       googleReviewCount: result.reviews,
       category: result.category,
@@ -590,14 +627,7 @@ async function createPlace(
       discoverySource: "brightdata_serp_api_de",
     };
 
-    if (result.openingHours) {
-      scrapedContent.openingHours = result.openingHours;
-    }
-
-    if (result.googleReviews && result.googleReviews.length > 0) {
-      scrapedContent.googleReviews = result.googleReviews;
-    }
-
+    // Add GPS coordinates if available
     if (result.latitude && result.longitude) {
       scrapedContent.coordinates = {
         lat: result.latitude,
@@ -605,6 +635,40 @@ async function createPlace(
       };
     }
 
+    // Add image URLs if available
+    if (result.imageUrl) {
+      scrapedContent.imageUrl = result.imageUrl;
+    }
+    if (result.thumbnailUrl) {
+      scrapedContent.thumbnailUrl = result.thumbnailUrl;
+    }
+
+    // Add opening hours if available
+    if (result.openingHours) {
+      scrapedContent.openingHours = result.openingHours;
+    }
+
+    // Add work status if available
+    if (result.workStatus) {
+      scrapedContent.workStatus = result.workStatus;
+    }
+
+    // Add accessibility/facilities if available
+    if (result.accessibility) {
+      scrapedContent.accessibility = result.accessibility;
+    }
+
+    // Add service options if available
+    if (result.serviceOptions && result.serviceOptions.length > 0) {
+      scrapedContent.serviceOptions = result.serviceOptions;
+    }
+
+    // Add Google reviews if available
+    if (result.googleReviews && result.googleReviews.length > 0) {
+      scrapedContent.googleReviews = result.googleReviews;
+    }
+
+    // Add price range if available
     if (result.priceRange) {
       scrapedContent.priceRange = result.priceRange;
     }

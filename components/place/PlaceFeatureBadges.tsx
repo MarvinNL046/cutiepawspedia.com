@@ -15,11 +15,7 @@ import {
   ShoppingBag,
   UtensilsCrossed,
   Coffee,
-  Wifi,
-  CreditCard,
   Dog,
-  Clock,
-  Phone,
   Calendar
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -32,7 +28,6 @@ interface AccessibilityData {
 interface PlaceFeatureBadgesProps {
   accessibility?: AccessibilityData | null;
   serviceOptions?: string[] | null;
-  workStatus?: string | null;
   className?: string;
 }
 
@@ -66,39 +61,20 @@ function getServiceIcon(option: string): React.ComponentType<{ className?: strin
 export function PlaceFeatureBadges({
   accessibility,
   serviceOptions,
-  workStatus,
   className = "",
 }: PlaceFeatureBadgesProps) {
   const t = useTranslations("place");
 
   const hasAccessibility = accessibility?.wheelchairEntrance || accessibility?.parking;
   const hasServices = serviceOptions && serviceOptions.length > 0;
-  const hasWorkStatus = workStatus && workStatus.length > 0;
 
   // Don't render if no data
-  if (!hasAccessibility && !hasServices && !hasWorkStatus) {
+  if (!hasAccessibility && !hasServices) {
     return null;
   }
 
   return (
     <div className={`flex flex-wrap gap-2 ${className}`}>
-      {/* Work Status Badge */}
-      {hasWorkStatus && (
-        <Badge
-          variant="outline"
-          className={`gap-1.5 ${
-            workStatus.toLowerCase().includes("open")
-              ? "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800"
-              : workStatus.toLowerCase().includes("closed")
-                ? "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800"
-                : "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800"
-          }`}
-        >
-          <Clock className="h-3 w-3" />
-          {workStatus}
-        </Badge>
-      )}
-
       {/* Accessibility Badges */}
       {accessibility?.wheelchairEntrance && (
         <Badge

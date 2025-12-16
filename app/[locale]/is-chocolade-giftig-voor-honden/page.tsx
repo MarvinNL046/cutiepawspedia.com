@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: 'Is Chocolade Giftig voor Honden? Gevaren & Symptomen | CutiePawsPedia',
   description: 'Chocolade is zeer giftig voor honden door theobromine en cafeïne. Leer de symptomen herkennen, wat te doen bij inname, en hoe je je hond beschermt tegen chocoladevergiftiging.',
   keywords: 'chocolade giftig honden, hond chocolade gegeten, theobromine vergiftiging, chocoladevergiftiging hond, symptomen chocolade hond, dierenarts spoed',
-  robots: 'index, follow',
+  robots: { index: true, follow: true },
   openGraph: {
     title: 'Is Chocolade Giftig voor Honden? Gevaren & Symptomen',
     description: 'Chocolade is zeer giftig voor honden. Ontdek waarom, welke symptomen je moet herkennen en wat te doen bij inname.',

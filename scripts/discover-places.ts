@@ -352,6 +352,16 @@ interface GoogleLocalResult {
   category?: string;
   latitude?: number;
   longitude?: number;
+  // New fields from SERP API
+  imageUrl?: string;
+  thumbnailUrl?: string;
+  openingHours?: Record<string, string>;
+  workStatus?: string;
+  accessibility?: {
+    wheelchairEntrance?: boolean;
+    parking?: boolean;
+  };
+  serviceOptions?: string[];
 }
 
 interface SerpLocalResult {
@@ -498,6 +508,7 @@ function parseGoogleSerpResults(data: SerpResponse): GoogleLocalResult[] {
 
     // BrightData snack_pack uses different field names
     // Keys: cid, name, rating, reviews_cnt, type, work_status, address, maps_link, site
+    // Additional: original_image, thumbnail, latitude, longitude, accessibility, service_options, working_hours
     const resultAny = result as Record<string, unknown>;
     const rating = parseFloat(String(resultAny.rating || resultAny.stars || 0));
     const reviewCount = parseInt(
@@ -513,6 +524,30 @@ function parseGoogleSerpResults(data: SerpResponse): GoogleLocalResult[] {
       // Extract place_id (ChIJ... format)
       const placeIdValue = resultAny.place_id || resultAny.data_id;
 
+      // Extract GPS coordinates
+      const lat = parseFloat(String(resultAny.latitude || resultAny.lat || 0));
+      const lng = parseFloat(String(resultAny.longitude || resultAny.lng || resultAny.lon || 0));
+
+      // Extract image URLs
+      const imageUrl = resultAny.original_image || resultAny.image || resultAny.photo;
+      const thumbnailUrl = resultAny.thumbnail || resultAny.thumb;
+
+      // Extract accessibility/facilities
+      const accessibilityData = resultAny.accessibility as Record<string, boolean> | undefined;
+      const accessibility = accessibilityData ? {
+        wheelchairEntrance: accessibilityData.wheelchair_entrance || accessibilityData.wheelchair_accessible || false,
+        parking: accessibilityData.parking || accessibilityData.has_parking || false,
+      } : undefined;
+
+      // Extract service options (array of strings)
+      const serviceOptions = Array.isArray(resultAny.service_options)
+        ? resultAny.service_options.map(String)
+        : undefined;
+
+      // Extract opening hours / work status
+      const workStatus = resultAny.work_status || resultAny.open_state;
+      const workingHours = resultAny.working_hours as Record<string, string> | undefined;
+
       results.push({
         title: String(name),
         name: String(name),
@@ -524,6 +559,15 @@ function parseGoogleSerpResults(data: SerpResponse): GoogleLocalResult[] {
         place_id: placeIdValue ? String(placeIdValue) : cidValue || "",
         cid: cidValue,
         category: String(resultAny.type || resultAny.category || resultAny.business_type || ""),
+        // New fields
+        latitude: lat > 0 ? lat : undefined,
+        longitude: lng !== 0 ? lng : undefined,
+        imageUrl: imageUrl ? String(imageUrl) : undefined,
+        thumbnailUrl: thumbnailUrl ? String(thumbnailUrl) : undefined,
+        workStatus: workStatus ? String(workStatus) : undefined,
+        openingHours: workingHours,
+        accessibility,
+        serviceOptions,
       });
     }
   }
@@ -583,12 +627,29 @@ async function createPlace(
   }
 
   try {
-    // Prepare scraped content metadata
+    // Prepare scraped content metadata with all available SERP data
     const scrapedContent = {
       googlePlaceId: result.place_id,
+      googleCid: result.cid,
       googleRating: result.rating,
       googleReviewCount: result.reviews,
       category: result.category,
+      // GPS coordinates
+      coordinates: result.latitude && result.longitude ? {
+        lat: result.latitude,
+        lng: result.longitude,
+      } : undefined,
+      // Image URLs
+      imageUrl: result.imageUrl,
+      thumbnailUrl: result.thumbnailUrl,
+      // Opening hours
+      openingHours: result.openingHours,
+      workStatus: result.workStatus,
+      // Accessibility/facilities
+      accessibility: result.accessibility,
+      // Service options
+      serviceOptions: result.serviceOptions,
+      // Metadata
       discoveredAt: new Date().toISOString(),
       discoverySource: "brightdata_serp_api",
     };

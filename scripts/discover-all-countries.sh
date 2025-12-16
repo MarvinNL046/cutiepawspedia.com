@@ -130,20 +130,21 @@ LIMIT=20
 MAX_RETRIES=5
 RESUME=false
 DRY_RUN=false
+SKIP_COUNTRIES=()
 
 # Countries to process (default: all)
 # Order: Larger countries first (more cities = more potential rate limits to recover from)
 ALL_COUNTRIES=("us" "ca" "uk" "de" "fr" "nl" "au" "es" "it" "be")
 COUNTRIES_TO_PROCESS=()
 
-# Retry configuration
-INITIAL_RETRY_DELAY=30           # Initial retry delay in seconds
-MAX_RETRY_DELAY=300              # Max retry delay (5 minutes)
+# Retry configuration - optimized for speed
+INITIAL_RETRY_DELAY=10           # Initial retry delay in seconds - reduced from 30
+MAX_RETRY_DELAY=60               # Max retry delay (1 minute) - reduced from 5 minutes
 
-# Rate limiting configuration
-BASE_RATE_LIMIT_DELAY=3          # Base delay between city searches (seconds)
-CATEGORY_DELAY=10                # Delay between categories (seconds)
-COUNTRY_DELAY=30                 # Delay between countries (seconds)
+# Rate limiting configuration - optimized for speed
+BASE_RATE_LIMIT_DELAY=1          # Base delay between city searches (seconds) - reduced from 3
+CATEGORY_DELAY=3                 # Delay between categories (seconds) - reduced from 10
+COUNTRY_DELAY=10                 # Delay between countries (seconds) - reduced from 30
 RATE_LIMIT_MULTIPLIER=2          # Multiply delay when rate limited
 CURRENT_RATE_LIMIT_DELAY=$BASE_RATE_LIMIT_DELAY
 
@@ -181,6 +182,10 @@ while [[ $# -gt 0 ]]; do
       IFS=',' read -ra COUNTRIES_TO_PROCESS <<< "${1#*=}"
       shift
       ;;
+    --skip-countries=*)
+      IFS=',' read -ra SKIP_COUNTRIES <<< "${1#*=}"
+      shift
+      ;;
     --category=*)
       CATEGORY="${1#*=}"
       shift
@@ -207,8 +212,9 @@ while [[ $# -gt 0 ]]; do
       echo "Usage: $0 [options]"
       echo ""
       echo "Options:"
-      echo "  --countries=us,uk,au   Specific countries (comma-separated)"
-      echo "  --category=<slug>      Single category to process"
+      echo "  --countries=us,uk,au      Specific countries (comma-separated)"
+      echo "  --skip-countries=us,ca    Skip these countries (comma-separated)"
+      echo "  --category=<slug>         Single category to process"
       echo "  --limit=<n>            Max results per city (default: 20)"
       echo "  --retries=<n>          Max retry attempts (default: 5)"
       echo "  --resume               Resume from last saved progress"
@@ -242,6 +248,25 @@ done
 # Default to all countries if none specified
 if [[ ${#COUNTRIES_TO_PROCESS[@]} -eq 0 ]]; then
   COUNTRIES_TO_PROCESS=("${ALL_COUNTRIES[@]}")
+fi
+
+# Filter out skipped countries
+if [[ ${#SKIP_COUNTRIES[@]} -gt 0 ]]; then
+  FILTERED_COUNTRIES=()
+  for country in "${COUNTRIES_TO_PROCESS[@]}"; do
+    skip=false
+    for skip_country in "${SKIP_COUNTRIES[@]}"; do
+      if [[ "$country" == "$skip_country" ]]; then
+        skip=true
+        break
+      fi
+    done
+    if [[ "$skip" == false ]]; then
+      FILTERED_COUNTRIES+=("$country")
+    fi
+  done
+  COUNTRIES_TO_PROCESS=("${FILTERED_COUNTRIES[@]}")
+  echo -e "${YELLOW}⏭️  Skipping countries: ${SKIP_COUNTRIES[*]}${NC}"
 fi
 
 # =============================================================================
@@ -385,20 +410,40 @@ run_category_discovery() {
   local attempt=1
   local script="${COUNTRY_SCRIPTS[$country]}"
   local country_log="${LOG_DIR}/${country}-$(date +%Y%m%d).log"
+  local temp_output="/tmp/discover-output-$$.txt"
 
   while [[ $attempt -le $MAX_RETRIES ]]; do
     log_country "$country" "${CYAN}🔍 Category: ${category} (attempt ${attempt}/${MAX_RETRIES})${NC}"
 
     save_progress "$country" "$category" "in_progress"
 
+    # Show real-time output with tee
+    echo ""
+    echo -e "${WHITE}───────────────────────────────────────────────────────────────${NC}"
+
     set +e
-    output=$(npx tsx "scripts/${script}" \
+    # Run with real-time output shown AND captured
+    npx tsx "scripts/${script}" \
       --category="$category" \
       --all-cities \
       --limit="$LIMIT" \
-      2>&1)
-    exit_code=$?
+      2>&1 | tee "$temp_output" | while IFS= read -r line; do
+        # Show key lines with timestamps
+        if echo "$line" | grep -qiE "created|skipped|error|warning|rate|TOTAL|Processing|Searching|Found"; then
+          echo -e "  ${CYAN}│${NC} $line"
+        elif echo "$line" | grep -qiE "^\[|^✓|^✗|^→"; then
+          echo -e "  ${CYAN}│${NC} $line"
+        fi
+      done
+    exit_code=${PIPESTATUS[0]}
     set -e
+
+    # Read the captured output
+    output=$(cat "$temp_output" 2>/dev/null || echo "")
+    rm -f "$temp_output"
+
+    echo -e "${WHITE}───────────────────────────────────────────────────────────────${NC}"
+    echo ""
 
     # Log to country-specific log
     echo "=== ${category} attempt ${attempt} @ $(date) ===" >> "$country_log"

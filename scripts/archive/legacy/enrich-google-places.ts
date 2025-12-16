@@ -21,7 +21,7 @@ dotenv.config({ override: true });
 const sql = neon(process.env.DATABASE_URL as string);
 
 // BrightData Datasets API configuration
-const BRIGHTDATA_API_TOKEN = process.env.BRIGHTDATA_API_TOKEN;
+const BRIGHTDATA_API_KEY = process.env.BRIGHTDATA_API_KEY;
 // Correct dataset ID for Google Maps scraping
 const GOOGLE_MAPS_DATASET_ID = "gd_m8ebnr0q2qlklc02fz";
 
@@ -84,8 +84,8 @@ function buildGoogleMapsSearchUrl(businessName: string, city: string): string {
 async function scrapeGoogleMapsPlaces(
   places: Place[]
 ): Promise<Map<number, GoogleMapsResult>> {
-  if (!BRIGHTDATA_API_TOKEN) {
-    console.error("❌ BRIGHTDATA_API_TOKEN not set in .env");
+  if (!BRIGHTDATA_API_KEY) {
+    console.error("❌ BRIGHTDATA_API_KEY not set in .env");
     return new Map();
   }
 
@@ -108,7 +108,7 @@ async function scrapeGoogleMapsPlaces(
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}`,
+          Authorization: `Bearer ${BRIGHTDATA_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(urlInputs.map((input) => ({ url: input.url }))),
@@ -144,7 +144,7 @@ async function scrapeGoogleMapsPlaces(
         {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}`,
+            Authorization: `Bearer ${BRIGHTDATA_API_KEY}`,
           },
         }
       );
@@ -283,15 +283,15 @@ async function main() {
   console.log("━".repeat(60));
 
   // Check credentials
-  if (!BRIGHTDATA_API_TOKEN) {
-    console.error("❌ BRIGHTDATA_API_TOKEN not found in .env\n");
+  if (!BRIGHTDATA_API_KEY) {
+    console.error("❌ BRIGHTDATA_API_KEY not found in .env\n");
     console.error("Add to .env:");
-    console.error("  BRIGHTDATA_API_TOKEN=your_token_here");
+    console.error("  BRIGHTDATA_API_KEY=your_token_here");
     console.error("\nYou can find this in your BrightData dashboard.");
     process.exit(1);
   }
 
-  console.log(`✅ API Token: ${BRIGHTDATA_API_TOKEN.slice(0, 15)}...`);
+  console.log(`✅ API Token: ${BRIGHTDATA_API_KEY.slice(0, 15)}...`);
   console.log(`✅ Dataset ID: ${GOOGLE_MAPS_DATASET_ID}`);
   console.log("");
 

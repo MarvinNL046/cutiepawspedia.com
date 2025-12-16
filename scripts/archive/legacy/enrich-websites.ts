@@ -17,7 +17,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const sql = neon(process.env.DATABASE_URL as string);
-const BRIGHTDATA_API_TOKEN = process.env.BRIGHTDATA_API_TOKEN;
+const BRIGHTDATA_API_KEY = process.env.BRIGHTDATA_API_KEY;
 const BRIGHTDATA_ZONE = process.env.BRIGHTDATA_ZONE || "mcp_unlocker";
 
 interface Place {
@@ -80,7 +80,7 @@ async function scrapeWebsite(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}`,
+        Authorization: `Bearer ${BRIGHTDATA_API_KEY}`,
       },
       body: JSON.stringify({
         zone: BRIGHTDATA_ZONE,
@@ -197,8 +197,8 @@ async function main() {
   console.log("\n🌐 Website Enrichment");
   console.log("━".repeat(50));
 
-  if (!BRIGHTDATA_API_TOKEN) {
-    console.error("❌ BRIGHTDATA_API_TOKEN not set");
+  if (!BRIGHTDATA_API_KEY) {
+    console.error("❌ BRIGHTDATA_API_KEY not set");
     process.exit(1);
   }
 

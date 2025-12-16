@@ -9,11 +9,11 @@ dotenv.config({ override: true });
 import { neon } from "@neondatabase/serverless";
 
 async function testUnlockerApi() {
-  const apiToken = process.env.BRIGHTDATA_API_TOKEN;
+  const apiToken = process.env.BRIGHTDATA_API_KEY;
   const zone = process.env.BRIGHTDATA_ZONE || "mcp_unlocker";
 
   if (!apiToken) {
-    console.error("BRIGHTDATA_API_TOKEN not set");
+    console.error("BRIGHTDATA_API_KEY not set");
     process.exit(1);
   }
 

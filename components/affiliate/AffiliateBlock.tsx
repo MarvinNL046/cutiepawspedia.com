@@ -105,6 +105,12 @@ function getLocaleAwareLinks(type: AffiliateType, countrySlug: string): Affiliat
       },
     ] : [
       {
+        name: "Zooplus",
+        url: "https://www.zooplus.nl/",
+        description: "Europa's grootste online dierenwinkel",
+        discount: "Gratis verzending vanaf €49",
+      },
+      {
         name: `Amazon ${amazonConfig.domain.split('.')[1]?.toUpperCase() || 'Pet'}`,
         url: getAmazonUrl(countrySlug, "huisdier benodigdheden"),
         description: "Groot assortiment, snelle levering",
@@ -151,10 +157,10 @@ function getLocaleAwareLinks(type: AffiliateType, countrySlug: string): Affiliat
     // Keep existing configs for non-product types (insurance, etc.)
     "pet-insurance": [
       {
-        name: "Lemonade Pet",
+        name: "Coming Soon",
         url: "#",
-        description: "Fast claims, customizable coverage",
-        discount: "Get a free quote",
+        description: "We're working on partnering with top pet insurers",
+        discount: "Stay tuned!",
       },
     ],
     "pet-cremation": [
@@ -224,28 +230,16 @@ const affiliateData: Record<
 > = {
   "pet-insurance": {
     title: "Pet Insurance",
-    description: "Protect your furry friend with comprehensive pet insurance coverage.",
+    description: "We're working on partnerships with trusted pet insurers. Check back soon!",
     icon: Shield,
     color: "text-cpCoral",
     bgColor: "bg-cpCoral/10 dark:bg-cpCoral/5",
     links: [
       {
-        name: "Lemonade Pet",
+        name: "Coming Soon",
         url: "#",
-        description: "Fast claims, customizable coverage",
-        discount: "Get a free quote",
-      },
-      {
-        name: "Healthy Paws",
-        url: "#",
-        description: "No annual or lifetime limits",
-        discount: "Save 10%",
-      },
-      {
-        name: "Embrace",
-        url: "#",
-        description: "Wellness rewards included",
-        discount: "Up to 25% off",
+        description: "Top pet insurance partners",
+        discount: "Stay tuned!",
       },
     ],
   },

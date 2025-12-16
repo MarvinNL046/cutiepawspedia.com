@@ -15,7 +15,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const sql = neon(process.env.DATABASE_URL as string);
-const BRIGHTDATA_API_TOKEN = process.env.BRIGHTDATA_API_TOKEN;
+const BRIGHTDATA_API_KEY = process.env.BRIGHTDATA_API_KEY;
 
 // Google Maps Reviews Dataset ID (correct ID from BrightData)
 const DATASET_ID = "gd_luzfs1dn2oa0teb81";
@@ -77,8 +77,8 @@ function buildGoogleMapsUrl(place: Place): string {
  * Trigger Reviews Dataset collection
  */
 async function triggerReviewsCollection(places: Place[]): Promise<string | null> {
-  if (!BRIGHTDATA_API_TOKEN) {
-    console.error("❌ BRIGHTDATA_API_TOKEN not set");
+  if (!BRIGHTDATA_API_KEY) {
+    console.error("❌ BRIGHTDATA_API_KEY not set");
     return null;
   }
 
@@ -96,7 +96,7 @@ async function triggerReviewsCollection(places: Place[]): Promise<string | null>
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}`,
+          Authorization: `Bearer ${BRIGHTDATA_API_KEY}`,
         },
         body: JSON.stringify(inputs),
       }
@@ -130,7 +130,7 @@ async function pollForResults(snapshotId: string, maxAttempts = 180): Promise<Br
       const progressRes = await fetch(
         `https://api.brightdata.com/datasets/v3/progress/${snapshotId}`,
         {
-          headers: { Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}` },
+          headers: { Authorization: `Bearer ${BRIGHTDATA_API_KEY}` },
         }
       );
 
@@ -142,7 +142,7 @@ async function pollForResults(snapshotId: string, maxAttempts = 180): Promise<Br
           const resultsRes = await fetch(
             `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`,
             {
-              headers: { Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}` },
+              headers: { Authorization: `Bearer ${BRIGHTDATA_API_KEY}` },
             }
           );
 
@@ -277,8 +277,8 @@ async function main() {
   console.log("🚀 Google Maps Reviews Enrichment\n");
   console.log("━".repeat(60));
 
-  if (!BRIGHTDATA_API_TOKEN) {
-    console.error("❌ BRIGHTDATA_API_TOKEN not set");
+  if (!BRIGHTDATA_API_KEY) {
+    console.error("❌ BRIGHTDATA_API_KEY not set");
     process.exit(1);
   }
 

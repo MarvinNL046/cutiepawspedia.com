@@ -17,7 +17,7 @@
  *
  * Environment:
  *   DATABASE_URL          - NeonDB connection string
- *   BRIGHTDATA_API_TOKEN  - BrightData API token
+ *   BRIGHTDATA_API_KEY  - BrightData API token
  */
 
 import { neon } from "@neondatabase/serverless";
@@ -26,7 +26,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const sql = neon(process.env.DATABASE_URL as string);
-const BRIGHTDATA_API_TOKEN = process.env.BRIGHTDATA_API_TOKEN;
+const BRIGHTDATA_API_KEY = process.env.BRIGHTDATA_API_KEY;
 
 // Google Maps Business Dataset ID (includes top_reviews)
 const DATASET_ID = "gd_m8ebnr0q2qlklc02fz";
@@ -217,7 +217,7 @@ async function triggerReviewsCollection(places: Place[]): Promise<string | null>
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}`,
+          Authorization: `Bearer ${BRIGHTDATA_API_KEY}`,
         },
         body: JSON.stringify(inputs),
       }
@@ -242,7 +242,7 @@ async function checkProgress(snapshotId: string): Promise<{ status: string; prog
   const response = await fetch(
     `https://api.brightdata.com/datasets/v3/progress/${snapshotId}`,
     {
-      headers: { Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}` },
+      headers: { Authorization: `Bearer ${BRIGHTDATA_API_KEY}` },
     }
   );
 
@@ -263,7 +263,7 @@ async function fetchResults(snapshotId: string): Promise<BrightDataPlaceResponse
     const response = await fetch(
       `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`,
       {
-        headers: { Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}` },
+        headers: { Authorization: `Bearer ${BRIGHTDATA_API_KEY}` },
       }
     );
 
@@ -592,8 +592,8 @@ async function main() {
   console.log("━".repeat(60));
 
   // Validate environment
-  if (!BRIGHTDATA_API_TOKEN) {
-    console.error("❌ BRIGHTDATA_API_TOKEN not set in .env");
+  if (!BRIGHTDATA_API_KEY) {
+    console.error("❌ BRIGHTDATA_API_KEY not set in .env");
     process.exit(1);
   }
 

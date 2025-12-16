@@ -1,0 +1,239 @@
+slug,name,type,toxicity_level,animals,notes
+# ===========================================
+# PLANTEN - Zeer Giftig (hoog)
+# ===========================================
+lelie,Lelie,plant,hoog,"katten,honden,konijnen",Zeer giftig voor katten - kan nierfalen veroorzaken
+tijgerlelie,Tijgerlelie,plant,hoog,"katten,honden,konijnen",Zeer giftig voor katten
+daglelie,Daglelie,plant,hoog,"katten",Zeer giftig voor katten
+azalea,Azalea,plant,hoog,"katten,honden,konijnen,vogels,knaagdieren",Bevat grayanotoxinen
+rhododendron,Rhododendron,plant,hoog,"katten,honden,konijnen,vogels,knaagdieren",Bevat grayanotoxinen
+dieffenbachia,Dieffenbachia,plant,middel,"katten,honden,konijnen,vogels,knaagdieren",Kan mond/keel irriteren
+philodendron,Philodendron,plant,middel,"katten,honden,konijnen,vogels,knaagdieren",Bevat calciumoxalaat
+pothos,Pothos,plant,middel,"katten,honden,konijnen,vogels,knaagdieren",Bevat calciumoxalaat
+monstera,Monstera,plant,laag,"katten,honden,konijnen",Mild irriterend
+caladium,Caladium,plant,hoog,"katten,honden,konijnen,vogels,knaagdieren",Bevat calciumoxalaat
+oleander,Oleander,plant,hoog,"katten,honden,konijnen,vogels,knaagdieren",Ernstig giftig (hart)
+taxus,Taxus,plant,hoog,"katten,honden,konijnen,vogels,knaagdieren",Bevat taxine - zeer gevaarlijk
+vingerhoedskruid,Vingerhoedskruid,plant,hoog,"katten,honden,konijnen,vogels,knaagdieren",Hartglycosiden
+sago-palm,Sagopalm,plant,hoog,"katten,honden,konijnen",Leverfalen risico
+tulp,Tulp,plant,middel,"katten,honden,konijnen,knaagdieren",Bol kan extra irriterend zijn
+narcis,Narcis,plant,middel,"katten,honden,konijnen,vogels,knaagdieren",Bol kan klachten geven
+klimop,Klimop,plant,middel,"katten,honden,konijnen,vogels,knaagdieren",Bladeren en bessen giftig
+lelietje-van-dalen,Lelietje-van-dalen,plant,hoog,"katten,honden,konijnen,vogels,knaagdieren",Hartglycosiden
+kerstster,Kerstster,plant,laag,"katten,honden,konijnen",Mild irriterend
+vredeslelie,Vredeslelie,plant,middel,"katten,honden,konijnen,vogels,knaagdieren",Geen echte lelie maar irriterend
+ficus,Ficus,plant,laag,"katten,honden,konijnen",Melksap irriterend
+aloe-vera,Aloe vera,plant,middel,"katten,honden,konijnen,vogels,knaagdieren",Saponinen giftig
+jade-plant,Jadeplant,plant,middel,"katten,honden,konijnen",Giftig bij inname
+hortensia,Hortensia,plant,middel,"katten,honden,konijnen,vogels,knaagdieren",Bevat cyanogene glycosiden
+chrysant,Chrysant,plant,middel,"katten,honden,konijnen",Kan huidirritatie geven
+amaryllis,Amaryllis,plant,middel,"katten,honden,konijnen,vogels,knaagdieren",Bol is giftig
+begonia,Begonia,plant,laag,"katten,honden,konijnen,knaagdieren",Wortels giftig
+cyclamen,Cyclamen,plant,hoog,"katten,honden,konijnen,vogels,knaagdieren",Knol extra toxisch
+castorbonen,Wonderboom,plant,hoog,"katten,honden,konijnen,vogels,knaagdieren",Ricin zeer giftig
+paddenstoel-wild,Wilde paddenstoel,plant,onbekend,"katten,honden,konijnen,vogels,knaagdieren",Veel soorten giftig - altijd voorzichtig
+monnikskap,Monnikskap,plant,hoog,"katten,honden,konijnen,vogels,knaagdieren",Een van de giftigste planten
+waterscheerling,Waterscheerling,plant,hoog,"katten,honden,konijnen,vogels,knaagdieren",Zeer giftig - snel dodelijk
+engelentrompet,Engelentrompet,plant,hoog,"katten,honden,konijnen,vogels,knaagdieren",Hele plant zeer giftig
+maretak,Maretak,plant,hoog,"katten,honden,konijnen,vogels,knaagdieren",Bessen zeer giftig
+hulst,Hulst,plant,middel,"katten,honden,konijnen,vogels,knaagdieren",Bessen giftig
+herfstcrocus,Herfstcrocus,plant,hoog,"katten,honden,konijnen,vogels,knaagdieren",Bevat colchicine
+kalanchoe,Kalanchoe,plant,hoog,"katten,honden,konijnen,vogels,knaagdieren",Bevat hartglycosiden
+hyacint,Hyacint,plant,hoog,"katten,honden,konijnen,knaagdieren",Bol bevat oxaalzuur
+dracaena,Dracaena,plant,middel,"katten,honden",Saponinen giftig
+yucca,Yucca,plant,middel,"katten,honden,konijnen",Saponinen giftig
+sneeuwklokje,Sneeuwklokje,plant,middel,"katten,honden,konijnen,knaagdieren",Bevat alkaloiden
+crocus,Crocus,plant,middel,"katten,honden,konijnen,knaagdieren",Bol giftig
+iris,Iris,plant,middel,"katten,honden,konijnen",Wortelstok giftig
+gladiool,Gladiool,plant,middel,"katten,honden,konijnen,knaagdieren",Bol giftig
+wisteria,Blauweregen,plant,middel,"katten,honden,konijnen",Zaden en peulen giftig
+schefflera,Schefflera,plant,laag,"katten,honden,konijnen",Mild giftig
+asparagus-varen,Asparagus varen,plant,laag,"katten,honden,konijnen",Bessen irriterend
+rubber-plant,Rubberplant,plant,laag,"katten,honden,konijnen",Melksap irriterend
+croton,Croton,plant,laag,"katten,honden,konijnen",Mild giftig
+aronskelk,Aronskelk,plant,middel,"katten,honden,konijnen,vogels,knaagdieren",Calciumoxalaat
+alocasia,Alocasia,plant,middel,"katten,honden,konijnen,vogels,knaagdieren",Calciumoxalaat
+# ===========================================
+# VOEDSEL - Giftig voor huisdieren
+# ===========================================
+chocolade,Chocolade,voedsel,hoog,"katten,honden,konijnen,vogels,knaagdieren",Theobromine/cafeine
+cacao,Cacaopoeder,voedsel,hoog,"katten,honden,konijnen,vogels,knaagdieren",Theobromine/cafeine
+xylitol,Xylitol,voedsel,hoog,"honden,konijnen",Zeer gevaarlijk voor honden
+druiven,Druiven,voedsel,hoog,"honden,katten",Kan acuut nierfalen veroorzaken
+rozijnen,Rozijnen,voedsel,hoog,"honden,katten",Geconcentreerder dan druiven
+ui,Ui,voedsel,middel,"katten,honden,konijnen,vogels,knaagdieren",Kan bloedarmoede veroorzaken
+knoflook,Knoflook,voedsel,middel,"katten,honden,konijnen,vogels,knaagdieren",Kan bloedarmoede veroorzaken
+prei,Prei,voedsel,middel,"katten,honden,konijnen,knaagdieren",Alliumfamilie giftig
+bieslook,Bieslook,voedsel,middel,"katten,honden,konijnen,knaagdieren",Alliumfamilie giftig
+avocado,Avocado,voedsel,laag,"honden,katten,vogels,konijnen",Persin kan klachten geven
+macadamia,Macadamianoten,voedsel,hoog,"honden",Neurologische klachten bij honden
+alcohol,Alcohol,voedsel,hoog,"katten,honden,konijnen,vogels,knaagdieren",Zeer giftig voor alle dieren
+koffie,Koffie,voedsel,hoog,"katten,honden,konijnen,vogels,knaagdieren",Cafeine giftig
+energiedrank,Energiedrank,voedsel,hoog,"katten,honden,konijnen,vogels,knaagdieren",Cafeine giftig
+thee,Thee,voedsel,middel,"katten,honden,konijnen,vogels,knaagdieren",Cafeine afhankelijk van soort
+deeg-rijzend,Rijzend deeg,voedsel,hoog,"honden,katten",Maag-darm en alcoholvorming
+zoetstof-onbekend,Zoetstof onbekend,voedsel,onbekend,"honden,katten,konijnen",Controleer ingredienten - xylitol risico
+chili,Chili/peper,voedsel,laag,"katten,honden,konijnen,knaagdieren",Kan irritatie/diarree geven
+noten-mix,Notenmix,voedsel,onbekend,"honden,katten",Afhankelijk van type
+pinda,Pinda,voedsel,laag,"honden,katten",Let op zout en schimmel
+amandelen,Amandelen,voedsel,laag,"honden,katten",Bittere amandelen gevaarlijk
+melk,Melk,voedsel,laag,"katten,honden",Lactose-intolerantie mogelijk
+kaas,Kaas,voedsel,laag,"honden,katten",Vet/lactose kan diarree geven
+bacon,Bacon/spek,voedsel,laag,"honden,katten",Vet kan pancreatitis veroorzaken
+kippenbot,Gekookte botten,voedsel,hoog,"honden,katten",Versplinteringsgevaar
+visgraat,Visgraten,voedsel,middel,"katten,honden",Verslikken/letsel risico
+champignon,Champignon,voedsel,laag,"honden,katten",Supermarkt OK maar verwarring met wild
+rauwe-aardappel,Rauwe aardappel,voedsel,middel,"honden,katten,konijnen,knaagdieren",Solanine giftig
+groene-tomaat,Groene tomaat,voedsel,middel,"honden,katten,konijnen,knaagdieren",Solanine giftig
+rabarber,Rabarber,voedsel,middel,"honden,katten,konijnen,knaagdieren",Oxaalzuur in bladeren
+# ===========================================
+# MEDICIJNEN - Groot risico
+# ===========================================
+paracetamol,Paracetamol,medicijn,hoog,"katten,honden,konijnen,vogels,knaagdieren",Zeer gevaarlijk voor katten
+ibuprofen,Ibuprofen,medicijn,hoog,"katten,honden,konijnen,vogels,knaagdieren",NSAID risico (maag/nier)
+diclofenac,Diclofenac,medicijn,hoog,"katten,honden,konijnen,vogels,knaagdieren",NSAID risico
+aspirine,Aspirine,medicijn,middel,"katten,honden,konijnen,vogels,knaagdieren",Alleen onder dierenartsadvies
+naproxen,Naproxen,medicijn,hoog,"katten,honden,konijnen,vogels,knaagdieren",NSAID risico
+antidepressiva,Antidepressiva,medicijn,onbekend,"katten,honden,konijnen,vogels,knaagdieren",Afhankelijk van middel - bel dierenarts
+slaappillen,Slaappillen,medicijn,onbekend,"katten,honden,konijnen,vogels,knaagdieren",Altijd contact met dierenarts
+vitamine-d3,Vitamine D3,medicijn,hoog,"katten,honden,konijnen,knaagdieren",Kan orgaanschade geven
+ijzer-tabletten,IJzersupplementen,medicijn,middel,"katten,honden,konijnen,knaagdieren",Te veel ijzer giftig
+antihistaminica,Antihistaminica,medicijn,onbekend,"katten,honden,konijnen,vogels,knaagdieren",Afhankelijk van type/dosis
+insuline,Insuline,medicijn,hoog,"katten,honden,konijnen,knaagdieren",Hypoglycemie risico
+schildkliermedicatie,Schildkliermedicatie,medicijn,onbekend,"katten,honden",Menselijke dosis gevaarlijk
+adhd-medicatie,ADHD-medicatie,medicijn,onbekend,"katten,honden,konijnen,vogels,knaagdieren",Stimulerende middelen gevaarlijk
+bloeddrukmedicatie,Bloeddrukmedicatie,medicijn,hoog,"katten,honden,konijnen",Hartritme problemen
+5-fluorouracil,5-Fluorouracil zalf,medicijn,hoog,"katten,honden",Chemotherapie middel zeer giftig
+maagzuurremmers,Maagzuurremmers,medicijn,laag,"katten,honden",Meestal mild
+antibiotica-mens,Antibiotica (menselijk),medicijn,onbekend,"katten,honden,konijnen,vogels,knaagdieren",Sommige giftig voor dieren
+# ===========================================
+# HUISHOUDEN - Giftige producten
+# ===========================================
+bleek,Bleek (chloor),huishouden,hoog,"katten,honden,konijnen,vogels,knaagdieren",Bijtend en giftig
+ammoniak,Ammoniak,huishouden,hoog,"katten,honden,konijnen,vogels,knaagdieren",Bijtend en giftig
+wasmiddel,Wasmiddel,huishouden,middel,"katten,honden,konijnen,vogels,knaagdieren",Kan maag-darm klachten geven
+wasmiddel-pods,Wasmiddel pods,huishouden,hoog,"katten,honden,konijnen,knaagdieren",Extra riskant door concentratie
+vaatwastablet,Vaatwastablet,huishouden,middel,"katten,honden,konijnen,knaagdieren",Bijtende stoffen
+vaatwasmiddel,Vaatwasmiddel,huishouden,laag,"katten,honden,konijnen",Mild irriterend
+luchtverfrisser,Luchtverfrisser,huishouden,laag,"katten,honden,vogels,konijnen",Kan irritatie geven bij vogels extra
+etherische-olie,Etherische olie,huishouden,onbekend,"katten,honden,vogels,konijnen,knaagdieren",Sommige zeer gevaarlijk
+tea-tree-olie,Tea tree olie,huishouden,hoog,"katten,honden,vogels,konijnen",Zeer giftig voor katten
+eucalyptus-olie,Eucalyptusolie,huishouden,middel,"katten,honden,vogels,konijnen",Irriterend voor luchtwegen
+pepermunt-olie,Pepermuntolie,huishouden,middel,"katten,honden,vogels,konijnen",Kan klachten geven
+lavendel-olie,Lavenolie,huishouden,laag,"katten,honden",Meestal mild in kleine hoeveelheden
+antivries,Antivries,huishouden,hoog,"katten,honden,konijnen,vogels,knaagdieren",Ethyleenglycol zeer giftig
+ruitensproeiervloeistof,Ruitensproeiervloeistof,huishouden,hoog,"katten,honden,konijnen,vogels,knaagdieren",Kan methanol bevatten
+rattengif,Rattengif,huishouden,hoog,"katten,honden,konijnen,vogels,knaagdieren",Altijd spoed
+slakkenkorrels,Slakkenkorrels,huishouden,hoog,"katten,honden,konijnen,vogels,knaagdieren",Metaldehyde risico
+insecticide-spray,Insecticide spray,huishouden,onbekend,"katten,honden,konijnen,vogels,knaagdieren",Afhankelijk van werkzame stof
+motballen,Motballen,huishouden,hoog,"katten,honden,konijnen,vogels,knaagdieren",Nafthaleen toxisch
+sigaretpeuk,Sigaretpeuk/nicotine,huishouden,hoog,"katten,honden,konijnen,vogels,knaagdieren",Nicotine zeer giftig
+nicotinevloeistof,Nicotinevloeistof e-sigaret,huishouden,hoog,"katten,honden,konijnen,vogels,knaagdieren",Zeer geconcentreerd
+mondwater,Mondwater,huishouden,onbekend,"honden,katten",Kan alcohol/xylitol bevatten
+parfum,Parfum,huishouden,laag,"katten,honden",Alcohol/irritatie
+handzeep,Handzeep,huishouden,laag,"katten,honden,konijnen",Meestal mild
+shampoo,Shampoo,huishouden,laag,"katten,honden,konijnen",Meestal mild irriterend
+nagellak,Nagellak,huishouden,middel,"katten,honden,vogels,konijnen",Oplosmiddelen giftig
+nagellakremover,Nagellakremover,huishouden,middel,"katten,honden,vogels,konijnen",Aceton giftig
+gootsteenontstopper,Gootsteenontstopper,huishouden,hoog,"katten,honden,konijnen,vogels,knaagdieren",Zeer bijtend
+ovenreiniger,Ovenreiniger,huishouden,hoog,"katten,honden,konijnen,vogels,knaagdieren",Zeer bijtend
+vlooienmiddel-hond,Vlooienmiddel hond,huishouden,hoog,"katten",Permethrine dodelijk voor katten
+# ===========================================
+# CHEMISCH / OVERIG
+# ===========================================
+benzine,Benzine,chemisch,hoog,"katten,honden,konijnen,vogels,knaagdieren",Giftig en brandgevaar
+terpentine,Terpentine,chemisch,hoog,"katten,honden,konijnen,vogels,knaagdieren",Giftig bij inname/inademing
+verfverdunner,Verfverdunner,chemisch,hoog,"katten,honden,konijnen,vogels,knaagdieren",Giftig oplosmiddelen
+handgel,Handgel (alcohol),chemisch,middel,"katten,honden,konijnen,vogels,knaagdieren",Alcohol giftig
+kunstsneeuw,Kunstsneeuw decor,chemisch,onbekend,"katten,honden,konijnen,vogels,knaagdieren",Samenstelling varieert
+secondelijm,Secondelijm,chemisch,laag,"katten,honden,konijnen",Mechanisch risico (plakken)
+accuzuur,Accuzuur,chemisch,hoog,"katten,honden,konijnen,vogels,knaagdieren",Zeer bijtend
+meststoffen,Meststoffen tuin,chemisch,onbekend,"katten,honden,konijnen,vogels,knaagdieren",Afhankelijk van type
+verf,Verf,chemisch,middel,"katten,honden,konijnen,vogels,knaagdieren",Lood/oplosmiddelen gevaarlijk
+lijm,Lijm,chemisch,laag,"katten,honden,konijnen",Meestal mild
+kit,Kit/siliconen,chemisch,laag,"katten,honden,konijnen",Kan verstopping geven
+batterijen,Batterijen,chemisch,hoog,"katten,honden,konijnen,vogels,knaagdieren",Bijtende stoffen en metalen
+blauwgroene-algen,Blauwgroene algen,chemisch,hoog,"honden,katten",In stilstaand water - dodelijk
+cannabis,Cannabis,chemisch,hoog,"honden,katten",THC giftig voor huisdieren
+cafeine,Cafeine,chemisch,hoog,"katten,honden,konijnen,vogels,knaagdieren",Overstimulatie hart
+# ===========================================
+# EXTRA PLANTEN voor volume
+# ===========================================
+duizendschoon,Duizendschoon,plant,middel,"katten,honden,konijnen",Mild giftig
+ridderspoor,Ridderspoor,plant,hoog,"katten,honden,konijnen,knaagdieren",Alkaloiden giftig
+gouden-regen,Gouden regen,plant,hoog,"katten,honden,konijnen,vogels,knaagdieren",Zeer giftig
+buxus,Buxus,plant,middel,"katten,honden,konijnen,vogels,knaagdieren",Alkaloiden
+liguster,Liguster,plant,middel,"katten,honden,konijnen,knaagdieren",Bessen giftig
+laurier,Laurier,plant,middel,"katten,honden,konijnen",Cyanide verbindingen
+snijbloemen-mix,Snijbloemen mix,plant,onbekend,"katten,honden,konijnen,vogels,knaagdieren",Check individuele bloemen
+venkelkruid,Venkel,plant,laag,"katten,honden,konijnen",Meestal veilig in kleine hoeveelheden
+eucalyptus,Eucalyptus,plant,middel,"katten,honden,vogels,konijnen",Olie giftig
+brandnetel,Brandnetel,plant,laag,"katten,honden,konijnen,knaagdieren",Irritatie door haren
+# ===========================================
+# EXTRA VOEDSEL voor volume
+# ===========================================
+soja,Soja,voedsel,laag,"honden,katten",Allergie mogelijk
+tarwe,Tarwe,voedsel,laag,"honden,katten",Allergie mogelijk
+mais,Mais,voedsel,laag,"honden,katten,konijnen,knaagdieren",Moeilijk verteerbaar
+tomaat-rijp,Rijpe tomaat,voedsel,laag,"honden,katten",Vruchtvlees meestal OK
+paprika,Paprika,voedsel,laag,"honden,katten,konijnen",Meestal veilig
+komkommer,Komkommer,voedsel,laag,"honden,katten,konijnen,knaagdieren",Veilig
+wortel,Wortel,voedsel,laag,"honden,katten,konijnen,knaagdieren",Veilig
+appel,Appel,voedsel,laag,"honden,katten,konijnen,knaagdieren",Pitten bevatten cyanide
+peer,Peer,voedsel,laag,"honden,katten,konijnen,knaagdieren",Pitten bevatten cyanide
+aardbei,Aardbei,voedsel,laag,"honden,katten,konijnen,knaagdieren",Meestal veilig met mate
+framboos,Framboos,voedsel,laag,"honden,katten,konijnen,knaagdieren",Meestal veilig met mate
+bosbes,Bosbes,voedsel,laag,"honden,katten,konijnen,knaagdieren",Meestal veilig met mate
+banaan,Banaan,voedsel,laag,"honden,katten,konijnen,knaagdieren,vogels",Veilig met mate
+mango,Mango,voedsel,laag,"honden,katten,vogels",Pit giftig
+ananas,Ananas,voedsel,laag,"honden,katten",Kan maagirritatie geven
+kiwi,Kiwi,voedsel,laag,"honden,katten",Meestal veilig
+watermeloen,Watermeloen,voedsel,laag,"honden,katten,konijnen,knaagdieren",Pitten verwijderen
+pompoen,Pompoen,voedsel,laag,"honden,katten,konijnen,knaagdieren",Veilig gekookt
+courgette,Courgette,voedsel,laag,"honden,katten,konijnen,knaagdieren",Meestal veilig
+broccoli,Broccoli,voedsel,laag,"honden,katten,konijnen,knaagdieren",Kleine hoeveelheden OK
+bloemkool,Bloemkool,voedsel,laag,"honden,katten,konijnen,knaagdieren",Kan gas geven
+spinazie,Spinazie,voedsel,laag,"honden,katten,konijnen,knaagdieren",Oxaalzuur met mate
+sla,Sla,voedsel,laag,"honden,katten,konijnen,knaagdieren",IJsbergsla weinig voeding
+# ===========================================
+# EXTRA HUISHOUDEN voor volume
+# ===========================================
+wc-reiniger,WC-reiniger,huishouden,hoog,"katten,honden,konijnen,vogels,knaagdieren",Bijtende zuren
+glasreiniger,Glasreiniger,huishouden,middel,"katten,honden,konijnen,vogels,knaagdieren",Ammonia bevattend
+allesreiniger,Allesreiniger,huishouden,middel,"katten,honden,konijnen,vogels,knaagdieren",Oppervlakte-actieve stoffen
+schoonmaakazijn,Schoonmaakazijn,huishouden,laag,"katten,honden,konijnen",Irriterend
+kaarsen,Kaarsen,huishouden,laag,"katten,honden,vogels,konijnen",Rook irriterend voor vogels
+wierook,Wierook,huishouden,middel,"vogels,katten,honden",Rook schadelijk voor vogels
+lood,Lood,huishouden,hoog,"katten,honden,konijnen,vogels,knaagdieren",Vergiftiging bij inname
+zink,Zink,huishouden,middel,"honden,katten,vogels",Te veel is giftig
+koper,Koper,huishouden,middel,"honden,katten,konijnen",Te veel is giftig
+# ===========================================
+# EXTRA MEDICIJNEN voor volume
+# ===========================================
+benzodiazepines,Benzodiazepines,medicijn,hoog,"katten,honden,konijnen,vogels,knaagdieren",Sederende middelen gevaarlijk
+opiaten,Opiaten,medicijn,hoog,"katten,honden,konijnen,vogels,knaagdieren",Ademhalingsdepressie
+tramadol,Tramadol,medicijn,hoog,"katten,honden",Niet voor katten
+prednison,Prednison,medicijn,middel,"katten,honden",Alleen onder begeleiding
+metformine,Metformine,medicijn,middel,"honden,katten",Hypoglycemie risico
+hartmedicatie,Hartmedicatie,medicijn,hoog,"katten,honden,konijnen",Ernstige bijwerkingen
+chemotherapie,Chemotherapie middelen,medicijn,hoog,"katten,honden,konijnen,vogels,knaagdieren",Altijd spoed
+jodium,Jodium,medicijn,middel,"katten,honden",Schildklier problemen
+zinkzalf,Zinkzalf,medicijn,laag,"honden,katten",Grote hoeveelheden problematisch
+# ===========================================
+# SPECIFIEK VOOR KONIJNEN
+# ===========================================
+sla-ijsberg,IJsbergsla,voedsel,laag,"konijnen",Weinig voeding veel water
+kool,Kool,voedsel,laag,"konijnen,knaagdieren",Kan gas veroorzaken
+# ===========================================
+# SPECIFIEK VOOR VOGELS
+# ===========================================
+avocado-vogel,Avocado,voedsel,hoog,"vogels",Persin dodelijk voor vogels
+chocolade-vogel,Chocolade voor vogels,voedsel,hoog,"vogels",Theobromine zeer giftig
+koffie-vogel,Koffie voor vogels,voedsel,hoog,"vogels",Cafeine zeer giftig
+zout,Zout,voedsel,middel,"vogels,konijnen,knaagdieren",Te veel is giftig
+teflon,Teflon dampen,huishouden,hoog,"vogels",Oververhitte pan dodelijk voor vogels
+# ===========================================
+# SPECIFIEK VOOR KNAAGDIEREN
+# ===========================================
+citrus,Citrusvruchten,voedsel,laag,"knaagdieren",Kan problemen geven bij ratten
+aardnoten,Aardnoten,voedsel,laag,"knaagdieren",Let op schimmel

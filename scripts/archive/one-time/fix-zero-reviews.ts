@@ -9,7 +9,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const sql = neon(process.env.DATABASE_URL as string);
-const BRIGHTDATA_API_TOKEN = process.env.BRIGHTDATA_API_TOKEN;
+const BRIGHTDATA_API_KEY = process.env.BRIGHTDATA_API_KEY;
 const DATASET_ID = "gd_m8ebnr0q2qlklc02fz";
 
 interface Place {
@@ -53,7 +53,7 @@ async function triggerBatchCollection(places: Place[]): Promise<string | null> {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}`,
+          Authorization: `Bearer ${BRIGHTDATA_API_KEY}`,
         },
         body: JSON.stringify(inputs),
       }
@@ -83,7 +83,7 @@ async function pollForResults(snapshotId: string, maxAttempts = 60): Promise<Goo
     try {
       const progressRes = await fetch(
         `https://api.brightdata.com/datasets/v3/progress/${snapshotId}`,
-        { headers: { Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}` } }
+        { headers: { Authorization: `Bearer ${BRIGHTDATA_API_KEY}` } }
       );
 
       if (progressRes.ok) {
@@ -93,7 +93,7 @@ async function pollForResults(snapshotId: string, maxAttempts = 60): Promise<Goo
         if (progress.status === "ready") {
           const resultsRes = await fetch(
             `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`,
-            { headers: { Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}` } }
+            { headers: { Authorization: `Bearer ${BRIGHTDATA_API_KEY}` } }
           );
 
           if (resultsRes.ok) {
@@ -184,8 +184,8 @@ async function main() {
   console.log("\n🔧 Fix Zero Reviews");
   console.log("━".repeat(60));
 
-  if (!BRIGHTDATA_API_TOKEN) {
-    console.error("❌ BRIGHTDATA_API_TOKEN not set");
+  if (!BRIGHTDATA_API_KEY) {
+    console.error("❌ BRIGHTDATA_API_KEY not set");
     process.exit(1);
   }
 

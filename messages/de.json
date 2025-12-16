@@ -556,7 +556,10 @@
     "awards": "Awards 2025",
     "newAdditions": "Neu Hinzugefügt",
     "interactiveMap": "Karte",
-    "compareCities": "Städte Vergleichen"
+    "compareCities": "Städte Vergleichen",
+    "partners": "Unsere Partner",
+    "affiliatePartner": "Affiliate-Partner",
+    "affiliateDisclosure": "CutiePawsPedia kann eine Provision über Affiliate-Links verdienen. Dies beeinflusst unsere Empfehlungen nicht."
   },
   "categories": {
     "veterinary": "Tierarzt",
@@ -740,7 +743,17 @@
     "freeListing": "Kostenloser Eintrag",
     "moreCustomers": "Mehr Kunden",
     "premiumOptions": "Premium Optionen",
-    "listYourBusiness": "Unternehmen Eintragen"
+    "listYourBusiness": "Unternehmen Eintragen",
+    "petGuideTitle": "Haustier-Ratgeber & Tipps",
+    "petGuideSubtitle": "Praktische Tipps und Ratschläge für die beste Pflege Ihres Haustieres",
+    "petGuideAll": "Alle Ratgeber",
+    "petGuideAllDesc": "Alle unsere Pflegeratgeber durchsuchen",
+    "petGuideDeals": "Angebote",
+    "petGuideDealsDesc": "Beste Angebote für Tierfutter",
+    "petGuideDogCare": "Hundepflege",
+    "petGuideDogCareDesc": "Tipps für Ihren Hund",
+    "petGuideCatCare": "Katzenpflege",
+    "petGuideCatCareDesc": "Tipps für Ihre Katze"
   },
   "faq": {
     "frequentlyAskedQuestions": "Häufig Gestellte Fragen",

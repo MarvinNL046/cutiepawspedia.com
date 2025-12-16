@@ -15,7 +15,7 @@ dotenv.config({ override: true });
 const sql = neon(process.env.DATABASE_URL as string);
 
 // Brightdata API configuration
-const BRIGHTDATA_API_TOKEN = process.env.BRIGHTDATA_API_TOKEN;
+const BRIGHTDATA_API_KEY = process.env.BRIGHTDATA_API_KEY;
 
 // Datasets API endpoint - uses different authentication
 const BRIGHTDATA_DATASETS_ENDPOINT = "https://api.brightdata.com/datasets/v3/trigger";
@@ -56,8 +56,8 @@ async function triggerGooglePlacesSearch(
   city: string,
   country: string
 ): Promise<string | null> {
-  if (!BRIGHTDATA_API_TOKEN) {
-    console.error("❌ BRIGHTDATA_API_TOKEN not set");
+  if (!BRIGHTDATA_API_KEY) {
+    console.error("❌ BRIGHTDATA_API_KEY not set");
     return null;
   }
 
@@ -69,7 +69,7 @@ async function triggerGooglePlacesSearch(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${BRIGHTDATA_API_TOKEN}`,
+        "Authorization": `Bearer ${BRIGHTDATA_API_KEY}`,
       },
       body: JSON.stringify({
         dataset_id: GOOGLE_PLACES_DATASET_ID,
@@ -109,7 +109,7 @@ async function scrapeGoogleSearchDirectly(
   city: string,
   country: string
 ): Promise<GoogleBusinessResult | null> {
-  if (!BRIGHTDATA_API_TOKEN) {
+  if (!BRIGHTDATA_API_KEY) {
     return null;
   }
 
@@ -122,7 +122,7 @@ async function scrapeGoogleSearchDirectly(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${BRIGHTDATA_API_TOKEN}`,
+        "Authorization": `Bearer ${BRIGHTDATA_API_KEY}`,
       },
       body: JSON.stringify({
         url: googleUrl,
@@ -235,7 +235,7 @@ async function searchWithSerpEndpoint(
   city: string,
   country: string
 ): Promise<GoogleBusinessResult | null> {
-  if (!BRIGHTDATA_API_TOKEN) {
+  if (!BRIGHTDATA_API_KEY) {
     return null;
   }
 
@@ -253,7 +253,7 @@ async function searchWithSerpEndpoint(
     const response = await fetch(`https://api.brightdata.com/serp/google/search?${params}`, {
       method: "GET",
       headers: {
-        "Authorization": `Bearer ${BRIGHTDATA_API_TOKEN}`,
+        "Authorization": `Bearer ${BRIGHTDATA_API_KEY}`,
       },
     });
 
@@ -363,8 +363,8 @@ async function main() {
   console.log("🚀 Brightdata Google Business Enrichment\n");
   console.log("━".repeat(60));
 
-  if (!BRIGHTDATA_API_TOKEN) {
-    console.error("❌ BRIGHTDATA_API_TOKEN not found in .env");
+  if (!BRIGHTDATA_API_KEY) {
+    console.error("❌ BRIGHTDATA_API_KEY not found in .env");
     console.error("\n💡 To use this script:");
     console.error("   1. Go to brightdata.com and create a SERP API zone");
     console.error("   2. Or use the Brightdata MCP directly in Claude Code");
@@ -372,7 +372,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`✅ API Token: ${BRIGHTDATA_API_TOKEN.slice(0, 10)}...`);
+  console.log(`✅ API Token: ${BRIGHTDATA_API_KEY.slice(0, 10)}...`);
   console.log(`\n⚠️  Note: This script requires a Brightdata SERP API zone.`);
   console.log(`   If you see "zone not found" errors, configure your zone at brightdata.com`);
   console.log("");

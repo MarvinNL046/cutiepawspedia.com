@@ -20,7 +20,7 @@ import { neon } from "@neondatabase/serverless";
 import { COUNTRIES } from "./config";
 
 const sql = neon(process.env.DATABASE_URL as string);
-const BRIGHTDATA_API_TOKEN = process.env.BRIGHTDATA_API_TOKEN;
+const BRIGHTDATA_API_KEY = process.env.BRIGHTDATA_API_KEY;
 
 // Google Maps Places Dataset ID
 const DATASET_ID = "gd_m8ebnr0q2qlklc02fz";
@@ -109,8 +109,8 @@ function buildGoogleMapsUrl(place: Place): string {
  * Uses URL collection mode with Google Maps search URLs
  */
 async function triggerDatasetCollection(places: Place[]): Promise<string | null> {
-  if (!BRIGHTDATA_API_TOKEN) {
-    console.error("❌ BRIGHTDATA_API_TOKEN not set");
+  if (!BRIGHTDATA_API_KEY) {
+    console.error("❌ BRIGHTDATA_API_KEY not set");
     return null;
   }
 
@@ -131,7 +131,7 @@ async function triggerDatasetCollection(places: Place[]): Promise<string | null>
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}`,
+          Authorization: `Bearer ${BRIGHTDATA_API_KEY}`,
         },
         body: JSON.stringify(inputs),
       }
@@ -167,7 +167,7 @@ async function pollForResults(snapshotId: string, maxAttempts = 180): Promise<Go
       const progressRes = await fetch(
         `https://api.brightdata.com/datasets/v3/progress/${snapshotId}`,
         {
-          headers: { Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}` },
+          headers: { Authorization: `Bearer ${BRIGHTDATA_API_KEY}` },
         }
       );
 
@@ -180,7 +180,7 @@ async function pollForResults(snapshotId: string, maxAttempts = 180): Promise<Go
           const resultsRes = await fetch(
             `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`,
             {
-              headers: { Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}` },
+              headers: { Authorization: `Bearer ${BRIGHTDATA_API_KEY}` },
             }
           );
 
@@ -409,8 +409,8 @@ async function main() {
   console.log("🚀 Google Maps Places Dataset Enrichment\n");
   console.log("━".repeat(60));
 
-  if (!BRIGHTDATA_API_TOKEN) {
-    console.error("❌ BRIGHTDATA_API_TOKEN not set");
+  if (!BRIGHTDATA_API_KEY) {
+    console.error("❌ BRIGHTDATA_API_KEY not set");
     process.exit(1);
   }
 

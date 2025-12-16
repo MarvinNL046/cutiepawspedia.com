@@ -103,6 +103,20 @@ async function getSitemapSections(): Promise<SitemapSection[]> {
       id: "best-country",
       path: "/sitemap-best-country.xml",
       lastmod: today,
+    },
+
+    // Guide/Gids pages (informational content pillars)
+    {
+      id: "gids",
+      path: "/sitemap-gids.xml",
+      lastmod: today,
+    },
+
+    // Toxicity information pages (is-X-giftig-voor-Y pattern)
+    {
+      id: "toxicity",
+      path: "/sitemap-toxicity.xml",
+      lastmod: today,
     }
   );
 

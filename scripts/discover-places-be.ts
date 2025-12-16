@@ -21,7 +21,7 @@ import { eq, and } from "drizzle-orm";
 import { BE_PROVINCE_CONFIGS } from "./config/be-provinces";
 
 // BrightData API configuration
-const BRIGHTDATA_API_TOKEN = process.env.BRIGHTDATA_API_TOKEN;
+const BRIGHTDATA_API_KEY = process.env.BRIGHTDATA_API_KEY;
 const BRIGHTDATA_SERP_ZONE = process.env.BRIGHTDATA_SERP_ZONE;
 const SERP_ENDPOINT = "https://api.brightdata.com/request";
 
@@ -394,7 +394,7 @@ async function searchGoogleMaps(
   language: "nl" | "fr",
   limit: number
 ): Promise<LocalResult[]> {
-  if (!BRIGHTDATA_API_TOKEN || !BRIGHTDATA_SERP_ZONE) {
+  if (!BRIGHTDATA_API_KEY || !BRIGHTDATA_SERP_ZONE) {
     console.error("❌ BrightData credentials not configured");
     return [];
   }
@@ -412,7 +412,7 @@ async function searchGoogleMaps(
     const response = await fetch(SERP_ENDPOINT, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}`,
+        Authorization: `Bearer ${BRIGHTDATA_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

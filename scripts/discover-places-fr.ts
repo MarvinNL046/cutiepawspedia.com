@@ -12,7 +12,7 @@
  *   npx tsx scripts/discover-places-fr.ts --category=pet-grooming --city=Lyon --dry-run
  *
  * Requirements:
- *   BRIGHTDATA_API_TOKEN    - BrightData API token
+ *   BRIGHTDATA_API_KEY    - BrightData API token
  *   BRIGHTDATA_SERP_ZONE    - SERP zone name (e.g., serp_cutiepaws)
  */
 
@@ -24,7 +24,7 @@ dotenv.config({ override: true });
 
 const sql = neon(process.env.DATABASE_URL as string);
 
-const BRIGHTDATA_API_TOKEN = process.env.BRIGHTDATA_API_TOKEN;
+const BRIGHTDATA_API_KEY = process.env.BRIGHTDATA_API_KEY;
 const BRIGHTDATA_SERP_ZONE = process.env.BRIGHTDATA_SERP_ZONE;
 const SERP_ENDPOINT = "https://api.brightdata.com/request";
 
@@ -384,7 +384,7 @@ async function searchGoogleMapsSerp(
   city: string,
   limit: number
 ): Promise<GoogleLocalResult[]> {
-  if (!BRIGHTDATA_API_TOKEN || !BRIGHTDATA_SERP_ZONE) {
+  if (!BRIGHTDATA_API_KEY || !BRIGHTDATA_SERP_ZONE) {
     console.error("❌ BrightData credentials not configured");
     return [];
   }
@@ -398,7 +398,7 @@ async function searchGoogleMapsSerp(
     const response = await fetchWithRetry(SERP_ENDPOINT, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}`,
+        Authorization: `Bearer ${BRIGHTDATA_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -660,9 +660,9 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  if (!BRIGHTDATA_API_TOKEN || !BRIGHTDATA_SERP_ZONE) {
+  if (!BRIGHTDATA_API_KEY || !BRIGHTDATA_SERP_ZONE) {
     console.error("❌ BrightData credentials not configured");
-    console.error("   Set BRIGHTDATA_API_TOKEN and BRIGHTDATA_SERP_ZONE in .env");
+    console.error("   Set BRIGHTDATA_API_KEY and BRIGHTDATA_SERP_ZONE in .env");
     process.exit(1);
   }
 
@@ -698,7 +698,7 @@ async function main(): Promise<void> {
 
         // Rate limiting between cities - 5 seconds to avoid API rate limits
         if (cities.length > 1) {
-          await new Promise((r) => setTimeout(r, 5000));
+          await new Promise((r) => setTimeout(r, 1000));
         }
       }
 
@@ -770,7 +770,7 @@ async function main(): Promise<void> {
     // Rate limiting between cities - 5 seconds to avoid API rate limits
     if (cities.length > 1) {
       console.log(`\n⏳ Waiting 5s before next city...`);
-      await new Promise((r) => setTimeout(r, 5000));
+      await new Promise((r) => setTimeout(r, 1000));
     }
   }
 

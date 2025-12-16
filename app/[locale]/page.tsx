@@ -267,6 +267,96 @@ export default async function HomePage({ params }: HomePageProps) {
           </div>
         </section>
 
+        {/* Pet Toxicity Warning Section */}
+        <section className="container mx-auto max-w-6xl px-4 py-16">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground dark:text-cpCream mb-4">
+              ⚠️ {locale === "nl" ? "Giftige Stoffen voor Huisdieren" : "Toxic Substances for Pets"}
+            </h2>
+            <p className="text-muted-foreground dark:text-cpCream/70 max-w-2xl mx-auto">
+              {locale === "nl"
+                ? "Weet welke stoffen gevaarlijk zijn voor je hond of kat. Onze gidsen helpen je je huisdier te beschermen."
+                : "Know which substances are dangerous for your dog or cat. Our guides help you protect your pet."}
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              {
+                icon: "🍫",
+                title: locale === "nl" ? "Chocolade" : "Chocolate",
+                desc: locale === "nl" ? "Zeer giftig voor honden door theobromine" : "Highly toxic to dogs due to theobromine",
+                href: `/${locale}/is-chocolade-giftig-voor-honden`,
+                level: "hoog",
+                animal: "🐕",
+              },
+              {
+                icon: "🌸",
+                title: locale === "nl" ? "Lelies" : "Lilies",
+                desc: locale === "nl" ? "Dodelijk voor katten - alle delen giftig" : "Deadly to cats - all parts toxic",
+                href: `/${locale}/is-lelie-giftig-voor-katten`,
+                level: "hoog",
+                animal: "🐈",
+              },
+              {
+                icon: "💊",
+                title: locale === "nl" ? "Paracetamol" : "Paracetamol",
+                desc: locale === "nl" ? "DODELIJK voor katten, nooit geven!" : "DEADLY for cats, never give!",
+                href: `/${locale}/is-paracetamol-giftig-voor-katten`,
+                level: "hoog",
+                animal: "🐈",
+              },
+              {
+                icon: "🍇",
+                title: locale === "nl" ? "Druiven" : "Grapes",
+                desc: locale === "nl" ? "Veroorzaakt acuut nierfalen bij honden" : "Causes acute kidney failure in dogs",
+                href: `/${locale}/is-druiven-giftig-voor-honden`,
+                level: "hoog",
+                animal: "🐕",
+              },
+            ].map((item) => (
+              <Link
+                key={item.title}
+                href={item.href}
+                className="group rounded-2xl p-5 border transition-all hover:-translate-y-1 hover:shadow-lg bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 border-red-200 dark:border-red-800/30 hover:border-red-400"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-3xl">{item.icon}</span>
+                  <span className="text-lg">{item.animal}</span>
+                </div>
+                <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold mb-2 ${
+                  item.level === "hoog"
+                    ? "bg-red-500 text-white"
+                    : "bg-orange-500 text-white"
+                }`}>
+                  {item.level === "hoog" ? "HOOG RISICO" : "MIDDEL"}
+                </span>
+                <h3 className="font-bold text-foreground dark:text-cpCream group-hover:text-red-600 transition-colors">
+                  {item.title}
+                </h3>
+                <p className="text-sm text-muted-foreground dark:text-slate-400 mt-1">
+                  {item.desc}
+                </p>
+              </Link>
+            ))}
+          </div>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+            <Link
+              href={`/${locale}/voedselgids`}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-cpCoral text-white rounded-2xl font-medium hover:bg-cpCoral/90 transition-colors"
+            >
+              {locale === "nl" ? "Complete Voedselgids (80+ pagina's)" : "Complete Food Guide (80+ pages)"}
+              <span>→</span>
+            </Link>
+            <Link
+              href={`/${locale}/giftige-stoffen`}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400 rounded-2xl font-medium hover:bg-red-500/20 dark:hover:bg-red-500/30 transition-colors"
+            >
+              {locale === "nl" ? "Alle 53 giftige stoffen" : "All 53 toxic substances"}
+              <span>→</span>
+            </Link>
+          </div>
+        </section>
+
         {/* Pet Guide Section */}
         <section className="container mx-auto max-w-6xl px-4 py-16">
           <div className="text-center mb-10">

@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const sql = neon(process.env.DATABASE_URL as string);
-const BRIGHTDATA_API_TOKEN = process.env.BRIGHTDATA_API_TOKEN;
+const BRIGHTDATA_API_KEY = process.env.BRIGHTDATA_API_KEY;
 
 interface GoogleBusinessResult {
   rating?: number;
@@ -34,7 +34,7 @@ async function searchWithDatasetAPI(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}`,
+          Authorization: `Bearer ${BRIGHTDATA_API_KEY}`,
         },
         body: JSON.stringify([
           {
@@ -67,7 +67,7 @@ async function searchWithDatasetAPI(
       const statusRes = await fetch(
         `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`,
         {
-          headers: { Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}` },
+          headers: { Authorization: `Bearer ${BRIGHTDATA_API_KEY}` },
         }
       );
 
@@ -113,7 +113,7 @@ async function searchWithSerpApi(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}`,
+        Authorization: `Bearer ${BRIGHTDATA_API_KEY}`,
       },
       body: JSON.stringify({
         zone: BRIGHTDATA_SERP_ZONE,
@@ -210,7 +210,7 @@ async function searchWithWebUnlocker(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}`,
+        Authorization: `Bearer ${BRIGHTDATA_API_KEY}`,
       },
       body: JSON.stringify({
         zone: BRIGHTDATA_ZONE,
@@ -343,8 +343,8 @@ function parseGoogleHtml(html: string): GoogleBusinessResult | null {
 async function main() {
   console.log("🚀 Brightdata SERP Test - Amsterdam (10 places)\n");
 
-  if (!BRIGHTDATA_API_TOKEN) {
-    console.error("❌ BRIGHTDATA_API_TOKEN not set");
+  if (!BRIGHTDATA_API_KEY) {
+    console.error("❌ BRIGHTDATA_API_KEY not set");
     process.exit(1);
   }
 

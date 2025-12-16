@@ -14,7 +14,7 @@
  *    - Enable Google search
  *
  * 2. Add to .env:
- *    BRIGHTDATA_API_TOKEN=your_api_token
+ *    BRIGHTDATA_API_KEY=your_api_token
  *    BRIGHTDATA_SERP_ZONE=serp_cutiepaws
  *
  * Usage:
@@ -31,7 +31,7 @@
  *   - pet-store (dierenwinkel)
  *
  * Environment:
- *   BRIGHTDATA_API_TOKEN    - BrightData API token (required)
+ *   BRIGHTDATA_API_KEY    - BrightData API token (required)
  *   BRIGHTDATA_SERP_ZONE    - SERP zone name (required, create in dashboard)
  */
 
@@ -45,7 +45,7 @@ dotenv.config({ override: true });
 const sql = neon(process.env.DATABASE_URL as string);
 
 // BrightData API configuration
-const BRIGHTDATA_API_TOKEN = process.env.BRIGHTDATA_API_TOKEN;
+const BRIGHTDATA_API_KEY = process.env.BRIGHTDATA_API_KEY;
 const BRIGHTDATA_SERP_ZONE = process.env.BRIGHTDATA_SERP_ZONE;
 
 // SERP API endpoint (new format)
@@ -386,8 +386,8 @@ async function searchGoogleMapsSerp(
   city: string,
   limit: number
 ): Promise<GoogleLocalResult[]> {
-  if (!BRIGHTDATA_API_TOKEN) {
-    console.error("❌ BRIGHTDATA_API_TOKEN not configured");
+  if (!BRIGHTDATA_API_KEY) {
+    console.error("❌ BRIGHTDATA_API_KEY not configured");
     return [];
   }
 
@@ -416,7 +416,7 @@ async function searchGoogleMapsSerp(
     const response = await fetch(SERP_ENDPOINT, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${BRIGHTDATA_API_TOKEN}`,
+        Authorization: `Bearer ${BRIGHTDATA_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -750,8 +750,8 @@ async function main(): Promise<void> {
   }
 
   // Validate BrightData credentials
-  if (!BRIGHTDATA_API_TOKEN) {
-    console.error("❌ BRIGHTDATA_API_TOKEN not set in environment");
+  if (!BRIGHTDATA_API_KEY) {
+    console.error("❌ BRIGHTDATA_API_KEY not set in environment");
     console.error("   Get your token from: https://brightdata.com/cp/account");
     process.exit(1);
   }
@@ -861,10 +861,10 @@ async function main(): Promise<void> {
     );
     allStats.push(stats);
 
-    // Rate limiting between cities (SERP API has rate limits)
+    // Rate limiting between cities (SERP API has rate limits) - reduced from 2s to 500ms
     if (cities.length > 1) {
-      console.log(`\n⏳ Waiting 2s before next city...`);
-      await new Promise((r) => setTimeout(r, 2000));
+      console.log(`\n⏳ Next city in 0.5s...`);
+      await new Promise((r) => setTimeout(r, 500));
     }
   }
 

@@ -16,10 +16,10 @@ const CONFIG = {
 };
 
 async function testSerpReviews() {
-  const apiKey = process.env.BRIGHTDATA_API_TOKEN;
+  const apiKey = process.env.BRIGHTDATA_API_KEY;
 
   if (!apiKey) {
-    console.error("BRIGHTDATA_API_TOKEN not set");
+    console.error("BRIGHTDATA_API_KEY not set");
     process.exit(1);
   }
 

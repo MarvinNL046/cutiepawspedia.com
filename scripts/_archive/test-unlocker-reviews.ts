@@ -59,7 +59,7 @@ async function testUnlockerReviews() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.BRIGHTDATA_API_TOKEN}`,
+        Authorization: `Bearer ${process.env.BRIGHTDATA_API_KEY}`,
       },
       body: JSON.stringify({
         zone: zone,

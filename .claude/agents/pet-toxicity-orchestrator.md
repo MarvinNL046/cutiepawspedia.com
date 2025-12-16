@@ -80,6 +80,12 @@ This orchestrator supports generating content in multiple languages. Each locale
 - Keywords: "tossico per", "velenoso per", "avvelenamento"
 - Professional, trustworthy tone
 
+**French (fr):**
+- Use formal "vous" for medical content
+- Keywords: "toxique pour", "dangereux pour", "empoisonnement"
+- Professional, refined tone with medical precision
+- Prices in EUR
+
 ---
 
 ## Global Non-Negotiable Rules (Apply to ALL sub-agents)
@@ -421,24 +427,36 @@ READY FOR DEPLOYMENT: Yes
 ### Step 1: Validate Input
 - Check all required fields present
 - Verify locale is supported
-- Count substances (must be divisible by 10 for even distribution)
+- Count substances and calculate agent distribution:
+  - If substances ≤ 50: use up to 10 agents (some may get 4-5 items)
+  - If substances > 50: spawn additional agents (max 15)
+  - Example: 47 substances = 10 agents (5×9 + 2×1 = 47)
 - Validate animal types
 
 ### Step 2: Prepare Agent Assignments
-- Split substances into 10 groups of 5
+- Split substances across agents (distribute evenly, remainder to last agents)
 - Prepare locale-specific instructions for each
 - Generate alternate locale URLs if multi-locale
 
 ### Step 3: Spawn All Agents (PARALLEL)
 ```
-CRITICAL: Use a SINGLE message with 10 Task tool calls
+CRITICAL: Use a SINGLE message with N Task tool calls
 All agents must start simultaneously!
 ```
 
 ### Step 4: Monitor Progress
 - Track completion of each agent
 - Log any errors or failures
-- Re-spawn failed agents if needed (max 2 retries)
+- Re-spawn failed agents if needed (max 2 retries per agent)
+- **Retry Logic for Sub-Agents:**
+  - On API timeout: wait 30s, retry with same parameters
+  - On validation failure: log issue, retry once
+  - On complete failure after 2 retries: mark as failed, continue with others
+
+### Step 4b: Handle Partial Failures
+- If 1-2 agents fail: report partial success, list missing substances
+- If 3+ agents fail: pause, report issue, ask user to retry or skip
+- Generate "PARTIAL_COMPLETION" report with successful/failed breakdown
 
 ### Step 5: Collect & Validate Outputs
 For each agent's output, verify:
@@ -455,25 +473,43 @@ For each agent's output, verify:
 
 ## Output Structure
 
+**NextJS App Router Structure (CutiePawsPedia):**
+
 ```
-/output/pet-toxicity/
+/app/[locale]/
+├── is-[substance]-giftig-voor-[animal]/     # NL canonical pages
+│   └── page.tsx                              # Dynamic route
+├── is-[substance]-gevaarlijk-voor-[animal]/ # NL variant (noindex)
+│   └── page.tsx
+├── [animal]-heeft-[substance]-gegeten/       # NL emergency variant
+│   └── page.tsx
+│
+├── is-[substance]-toxic-to-[animal]s/        # EN canonical pages
+│   └── page.tsx
+│
+├── ist-[substance]-giftig-fuer-[animal]/     # DE canonical pages
+│   └── page.tsx
+│
+└── ... (other locales)
+```
+
+**Alternative: Static Generation with JSON data:**
+
+```
+/data/pet-toxicity/
 ├── nl/
-│   ├── is-lelie-giftig-voor-katten/
-│   │   ├── page.tsx
-│   │   ├── schema.json
-│   │   ├── metadata.json
-│   │   └── variants/
-│   │       ├── is-lelie-gevaarlijk-voor-katten.tsx
-│   │       ├── kat-heeft-lelie-gegeten.tsx
-│   │       └── lelie-toxiciteit-bij-katten.tsx
-│   ├── is-chocolade-giftig-voor-honden/
-│   │   └── ...
-│   └── ... (48 more substances)
+│   ├── lelie-katten.json
+│   ├── chocolade-honden.json
+│   └── ... (all substance-animal combinations)
 ├── en/
-│   └── ... (if multi-locale)
+│   └── ...
 └── de/
-    └── ... (if multi-locale)
+    └── ...
+
+/app/[locale]/is-[substance]-giftig-voor-[animal]/page.tsx  # reads from /data/
 ```
+
+**Note:** Choose the structure that fits your project. For CutiePawsPedia, the dynamic route with JSON data is recommended for scalability.
 
 ---
 

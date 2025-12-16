@@ -271,7 +271,7 @@ async function main() {
 
   // Check environment
   const connectionString = process.env.DATABASE_URL;
-  const apiKey = process.env.BRIGHTDATA_API_TOKEN;
+  const apiKey = process.env.BRIGHTDATA_API_KEY;
 
   if (!connectionString) {
     console.error("❌ DATABASE_URL not set");
@@ -279,7 +279,7 @@ async function main() {
   }
 
   if (!apiKey) {
-    console.error("❌ BRIGHTDATA_API_TOKEN not set");
+    console.error("❌ BRIGHTDATA_API_KEY not set");
     process.exit(1);
   }
 

@@ -32,13 +32,30 @@ export const LOCALE_TO_COUNTRY_SLUG: Record<string, string> = {
 
 // Map country slug to preferred locale for URL generation
 export const COUNTRY_SLUG_TO_LOCALE: Record<string, string> = {
+  // Core European markets
   netherlands: "nl",
   belgie: "nl", // Belgium uses Dutch locale (also supports French)
+  belgium: "nl", // Alias for belgie
   germany: "de",
+  deutschland: "de", // German name for Germany
   france: "fr",
+  "united-kingdom": "en",
+  uk: "en", // Alias
+
+  // English-speaking countries
+  australia: "en",
+  "united-states": "en",
+  usa: "en", // Alias
+  canada: "en", // Primary locale (also supports French)
+  ireland: "en",
+  "new-zealand": "en",
+
+  // Other European countries
   spain: "es",
   italy: "it",
   portugal: "pt",
+  austria: "de",
+  switzerland: "de", // Primary locale (also supports fr, it)
 };
 
 // Map country code to preferred locale (for country-based locale switching)

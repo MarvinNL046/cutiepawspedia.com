@@ -269,11 +269,30 @@ export const DEFAULT_SEO_CONFIG: SeoConfig = {
  * Each country only supports specific locales relevant to that market
  */
 export const COUNTRY_LOCALES: Record<string, string[]> = {
-  belgium: ["nl", "en", "fr"],      // Dutch, English, French
+  // Core European markets
   netherlands: ["nl", "en"],         // Dutch, English
-  germany: ["de"],                   // German only
-  france: ["fr"],                    // French only
+  belgie: ["nl", "en", "fr"],        // Dutch, English, French (Belgian variant)
+  belgium: ["nl", "en", "fr"],       // Dutch, English, French (alias)
+  germany: ["de", "en"],             // German, English
+  deutschland: ["de", "en"],         // German, English (German name)
+  france: ["fr", "en"],              // French, English
   "united-kingdom": ["en"],          // English only
+  uk: ["en"],                        // English only (alias)
+
+  // English-speaking countries
+  australia: ["en"],                 // English only
+  "united-states": ["en"],           // English only
+  usa: ["en"],                       // English only (alias)
+  canada: ["en", "fr"],              // English, French
+  ireland: ["en"],                   // English only
+  "new-zealand": ["en"],             // English only
+
+  // Other European countries
+  spain: ["es", "en"],               // Spanish, English
+  italy: ["it", "en"],               // Italian, English
+  portugal: ["pt", "en"],            // Portuguese, English
+  austria: ["de", "en"],             // German, English
+  switzerland: ["de", "fr", "it", "en"], // German, French, Italian, English
 };
 
 /**

@@ -42,7 +42,7 @@ import { FavoriteButton } from "@/components/favorites/FavoriteButton";
 import { isFavorite } from "@/db/queries/favorites";
 import { MapPin, Phone, Globe, Mail, Star, CheckCircle, Lock, Shield, Crown, MessageSquare } from "lucide-react";
 import { ReviewSection } from "@/components/reviews";
-import { AboutSection, ServicesSection, HighlightsSection, BusinessSnapshot, BusinessPhotoGallery, GoogleReviewsSection } from "@/components/place";
+import { AboutSection, ServicesSection, HighlightsSection, BusinessSnapshot, BusinessPhotoGallery, GoogleReviewsSection, PlaceFeatureBadges, PlaceHeroImage } from "@/components/place";
 import { getActivePhotosByPlaceId } from "@/db/queries/businessPhotos";
 import { getBusinessPhotoUrl } from "@/lib/storage/businessPhotos";
 import { BetweenContentAd, SidebarAd } from "@/components/ads";
@@ -246,6 +246,16 @@ export default async function PlacePage({ params }: PlacePageProps) {
       specializations?: string[];
       awards?: string[];
     };
+    // New SERP API fields
+    imageUrl?: string;
+    thumbnailUrl?: string;
+    openingHours?: Record<string, string>;
+    workStatus?: string;
+    accessibility?: {
+      wheelchairEntrance?: boolean;
+      parking?: boolean;
+    };
+    serviceOptions?: string[];
   } | null;
 
   // Generate AI content
@@ -446,6 +456,13 @@ export default async function PlacePage({ params }: PlacePageProps) {
                   <span className="text-muted-foreground dark:text-cpCream/60">({place.reviewCount} reviews)</span>
                 </div>
               )}
+              {/* Feature badges from SERP data */}
+              <PlaceFeatureBadges
+                accessibility={scrapedContent?.accessibility}
+                serviceOptions={scrapedContent?.serviceOptions}
+                workStatus={scrapedContent?.workStatus}
+                className="mt-3"
+              />
             </div>
             <div className="flex flex-col gap-2 min-w-[200px]">
               <FavoriteButton placeId={place.id} initialIsFavorite={isPlaceFavorited} variant="default" />
@@ -476,6 +493,15 @@ export default async function PlacePage({ params }: PlacePageProps) {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Google Maps image from SERP API - only show if no business photos */}
+            {photosWithUrls.length === 0 && (scrapedContent?.imageUrl || scrapedContent?.thumbnailUrl) && (
+              <PlaceHeroImage
+                imageUrl={scrapedContent.imageUrl}
+                thumbnailUrl={scrapedContent.thumbnailUrl}
+                placeName={place.name}
+              />
+            )}
+
             <AboutSection
               place={{
                 name: place.name,

@@ -630,7 +630,12 @@
     "pendingModeration": "Pending moderation",
     "pendingModerationFull": "Your review is pending moderation and will appear shortly.",
     "photosFailedPartial": "Some photos failed to upload",
-    "showLess": "Show less"
+    "showLess": "Show less",
+    "wheelchairAccessible": "Wheelchair accessible",
+    "parkingAvailable": "Parking available",
+    "more": "more",
+    "features": "Features",
+    "businessImage": "Business Image"
   },
   "search": {
     "placeholder": "Search for pet services...",

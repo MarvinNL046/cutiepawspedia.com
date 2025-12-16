@@ -630,7 +630,12 @@
     "pendingModeration": "In afwachting van moderatie",
     "pendingModerationFull": "Je review wordt gemodereerd en verschijnt binnenkort.",
     "photosFailedPartial": "Sommige foto's konden niet worden geüpload",
-    "showLess": "Toon minder"
+    "showLess": "Toon minder",
+    "wheelchairAccessible": "Rolstoeltoegankelijk",
+    "parkingAvailable": "Parkeren beschikbaar",
+    "more": "meer",
+    "features": "Kenmerken",
+    "businessImage": "Bedrijfsfoto"
   },
   "search": {
     "placeholder": "Zoek naar huisdierdiensten...",

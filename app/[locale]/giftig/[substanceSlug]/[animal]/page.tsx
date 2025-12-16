@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
   getSubstanceBySlug,
-  getAllToxicityCombinations,
   getTypeInfo,
   getAnimalInfo,
   getToxicityLevelInfo,
@@ -18,14 +17,8 @@ interface PageProps {
   }>;
 }
 
-// Generate static params for all valid combinations
-export async function generateStaticParams() {
-  const combinations = getAllToxicityCombinations();
-  return combinations.map(({ substanceSlug, animal }) => ({
-    substanceSlug,
-    animal,
-  }));
-}
+// Dynamic rendering - no static generation for noindex detail pages
+// This reduces build size significantly and these pages don't need to be pre-rendered
 
 // Generate metadata with noindex, follow for detail pages
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

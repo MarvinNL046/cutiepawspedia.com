@@ -17,10 +17,88 @@ interface PageProps {
   }>;
 }
 
-// Dynamic rendering - no static generation for noindex detail pages
-// This reduces build size significantly and these pages don't need to be pre-rendered
+// The 52 most important substance+animal combinations that should be indexed
+// These are high-search-volume, dangerous substances
+const INDEXED_COMBINATIONS = new Set([
+  // High toxicity foods - DOGS (most searched)
+  "chocolade-honden",
+  "druiven-honden",
+  "rozijnen-honden",
+  "xylitol-honden",
+  "ui-honden",
+  "knoflook-honden",
+  "avocado-honden",
+  "macadamia-honden",
+  "alcohol-honden",
+  "koffie-honden",
 
-// Generate metadata with noindex, follow for detail pages
+  // High toxicity foods - CATS (most searched)
+  "chocolade-katten",
+  "ui-katten",
+  "knoflook-katten",
+  "druiven-katten",
+  "rozijnen-katten",
+  "alcohol-katten",
+  "koffie-katten",
+  "paracetamol-katten",
+
+  // Dangerous plants - CATS
+  "lelie-katten",
+  "tijgerlelie-katten",
+  "daglelie-katten",
+  "azalea-katten",
+  "oleander-katten",
+  "sago-palm-katten",
+
+  // Dangerous plants - DOGS
+  "lelie-honden",
+  "azalea-honden",
+  "oleander-honden",
+  "taxus-honden",
+  "sago-palm-honden",
+  "rhododendron-honden",
+
+  // Household items - DOGS
+  "rattengif-honden",
+  "antivries-honden",
+  "slakkenkorrels-honden",
+  "ibuprofen-honden",
+  "paracetamol-honden",
+
+  // Household items - CATS
+  "rattengif-katten",
+  "antivries-katten",
+  "tea-tree-olie-katten",
+  "vlooienmiddel-hond-katten",
+  "ibuprofen-katten",
+
+  // Common houseplants
+  "monstera-katten",
+  "monstera-honden",
+  "philodendron-katten",
+  "philodendron-honden",
+  "dieffenbachia-katten",
+  "dieffenbachia-honden",
+  "pothos-katten",
+  "pothos-honden",
+
+  // Other animals
+  "chocolade-konijnen",
+  "avocado-vogels",
+  "teflon-vogels",
+  "chocolade-vogels",
+]);
+
+/**
+ * Check if this substance+animal combo should be indexed
+ */
+function shouldBeIndexed(substanceSlug: string, animal: string): boolean {
+  return INDEXED_COMBINATIONS.has(`${substanceSlug}-${animal}`);
+}
+
+// Dynamic rendering - reduces build size significantly
+
+// Generate metadata with conditional index/noindex based on importance
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale, substanceSlug, animal } = await params;
   const substance = getSubstanceBySlug(substanceSlug);
@@ -33,14 +111,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = `Is ${substance.name} Giftig voor ${animalInfo.plural}? | CutiePawsPedia`;
   const description = `${substance.name} en ${animalInfo.plural.toLowerCase()}: toxiciteitsniveau ${substance.toxicityLevel}. ${substance.notes || 'Leer de risicos en wat te doen.'}`;
 
+  // 52 important pages get indexed, rest is noindex but dofollow
+  const isImportant = shouldBeIndexed(substanceSlug, animal);
+
   return {
     title,
     description,
-    // NOINDEX, FOLLOW - Detail pages pass link juice but don't compete for rankings
-    robots: {
-      index: false,
-      follow: true,
-    },
+    robots: isImportant
+      ? { index: true, follow: true }
+      : { index: false, follow: true },
     openGraph: {
       title: `Is ${substance.name} Giftig voor ${animalInfo.plural}?`,
       description,
@@ -48,7 +127,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       locale: locale === 'nl' ? 'nl_NL' : 'en_US',
     },
     alternates: {
-      canonical: `/${locale}/giftige-stoffen`,
+      // Use SEO-friendly canonical URL for important pages
+      canonical: isImportant
+        ? `https://cutiepawspedia.com/${locale}/is-${substanceSlug}-giftig-voor-${animal}`
+        : `/${locale}/giftige-stoffen`,
     },
   };
 }

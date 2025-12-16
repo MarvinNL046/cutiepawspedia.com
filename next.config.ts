@@ -66,9 +66,54 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === "production",
   },
 
-  // Rewrites for dynamic sitemaps
+  // Rewrites for SEO-friendly URLs and dynamic sitemaps
   async rewrites() {
     return [
+      // ===========================================
+      // TOXICITY SEO REWRITES
+      // Route SEO-friendly toxicity URLs to the actual pages
+      // This prevents overlap with [countrySlug] dynamic route
+      // ===========================================
+
+      // Pattern: /nl/is-chocolade-giftig-voor-honden → /nl/giftig/chocolade/honden
+      // Captures: is-{substance}-giftig-voor-{animal}
+      {
+        source: "/:locale/is-:substance-giftig-voor-:animal",
+        destination: "/:locale/giftig/:substance/:animal",
+      },
+
+      // Pattern: /nl/is-chocolade-gevaarlijk-voor-honden → /nl/giftig/chocolade/honden
+      // Variant URL for different search queries
+      {
+        source: "/:locale/is-:substance-gevaarlijk-voor-:animal",
+        destination: "/:locale/giftig/:substance/:animal",
+      },
+
+      // Pattern: /nl/honden-heeft-chocolade-gegeten → /nl/giftig/chocolade/honden
+      // Emergency search variant
+      {
+        source: "/:locale/:animal-heeft-:substance-gegeten",
+        destination: "/:locale/giftig/:substance/:animal",
+      },
+
+      // Pattern: /nl/chocolade-toxiciteit-bij-honden → /nl/giftig/chocolade/honden
+      // Medical search variant
+      {
+        source: "/:locale/:substance-toxiciteit-bij-:animal",
+        destination: "/:locale/giftig/:substance/:animal",
+      },
+
+      // Pattern: /nl/mag-honden-chocolade → /nl/giftig/chocolade/honden
+      // Question-based search variant
+      {
+        source: "/:locale/mag-:animal-:substance",
+        destination: "/:locale/giftig/:substance/:animal",
+      },
+
+      // ===========================================
+      // SITEMAP REWRITES
+      // ===========================================
+
       // Rewrite /sitemap-places-{N}.xml to /api/sitemap-places/{N}
       {
         source: "/sitemap-places-:page(\\d+).xml",

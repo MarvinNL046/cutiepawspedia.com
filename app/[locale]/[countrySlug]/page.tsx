@@ -9,6 +9,7 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { getCountryBySlug, getCitiesByCountrySlug, getProvincesByCountrySlug, getCategories, getPlaceCount } from "@/db/queries";
 import {
@@ -58,8 +59,13 @@ export default async function CountryPage({ params }: CountryPageProps) {
     getPlaceCount(),
   ]);
 
-  const countryName = country?.name || countrySlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  const countryCode = country?.code || "XX";
+  // If no country exists in database, return 404
+  if (!country) {
+    notFound();
+  }
+
+  const countryName = country.name;
+  const countryCode = country.code;
 
   const displayCategories = categories.length > 0 ? categories : defaultCategories;
 
@@ -85,7 +91,7 @@ export default async function CountryPage({ params }: CountryPageProps) {
       <PageHeader
         title={`${t("petServicesIn")} ${countryName}`}
         icon={<span className="text-4xl">{getCountryFlag(countryCode)}</span>}
-        badge={!country ? <Badge variant="secondary">{t("comingSoon")}</Badge> : undefined}
+        badge={undefined}
         variant="gradient-aqua"
         breadcrumbs={[
           { label: t("directory"), href: `/${locale}` },

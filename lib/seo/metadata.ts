@@ -74,10 +74,16 @@ interface CountryData {
   code?: string;
 }
 
+interface ProvinceData {
+  name: string;
+  slug: string;
+}
+
 interface CityData {
   name: string;
   slug: string;
   country?: CountryData | null;
+  province?: ProvinceData | null;
 }
 
 interface CategoryData {
@@ -144,6 +150,7 @@ export function getCountryMetadata(
 
 /**
  * Generate metadata for city pages
+ * Supports both province-aware and legacy URLs
  */
 export function getCityMetadata(
   city: CityData,
@@ -155,6 +162,12 @@ export function getCityMetadata(
   const description = `Discover ${placeCount ? `${placeCount}+ ` : ""}pet services in ${city.name}. Find trusted veterinarians, professional groomers, pet hotels, dog walkers, and pet shops near you.`;
 
   const countrySlug = city.country?.slug || "";
+  const provinceSlug = city.province?.slug;
+
+  // Build URL path with or without province
+  const cityPath = provinceSlug
+    ? `/${locale}/${countrySlug}/p/${provinceSlug}/${city.slug}`
+    : `/${locale}/${countrySlug}/${city.slug}`;
 
   return {
     title,
@@ -170,7 +183,7 @@ export function getCityMetadata(
     openGraph: {
       title,
       description,
-      url: `${BASE_URL}/${locale}/${countrySlug}/${city.slug}`,
+      url: `${BASE_URL}${cityPath}`,
       type: "website",
       locale: locale === "nl" ? "nl_NL" : "en_US",
     },
@@ -180,17 +193,23 @@ export function getCityMetadata(
       description,
     },
     alternates: {
-      canonical: `${BASE_URL}/${locale}/${countrySlug}/${city.slug}`,
-      languages: {
-        en: `${BASE_URL}/en/${countrySlug}/${city.slug}`,
-        nl: `${BASE_URL}/nl/${countrySlug}/${city.slug}`,
-      },
+      canonical: `${BASE_URL}${cityPath}`,
+      languages: provinceSlug
+        ? {
+            en: `${BASE_URL}/en/${countrySlug}/p/${provinceSlug}/${city.slug}`,
+            nl: `${BASE_URL}/nl/${countrySlug}/p/${provinceSlug}/${city.slug}`,
+          }
+        : {
+            en: `${BASE_URL}/en/${countrySlug}/${city.slug}`,
+            nl: `${BASE_URL}/nl/${countrySlug}/${city.slug}`,
+          },
     },
   };
 }
 
 /**
  * Generate metadata for category pages (city + category)
+ * Supports both province-aware and legacy URLs
  */
 export function getCategoryMetadata(
   category: CategoryData,
@@ -200,10 +219,16 @@ export function getCategoryMetadata(
 ): Metadata {
   const countryName = city.country?.name || "";
   const countrySlug = city.country?.slug || "";
+  const provinceSlug = city.province?.slug;
   const categoryName = category.labelKey;
 
   const title = `${categoryName} in ${city.name}${countryName ? `, ${countryName}` : ""}`;
   const description = `Find ${placeCount ? `${placeCount} ` : ""}${categoryName.toLowerCase()} in ${city.name}. Compare reviews, prices, and services. Book appointments with trusted pet care providers.`;
+
+  // Build URL path with or without province
+  const categoryPath = provinceSlug
+    ? `/${locale}/${countrySlug}/p/${provinceSlug}/${city.slug}/${category.slug}`
+    : `/${locale}/${countrySlug}/${city.slug}/${category.slug}`;
 
   return {
     title,
@@ -217,7 +242,7 @@ export function getCategoryMetadata(
     openGraph: {
       title,
       description,
-      url: `${BASE_URL}/${locale}/${countrySlug}/${city.slug}/${category.slug}`,
+      url: `${BASE_URL}${categoryPath}`,
       type: "website",
       locale: locale === "nl" ? "nl_NL" : "en_US",
     },
@@ -227,24 +252,31 @@ export function getCategoryMetadata(
       description,
     },
     alternates: {
-      canonical: `${BASE_URL}/${locale}/${countrySlug}/${city.slug}/${category.slug}`,
-      languages: {
-        en: `${BASE_URL}/en/${countrySlug}/${city.slug}/${category.slug}`,
-        nl: `${BASE_URL}/nl/${countrySlug}/${city.slug}/${category.slug}`,
-      },
+      canonical: `${BASE_URL}${categoryPath}`,
+      languages: provinceSlug
+        ? {
+            en: `${BASE_URL}/en/${countrySlug}/p/${provinceSlug}/${city.slug}/${category.slug}`,
+            nl: `${BASE_URL}/nl/${countrySlug}/p/${provinceSlug}/${city.slug}/${category.slug}`,
+          }
+        : {
+            en: `${BASE_URL}/en/${countrySlug}/${city.slug}/${category.slug}`,
+            nl: `${BASE_URL}/nl/${countrySlug}/${city.slug}/${category.slug}`,
+          },
     },
   };
 }
 
 /**
  * Generate metadata for individual place/listing pages
+ * Supports both province-aware and legacy URLs
  */
 export function getPlaceMetadata(
   place: PlaceData,
   citySlug: string,
   countrySlug: string,
   categorySlug: string,
-  locale: string
+  locale: string,
+  provinceSlug?: string
 ): Metadata {
   const cityName = place.city?.name || "";
   const countryName = place.city?.country?.name || "";
@@ -275,6 +307,11 @@ export function getPlaceMetadata(
     keywords.push(`verified ${primaryCategory.toLowerCase()}`);
   }
 
+  // Build URL path with or without province
+  const placePath = provinceSlug
+    ? `/${locale}/${countrySlug}/p/${provinceSlug}/${citySlug}/${categorySlug}/${place.slug}`
+    : `/${locale}/${countrySlug}/${citySlug}/${categorySlug}/${place.slug}`;
+
   return {
     title,
     description,
@@ -282,7 +319,7 @@ export function getPlaceMetadata(
     openGraph: {
       title: `${place.name} - ${primaryCategory} in ${cityName}`,
       description,
-      url: `${BASE_URL}/${locale}/${countrySlug}/${citySlug}/${categorySlug}/${place.slug}`,
+      url: `${BASE_URL}${placePath}`,
       type: "website",
       locale: locale === "nl" ? "nl_NL" : "en_US",
     },
@@ -292,11 +329,16 @@ export function getPlaceMetadata(
       description,
     },
     alternates: {
-      canonical: `${BASE_URL}/${locale}/${countrySlug}/${citySlug}/${categorySlug}/${place.slug}`,
-      languages: {
-        en: `${BASE_URL}/en/${countrySlug}/${citySlug}/${categorySlug}/${place.slug}`,
-        nl: `${BASE_URL}/nl/${countrySlug}/${citySlug}/${categorySlug}/${place.slug}`,
-      },
+      canonical: `${BASE_URL}${placePath}`,
+      languages: provinceSlug
+        ? {
+            en: `${BASE_URL}/en/${countrySlug}/p/${provinceSlug}/${citySlug}/${categorySlug}/${place.slug}`,
+            nl: `${BASE_URL}/nl/${countrySlug}/p/${provinceSlug}/${citySlug}/${categorySlug}/${place.slug}`,
+          }
+        : {
+            en: `${BASE_URL}/en/${countrySlug}/${citySlug}/${categorySlug}/${place.slug}`,
+            nl: `${BASE_URL}/nl/${countrySlug}/${citySlug}/${categorySlug}/${place.slug}`,
+          },
     },
   };
 }

@@ -346,32 +346,21 @@ export async function generateContent(
     }
   }
 
-  // 2. If AI is disabled, use fallback templates
-  if (!AI_ENABLED) {
-    const fallbackContent = generateFallbackContent(type, data, locale);
-    return {
-      content: fallbackContent,
-      fromCache: false,
-      isStale: false,
-      version: "fallback",
-    };
-  }
-
-  // 3. NON-BLOCKING: Return fallback immediately, generate AI in background
-  // This prevents 20-30 second page loads for uncached content
+  // 2. AI generation on page visits is DISABLED
+  // We only use cached content (pre-generated via scripts) or fallback templates
+  // This prevents uncontrolled API costs from user visits
+  //
+  // To generate AI content, use scripts like:
+  // - npx tsx scripts/generate-ai-content.ts
+  // - npx tsx scripts/enrich-content.ts
+  //
+  // The AI_ENABLED flag is now only respected by those scripts, not runtime
   const fallbackContent = generateFallbackContent(type, data, locale);
-
-  // Fire-and-forget: Generate AI content in background and cache it
-  // Next page load will use the cached AI content
-  generateAndCacheInBackground(cacheKey, type, data, locale).catch((error) => {
-    console.error(`Background AI generation failed for ${cacheKey}:`, error);
-  });
-
   return {
     content: fallbackContent,
     fromCache: false,
-    isStale: true, // Mark as stale so we know AI content is being generated
-    version: "fallback-pending",
+    isStale: false,
+    version: "fallback",
   };
 }
 

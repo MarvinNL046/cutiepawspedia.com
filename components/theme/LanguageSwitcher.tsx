@@ -19,6 +19,8 @@ const locales = [
   { code: "nl", label: "Nederlands", flag: "🇳🇱" },
   { code: "de", label: "Deutsch", flag: "🇩🇪" },
   { code: "fr", label: "Français", flag: "🇫🇷" },
+  { code: "es", label: "Español", flag: "🇪🇸" },
+  { code: "it", label: "Italiano", flag: "🇮🇹" },
 ];
 
 /**

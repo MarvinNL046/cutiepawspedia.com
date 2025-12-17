@@ -259,7 +259,7 @@ export interface SeoConfig {
 export const DEFAULT_SEO_CONFIG: SeoConfig = {
   siteName: "CutiePawsPedia",
   defaultLocale: "nl",
-  supportedLocales: ["nl", "en", "de", "fr"],
+  supportedLocales: ["nl", "en", "de", "fr", "es", "it"],
   twitterHandle: "@cutiepawspedia",
   defaultImage: "/images/og-default.jpg",
 };

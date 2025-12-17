@@ -1,9 +1,9 @@
 /**
  * i18n Configuration for CutiePawsPedia
- * Supports: Dutch (nl), German (de), English (en), French (fr)
+ * Supports: Dutch (nl), German (de), English (en), French (fr), Spanish (es), Italian (it)
  */
 
-export const locales = ['nl', 'de', 'en', 'fr'] as const;
+export const locales = ['nl', 'de', 'en', 'fr', 'es', 'it'] as const;
 export type Locale = (typeof locales)[number];
 
 export const defaultLocale: Locale = 'nl';
@@ -14,6 +14,8 @@ export const localeNames: Record<Locale, string> = {
   de: 'Deutsch',
   en: 'English',
   fr: 'Français',
+  es: 'Español',
+  it: 'Italiano',
 };
 
 // Locale to country mapping (primary country for each locale)
@@ -22,6 +24,8 @@ export const localeCountries: Record<Locale, string> = {
   de: 'DE',
   en: 'GB',
   fr: 'FR',
+  es: 'ES',
+  it: 'IT',
 };
 
 // Countries that use each locale
@@ -36,6 +40,8 @@ export const countryToLocale: Record<string, Locale> = {
   US: 'en',
   FR: 'fr',
   LU: 'fr', // Luxembourg defaults to French
+  ES: 'es', // Spain uses Spanish
+  IT: 'it', // Italy uses Italian
 };
 
 // Check if a string is a valid locale

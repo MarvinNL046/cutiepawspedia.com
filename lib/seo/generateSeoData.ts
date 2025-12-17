@@ -34,7 +34,7 @@ import {
 import type { ContentLocale } from "./aiContent";
 
 // Locale type for SEO templates (all supported locales)
-type SeoLocale = "nl" | "en" | "de" | "fr";
+type SeoLocale = "nl" | "en" | "de" | "fr" | "es" | "it";
 import {
   generateHomeContent,
   generateCountryContent,
@@ -77,12 +77,16 @@ const TITLE_TEMPLATES = {
     en: "CutiePawsPedia - Find the best pet services near you",
     de: "CutiePawsPedia - Finden Sie die besten Haustierservices in Ihrer Nähe",
     fr: "CutiePawsPedia - Trouvez les meilleurs services pour animaux près de chez vous",
+    es: "CutiePawsPedia - Encuentra los mejores servicios para mascotas cerca de ti",
+    it: "CutiePawsPedia - Trova i migliori servizi per animali vicino a te",
   },
   country: {
     nl: (country: string) => `Huisdierservices in ${country} | CutiePawsPedia`,
     en: (country: string) => `Pet Services in ${country} | CutiePawsPedia`,
     de: (country: string) => `Haustierservices in ${country} | CutiePawsPedia`,
     fr: (country: string) => `Services pour animaux en ${country} | CutiePawsPedia`,
+    es: (country: string) => `Servicios para mascotas en ${country} | CutiePawsPedia`,
+    it: (country: string) => `Servizi per animali in ${country} | CutiePawsPedia`,
   },
   city: {
     nl: (city: string, country: string) =>
@@ -93,6 +97,10 @@ const TITLE_TEMPLATES = {
       `Haustierservices in ${city}, ${country} | CutiePawsPedia`,
     fr: (city: string, country: string) =>
       `Services pour animaux à ${city}, ${country} | CutiePawsPedia`,
+    es: (city: string, country: string) =>
+      `Servicios para mascotas en ${city}, ${country} | CutiePawsPedia`,
+    it: (city: string, country: string) =>
+      `Servizi per animali a ${city}, ${country} | CutiePawsPedia`,
   },
   category: {
     nl: (category: string, city: string) =>
@@ -103,6 +111,10 @@ const TITLE_TEMPLATES = {
       `${category} in ${city} | CutiePawsPedia`,
     fr: (category: string, city: string) =>
       `${category} à ${city} | CutiePawsPedia`,
+    es: (category: string, city: string) =>
+      `${category} en ${city} | CutiePawsPedia`,
+    it: (category: string, city: string) =>
+      `${category} a ${city} | CutiePawsPedia`,
   },
   place: {
     nl: (place: string, city: string) =>
@@ -112,6 +124,10 @@ const TITLE_TEMPLATES = {
     de: (place: string, city: string) =>
       `${place} - ${city} | CutiePawsPedia`,
     fr: (place: string, city: string) =>
+      `${place} - ${city} | CutiePawsPedia`,
+    es: (place: string, city: string) =>
+      `${place} - ${city} | CutiePawsPedia`,
+    it: (place: string, city: string) =>
       `${place} - ${city} | CutiePawsPedia`,
   },
 };
@@ -126,6 +142,8 @@ const DESCRIPTION_TEMPLATES = {
     en: "Discover the best veterinarians, pet groomers, pet stores and more in the Netherlands, Belgium and Germany. Find and compare pet services near you.",
     de: "Entdecken Sie die besten Tierärzte, Hundefriseure, Tierhandlungen und mehr in Deutschland. Finden und vergleichen Sie Haustierservices in Ihrer Nähe.",
     fr: "Découvrez les meilleurs vétérinaires, toiletteurs, animaleries et plus en Belgique et en France. Trouvez et comparez les services pour animaux près de chez vous.",
+    es: "Descubre los mejores veterinarios, peluqueros de mascotas, tiendas de animales y más. Encuentra y compara servicios para mascotas cerca de ti.",
+    it: "Scopri i migliori veterinari, toelettatori, negozi di animali e altro ancora. Trova e confronta i servizi per animali vicino a te.",
   },
   country: {
     nl: (country: string, cityCount: number) =>
@@ -136,6 +154,10 @@ const DESCRIPTION_TEMPLATES = {
       `Finden Sie Haustierservices in ${country}. Entdecken Sie Tierärzte, Hundefriseure und Tierhandlungen in ${cityCount} Städten.`,
     fr: (country: string, cityCount: number) =>
       `Trouvez des services pour animaux en ${country}. Découvrez vétérinaires, toiletteurs et animaleries dans ${cityCount} villes.`,
+    es: (country: string, cityCount: number) =>
+      `Encuentra servicios para mascotas en ${country}. Descubre veterinarios, peluqueros y tiendas de animales en ${cityCount} ciudades.`,
+    it: (country: string, cityCount: number) =>
+      `Trova servizi per animali in ${country}. Scopri veterinari, toelettatori e negozi di animali in ${cityCount} città.`,
   },
   city: {
     nl: (city: string, placeCount: number) =>
@@ -146,6 +168,10 @@ const DESCRIPTION_TEMPLATES = {
       `Entdecken Sie ${placeCount}+ Haustierservices in ${city}. Finden Sie Tierärzte, Hundefriseure, Tierhandlungen und mehr.`,
     fr: (city: string, placeCount: number) =>
       `Découvrez ${placeCount}+ services pour animaux à ${city}. Trouvez vétérinaires, toiletteurs, animaleries et plus.`,
+    es: (city: string, placeCount: number) =>
+      `Descubre ${placeCount}+ servicios para mascotas en ${city}. Encuentra veterinarios, peluqueros, tiendas de animales y más.`,
+    it: (city: string, placeCount: number) =>
+      `Scopri ${placeCount}+ servizi per animali a ${city}. Trova veterinari, toelettatori, negozi di animali e altro.`,
   },
   category: {
     nl: (category: string, city: string, count: number) =>
@@ -156,6 +182,10 @@ const DESCRIPTION_TEMPLATES = {
       `Vergleichen Sie ${count} ${category.toLowerCase()} in ${city}. Sehen Sie Bewertungen, Öffnungszeiten und Kontaktdaten.`,
     fr: (category: string, city: string, count: number) =>
       `Comparez ${count} ${category.toLowerCase()} à ${city}. Voir avis, horaires et coordonnées.`,
+    es: (category: string, city: string, count: number) =>
+      `Compara ${count} ${category.toLowerCase()} en ${city}. Ver opiniones, horarios y datos de contacto.`,
+    it: (category: string, city: string, count: number) =>
+      `Confronta ${count} ${category.toLowerCase()} a ${city}. Vedi recensioni, orari e contatti.`,
   },
   place: {
     nl: (place: string, category: string, city: string, description?: string) =>
@@ -170,6 +200,12 @@ const DESCRIPTION_TEMPLATES = {
     fr: (place: string, category: string, city: string, description?: string) =>
       description ||
       `${place} est un ${category.toLowerCase()} à ${city}. Voir avis, horaires et coordonnées.`,
+    es: (place: string, category: string, city: string, description?: string) =>
+      description ||
+      `${place} es un ${category.toLowerCase()} en ${city}. Ver opiniones, horarios y datos de contacto.`,
+    it: (place: string, category: string, city: string, description?: string) =>
+      description ||
+      `${place} è un ${category.toLowerCase()} a ${city}. Vedi recensioni, orari e contatti.`,
   },
 };
 
@@ -177,15 +213,15 @@ const DESCRIPTION_TEMPLATES = {
 // CATEGORY TRANSLATIONS
 // =============================================================================
 
-const CATEGORY_LABELS: Record<string, { nl: string; en: string; de: string; fr: string }> = {
-  veterinary: { nl: "Dierenartsen", en: "Veterinarians", de: "Tierärzte", fr: "Vétérinaires" },
-  "pet-store": { nl: "Dierenwinkels", en: "Pet Stores", de: "Tierhandlungen", fr: "Animaleries" },
-  grooming: { nl: "Trimsalons", en: "Pet Groomers", de: "Hundefriseure", fr: "Toiletteurs" },
-  "animal-shelter": { nl: "Dierenopvang", en: "Animal Shelters", de: "Tierheime", fr: "Refuges" },
-  boarding: { nl: "Dierenpensions", en: "Pet Boarding", de: "Tierpensionen", fr: "Pensions" },
-  "dog-park": { nl: "Hondenuitlaatgebieden", en: "Dog Parks", de: "Hundeparks", fr: "Parcs canins" },
-  "pet-cafe": { nl: "Huisdiervriendelijke cafés", en: "Pet-friendly Cafes", de: "Tierfreundliche Cafés", fr: "Cafés accueillants" },
-  cemetery: { nl: "Dierenbegraafplaatsen", en: "Pet Cemeteries", de: "Tierfriedhöfe", fr: "Cimetières" },
+const CATEGORY_LABELS: Record<string, { nl: string; en: string; de: string; fr: string; es: string; it: string }> = {
+  veterinary: { nl: "Dierenartsen", en: "Veterinarians", de: "Tierärzte", fr: "Vétérinaires", es: "Veterinarios", it: "Veterinari" },
+  "pet-store": { nl: "Dierenwinkels", en: "Pet Stores", de: "Tierhandlungen", fr: "Animaleries", es: "Tiendas de mascotas", it: "Negozi di animali" },
+  grooming: { nl: "Trimsalons", en: "Pet Groomers", de: "Hundefriseure", fr: "Toiletteurs", es: "Peluqueros de mascotas", it: "Toelettatori" },
+  "animal-shelter": { nl: "Dierenopvang", en: "Animal Shelters", de: "Tierheime", fr: "Refuges", es: "Refugios de animales", it: "Rifugi per animali" },
+  boarding: { nl: "Dierenpensions", en: "Pet Boarding", de: "Tierpensionen", fr: "Pensions", es: "Residencias de mascotas", it: "Pensioni per animali" },
+  "dog-park": { nl: "Hondenuitlaatgebieden", en: "Dog Parks", de: "Hundeparks", fr: "Parcs canins", es: "Parques para perros", it: "Parchi per cani" },
+  "pet-cafe": { nl: "Huisdiervriendelijke cafés", en: "Pet-friendly Cafes", de: "Tierfreundliche Cafés", fr: "Cafés accueillants", es: "Cafeterías pet-friendly", it: "Bar pet-friendly" },
+  cemetery: { nl: "Dierenbegraafplaatsen", en: "Pet Cemeteries", de: "Tierfriedhöfe", fr: "Cimetières", es: "Cementerios de mascotas", it: "Cimiteri per animali" },
 };
 
 function getCategoryLabel(slug: string, locale: string): string {

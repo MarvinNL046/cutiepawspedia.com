@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://cutiepawspedia.nl";
+const baseUrl = process.env.APP_BASE_URL || "https://cutiepawspedia.com";
 
 // Dutch pillars
 const pillarsNl = [

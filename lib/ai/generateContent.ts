@@ -793,6 +793,7 @@ function generateFallbackContent(
         rating: placeData.rating,
         reviewCount: placeData.reviewCount,
         description: placeData.description,
+        aboutUs: placeData.aboutUs, // Pass E-E-A-T enriched content
         address: placeData.address,
       });
       break;

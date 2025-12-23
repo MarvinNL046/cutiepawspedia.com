@@ -152,6 +152,7 @@ export interface PlaceContentInput extends AiContentInputBase {
   rating?: number;
   reviewCount?: number;
   description?: string; // existing description from DB/Jina
+  aboutUs?: string; // E-E-A-T content from Jina+GPT enrichment
   address?: string;
   services?: string[];
   petTypes?: string[];

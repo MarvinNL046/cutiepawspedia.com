@@ -407,13 +407,14 @@ export function generatePlaceContent(input: PlaceContentInput): SeoContentResult
     rating,
     reviewCount,
     description,
+    aboutUs, // E-E-A-T enriched content from Jina+GPT
     services,
     petTypes,
   } = input;
   const s = getLocalizedStrings(locale);
 
-  // Start with existing description or generate one
-  let intro = description || "";
+  // Priority: aboutUs (E-E-A-T content) > description > generated fallback
+  let intro = aboutUs || description || "";
 
   if (!intro) {
     const categoryNames = categories
@@ -471,7 +472,8 @@ export function generatePlaceContent(input: PlaceContentInput): SeoContentResult
   );
 
   return {
-    intro: truncateText(intro, 300),
+    // Don't truncate if we have full aboutUs content (E-E-A-T)
+    intro: aboutUs ? intro : truncateText(intro, 300),
     secondary,
     bullets: bullets.length > 0 ? bullets : undefined,
     metaDescription,

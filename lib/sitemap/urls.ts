@@ -450,3 +450,49 @@ export async function getPlaceSitemapPageCount(
   const urls = await buildPlaceUrls(config);
   return Math.max(1, Math.ceil(urls.length / config.maxUrlsPerSitemap));
 }
+
+/**
+ * Get the number of paginated category sitemaps needed
+ */
+export async function getCategorySitemapPageCount(
+  config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
+): Promise<number> {
+  const urls = await buildCategoryUrls(config);
+  return Math.max(1, Math.ceil(urls.length / config.maxUrlsPerSitemap));
+}
+
+/**
+ * Get paginated category URLs for a specific page
+ */
+export async function buildCategoryUrlsPaginated(
+  page: number,
+  config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
+): Promise<SitemapUrl[]> {
+  const allUrls = await buildCategoryUrls(config);
+  const start = (page - 1) * config.maxUrlsPerSitemap;
+  const end = start + config.maxUrlsPerSitemap;
+  return allUrls.slice(start, end);
+}
+
+/**
+ * Get the number of paginated best-in-city sitemaps needed
+ */
+export async function getBestInCitySitemapPageCount(
+  config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
+): Promise<number> {
+  const urls = await buildBestInCityUrls(config);
+  return Math.max(1, Math.ceil(urls.length / config.maxUrlsPerSitemap));
+}
+
+/**
+ * Get paginated best-in-city URLs for a specific page
+ */
+export async function buildBestInCityUrlsPaginated(
+  page: number,
+  config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
+): Promise<SitemapUrl[]> {
+  const allUrls = await buildBestInCityUrls(config);
+  const start = (page - 1) * config.maxUrlsPerSitemap;
+  const end = start + config.maxUrlsPerSitemap;
+  return allUrls.slice(start, end);
+}

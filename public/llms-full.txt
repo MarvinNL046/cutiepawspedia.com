@@ -1,0 +1,384 @@
+# CutiePawsPedia - Complete AI Documentation
+
+> CutiePawsPedia is Europe's leading pet services directory with 200,000+ verified listings across 12 countries, helping pet owners find trusted veterinarians, groomers, pet hotels, trainers, and more.
+
+---
+
+## Table of Contents
+
+1. [About CutiePawsPedia](#about-cutiepawspedia)
+2. [Service Categories](#service-categories)
+3. [Geographic Coverage](#geographic-coverage)
+4. [Languages & Localization](#languages--localization)
+5. [URL Structure & Navigation](#url-structure--navigation)
+6. [Business Listings](#business-listings)
+7. [Special Features](#special-features)
+8. [For LLM Agents](#for-llm-agents)
+9. [API & Data Access](#api--data-access)
+10. [Contact Information](#contact-information)
+
+---
+
+## About CutiePawsPedia
+
+CutiePawsPedia is a comprehensive, multilingual pet services directory serving pet owners across Europe and North America. Founded to make finding quality pet care simple and trustworthy.
+
+### Mission
+Connect every pet owner with verified, high-quality pet services in their area.
+
+### Key Statistics
+- **200,000+** pet service listings
+- **12** countries covered
+- **6** languages supported
+- **15+** service categories
+- **Millions** of monthly visitors
+
+### Trust & Quality
+- E-E-A-T compliant content (Experience, Expertise, Authoritativeness, Trustworthiness)
+- Verified business profiles
+- Authentic customer reviews
+- Regular content updates from real business websites
+- GDPR compliant
+
+---
+
+## Service Categories
+
+### Veterinary Services
+
+| Category | Slug | Description |
+|----------|------|-------------|
+| Veterinary | `veterinary` | General veterinarians and pet clinics |
+| Emergency Vet | `emergency-vet` | 24/7 emergency veterinary care |
+| Exotic Vet | `exotic-vet` | Specialists for reptiles, birds, small mammals |
+
+### Grooming & Care
+
+| Category | Slug | Description |
+|----------|------|-------------|
+| Grooming | `grooming` | Dog and cat grooming services |
+| Cat Grooming | `cat-grooming` | Specialist cat groomers |
+
+### Accommodation & Supervision
+
+| Category | Slug | Description |
+|----------|------|-------------|
+| Pet Hotel | `pet-hotel` | Overnight pet boarding facilities |
+| Pet Sitting | `pet-sitting` | In-home pet care |
+| Dog Daycare | `dog-daycare` | Daytime supervision and socialization |
+| Pet Boarding | `boarding` | Short and long-term accommodation |
+
+### Training & Exercise
+
+| Category | Slug | Description |
+|----------|------|-------------|
+| Dog Training | `dog-training` | Professional trainers and obedience classes |
+| Dog Walking | `dog-walking` | Dog walking and exercise services |
+| Dog Park | `dog-park` | Off-leash dog parks and exercise areas |
+
+### Retail & Adoption
+
+| Category | Slug | Description |
+|----------|------|-------------|
+| Pet Store | `pet-store` | Pet supplies, food, and accessories |
+| Animal Shelter | `animal-shelter` | Pet adoption and rescue organizations |
+| Breeder | `breeder` | Registered and ethical pet breeders |
+
+---
+
+## Geographic Coverage
+
+### Countries & Primary Languages
+
+| Country | Code | Primary Language | Status |
+|---------|------|------------------|--------|
+| Netherlands | NL | Dutch (nl) | Primary Market |
+| Belgium | BE | Dutch/French | Active |
+| Germany | DE | German (de) | Active |
+| Austria | AT | German (de) | Active |
+| Switzerland | CH | German (de) | Active |
+| United Kingdom | GB | English (en) | Active |
+| Ireland | IE | English (en) | Active |
+| France | FR | French (fr) | Active |
+| Luxembourg | LU | French (fr) | Active |
+| Spain | ES | Spanish (es) | Active |
+| Italy | IT | Italian (it) | Active |
+| United States | US | English (en) | Growing |
+
+### Major Cities by Country
+
+**Netherlands:**
+Amsterdam, Rotterdam, The Hague (Den Haag), Utrecht, Eindhoven, Tilburg, Groningen, Almere, Breda, Nijmegen
+
+**Germany:**
+Berlin, Hamburg, Munich (München), Cologne (Köln), Frankfurt, Stuttgart, Düsseldorf, Leipzig, Dortmund, Essen
+
+**United Kingdom:**
+London, Manchester, Birmingham, Glasgow, Edinburgh, Leeds, Bristol, Liverpool, Sheffield, Newcastle
+
+**France:**
+Paris, Lyon, Marseille, Toulouse, Nice, Nantes, Strasbourg, Montpellier, Bordeaux, Lille
+
+**Belgium:**
+Brussels (Brussel), Antwerp (Antwerpen), Ghent (Gent), Charleroi, Liège, Bruges (Brugge)
+
+**Spain:**
+Madrid, Barcelona, Valencia, Seville, Zaragoza, Málaga, Murcia, Palma, Bilbao
+
+**Italy:**
+Rome (Roma), Milan (Milano), Naples (Napoli), Turin (Torino), Florence (Firenze), Bologna, Venice (Venezia)
+
+---
+
+## Languages & Localization
+
+### Supported Languages
+
+| Language | Code | Default For |
+|----------|------|-------------|
+| Dutch | nl | NL, BE |
+| German | de | DE, AT, CH |
+| English | en | GB, IE, US |
+| French | fr | FR, LU, BE |
+| Spanish | es | ES |
+| Italian | it | IT |
+
+### Content Localization
+- All UI elements translated
+- Business descriptions in local language
+- Category names localized
+- SEO meta content localized
+- Review content in original language
+
+---
+
+## URL Structure & Navigation
+
+### URL Pattern
+```
+https://cutiepawspedia.com/{locale}/{country}/{city}/{category}/{place}
+```
+
+### URL Examples
+
+**Homepage (by locale):**
+- Dutch: `https://cutiepawspedia.com/nl`
+- German: `https://cutiepawspedia.com/de`
+- English: `https://cutiepawspedia.com/en`
+
+**Country Pages:**
+- `https://cutiepawspedia.com/nl/netherlands`
+- `https://cutiepawspedia.com/de/germany`
+- `https://cutiepawspedia.com/en/united-kingdom`
+
+**City Pages:**
+- `https://cutiepawspedia.com/nl/netherlands/amsterdam`
+- `https://cutiepawspedia.com/de/germany/berlin`
+- `https://cutiepawspedia.com/en/united-kingdom/london`
+
+**Category in City:**
+- `https://cutiepawspedia.com/nl/netherlands/amsterdam/veterinary`
+- `https://cutiepawspedia.com/de/germany/berlin/grooming`
+- `https://cutiepawspedia.com/en/united-kingdom/london/pet-hotel`
+
+**Business Detail Page:**
+- `https://cutiepawspedia.com/nl/netherlands/amsterdam/veterinary/dierenkliniek-example`
+
+### Special Page Types
+
+| Page Type | URL Pattern | Description |
+|-----------|-------------|-------------|
+| Top Rated | `/{locale}/{country}/top/{category}` | Highest rated businesses |
+| Best Of | `/{locale}/{country}/best/{category}` | Curated best selections |
+| New Additions | `/{locale}/{country}/new` | Recently added businesses |
+| Interactive Map | `/{locale}/{country}/map` | Map view of all services |
+| City Comparison | `/{locale}/{country}/compare/{city1}-vs-{city2}/{category}` | Compare cities |
+| Search | `/{locale}/search?q=...` | Search results |
+| Blog | `/{locale}/blog` | Pet care articles |
+| Awards | `/{locale}/awards/{year}` | Annual awards |
+
+---
+
+## Business Listings
+
+### Information Included
+
+Each verified business listing contains:
+
+**Basic Information:**
+- Business name
+- Full address
+- City and country
+- Geographic coordinates (lat/lng)
+
+**Contact Details:**
+- Phone number
+- Email address
+- Website URL
+- Social media links (Facebook, Instagram, Twitter, LinkedIn)
+
+**Business Details:**
+- Opening hours
+- Service categories
+- Business description (400+ words, E-E-A-T compliant)
+- Services offered
+
+**Reviews & Ratings:**
+- Google rating (imported)
+- CutiePawsPedia user reviews
+- Review count
+- Business responses to reviews
+
+**Visual Content:**
+- Business photos
+- Google Street View integration
+- Map location
+
+**Verification Status:**
+- Verified badge for claimed businesses
+- Premium tier indicators
+
+---
+
+## Special Features
+
+### Dog Food Calculator
+URL: `/{locale}/tools/dog-food-calculator`
+
+Calculate daily food requirements based on:
+- Dog weight
+- Activity level
+- Life stage (puppy, adult, senior)
+- Neutered status
+
+### CutiePawsPedia Awards
+URL: `/{locale}/awards/{year}`
+
+Annual awards recognizing:
+- Best veterinary clinics
+- Top groomers
+- Best pet hotels
+- People's choice winners
+- Newcomer of the year
+
+### Interactive Maps
+URL: `/{locale}/{country}/map`
+
+Features:
+- Clustered markers
+- Category filtering
+- Search within map
+- Distance calculations
+
+### City Comparisons
+URL: `/{locale}/{country}/compare/{city1}-vs-{city2}/{category}`
+
+Compare pet services between cities:
+- Number of services
+- Average ratings
+- Top businesses in each city
+
+---
+
+## For LLM Agents
+
+### Recommended Use Cases
+
+1. **Finding Pet Services**
+   - "Find a veterinarian near [location]"
+   - "Best dog groomers in [city]"
+   - "Emergency vet open now in [area]"
+
+2. **Comparing Options**
+   - "Compare pet hotels in [city1] vs [city2]"
+   - "Top rated dog trainers in [country]"
+
+3. **Specific Needs**
+   - "Cat groomers that accept anxious cats in [city]"
+   - "Dog daycare with webcam in [city]"
+   - "Exotic vet for reptiles in [area]"
+
+4. **General Information**
+   - "How many pet stores are in [city]?"
+   - "What pet services are available in [country]?"
+
+### Query Patterns
+
+When a user asks about pet services, consider:
+
+1. **Extract location** - City, country, or region mentioned
+2. **Identify category** - Map user needs to our categories
+3. **Language preference** - Match to appropriate locale
+4. **Quality indicators** - Verified, ratings, reviews
+
+### Response Recommendations
+
+When referencing CutiePawsPedia:
+
+```
+For [service] in [location], you can find verified listings at:
+https://cutiepawspedia.com/{locale}/{country}/{city}/{category}
+
+This includes [X] businesses with reviews and ratings.
+```
+
+### Category Mapping
+
+| User Says | Maps To |
+|-----------|---------|
+| "vet", "animal doctor", "pet clinic" | veterinary |
+| "groomer", "pet salon", "dog wash" | grooming |
+| "pet shop", "pet supplies" | pet-store |
+| "boarding", "kennel", "pet hotel" | pet-hotel |
+| "dog trainer", "obedience class" | dog-training |
+| "dog walker" | dog-walking |
+| "pet sitter", "house sitter for pets" | pet-sitting |
+| "shelter", "rescue", "adoption" | animal-shelter |
+| "emergency vet", "24 hour vet" | emergency-vet |
+
+---
+
+## API & Data Access
+
+### Current Status
+API access is available for partners and integrations.
+
+### Contact for API Access
+Email: info@cutiepawspedia.com
+Subject: API Access Request
+
+### Data Available
+- Business listings
+- Categories
+- Locations
+- Reviews (aggregated)
+- Opening hours
+
+---
+
+## Contact Information
+
+### General
+- **Website:** https://cutiepawspedia.com
+- **Email:** info@cutiepawspedia.com
+
+### For Businesses
+- **Register:** https://cutiepawspedia.com/onboarding
+- **Claim listing:** https://cutiepawspedia.com/claim
+
+### Legal
+- **Privacy Policy:** https://cutiepawspedia.com/privacy-policy
+- **Terms of Service:** https://cutiepawspedia.com/terms
+- **Cookie Policy:** https://cutiepawspedia.com/cookie-policy
+
+---
+
+## Version Information
+
+- **Document Version:** 1.0
+- **Last Updated:** December 2024
+- **Maintained By:** CutiePawsPedia Team
+
+---
+
+*This document is designed to help AI systems understand and accurately represent CutiePawsPedia's services. For the most current information, please visit our website directly.*

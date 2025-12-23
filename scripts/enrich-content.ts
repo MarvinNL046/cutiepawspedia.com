@@ -31,6 +31,7 @@ interface Place {
   address: string | null;
   city_name: string;
   country_name: string;
+  country_code: string;
   website: string | null;
   phone: string | null;
   avg_rating: string | null;
@@ -42,6 +43,92 @@ interface Place {
   scraped_content: Record<string, unknown> | null;
 }
 
+/**
+ * Get language configuration based on country code
+ */
+function getLocaleConfig(countryCode: string): {
+  language: string;
+  languageName: string;
+  noRating: string;
+  noAddress: string;
+  noWebsite: string;
+} {
+  const configs: Record<string, typeof configs.NL> = {
+    NL: {
+      language: "Dutch",
+      languageName: "Nederlands",
+      noRating: "Geen rating",
+      noAddress: "Niet beschikbaar",
+      noWebsite: "Niet beschikbaar",
+    },
+    BE: {
+      language: "Dutch",
+      languageName: "Nederlands",
+      noRating: "Geen rating",
+      noAddress: "Niet beschikbaar",
+      noWebsite: "Niet beschikbaar",
+    },
+    DE: {
+      language: "German",
+      languageName: "Deutsch",
+      noRating: "Keine Bewertung",
+      noAddress: "Nicht verfügbar",
+      noWebsite: "Nicht verfügbar",
+    },
+    GB: {
+      language: "English",
+      languageName: "English",
+      noRating: "No rating",
+      noAddress: "Not available",
+      noWebsite: "Not available",
+    },
+    US: {
+      language: "English",
+      languageName: "English",
+      noRating: "No rating",
+      noAddress: "Not available",
+      noWebsite: "Not available",
+    },
+    CA: {
+      language: "English",
+      languageName: "English",
+      noRating: "No rating",
+      noAddress: "Not available",
+      noWebsite: "Not available",
+    },
+    AU: {
+      language: "English",
+      languageName: "English",
+      noRating: "No rating",
+      noAddress: "Not available",
+      noWebsite: "Not available",
+    },
+    FR: {
+      language: "French",
+      languageName: "Français",
+      noRating: "Pas de note",
+      noAddress: "Non disponible",
+      noWebsite: "Non disponible",
+    },
+    ES: {
+      language: "Spanish",
+      languageName: "Español",
+      noRating: "Sin calificación",
+      noAddress: "No disponible",
+      noWebsite: "No disponible",
+    },
+    IT: {
+      language: "Italian",
+      languageName: "Italiano",
+      noRating: "Nessuna valutazione",
+      noAddress: "Non disponibile",
+      noWebsite: "Non disponibile",
+    },
+  };
+
+  return configs[countryCode] || configs.GB;
+}
+
 interface ContentResult {
   aboutUs: string;
   highlights: string[];
@@ -50,44 +137,46 @@ interface ContentResult {
 }
 
 /**
- * Generate aboutUs content using OpenAI
+ * Generate aboutUs content using OpenAI - LOCALE AWARE
  */
 async function generateAboutContent(place: Place): Promise<ContentResult | null> {
-  const categoryContext = getCategoryContext(place.category_slug);
+  const locale = getLocaleConfig(place.country_code);
+  const categoryContext = getCategoryContext(place.category_slug, place.country_code);
 
-  const prompt = `Je bent een professionele copywriter voor een huisdieren directory website.
-Schrijf een uitgebreide "Over Ons" tekst voor het volgende bedrijf:
+  const prompt = `You are a professional copywriter for a pet services directory website.
+Write an "About Us" text for the following business.
 
-Bedrijfsnaam: ${place.name}
-Categorie: ${place.category_name || place.category_slug || "Huisdierenservice"}
-Adres: ${place.address || "Niet beschikbaar"}
-Stad: ${place.city_name}, ${place.country_name}
-Website: ${place.website || "Niet beschikbaar"}
-Rating: ${place.avg_rating ? `${place.avg_rating}/5` : "Geen rating"}
+IMPORTANT: Write ALL content in ${locale.language} (${locale.languageName}).
+
+Business Name: ${place.name}
+Category: ${place.category_name || place.category_slug || "Pet Service"}
+Address: ${place.address || locale.noAddress}
+City: ${place.city_name}, ${place.country_name}
+Website: ${place.website || locale.noWebsite}
+Rating: ${place.avg_rating ? `${place.avg_rating}/5` : locale.noRating}
 Reviews: ${place.review_count || 0}
 
 ${categoryContext}
 
-Bestaande informatie (indien beschikbaar):
-${place.scraped_content?.aboutUs ? `Huidige beschrijving: ${String(place.scraped_content.aboutUs).slice(0, 500)}` : "Geen bestaande beschrijving"}
+Generate a JSON response with ALL text in ${locale.language}:
+1. "aboutUs": A professional, informative text of 150-250 words in ${locale.language}. Focus on:
+   - What the business does
+   - Quality and expertise
+   - Location advantages
+   - Why customers choose this business
 
-Genereer een JSON response met:
-1. "aboutUs": Een professionele, informatieve tekst van 150-250 woorden in het Nederlands. Focus op:
-   - Wat het bedrijf doet
-   - Kwaliteit en expertise
-   - Locatie voordelen
-   - Waarom klanten voor dit bedrijf kiezen
+2. "highlights": An array of 3-5 short highlights/USPs (max 10 words each) in ${locale.language}
 
-2. "highlights": Een array van 3-5 korte highlights/USPs (max 10 woorden elk)
+3. "services": An array of 4-8 services this type of business typically offers in ${locale.language}
 
-3. "services": Een array van 4-8 diensten die dit type bedrijf typisch aanbiedt
+4. "targetAudience": A short sentence about the target audience in ${locale.language}
 
-4. "targetAudience": Een korte zin over de doelgroep
+Write in a professional but friendly tone. Avoid exaggeration and don't make false claims.
+If little information is available, write general but relevant content for this type of business.
 
-Schrijf in een professionele maar vriendelijke toon. Vermijd overdrijving en maak geen valse claims.
-Als er weinig informatie beschikbaar is, schrijf dan algemene maar relevante content voor dit type bedrijf.
+CRITICAL: All output text MUST be in ${locale.language}. Do not use English unless the country is UK/US/CA/AU.
 
-Antwoord alleen met valid JSON, geen extra tekst.`;
+Respond only with valid JSON, no extra text.`;
 
   try {
     const response = await openai.chat.completions.create({
@@ -95,7 +184,7 @@ Antwoord alleen met valid JSON, geen extra tekst.`;
       messages: [
         {
           role: "system",
-          content: "Je bent een expert copywriter gespecialiseerd in huisdieren diensten. Antwoord alleen met valid JSON.",
+          content: `You are an expert copywriter specialized in pet services. Write in ${locale.language}. Respond only with valid JSON.`,
         },
         {
           role: "user",
@@ -122,89 +211,38 @@ Antwoord alleen met valid JSON, geen extra tekst.`;
 }
 
 /**
- * Get category-specific context for better content generation
+ * Get category-specific context for better content generation - LOCALE AWARE
  */
-function getCategoryContext(category: string | null): string {
-  const contexts: Record<string, string> = {
-    "veterinary": `Dit is een dierenarts/dierenkliniek. Focus op:
-- Medische zorg en expertise
-- Preventieve gezondheid
-- Noodgevallen beschikbaarheid
-- Specialisaties (bijv. honden, katten, exotische dieren)`,
-
-    "vet": `Dit is een dierenarts/dierenkliniek. Focus op:
-- Medische zorg en expertise
-- Preventieve gezondheid
-- Behandelmogelijkheden`,
-
-    "grooming": `Dit is een trimsalon voor huisdieren. Focus op:
-- Vacht verzorging en styling
-- Hygiëne behandelingen
-- Ervaring met verschillende rassen
-- Rustige, stressvrije omgeving`,
-
-    "pet-grooming": `Dit is een trimsalon. Focus op:
-- Professionele verzorging
-- Verschillende behandelingen
-- Rasvaardigheid`,
-
-    "pet-store": `Dit is een dierenwinkel. Focus op:
-- Productassortiment (voeding, speelgoed, accessoires)
-- Merkenkwaliteit
-- Advies en expertise
-- Lokale service`,
-
-    "pet-shops": `Dit is een dierenwinkel. Focus op:
-- Breed assortiment
-- Kwaliteitsproducten
-- Deskundig advies`,
-
-    "pet-hotel": `Dit is een dierenpension/hotel. Focus op:
-- Verblijfkwaliteit en comfort
-- Verzorging en aandacht
-- Veiligheid en toezicht
-- Ruimte en faciliteiten`,
-
-    "pet-boarding": `Dit is een pension. Focus op:
-- Liefdevolle opvang
-- Dagelijkse verzorging
-- Veilige omgeving`,
-
-    "dog-training": `Dit is een hondentraining/school. Focus op:
-- Trainingsmethodes (positief)
-- Gedragscorrectie
-- Puppy cursussen
-- Ervaring en certificeringen`,
-
-    "pet-training": `Dit is een trainingscentrum. Focus op:
-- Professionele begeleiding
-- Verschillende cursussen
-- Resultaatgericht`,
-
-    "dog-walking": `Dit is een hondenuitlaatservice. Focus op:
-- Dagelijkse wandelingen
-- Flexibiliteit en betrouwbaarheid
-- Ervaring met honden
-- Groeps- of individuele wandelingen`,
-
-    "pet-sitting": `Dit is een oppasservice. Focus op:
-- Thuisoppas mogelijkheden
-- Betrouwbaarheid
-- Ervaring met dieren
-- Flexibele afspraken`,
-
-    "pet-daycare": `Dit is een dagopvang/crèche. Focus op:
-- Socialisatie
-- Spel en activiteiten
-- Toezicht en veiligheid
-- Dagprogramma`,
+function getCategoryContext(category: string | null, countryCode: string): string {
+  // Category descriptions in English (GPT will translate to target language)
+  const categories: Record<string, string> = {
+    "veterinary": "veterinary clinic/animal hospital",
+    "vet": "veterinary clinic",
+    "grooming": "pet grooming salon",
+    "pet-grooming": "pet grooming salon",
+    "pet-store": "pet store/shop",
+    "pet-shops": "pet store",
+    "pet-hotel": "pet hotel/boarding facility",
+    "pet-boarding": "pet boarding facility",
+    "dog-training": "dog training school",
+    "pet-training": "pet training center",
+    "dog-walking": "dog walking service",
+    "pet-sitting": "pet sitting service",
+    "pet-daycare": "pet daycare center",
+    "shelter": "animal shelter",
+    "emergency-vet": "emergency veterinary clinic",
+    "exotic-vet": "exotic animal veterinarian",
+    "cat-grooming": "cat grooming salon",
+    "dog-park": "dog park",
   };
 
-  return contexts[category || ""] || `Dit is een huisdieren gerelateerd bedrijf. Focus op:
-- Kwaliteit van service
-- Ervaring en expertise
-- Klantgerichtheid
-- Lokale bereikbaarheid`;
+  const categoryName = categories[category || ""] || "pet-related business";
+
+  return `This is a ${categoryName}. Focus on aspects relevant to this type of business such as:
+- Quality of service and expertise
+- Customer care and satisfaction
+- Location benefits
+- Professional approach`;
 }
 
 /**
@@ -213,8 +251,10 @@ function getCategoryContext(category: string | null): string {
 async function updatePlaceWithContent(
   placeId: number,
   placeName: string,
-  content: ContentResult
+  content: ContentResult,
+  countryCode: string
 ): Promise<boolean> {
+  const locale = getLocaleConfig(countryCode);
   try {
     const scrapedContent = {
       aboutUs: content.aboutUs,
@@ -222,6 +262,7 @@ async function updatePlaceWithContent(
       services: content.services,
       targetAudience: content.targetAudience,
       contentSource: "openai_generated",
+      contentLanguage: locale.language.toLowerCase(),
       contentGeneratedAt: new Date().toISOString(),
     };
 
@@ -306,6 +347,7 @@ async function main() {
       p.scraped_content,
       ci.name as city_name,
       co.name as country_name,
+      co.code as country_code,
       cat.slug as category_slug,
       cat.label_key as category_name
     FROM places p
@@ -331,8 +373,9 @@ async function main() {
   let failed = 0;
 
   for (const place of placesToEnrich) {
+    const locale = getLocaleConfig(place.country_code);
     console.log(`\n🏢 ${place.name}`);
-    console.log(`   📍 ${place.city_name}, ${place.country_name}`);
+    console.log(`   📍 ${place.city_name}, ${place.country_name} (${locale.languageName})`);
     console.log(`   📁 ${place.category_name || place.category_slug || "Unknown"}`);
 
     const content = await generateAboutContent(place);
@@ -343,7 +386,7 @@ async function main() {
         console.log(`   🎯 Highlights: ${content.highlights.join(", ")}`);
         enriched++;
       } else {
-        const updated = await updatePlaceWithContent(place.id, place.name, content);
+        const updated = await updatePlaceWithContent(place.id, place.name, content, place.country_code);
         if (updated) {
           enriched++;
           console.log(`   ✅ Content saved (${content.aboutUs.length} chars)`);

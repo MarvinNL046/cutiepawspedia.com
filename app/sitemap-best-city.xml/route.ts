@@ -1,21 +1,26 @@
 /**
  * Best in City Sitemap Route (/sitemap-best-city.xml)
  *
+ * DEPRECATED: This route now returns the first page of paginated best-in-city URLs.
+ * Use /sitemap-best-city-1.xml, /sitemap-best-city-2.xml, etc. instead.
+ *
  * Contains URLs for "Best X in City" aggregation pages
  * (e.g., /nl/netherlands/amsterdam/best/veterinary)
+ * Limited to first page (10,000 URLs) for backwards compatibility.
  *
  * CACHING STRATEGY: ISR
  * - revalidate: 300s (5 minutes) - Updated with new places
  */
 
 import { NextResponse } from "next/server";
-import { buildSitemapXml, buildBestInCityUrls, DEFAULT_SITEMAP_CONFIG } from "@/lib/sitemap";
+import { buildSitemapXml, buildBestInCityUrlsPaginated, DEFAULT_SITEMAP_CONFIG } from "@/lib/sitemap";
 
 export const revalidate = 300;
 
 export async function GET() {
   try {
-    const urls = await buildBestInCityUrls(DEFAULT_SITEMAP_CONFIG);
+    // Return only the first page for backwards compatibility
+    const urls = await buildBestInCityUrlsPaginated(1, DEFAULT_SITEMAP_CONFIG);
     const xml = buildSitemapXml(urls);
 
     return new NextResponse(xml, {

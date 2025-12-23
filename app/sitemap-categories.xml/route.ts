@@ -1,20 +1,25 @@
 /**
  * Categories Sitemap Route (/sitemap-categories.xml)
  *
- * Contains URLs for all category pages within cities (e.g., /nl/netherlands/amsterdam/veterinary)
+ * DEPRECATED: This route now returns the first page of paginated categories.
+ * Use /sitemap-categories-1.xml, /sitemap-categories-2.xml, etc. instead.
+ *
+ * Contains URLs for category pages within cities (e.g., /nl/netherlands/amsterdam/veterinary)
+ * Limited to first page (10,000 URLs) for backwards compatibility.
  *
  * CACHING STRATEGY: ISR
  * - revalidate: 300s (5 minutes) - Categories updated with new places
  */
 
 import { NextResponse } from "next/server";
-import { buildSitemapXml, buildCategoryUrls, DEFAULT_SITEMAP_CONFIG } from "@/lib/sitemap";
+import { buildSitemapXml, buildCategoryUrlsPaginated, DEFAULT_SITEMAP_CONFIG } from "@/lib/sitemap";
 
 export const revalidate = 300;
 
 export async function GET() {
   try {
-    const urls = await buildCategoryUrls(DEFAULT_SITEMAP_CONFIG);
+    // Return only the first page for backwards compatibility
+    const urls = await buildCategoryUrlsPaginated(1, DEFAULT_SITEMAP_CONFIG);
     const xml = buildSitemapXml(urls);
 
     return new NextResponse(xml, {

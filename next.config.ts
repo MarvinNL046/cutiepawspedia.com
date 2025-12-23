@@ -119,6 +119,18 @@ const nextConfig: NextConfig = {
         source: "/sitemap-places-:page(\\d+).xml",
         destination: "/api/sitemap-places/:page",
       },
+
+      // Rewrite /sitemap-categories-{N}.xml to /api/sitemap-categories/{N}
+      {
+        source: "/sitemap-categories-:page(\\d+).xml",
+        destination: "/api/sitemap-categories/:page",
+      },
+
+      // Rewrite /sitemap-best-city-{N}.xml to /api/sitemap-best-city/{N}
+      {
+        source: "/sitemap-best-city-:page(\\d+).xml",
+        destination: "/api/sitemap-best-city/:page",
+      },
     ];
   },
 

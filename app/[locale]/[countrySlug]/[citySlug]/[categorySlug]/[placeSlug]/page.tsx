@@ -40,7 +40,7 @@ import { PlaceViewTracker } from "@/components/analytics";
 import { Breadcrumbs } from "@/components/layout";
 import { FavoriteButton } from "@/components/favorites/FavoriteButton";
 import { isFavorite } from "@/db/queries/favorites";
-import { MapPin, Phone, Globe, Mail, Star, CheckCircle, MessageSquare, Lock, Shield, Crown } from "lucide-react";
+import { MapPin, Phone, Globe, Mail, Star, CheckCircle, MessageSquare, Lock, Shield, Crown, Facebook, Instagram, Twitter, Linkedin } from "lucide-react";
 import { getCityName, getCountryName } from "@/lib/utils/place-helpers";
 import { AboutSection, ServicesSection, HighlightsSection, BusinessSnapshot, BusinessPhotoGallery, ContentSections, ServiceHighlightsSection, CTASection, GoogleReviewsSection } from "@/components/place";
 import { EditorialByline } from "@/components/seo";
@@ -117,7 +117,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
     // Silently fail if auth check fails
   }
 
-  // Extract scraped content for personalized AI generation
+  // Extract scraped content for personalized AI generation and contact fallback
   const scrapedContent = place.scrapedContent as {
     aboutUs?: string;
     googleRating?: number;
@@ -136,7 +136,24 @@ export default async function PlacePage({ params }: PlacePageProps) {
       specializations?: string[];
       awards?: string[];
     };
+    // Jina scraped metadata - used as fallback when main columns are empty
+    email?: string;
+    phone?: string;
+    socialMedia?: {
+      facebook?: string;
+      instagram?: string;
+      twitter?: string;
+      linkedin?: string;
+    };
+    foundedYear?: number;
+    teamSize?: string;
+    jinaMetadataAt?: string;
   } | null;
+
+  // Effective contact info: main columns take priority, scraped data as fallback
+  const effectiveEmail = place.email || scrapedContent?.email;
+  const effectivePhone = place.phone || scrapedContent?.phone;
+  const socialMedia = scrapedContent?.socialMedia;
 
   // Generate AI content for the place (cached or generated on demand)
   const { content } = await generateContent({
@@ -347,11 +364,11 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 variant="default"
               />
               {/* Call button - only show if plan allows phone display */}
-              {place.phone && placeFeatures.canShowPhone ? (
+              {effectivePhone && placeFeatures.canShowPhone ? (
                 <Button asChild className="bg-cpCoral hover:bg-cpCoral/90 gap-2">
-                  <a href={`tel:${place.phone}`}><Phone className="h-4 w-4" />{t("callNow")}</a>
+                  <a href={`tel:${effectivePhone}`}><Phone className="h-4 w-4" />{t("callNow")}</a>
                 </Button>
-              ) : place.phone && !placeFeatures.canShowPhone ? (
+              ) : effectivePhone && !placeFeatures.canShowPhone ? (
                 <Button variant="outline" className="gap-2 text-slate-400" disabled>
                   <Lock className="h-4 w-4" />{t("phoneHidden")}
                 </Button>
@@ -457,7 +474,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
               <CTASection
                 cta={content.cta}
                 placeName={place.name}
-                phone={placeFeatures.canShowPhone ? place.phone : null}
+                phone={placeFeatures.canShowPhone ? effectivePhone : null}
                 locale={locale}
               />
             )}
@@ -556,15 +573,15 @@ export default async function PlacePage({ params }: PlacePageProps) {
                   </div>
                 )}
 
-                {/* Phone - gated by plan */}
-                {place.phone && placeFeatures.canShowPhone ? (
+                {/* Phone - gated by plan, uses scraped data as fallback */}
+                {effectivePhone && placeFeatures.canShowPhone ? (
                   <div className="flex items-center gap-3">
                     <Phone className="h-5 w-5 text-cpCoral" />
-                    <a href={`tel:${place.phone}`} className="text-cpDark hover:text-cpCoral transition-colors">
-                      {place.phone}
+                    <a href={`tel:${effectivePhone}`} className="text-cpDark hover:text-cpCoral transition-colors">
+                      {effectivePhone}
                     </a>
                   </div>
-                ) : place.phone && !placeFeatures.canShowPhone ? (
+                ) : effectivePhone && !placeFeatures.canShowPhone ? (
                   <div className="flex items-center gap-3 text-slate-400">
                     <Phone className="h-5 w-5" />
                     <span className="flex items-center gap-1">
@@ -574,15 +591,15 @@ export default async function PlacePage({ params }: PlacePageProps) {
                   </div>
                 ) : null}
 
-                {/* Email - gated by plan */}
-                {place.email && placeFeatures.canShowEmail ? (
+                {/* Email - gated by plan, uses scraped data as fallback */}
+                {effectiveEmail && placeFeatures.canShowEmail ? (
                   <div className="flex items-center gap-3">
                     <Mail className="h-5 w-5 text-cpCoral" />
-                    <a href={`mailto:${place.email}`} className="text-cpDark hover:text-cpCoral transition-colors truncate">
-                      {place.email}
+                    <a href={`mailto:${effectiveEmail}`} className="text-cpDark hover:text-cpCoral transition-colors truncate">
+                      {effectiveEmail}
                     </a>
                   </div>
-                ) : place.email && !placeFeatures.canShowEmail ? (
+                ) : effectiveEmail && !placeFeatures.canShowEmail ? (
                   <div className="flex items-center gap-3 text-slate-400">
                     <Mail className="h-5 w-5" />
                     <span className="flex items-center gap-1">
@@ -609,6 +626,35 @@ export default async function PlacePage({ params }: PlacePageProps) {
                     </span>
                   </div>
                 ) : null}
+
+                {/* Social Media Links - from scraped data */}
+                {socialMedia && Object.keys(socialMedia).length > 0 && (
+                  <div className="flex items-center gap-3 pt-2 border-t border-slate-100">
+                    <span className="text-sm text-slate-500">{t("followUs")}:</span>
+                    <div className="flex gap-2">
+                      {socialMedia.facebook && (
+                        <a href={socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-cpCoral transition-colors" aria-label="Facebook">
+                          <Facebook className="h-5 w-5" />
+                        </a>
+                      )}
+                      {socialMedia.instagram && (
+                        <a href={socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-cpCoral transition-colors" aria-label="Instagram">
+                          <Instagram className="h-5 w-5" />
+                        </a>
+                      )}
+                      {socialMedia.twitter && (
+                        <a href={socialMedia.twitter} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-cpCoral transition-colors" aria-label="Twitter">
+                          <Twitter className="h-5 w-5" />
+                        </a>
+                      )}
+                      {socialMedia.linkedin && (
+                        <a href={socialMedia.linkedin} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-cpCoral transition-colors" aria-label="LinkedIn">
+                          <Linkedin className="h-5 w-5" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* Upgrade CTA for FREE tier */}
                 {upgradeCTA && (

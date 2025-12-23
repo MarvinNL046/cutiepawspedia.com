@@ -24,14 +24,18 @@ export {
   buildProvinceUrls,
   buildCityUrls,
   buildCategoryUrls,
+  buildCategoryUrlsPaginated,
   buildPlaceUrls,
   buildBestInCityUrls,
+  buildBestInCityUrlsPaginated,
   buildTopInCountryUrls,
   buildBestInCountryUrls,
   buildCategoryInCountryUrls,
   buildStaticUrls,
   getSitemapCounts,
   getPlaceSitemapPageCount,
+  getCategorySitemapPageCount,
+  getBestInCitySitemapPageCount,
 } from "./urls";
 
 // XML builders

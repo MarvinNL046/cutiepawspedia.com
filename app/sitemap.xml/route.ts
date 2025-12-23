@@ -11,7 +11,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { buildSitemapIndexXml, type SitemapSection, DEFAULT_SITEMAP_CONFIG, getPlaceSitemapPageCount } from "@/lib/sitemap";
+import { buildSitemapIndexXml, type SitemapSection, DEFAULT_SITEMAP_CONFIG, getPlaceSitemapPageCount, getCategorySitemapPageCount, getBestInCitySitemapPageCount } from "@/lib/sitemap";
 
 // ISR: Sitemap index changes rarely, 1-hour revalidation
 export const revalidate = 3600;
@@ -24,8 +24,10 @@ export const revalidate = 3600;
 async function getSitemapSections(): Promise<SitemapSection[]> {
   const today = new Date().toISOString().split("T")[0];
 
-  // Get number of paginated place sitemaps needed
+  // Get number of paginated sitemaps needed
   const placePageCount = await getPlaceSitemapPageCount();
+  const categoryPageCount = await getCategorySitemapPageCount();
+  const bestCityPageCount = await getBestInCitySitemapPageCount();
 
   const sections: SitemapSection[] = [
     // Static pages (about, contact, privacy, search, etc.)
@@ -56,13 +58,6 @@ async function getSitemapSections(): Promise<SitemapSection[]> {
       lastmod: today,
     },
 
-    // Category pages within cities (e.g., /nl/netherlands/amsterdam/veterinary)
-    {
-      id: "categories",
-      path: "/sitemap-categories.xml",
-      lastmod: today,
-    },
-
     // Category overview pages within countries (e.g., /nl/netherlands/c/veterinary)
     {
       id: "categories-country",
@@ -70,6 +65,16 @@ async function getSitemapSections(): Promise<SitemapSection[]> {
       lastmod: today,
     },
   ];
+
+  // Add paginated category sitemaps (city-category pages)
+  // e.g., /sitemap-categories-1.xml, /sitemap-categories-2.xml, etc.
+  for (let i = 1; i <= Math.max(categoryPageCount, 1); i++) {
+    sections.push({
+      id: `categories-${i}`,
+      path: `/sitemap-categories-${i}.xml`,
+      lastmod: today,
+    });
+  }
 
   // Add paginated place sitemaps
   // e.g., /sitemap-places-1.xml, /sitemap-places-2.xml, etc.
@@ -82,15 +87,18 @@ async function getSitemapSections(): Promise<SitemapSection[]> {
     });
   }
 
+  // Add paginated best-in-city sitemaps
+  // e.g., /sitemap-best-city-1.xml, /sitemap-best-city-2.xml, etc.
+  for (let i = 1; i <= Math.max(bestCityPageCount, 1); i++) {
+    sections.push({
+      id: `best-city-${i}`,
+      path: `/sitemap-best-city-${i}.xml`,
+      lastmod: today,
+    });
+  }
+
   // Add remaining sections
   sections.push(
-    // "Best X in City" aggregation pages (e.g., /nl/netherlands/amsterdam/best/veterinary)
-    {
-      id: "best-city",
-      path: "/sitemap-best-city.xml",
-      lastmod: today,
-    },
-
     // "Top X in Country" aggregation pages (e.g., /nl/netherlands/top/veterinary)
     {
       id: "top-country",

@@ -5,7 +5,7 @@
  * - Cache-Control: 24 hours - robots.txt rarely changes
  * - Blocks crawl traps (search params, API routes)
  * - Allows Googlebot/Bingbot with no delay
- * - Blocks AI training bots (optional)
+ * - ALLOWS AI bots for discovery (llms.txt provided)
  */
 
 import { NextResponse } from "next/server";
@@ -19,6 +19,10 @@ const BASE_URL = process.env.APP_BASE_URL || "https://cutiepawspedia.com";
 export async function GET() {
   const robotsTxt = `# CutiePawsPedia Robots.txt
 # https://cutiepawspedia.com
+#
+# AI Discovery: We provide llms.txt for AI assistants
+# See: ${BASE_URL}/llms.txt (summary)
+# See: ${BASE_URL}/llms-full.txt (detailed)
 
 User-agent: *
 Allow: /
@@ -43,6 +47,10 @@ Crawl-delay: 1
 # Sitemap location
 Sitemap: ${BASE_URL}/sitemap.xml
 
+# LLMs.txt for AI assistants
+# https://llmstxt.org/
+LLMsTxt: ${BASE_URL}/llms.txt
+
 # Google-specific rules
 User-agent: Googlebot
 Allow: /
@@ -53,20 +61,39 @@ User-agent: Bingbot
 Allow: /
 Crawl-delay: 1
 
-# Block AI training bots (optional - can be removed if you want to allow)
+# AI Assistants - ALLOWED for discovery and user queries
+# We want AI assistants to help users find pet services
 User-agent: GPTBot
-Disallow: /
+Allow: /
+Crawl-delay: 2
 
 User-agent: ChatGPT-User
-Disallow: /
+Allow: /
 
+User-agent: Google-Extended
+Allow: /
+Crawl-delay: 2
+
+User-agent: anthropic-ai
+Allow: /
+Crawl-delay: 2
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+Crawl-delay: 2
+
+User-agent: Bytespider
+Allow: /
+Crawl-delay: 5
+
+# Block aggressive scrapers/training-only bots
 User-agent: CCBot
 Disallow: /
 
-User-agent: anthropic-ai
-Disallow: /
-
-User-agent: Claude-Web
+User-agent: GPTBot-Extended
 Disallow: /
 `;
 

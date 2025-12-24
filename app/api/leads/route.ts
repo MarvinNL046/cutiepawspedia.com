@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/db";
-import { leads, places } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { leads, places, businesses } from "@/db/schema";
+import { eq, and } from "drizzle-orm";
 import { sendNotification } from "@/lib/notifications";
 import { addToNewsletterAudience } from "@/lib/email/resend";
 // NOTE: Pay-per-lead paywall disabled - leads are now free to view
@@ -16,6 +16,8 @@ import {
 } from "@/lib/rateLimit";
 import { logAuditEvent } from "@/db/queries/auditLogs";
 import { verifyRecaptcha, isRecaptchaConfigured } from "@/lib/recaptcha";
+import { stackServerApp } from "@/lib/auth/stack";
+import { getUserByStackAuthId } from "@/db/queries/users";
 
 // Lead submission schema
 const leadSchema = z.object({
@@ -244,9 +246,38 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Get leads for a business (admin/business owner only - to be protected later)
+/**
+ * GET /api/leads?placeId=X
+ * Get leads for a place - requires authentication as business owner or admin
+ */
 export async function GET(request: NextRequest) {
   try {
+    // 1. Verify authentication
+    if (!stackServerApp) {
+      return NextResponse.json(
+        { error: "Authentication not configured" },
+        { status: 500 }
+      );
+    }
+
+    const stackUser = await stackServerApp.getUser();
+    if (!stackUser) {
+      return NextResponse.json(
+        { error: "You must be logged in to view leads" },
+        { status: 401 }
+      );
+    }
+
+    // 2. Get internal user
+    const dbUser = await getUserByStackAuthId(stackUser.id);
+    if (!dbUser) {
+      return NextResponse.json(
+        { error: "User account not found" },
+        { status: 401 }
+      );
+    }
+
+    // 3. Validate request
     const { searchParams } = new URL(request.url);
     const placeId = searchParams.get("placeId");
 
@@ -264,8 +295,56 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const placeIdNum = parseInt(placeId, 10);
+    if (isNaN(placeIdNum)) {
+      return NextResponse.json(
+        { error: "Invalid placeId" },
+        { status: 400 }
+      );
+    }
+
+    // 4. Get the place and verify ownership
+    const place = await db.query.places.findFirst({
+      where: eq(places.id, placeIdNum),
+      columns: {
+        id: true,
+        businessId: true,
+      },
+    });
+
+    if (!place) {
+      return NextResponse.json(
+        { error: "Place not found" },
+        { status: 404 }
+      );
+    }
+
+    // 5. Authorization check: must be admin OR own the business
+    const isAdmin = dbUser.role === "admin";
+    let hasAccess = isAdmin;
+
+    if (!isAdmin && place.businessId) {
+      // Check if user owns the business
+      const business = await db.query.businesses.findFirst({
+        where: and(
+          eq(businesses.id, place.businessId),
+          eq(businesses.userId, dbUser.id)
+        ),
+        columns: { id: true },
+      });
+      hasAccess = !!business;
+    }
+
+    if (!hasAccess) {
+      return NextResponse.json(
+        { error: "You don't have permission to view leads for this place" },
+        { status: 403 }
+      );
+    }
+
+    // 6. Fetch leads
     const placeLeads = await db.query.leads.findMany({
-      where: eq(leads.placeId, parseInt(placeId, 10)),
+      where: eq(leads.placeId, placeIdNum),
       orderBy: (leads, { desc }) => [desc(leads.createdAt)],
       limit: 100,
     });

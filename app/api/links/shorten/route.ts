@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createShortLink, isShortioConfigured } from "@/lib/links/shortio";
+import { verifyAdminAccess } from "@/lib/auth/admin-api";
 
 // Validation schema
 const shortenSchema = z.object({
@@ -13,9 +14,14 @@ const shortenSchema = z.object({
 /**
  * POST /api/links/shorten
  * Create a shortened URL using Short.io
+ * Requires admin authentication to prevent abuse
  */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    // Verify admin access
+    const auth = await verifyAdminAccess(request);
+    if (!auth.authorized) return auth.response;
+
     // Check if Short.io is configured
     if (!isShortioConfigured) {
       return NextResponse.json(

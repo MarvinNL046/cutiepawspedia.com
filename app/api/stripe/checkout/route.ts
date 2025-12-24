@@ -6,6 +6,11 @@ import {
   stripeCheckoutRateLimiter,
   rateLimitExceededResponse,
 } from "@/lib/rateLimit";
+import { stackServerApp } from "@/lib/auth/stack";
+import { getUserByStackAuthId } from "@/db/queries/users";
+import { db } from "@/db";
+import { businesses } from "@/db/schema";
+import { eq, and } from "drizzle-orm";
 
 // Initialize Stripe with secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -23,9 +28,35 @@ const checkoutSchema = z.object({
 /**
  * POST /api/stripe/checkout
  * Creates a Stripe Checkout session for purchasing credits
+ * Requires authentication and business ownership
  */
 export async function POST(request: NextRequest) {
   try {
+    // 1. Verify authentication
+    if (!stackServerApp) {
+      return NextResponse.json(
+        { error: "Authentication not configured" },
+        { status: 500 }
+      );
+    }
+
+    const stackUser = await stackServerApp.getUser();
+    if (!stackUser) {
+      return NextResponse.json(
+        { error: "You must be logged in to purchase credits" },
+        { status: 401 }
+      );
+    }
+
+    // 2. Get internal user
+    const dbUser = await getUserByStackAuthId(stackUser.id);
+    if (!dbUser) {
+      return NextResponse.json(
+        { error: "User account not found" },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const result = checkoutSchema.safeParse(body);
 
@@ -37,6 +68,28 @@ export async function POST(request: NextRequest) {
     }
 
     const { businessId, packageId, successUrl, cancelUrl } = result.data;
+
+    // 3. Authorization check: must be admin OR own the business
+    const isAdmin = dbUser.role === "admin";
+    let hasAccess = isAdmin;
+
+    if (!isAdmin) {
+      const business = await db.query.businesses.findFirst({
+        where: and(
+          eq(businesses.id, businessId),
+          eq(businesses.userId, dbUser.id)
+        ),
+        columns: { id: true },
+      });
+      hasAccess = !!business;
+    }
+
+    if (!hasAccess) {
+      return NextResponse.json(
+        { error: "You don't have permission to purchase credits for this business" },
+        { status: 403 }
+      );
+    }
 
     // Rate limiting: max 10 checkout sessions per hour per business
     const rateLimitResult = await stripeCheckoutRateLimiter(

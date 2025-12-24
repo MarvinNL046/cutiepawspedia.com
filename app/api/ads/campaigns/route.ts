@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/db";
-import { adPackages, adCampaigns } from "@/db/schema";
+import { adPackages, adCampaigns, businesses } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
+import { stackServerApp } from "@/lib/auth/stack";
+import { getUserByStackAuthId } from "@/db/queries/users";
 
 // Create campaign request schema
 const createCampaignSchema = z.object({
@@ -23,9 +25,35 @@ const createCampaignSchema = z.object({
 /**
  * POST /api/ads/campaigns
  * Creates a new ad campaign in draft status
+ * Requires authentication and business ownership
  */
 export async function POST(request: NextRequest) {
   try {
+    // 1. Verify authentication
+    if (!stackServerApp) {
+      return NextResponse.json(
+        { error: "Authentication not configured" },
+        { status: 500 }
+      );
+    }
+
+    const stackUser = await stackServerApp.getUser();
+    if (!stackUser) {
+      return NextResponse.json(
+        { error: "You must be logged in to create campaigns" },
+        { status: 401 }
+      );
+    }
+
+    // 2. Get internal user
+    const dbUser = await getUserByStackAuthId(stackUser.id);
+    if (!dbUser) {
+      return NextResponse.json(
+        { error: "User account not found" },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const result = createCampaignSchema.safeParse(body);
 
@@ -50,6 +78,28 @@ export async function POST(request: NextRequest) {
       ctaTextNl,
       placeId,
     } = result.data;
+
+    // 3. Authorization check: must be admin OR own the business
+    const isAdmin = dbUser.role === "admin";
+    let hasAccess = isAdmin;
+
+    if (!isAdmin) {
+      const business = await db.query.businesses.findFirst({
+        where: and(
+          eq(businesses.id, businessId),
+          eq(businesses.userId, dbUser.id)
+        ),
+        columns: { id: true },
+      });
+      hasAccess = !!business;
+    }
+
+    if (!hasAccess) {
+      return NextResponse.json(
+        { error: "You don't have permission to create campaigns for this business" },
+        { status: 403 }
+      );
+    }
 
     // Find the package
     const [pkg] = await db

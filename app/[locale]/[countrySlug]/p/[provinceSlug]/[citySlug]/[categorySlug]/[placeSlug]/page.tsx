@@ -229,7 +229,15 @@ export default async function PlacePage({ params }: PlacePageProps) {
 
   // Extract scraped content for personalized AI generation
   const scrapedContent = place.scrapedContent as {
+    // Jina+GPT enriched content (high quality, 400+ words)
     aboutUs?: string;
+    services?: string[];
+    highlights?: string[];
+    contentSource?: string;
+    contentLanguage?: string;
+    contentGeneratedAt?: string;
+    writingStyle?: string;
+    // Google Maps data
     googleRating?: number;
     googleReviewCount?: number;
     scrapedAt?: string;
@@ -515,6 +523,14 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 secondary: content.secondary,
                 bullets: content.bullets,
               }}
+              scrapedContent={scrapedContent ? {
+                aboutUs: scrapedContent.aboutUs,
+                services: scrapedContent.services,
+                highlights: scrapedContent.highlights,
+                contentSource: scrapedContent.contentSource,
+                contentLanguage: scrapedContent.contentLanguage,
+                contentGeneratedAt: scrapedContent.contentGeneratedAt,
+              } : undefined}
               locale={locale}
             />
 
@@ -525,6 +541,14 @@ export default async function PlacePage({ params }: PlacePageProps) {
             <ServicesSection
               categories={place.placeCategories?.map((pc) => pc.category)}
               description={place.description}
+              scrapedContent={scrapedContent ? {
+                aboutUs: scrapedContent.aboutUs,
+                services: scrapedContent.services,
+                highlights: scrapedContent.highlights,
+                contentSource: scrapedContent.contentSource,
+                contentLanguage: scrapedContent.contentLanguage,
+                contentGeneratedAt: scrapedContent.contentGeneratedAt,
+              } : undefined}
               locale={locale}
             />
 
@@ -541,6 +565,14 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 secondary: content.secondary,
                 bullets: content.bullets,
               }}
+              scrapedContent={scrapedContent ? {
+                aboutUs: scrapedContent.aboutUs,
+                services: scrapedContent.services,
+                highlights: scrapedContent.highlights,
+                contentSource: scrapedContent.contentSource,
+                contentLanguage: scrapedContent.contentLanguage,
+                contentGeneratedAt: scrapedContent.contentGeneratedAt,
+              } : undefined}
               locale={locale}
             />
 

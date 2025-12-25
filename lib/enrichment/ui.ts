@@ -24,6 +24,16 @@ export interface PlaceData {
   address?: string | null;
 }
 
+// Enriched content from Jina+GPT scraping
+export interface ScrapedContent {
+  aboutUs?: string;
+  services?: string[];
+  highlights?: string[];
+  contentSource?: string;
+  contentLanguage?: string;
+  contentGeneratedAt?: string;
+}
+
 export interface AIContent {
   intro?: string;
   secondary?: string;
@@ -45,18 +55,24 @@ export interface OpeningHoursDisplay {
 
 /**
  * Get the best available about text with fallback logic
- * Priority: 1. description (if long enough) → 2. AI content intro → 3. default text
+ * Priority: 1. scrapedContent.aboutUs (Jina+GPT enriched) → 2. description (if long enough) → 3. AI content intro → 4. default text
  */
 export function getBestAboutText(
   place: PlaceData,
-  aiContent?: AIContent
+  aiContent?: AIContent,
+  scrapedContent?: ScrapedContent
 ): { text: string; source: "enriched" | "ai" | "default" } {
-  // Check if description exists and is substantial (more than just a short tagline)
+  // Priority 1: Use Jina+GPT enriched aboutUs content (highest quality, 400+ words)
+  if (scrapedContent?.aboutUs && scrapedContent.aboutUs.trim().length > 200) {
+    return { text: scrapedContent.aboutUs.trim(), source: "enriched" };
+  }
+
+  // Priority 2: Check if description exists and is substantial (more than just a short tagline)
   if (place.description && place.description.trim().length > 100) {
     return { text: place.description.trim(), source: "enriched" };
   }
 
-  // Fall back to AI-generated content
+  // Priority 3: Fall back to AI-generated content
   if (aiContent?.intro) {
     const fullAiText = [aiContent.intro, aiContent.secondary]
       .filter(Boolean)
@@ -322,13 +338,21 @@ export function formatRating(rating: string | number | null | undefined): {
 // ============================================================================
 
 /**
- * Generate service badges from categories and description
- * Since we don't have enriched_services yet, we derive from categories
+ * Generate service badges from enriched content, categories and description
+ * Priority: 1. scrapedContent.services (real services from website) → 2. categories → 3. description keywords
  */
 export function getServiceBadges(
   categories: Array<{ slug: string; labelKey: string }> | undefined,
-  description?: string | null
+  description?: string | null,
+  scrapedContent?: ScrapedContent
 ): string[] {
+  // Priority 1: Use enriched services from Jina+GPT (real services from website)
+  if (scrapedContent?.services && scrapedContent.services.length > 0) {
+    // Return unique enriched services, max 8 (they're more accurate)
+    return [...new Set(scrapedContent.services)].slice(0, 8);
+  }
+
+  // Fallback: Generate from categories and description
   const badges: string[] = [];
 
   // Add category-based badges
@@ -390,12 +414,21 @@ export function getServiceBadges(
 
 /**
  * Generate highlights based on available data
+ * Priority: 1. scrapedContent.highlights (real USPs from website) → 2. AI bullets → 3. derived from ratings/reviews
  */
 export function getHighlights(
   place: PlaceData,
   aiContent?: AIContent,
-  locale: string = "en"
+  locale: string = "en",
+  scrapedContent?: ScrapedContent
 ): string[] {
+  // Priority 1: Use enriched highlights from Jina+GPT (real USPs from website)
+  if (scrapedContent?.highlights && scrapedContent.highlights.length > 0) {
+    // Return enriched highlights, max 6 (they're more accurate and specific)
+    return [...scrapedContent.highlights].slice(0, 6);
+  }
+
+  // Fallback: Generate from AI content and place data
   const highlights: string[] = [];
 
   // Add AI-generated bullets if available

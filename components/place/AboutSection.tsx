@@ -5,19 +5,21 @@ import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ChevronDown, ChevronUp, Info } from "lucide-react";
-import { getBestAboutText, type PlaceData, type AIContent } from "@/lib/enrichment/ui";
+import { getBestAboutText, type PlaceData, type AIContent, type ScrapedContent } from "@/lib/enrichment/ui";
 
 interface AboutSectionProps {
   place: PlaceData;
   aiContent?: AIContent;
+  scrapedContent?: ScrapedContent;
+  locale?: string;
 }
 
-export function AboutSection({ place, aiContent }: AboutSectionProps) {
+export function AboutSection({ place, aiContent, scrapedContent }: AboutSectionProps) {
   const [expanded, setExpanded] = useState(false);
   const t = useTranslations("place");
   const tCommon = useTranslations("common");
 
-  const { text, source } = getBestAboutText(place, aiContent);
+  const { text, source } = getBestAboutText(place, aiContent, scrapedContent);
 
   // Check if text is long enough to warrant expand/collapse
   const isLongText = text.length > 400;

@@ -2,19 +2,22 @@
 
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
-import { getServiceBadges } from "@/lib/enrichment/ui";
+import { getServiceBadges, type ScrapedContent } from "@/lib/enrichment/ui";
 
 interface ServicesSectionProps {
   categories?: Array<{ slug: string; labelKey: string }>;
   description?: string | null;
+  scrapedContent?: ScrapedContent;
+  locale?: string;
 }
 
 export function ServicesSection({
   categories,
   description,
+  scrapedContent,
 }: ServicesSectionProps) {
   const t = useTranslations("place");
-  const services = getServiceBadges(categories, description);
+  const services = getServiceBadges(categories, description, scrapedContent);
 
   // Don't render if no services
   if (services.length === 0) return null;

@@ -2,19 +2,23 @@
 
 import { useTranslations } from "next-intl";
 import { Sparkles } from "lucide-react";
-import { getHighlights, type PlaceData, type AIContent } from "@/lib/enrichment/ui";
+import { getHighlights, type PlaceData, type AIContent, type ScrapedContent } from "@/lib/enrichment/ui";
 
 interface HighlightsSectionProps {
   place: PlaceData;
   aiContent?: AIContent;
+  scrapedContent?: ScrapedContent;
+  locale?: string;
 }
 
 export function HighlightsSection({
   place,
   aiContent,
+  scrapedContent,
+  locale = "en",
 }: HighlightsSectionProps) {
   const t = useTranslations("place");
-  const highlights = getHighlights(place, aiContent);
+  const highlights = getHighlights(place, aiContent, locale, scrapedContent);
 
   // Don't render if no highlights
   if (highlights.length === 0) return null;

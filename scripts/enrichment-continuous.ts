@@ -154,7 +154,7 @@ Output only valid JSON in ${locale.language}.`;
 
   try {
     const response = await openai.chat.completions.create({
-      model: process.env.AI_MODEL || "gpt-4o-mini",
+      model: process.env.AI_MODEL || "gpt-5-nano",
       messages: [
         { role: "system", content: `Expert pet services content writer. Output JSON in ${locale.language}.` },
         { role: "user", content: prompt },

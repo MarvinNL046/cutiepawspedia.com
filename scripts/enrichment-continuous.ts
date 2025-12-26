@@ -32,6 +32,11 @@ const REQUEST_TIMEOUT = 15000; // 15 seconds (was 30)
 const BATCH_SIZE = 300; // Larger batches (was 200)
 const PAUSE_BETWEEN_BATCHES_MS = 30 * 1000; // 30 seconds (was 2 minutes)
 
+// Parse --country flag for parallel execution
+const args = process.argv.slice(2);
+const countryIndex = args.indexOf("--country");
+const COUNTRY_FILTER = countryIndex !== -1 ? args[countryIndex + 1]?.toUpperCase() : null;
+
 interface Place {
   id: number;
   name: string;
@@ -209,6 +214,38 @@ async function updatePlace(
 }
 
 async function getPlacesToEnrich(limit: number): Promise<Place[]> {
+  if (COUNTRY_FILTER) {
+    return (await sql`
+      SELECT
+        p.id,
+        p.name,
+        p.website,
+        p.address,
+        p.avg_rating,
+        p.review_count,
+        ci.name as city_name,
+        co.name as country_name,
+        co.code as country_code,
+        cat.slug as category_slug,
+        cat.label_key as category_name
+      FROM places p
+      JOIN cities ci ON p.city_id = ci.id
+      JOIN countries co ON ci.country_id = co.id
+      LEFT JOIN place_categories pc ON pc.place_id = p.id
+      LEFT JOIN categories cat ON pc.category_id = cat.id
+      WHERE p.website IS NOT NULL
+        AND p.website != ''
+        AND co.code = ${COUNTRY_FILTER}
+        AND (
+          p.scraped_content IS NULL
+          OR p.scraped_content->>'aboutUs' IS NULL
+          OR LENGTH(p.scraped_content->>'aboutUs') < 500
+        )
+      ORDER BY RANDOM()
+      LIMIT ${limit}
+    `) as Place[];
+  }
+
   return (await sql`
     SELECT
       p.id,
@@ -240,6 +277,24 @@ async function getPlacesToEnrich(limit: number): Promise<Place[]> {
 }
 
 async function getStats(): Promise<{ total: number; enriched: number; todo: number }> {
+  if (COUNTRY_FILTER) {
+    const result = await sql`
+      SELECT
+        COUNT(*) as total,
+        COUNT(CASE WHEN p.scraped_content->>'aboutUs' IS NOT NULL AND LENGTH(p.scraped_content->>'aboutUs') > 500 THEN 1 END) as enriched,
+        COUNT(CASE WHEN p.website IS NOT NULL AND p.website != '' AND (p.scraped_content->>'aboutUs' IS NULL OR LENGTH(p.scraped_content->>'aboutUs') < 500) THEN 1 END) as todo
+      FROM places p
+      JOIN cities ci ON p.city_id = ci.id
+      JOIN countries co ON ci.country_id = co.id
+      WHERE co.code = ${COUNTRY_FILTER}
+    `;
+    return {
+      total: Number(result[0].total),
+      enriched: Number(result[0].enriched),
+      todo: Number(result[0].todo),
+    };
+  }
+
   const result = await sql`
     SELECT
       COUNT(*) as total,
@@ -325,6 +380,7 @@ async function main() {
   log("📋 Configuration:");
   log(`   Batch size: ${BATCH_SIZE}`);
   log(`   Pause between batches: ${PAUSE_BETWEEN_BATCHES_MS / 1000 / 60} minutes`);
+  log(`   Country filter: ${COUNTRY_FILTER || "ALL COUNTRIES"}`);
   log("═".repeat(70));
 
   if (!JINA_API_KEY) {

@@ -1,0 +1,9 @@
+{
+  "total_processed": 2140,
+  "successful_updates": 2140,
+  "failed_updates": 0,
+  "skipped": 167,
+  "last_processed_id": 3221,
+  "last_run_at": "2025-12-26T18:33:59.874Z",
+  "errors": []
+}

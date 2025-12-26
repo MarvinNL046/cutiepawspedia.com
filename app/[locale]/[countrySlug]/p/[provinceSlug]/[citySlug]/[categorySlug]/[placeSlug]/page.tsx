@@ -257,6 +257,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
     // New SERP API fields
     imageUrl?: string;
     thumbnailUrl?: string;
+    photoUrl?: string; // From coordinate enrichment script
     openingHours?: Record<string, string>;
     workStatus?: string;
     accessibility?: {
@@ -501,9 +502,9 @@ export default async function PlacePage({ params }: PlacePageProps) {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Google Maps image from SERP API - only show if no business photos */}
-            {photosWithUrls.length === 0 && (scrapedContent?.imageUrl || scrapedContent?.thumbnailUrl) && (
+            {photosWithUrls.length === 0 && (scrapedContent?.imageUrl || scrapedContent?.thumbnailUrl || scrapedContent?.photoUrl) && (
               <PlaceHeroImage
-                imageUrl={scrapedContent.imageUrl}
+                imageUrl={scrapedContent.imageUrl || scrapedContent.photoUrl}
                 thumbnailUrl={scrapedContent.thumbnailUrl}
                 placeName={place.name}
               />

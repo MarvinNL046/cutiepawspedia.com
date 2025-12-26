@@ -42,7 +42,7 @@ import { FavoriteButton } from "@/components/favorites/FavoriteButton";
 import { isFavorite } from "@/db/queries/favorites";
 import { MapPin, Phone, Globe, Mail, Star, CheckCircle, MessageSquare, Lock, Shield, Crown, Facebook, Instagram, Twitter, Linkedin } from "lucide-react";
 import { getCityName, getCountryName } from "@/lib/utils/place-helpers";
-import { AboutSection, ServicesSection, HighlightsSection, BusinessSnapshot, BusinessPhotoGallery, ContentSections, ServiceHighlightsSection, CTASection, GoogleReviewsSection } from "@/components/place";
+import { AboutSection, ServicesSection, HighlightsSection, BusinessSnapshot, BusinessPhotoGallery, ContentSections, ServiceHighlightsSection, CTASection, GoogleReviewsSection, PlaceHeroImage } from "@/components/place";
 import { EditorialByline } from "@/components/seo";
 import { getActivePhotosByPlaceId } from "@/db/queries/businessPhotos";
 import { getBusinessPhotoUrl } from "@/lib/storage/businessPhotos";
@@ -144,6 +144,10 @@ export default async function PlacePage({ params }: PlacePageProps) {
       specializations?: string[];
       awards?: string[];
     };
+    // Image from coordinate enrichment
+    photoUrl?: string;
+    imageUrl?: string;
+    thumbnailUrl?: string;
     // Jina scraped metadata - used as fallback when main columns are empty
     email?: string;
     phone?: string;
@@ -400,6 +404,15 @@ export default async function PlacePage({ params }: PlacePageProps) {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Google Maps image from SERP API - only show if no business photos */}
+            {photosWithUrls.length === 0 && (scrapedContent?.imageUrl || scrapedContent?.thumbnailUrl || scrapedContent?.photoUrl) && (
+              <PlaceHeroImage
+                imageUrl={scrapedContent.imageUrl || scrapedContent.photoUrl}
+                thumbnailUrl={scrapedContent.thumbnailUrl}
+                placeName={place.name}
+              />
+            )}
+
             {/* Enriched About Section with fallback to AI content */}
             <AboutSection
               place={{

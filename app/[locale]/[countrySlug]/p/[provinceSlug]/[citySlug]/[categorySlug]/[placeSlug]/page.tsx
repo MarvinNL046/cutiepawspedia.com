@@ -163,26 +163,47 @@ export default async function PlacePage({ params }: PlacePageProps) {
   const t = await getTranslations("place");
   const tCommon = await getTranslations("common");
 
-  const province = await getProvinceBySlugAndCountry(provinceSlug, countrySlug);
-  if (!province) notFound();
+  // Wrap database queries in try-catch to handle errors gracefully
+  // This ensures we return 404 on database errors instead of 500
+  let province;
+  let place;
 
-  const place = await getPlaceBySlugWithProvince(placeSlug, citySlug, provinceSlug, countrySlug);
+  try {
+    province = await getProvinceBySlugAndCountry(provinceSlug, countrySlug);
+    if (!province) notFound();
+
+    place = await getPlaceBySlugWithProvince(placeSlug, citySlug, provinceSlug, countrySlug);
+  } catch (error) {
+    // Check if this is a notFound() throw (don't catch those)
+    if (error && typeof error === "object" && "digest" in error) {
+      throw error;
+    }
+    // Log the error for debugging
+    console.error("Database error in place page:", error);
+    // Return 404 for database errors
+    notFound();
+  }
 
   // If place not found at this location, check if it exists elsewhere and redirect
   if (!place) {
-    const placeElsewhere = await findPlaceBySlugOnly(placeSlug);
+    try {
+      const placeElsewhere = await findPlaceBySlugOnly(placeSlug);
 
-    if (placeElsewhere && placeElsewhere.city) {
-      // Place exists but at a different location - build correct URL and 301 redirect
-      const correctCity = placeElsewhere.city;
-      const correctProvince = correctCity.province;
-      const correctCountry = correctCity.country;
-      const correctCategory = placeElsewhere.placeCategories?.[0]?.category;
+      if (placeElsewhere && placeElsewhere.city) {
+        // Place exists but at a different location - build correct URL and 301 redirect
+        const correctCity = placeElsewhere.city;
+        const correctProvince = correctCity.province;
+        const correctCountry = correctCity.country;
+        const correctCategory = placeElsewhere.placeCategories?.[0]?.category;
 
-      if (correctCountry && correctProvince) {
-        const correctUrl = `/${locale}/${correctCountry.slug}/p/${correctProvince.slug}/${correctCity.slug}/${correctCategory?.slug || categorySlug}/${placeSlug}`;
-        permanentRedirect(correctUrl);
+        if (correctCountry && correctProvince) {
+          const correctUrl = `/${locale}/${correctCountry.slug}/p/${correctProvince.slug}/${correctCity.slug}/${correctCategory?.slug || categorySlug}/${placeSlug}`;
+          permanentRedirect(correctUrl);
+        }
       }
+    } catch (error) {
+      // Ignore redirect lookup errors
+      console.error("Error looking up place elsewhere:", error);
     }
 
     // Place truly doesn't exist anywhere

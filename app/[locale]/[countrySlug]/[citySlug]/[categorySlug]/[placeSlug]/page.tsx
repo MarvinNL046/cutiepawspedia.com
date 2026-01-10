@@ -72,7 +72,21 @@ export async function generateMetadata({ params }: PlacePageProps): Promise<Meta
 export default async function PlacePage({ params }: PlacePageProps) {
   const { locale, countrySlug, citySlug, categorySlug, placeSlug } = await params;
   const t = await getTranslations("place");
-  const place = await getPlaceBySlug(placeSlug, citySlug, countrySlug);
+
+  // Wrap database query in try-catch to handle errors gracefully
+  let place;
+  try {
+    place = await getPlaceBySlug(placeSlug, citySlug, countrySlug);
+  } catch (error) {
+    // Check if this is a notFound() throw (don't catch those)
+    if (error && typeof error === "object" && "digest" in error) {
+      throw error;
+    }
+    // Log the error for debugging
+    console.error("Database error in place page:", error);
+    // Return 404 for database errors
+    notFound();
+  }
 
   if (!place) notFound();
 

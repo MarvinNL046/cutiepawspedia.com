@@ -66,3 +66,4 @@ next-env.d.ts
 /public/uploads/
 .playwright-mcp/
 Bedrijfsinfo
+.env*.local

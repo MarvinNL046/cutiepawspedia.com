@@ -24,8 +24,9 @@ export const db = createDb();
 export type Database = typeof db;
 
 // Helper to check if db is available
+// Check env var directly (not cached) for serverless edge compatibility
 export function isDatabaseAvailable(): boolean {
-  return !!connectionString;
+  return !!process.env.DATABASE_URL;
 }
 
 /**

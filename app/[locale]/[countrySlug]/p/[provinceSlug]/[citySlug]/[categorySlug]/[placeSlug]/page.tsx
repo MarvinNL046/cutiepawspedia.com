@@ -149,8 +149,15 @@ export async function generateMetadata({ params }: PlacePageProps): Promise<Meta
   }
 
   if (!place) {
+    // Return noindex metadata for non-existent pages to prevent soft 404 issues
     return {
-      title: placeSlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+      title: "Page Not Found - CutiePawsPedia",
+      description: "This page does not exist or has been moved.",
+      robots: {
+        index: false,
+        follow: false,
+        noarchive: true,
+      },
     };
   }
 

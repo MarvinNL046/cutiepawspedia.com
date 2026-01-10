@@ -35,7 +35,19 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   // Get ad visibility context (server-side auth check)
-  const adContext = await getAdVisibilityContext();
+  // Wrap in try-catch to prevent SSR bailout from affecting notFound()
+  let adContext;
+  try {
+    adContext = await getAdVisibilityContext();
+  } catch {
+    // On auth check failure, default to showing ads (anonymous user experience)
+    adContext = {
+      isLoggedIn: false,
+      showAds: true,
+      isPremium: false,
+      adsEnabled: process.env.NEXT_PUBLIC_ADS_ENABLED === "true",
+    };
+  }
 
   return (
     <NextIntlClientProvider messages={messages}>

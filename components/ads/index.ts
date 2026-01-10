@@ -38,3 +38,6 @@ export {
   useShouldShowAds,
   type AdVisibility,
 } from "./AdVisibilityContext";
+
+// Client-side visibility provider (for layouts that need to avoid SSR bailout)
+export { AdVisibilityProviderClient } from "./AdVisibilityProviderClient";

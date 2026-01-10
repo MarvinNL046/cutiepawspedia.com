@@ -2,14 +2,13 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 import { Header, Footer } from "@/components/layout";
 import { JsonLd } from "@/components/seo";
-import { AdVisibilityProvider } from "@/components/ads";
+import { AdVisibilityProviderClient } from "@/components/ads";
 import { CookieConsentBanner } from "@/components/consent";
 import { ExitIntentPopup } from "@/components/popups";
 import { FeedbackRibbon } from "@/components/FeedbackRibbon";
 import { TopBanner } from "@/components/ui/TopBanner";
 import { StickyBottomBanner } from "@/components/ui/StickyBottomBanner";
 import { websiteSchema, organizationSchema } from "@/lib/seo";
-import { getAdVisibilityContext } from "@/lib/ads/visibility";
 import { locales } from "@/i18n/config";
 
 interface LocaleLayoutProps {
@@ -34,24 +33,12 @@ export default async function LocaleLayout({
   // Get messages for the current locale
   const messages = await getMessages();
 
-  // Get ad visibility context (server-side auth check)
-  // Wrap in try-catch to prevent SSR bailout from affecting notFound()
-  let adContext;
-  try {
-    adContext = await getAdVisibilityContext();
-  } catch {
-    // On auth check failure, default to showing ads (anonymous user experience)
-    adContext = {
-      isLoggedIn: false,
-      showAds: true,
-      isPremium: false,
-      adsEnabled: process.env.NEXT_PUBLIC_ADS_ENABLED === "true",
-    };
-  }
+  // Note: Ad visibility is now determined client-side via AdVisibilityProviderClient
+  // This prevents SSR bailout and allows proper 404 status codes
 
   return (
     <NextIntlClientProvider messages={messages}>
-      <AdVisibilityProvider value={adContext}>
+      <AdVisibilityProviderClient>
         <div className="flex min-h-screen flex-col">
           {/* Skip link for keyboard navigation */}
           <a href="#main-content" className="skip-link">
@@ -73,7 +60,7 @@ export default async function LocaleLayout({
         <StickyBottomBanner locale={locale} />
         {/* Feedback ribbon on the right side */}
         <FeedbackRibbon />
-      </AdVisibilityProvider>
+      </AdVisibilityProviderClient>
     </NextIntlClientProvider>
   );
 }

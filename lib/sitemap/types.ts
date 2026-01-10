@@ -104,5 +104,5 @@ export const DEFAULT_SITEMAP_CONFIG: SitemapConfig = {
   baseUrl: process.env.APP_BASE_URL || "https://cutiepawspedia.com",
   locales: ["nl", "en", "de"],
   defaultLocale: "nl",
-  maxUrlsPerSitemap: 10000, // Smaller sitemaps for faster crawling and better error recovery
+  maxUrlsPerSitemap: 25000, // Larger sitemaps for fewer files (Google limit: 50,000)
 };

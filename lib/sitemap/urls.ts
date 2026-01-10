@@ -5,7 +5,7 @@
  * Queries the database to get all entities and generates sitemap entries.
  */
 
-import { db } from "@/db";
+import { db, isDatabaseAvailable } from "@/db";
 import { countries, cities, provinces, categories, places, placeCategories } from "@/db/schema";
 import { eq, isNotNull, sql } from "drizzle-orm";
 import {
@@ -42,7 +42,7 @@ export async function buildHomeUrls(
 export async function buildCountryUrls(
   config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
 ): Promise<SitemapUrl[]> {
-  if (!db) return [];
+  if (!isDatabaseAvailable()) return [];
   const urls: SitemapUrl[] = [];
   const today = new Date().toISOString().split("T")[0];
 
@@ -73,7 +73,7 @@ export async function buildCountryUrls(
 export async function buildProvinceUrls(
   config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
 ): Promise<SitemapUrl[]> {
-  if (!db) return [];
+  if (!isDatabaseAvailable()) return [];
   const urls: SitemapUrl[] = [];
   const today = new Date().toISOString().split("T")[0];
 
@@ -107,7 +107,7 @@ export async function buildProvinceUrls(
 export async function buildCityUrls(
   config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
 ): Promise<SitemapUrl[]> {
-  if (!db) return [];
+  if (!isDatabaseAvailable()) return [];
   const urls: SitemapUrl[] = [];
   const today = new Date().toISOString().split("T")[0];
 
@@ -146,7 +146,7 @@ export async function buildCityUrls(
 export async function buildCategoryUrls(
   config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
 ): Promise<SitemapUrl[]> {
-  if (!db) return [];
+  if (!isDatabaseAvailable()) return [];
   const urls: SitemapUrl[] = [];
   const today = new Date().toISOString().split("T")[0];
 
@@ -190,7 +190,7 @@ export async function buildCategoryUrls(
 export async function buildPlaceUrls(
   config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
 ): Promise<SitemapUrl[]> {
-  if (!db) return [];
+  if (!isDatabaseAvailable()) return [];
   const urls: SitemapUrl[] = [];
   const today = new Date().toISOString().split("T")[0];
 
@@ -249,7 +249,7 @@ export async function buildPlaceUrls(
 export async function buildBestInCityUrls(
   config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
 ): Promise<SitemapUrl[]> {
-  if (!db) return [];
+  if (!isDatabaseAvailable()) return [];
   const urls: SitemapUrl[] = [];
   const today = new Date().toISOString().split("T")[0];
 
@@ -286,7 +286,7 @@ export async function buildBestInCityUrls(
 export async function buildTopInCountryUrls(
   config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
 ): Promise<SitemapUrl[]> {
-  if (!db) return [];
+  if (!isDatabaseAvailable()) return [];
   const urls: SitemapUrl[] = [];
   const today = new Date().toISOString().split("T")[0];
 
@@ -322,7 +322,7 @@ export async function buildTopInCountryUrls(
 export async function buildBestInCountryUrls(
   config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
 ): Promise<SitemapUrl[]> {
-  if (!db) return [];
+  if (!isDatabaseAvailable()) return [];
   const urls: SitemapUrl[] = [];
   const today = new Date().toISOString().split("T")[0];
 
@@ -359,7 +359,7 @@ export async function buildBestInCountryUrls(
 export async function buildCategoryInCountryUrls(
   config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
 ): Promise<SitemapUrl[]> {
-  if (!db) return [];
+  if (!isDatabaseAvailable()) return [];
   const urls: SitemapUrl[] = [];
   const today = new Date().toISOString().split("T")[0];
 
@@ -425,7 +425,7 @@ export async function buildStaticUrls(
  * Get counts for each sitemap section (for logging/debugging)
  */
 export async function getSitemapCounts(): Promise<Record<string, number>> {
-  if (!db) return { countries: 0, cities: 0, categories: 0, places: 0 };
+  if (!isDatabaseAvailable()) return { countries: 0, cities: 0, categories: 0, places: 0 };
 
   const [countryCount] = await db.select({ count: sql<number>`count(*)` }).from(countries);
   const [cityCount] = await db.select({ count: sql<number>`count(*)` }).from(cities);
@@ -441,14 +441,125 @@ export async function getSitemapCounts(): Promise<Record<string, number>> {
 }
 
 /**
+ * Get the total count of place URLs (optimized count query)
+ * Much faster than loading all places
+ */
+export async function getPlaceUrlCount(
+  config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
+): Promise<number> {
+  if (!isDatabaseAvailable()) return 0;
+
+  // Count distinct place-category combinations (excluding permanently closed)
+  const result = await db
+    .select({ count: sql<number>`count(DISTINCT CONCAT(${places.slug}, '-', ${categories.slug}))` })
+    .from(places)
+    .innerJoin(cities, eq(places.cityId, cities.id))
+    .innerJoin(placeCategories, eq(places.id, placeCategories.placeId))
+    .innerJoin(categories, eq(placeCategories.categoryId, categories.id))
+    .where(
+      sql`${places.slug} IS NOT NULL AND (${places.status} IS NULL OR ${places.status} != 'permanently_closed')`
+    );
+
+  const count = Number(result[0]?.count || 0);
+  // Multiply by number of locales (each place URL exists in all locales)
+  return count * config.locales.length;
+}
+
+/**
  * Get the number of paginated place sitemaps needed
  * Used by sitemap index to generate correct number of sitemap entries
  */
 export async function getPlaceSitemapPageCount(
   config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
 ): Promise<number> {
-  const urls = await buildPlaceUrls(config);
-  return Math.max(1, Math.ceil(urls.length / config.maxUrlsPerSitemap));
+  const totalUrls = await getPlaceUrlCount(config);
+  return Math.max(1, Math.ceil(totalUrls / config.maxUrlsPerSitemap));
+}
+
+/**
+ * Build place URLs with database-level pagination
+ * CRITICAL: Uses LIMIT/OFFSET to avoid loading all places into memory
+ */
+export async function buildPlaceUrlsPaginated(
+  page: number,
+  config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
+): Promise<SitemapUrl[]> {
+  if (!isDatabaseAvailable()) return [];
+
+  const today = new Date().toISOString().split("T")[0];
+  const localeCount = config.locales.length;
+
+  // Calculate how many places we need per page
+  // Since each place generates URLs for all locales
+  const placesPerPage = Math.ceil(config.maxUrlsPerSitemap / localeCount);
+  const offset = (page - 1) * placesPerPage;
+
+  // Get paginated places with their location and primary category
+  // Using a subquery to get distinct place-category combinations with pagination
+  const paginatedPlaces = await db
+    .selectDistinct({
+      placeSlug: places.slug,
+      placeStatus: places.status,
+      citySlug: cities.slug,
+      provinceSlug: provinces.slug,
+      countrySlug: countries.slug,
+      categorySlug: categories.slug,
+      updatedAt: places.updatedAt,
+      isPremium: places.isPremium,
+    })
+    .from(places)
+    .innerJoin(cities, eq(places.cityId, cities.id))
+    .innerJoin(countries, eq(cities.countryId, countries.id))
+    .leftJoin(provinces, eq(cities.provinceId, provinces.id))
+    .innerJoin(placeCategories, eq(places.id, placeCategories.placeId))
+    .innerJoin(categories, eq(placeCategories.categoryId, categories.id))
+    .where(
+      sql`${places.slug} IS NOT NULL AND (${places.status} IS NULL OR ${places.status} != 'permanently_closed')`
+    )
+    .orderBy(places.id, categories.id) // Consistent ordering for pagination
+    .limit(placesPerPage)
+    .offset(offset);
+
+  const urls: SitemapUrl[] = [];
+
+  for (const place of paginatedPlaces) {
+    for (const locale of config.locales) {
+      // Include province in URL if available
+      const url = place.provinceSlug
+        ? `${config.baseUrl}/${locale}/${place.countrySlug}/p/${place.provinceSlug}/${place.citySlug}/${place.categorySlug}/${place.placeSlug}`
+        : `${config.baseUrl}/${locale}/${place.countrySlug}/${place.citySlug}/${place.categorySlug}/${place.placeSlug}`;
+
+      urls.push({
+        loc: url,
+        lastmod: place.updatedAt?.toISOString().split("T")[0] || today,
+        changefreq: PAGE_CHANGEFREQ.place,
+        // Premium places get slightly higher priority
+        priority: place.isPremium ? 0.8 : PAGE_PRIORITIES.place,
+      });
+    }
+  }
+
+  return urls;
+}
+
+/**
+ * Get total count of category URLs (optimized count query)
+ */
+export async function getCategoryUrlCount(
+  config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
+): Promise<number> {
+  if (!isDatabaseAvailable()) return 0;
+
+  // Count distinct city-category combinations
+  const result = await db
+    .select({ count: sql<number>`count(DISTINCT CONCAT(${cities.slug}, '-', ${categories.slug}))` })
+    .from(placeCategories)
+    .innerJoin(places, eq(placeCategories.placeId, places.id))
+    .innerJoin(cities, eq(places.cityId, cities.id))
+    .innerJoin(categories, eq(placeCategories.categoryId, categories.id));
+
+  const count = Number(result[0]?.count || 0);
+  return count * config.locales.length;
 }
 
 /**
@@ -457,21 +568,76 @@ export async function getPlaceSitemapPageCount(
 export async function getCategorySitemapPageCount(
   config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
 ): Promise<number> {
-  const urls = await buildCategoryUrls(config);
-  return Math.max(1, Math.ceil(urls.length / config.maxUrlsPerSitemap));
+  const totalUrls = await getCategoryUrlCount(config);
+  return Math.max(1, Math.ceil(totalUrls / config.maxUrlsPerSitemap));
 }
 
 /**
- * Get paginated category URLs for a specific page
+ * Get paginated category URLs with database-level pagination
  */
 export async function buildCategoryUrlsPaginated(
   page: number,
   config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
 ): Promise<SitemapUrl[]> {
-  const allUrls = await buildCategoryUrls(config);
-  const start = (page - 1) * config.maxUrlsPerSitemap;
-  const end = start + config.maxUrlsPerSitemap;
-  return allUrls.slice(start, end);
+  if (!isDatabaseAvailable()) return [];
+
+  const today = new Date().toISOString().split("T")[0];
+  const localeCount = config.locales.length;
+  const itemsPerPage = Math.ceil(config.maxUrlsPerSitemap / localeCount);
+  const offset = (page - 1) * itemsPerPage;
+
+  const cityCategoryPairs = await db
+    .selectDistinct({
+      citySlug: cities.slug,
+      provinceSlug: provinces.slug,
+      countrySlug: countries.slug,
+      categorySlug: categories.slug,
+    })
+    .from(placeCategories)
+    .innerJoin(places, eq(placeCategories.placeId, places.id))
+    .innerJoin(cities, eq(places.cityId, cities.id))
+    .innerJoin(countries, eq(cities.countryId, countries.id))
+    .leftJoin(provinces, eq(cities.provinceId, provinces.id))
+    .innerJoin(categories, eq(placeCategories.categoryId, categories.id))
+    .orderBy(countries.slug, cities.slug, categories.slug)
+    .limit(itemsPerPage)
+    .offset(offset);
+
+  const urls: SitemapUrl[] = [];
+  for (const pair of cityCategoryPairs) {
+    for (const locale of config.locales) {
+      const url = pair.provinceSlug
+        ? `${config.baseUrl}/${locale}/${pair.countrySlug}/p/${pair.provinceSlug}/${pair.citySlug}/${pair.categorySlug}`
+        : `${config.baseUrl}/${locale}/${pair.countrySlug}/${pair.citySlug}/${pair.categorySlug}`;
+      urls.push({
+        loc: url,
+        lastmod: today,
+        changefreq: PAGE_CHANGEFREQ.category,
+        priority: PAGE_PRIORITIES.category,
+      });
+    }
+  }
+
+  return urls;
+}
+
+/**
+ * Get total count of best-in-city URLs (optimized count query)
+ */
+export async function getBestInCityUrlCount(
+  config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
+): Promise<number> {
+  if (!isDatabaseAvailable()) return 0;
+
+  const result = await db
+    .select({ count: sql<number>`count(DISTINCT CONCAT(${cities.slug}, '-', ${categories.slug}))` })
+    .from(placeCategories)
+    .innerJoin(places, eq(placeCategories.placeId, places.id))
+    .innerJoin(cities, eq(places.cityId, cities.id))
+    .innerJoin(categories, eq(placeCategories.categoryId, categories.id));
+
+  const count = Number(result[0]?.count || 0);
+  return count * config.locales.length;
 }
 
 /**
@@ -480,19 +646,50 @@ export async function buildCategoryUrlsPaginated(
 export async function getBestInCitySitemapPageCount(
   config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
 ): Promise<number> {
-  const urls = await buildBestInCityUrls(config);
-  return Math.max(1, Math.ceil(urls.length / config.maxUrlsPerSitemap));
+  const totalUrls = await getBestInCityUrlCount(config);
+  return Math.max(1, Math.ceil(totalUrls / config.maxUrlsPerSitemap));
 }
 
 /**
- * Get paginated best-in-city URLs for a specific page
+ * Get paginated best-in-city URLs with database-level pagination
  */
 export async function buildBestInCityUrlsPaginated(
   page: number,
   config: SitemapConfig = DEFAULT_SITEMAP_CONFIG
 ): Promise<SitemapUrl[]> {
-  const allUrls = await buildBestInCityUrls(config);
-  const start = (page - 1) * config.maxUrlsPerSitemap;
-  const end = start + config.maxUrlsPerSitemap;
-  return allUrls.slice(start, end);
+  if (!isDatabaseAvailable()) return [];
+
+  const today = new Date().toISOString().split("T")[0];
+  const localeCount = config.locales.length;
+  const itemsPerPage = Math.ceil(config.maxUrlsPerSitemap / localeCount);
+  const offset = (page - 1) * itemsPerPage;
+
+  const cityCategoryPairs = await db
+    .selectDistinct({
+      citySlug: cities.slug,
+      countrySlug: countries.slug,
+      categorySlug: categories.slug,
+    })
+    .from(placeCategories)
+    .innerJoin(places, eq(placeCategories.placeId, places.id))
+    .innerJoin(cities, eq(places.cityId, cities.id))
+    .innerJoin(countries, eq(cities.countryId, countries.id))
+    .innerJoin(categories, eq(placeCategories.categoryId, categories.id))
+    .orderBy(countries.slug, cities.slug, categories.slug)
+    .limit(itemsPerPage)
+    .offset(offset);
+
+  const urls: SitemapUrl[] = [];
+  for (const pair of cityCategoryPairs) {
+    for (const locale of config.locales) {
+      urls.push({
+        loc: `${config.baseUrl}/${locale}/${pair.countrySlug}/${pair.citySlug}/best/${pair.categorySlug}`,
+        lastmod: today,
+        changefreq: PAGE_CHANGEFREQ.best,
+        priority: PAGE_PRIORITIES.best,
+      });
+    }
+  }
+
+  return urls;
 }

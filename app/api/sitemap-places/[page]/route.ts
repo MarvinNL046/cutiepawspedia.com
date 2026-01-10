@@ -3,6 +3,7 @@
  *
  * Handles ALL paginated place sitemaps dynamically via rewrite.
  * - /sitemap-places-1.xml -> /api/sitemap-places/1
+ * - Uses DATABASE-LEVEL PAGINATION to avoid loading all places into memory
  * - Returns proper XML for valid pages with places
  * - Returns empty valid XML for pages beyond data (graceful handling)
  * - Never returns HTML (prevents "Sitemap is HTML" errors)
@@ -11,7 +12,8 @@
 import { NextResponse } from "next/server";
 import {
   buildSitemapXml,
-  buildPlaceUrls,
+  buildPlaceUrlsPaginated,
+  getPlaceSitemapPageCount,
   DEFAULT_SITEMAP_CONFIG,
 } from "@/lib/sitemap";
 
@@ -42,9 +44,8 @@ export async function GET(request: Request, { params }: RouteParams) {
   }
 
   try {
-    const urls = await buildPlaceUrls(DEFAULT_SITEMAP_CONFIG);
-    const maxPerPage = DEFAULT_SITEMAP_CONFIG.maxUrlsPerSitemap;
-    const totalPages = Math.ceil(urls.length / maxPerPage);
+    // Get total page count using optimized count query
+    const totalPages = await getPlaceSitemapPageCount(DEFAULT_SITEMAP_CONFIG);
 
     // If page is beyond available data, return empty sitemap
     // This prevents "Sitemap is HTML" errors when Google crawls old URLs
@@ -58,10 +59,9 @@ export async function GET(request: Request, { params }: RouteParams) {
       });
     }
 
-    // Get URLs for this page
-    const startIndex = (pageNumber - 1) * maxPerPage;
-    const endIndex = Math.min(startIndex + maxPerPage, urls.length);
-    const pageUrls = urls.slice(startIndex, endIndex);
+    // Get URLs for this page using database-level pagination
+    // Only loads the places needed for this specific page
+    const pageUrls = await buildPlaceUrlsPaginated(pageNumber, DEFAULT_SITEMAP_CONFIG);
 
     const xml = buildSitemapXml(pageUrls);
 
@@ -69,7 +69,7 @@ export async function GET(request: Request, { params }: RouteParams) {
       status: 200,
       headers: {
         "Content-Type": "application/xml",
-        "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
+        "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
       },
     });
   } catch (error) {

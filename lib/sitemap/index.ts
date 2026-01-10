@@ -26,6 +26,7 @@ export {
   buildCategoryUrls,
   buildCategoryUrlsPaginated,
   buildPlaceUrls,
+  buildPlaceUrlsPaginated,
   buildBestInCityUrls,
   buildBestInCityUrlsPaginated,
   buildTopInCountryUrls,
@@ -33,8 +34,11 @@ export {
   buildCategoryInCountryUrls,
   buildStaticUrls,
   getSitemapCounts,
+  getPlaceUrlCount,
   getPlaceSitemapPageCount,
+  getCategoryUrlCount,
   getCategorySitemapPageCount,
+  getBestInCityUrlCount,
   getBestInCitySitemapPageCount,
 } from "./urls";
 

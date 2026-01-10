@@ -1,10 +1,15 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, DM_Serif_Display } from "next/font/google";
 import Script from "next/script";
-import { StackProvider, StackTheme } from "@stackframe/stack";
-import { stackServerApp } from "@/lib/auth/stack";
+import { StackProviderClient } from "@/components/auth/StackProviderClient";
 import { ThemeProvider } from "@/components/theme";
 import "./globals.css";
+
+// Check if Stack Auth is configured
+const isStackAuthConfigured = Boolean(
+  process.env.NEXT_PUBLIC_STACK_PROJECT_ID &&
+  process.env.NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY
+);
 
 // AdSense configuration
 const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
@@ -142,8 +147,9 @@ export default function RootLayout({
     />
   );
 
-  // Only wrap with StackProvider if configured
-  if (stackServerApp) {
+  // Use client-side StackProvider to prevent SSR bailout
+  // This allows proper 404 status codes for non-existent pages
+  if (isStackAuthConfigured) {
     return (
       <html lang="en" suppressHydrationWarning>
         {preconnectLinks}
@@ -152,11 +158,9 @@ export default function RootLayout({
           {clarityScript}
           {adsenseScript}
           <ThemeProvider>
-            <StackProvider app={stackServerApp}>
-              <StackTheme>
-                {children}
-              </StackTheme>
-            </StackProvider>
+            <StackProviderClient>
+              {children}
+            </StackProviderClient>
           </ThemeProvider>
         </body>
       </html>

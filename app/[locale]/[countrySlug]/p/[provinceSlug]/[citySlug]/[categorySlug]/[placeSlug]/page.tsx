@@ -15,10 +15,7 @@ import {
   getCityBySlugAndProvince,
   getProvinceBySlugAndCountry,
 } from "@/db/queries";
-import { getClaims } from "@/db/queries/claims";
 import { getReviewsForPlace } from "@/db/queries/reviews";
-import { stackServerApp } from "@/lib/auth/stack";
-import { getUserByStackAuthId } from "@/db/queries/users";
 import {
   getPlaceMetadata,
   localBusinessSchema,
@@ -39,7 +36,6 @@ import { CategoryAffiliateBlockLazy as CategoryAffiliateBlock } from "@/componen
 import { PlaceViewTracker } from "@/components/analytics";
 import { Breadcrumbs } from "@/components/layout";
 import { FavoriteButton } from "@/components/favorites/FavoriteButton";
-import { isFavorite } from "@/db/queries/favorites";
 import { MapPin, Phone, Globe, Mail, Star, CheckCircle, Lock, Shield, Crown, MessageSquare } from "lucide-react";
 import { ReviewSection } from "@/components/reviews";
 import { AboutSection, ServicesSection, HighlightsSection, BusinessSnapshot, BusinessPhotoGallery, GoogleReviewsSection, PlaceFeatureBadges, PlaceHeroImage } from "@/components/place";
@@ -228,32 +224,10 @@ export default async function PlacePage({ params }: PlacePageProps) {
   const placeFeatures = getPlaceFeatures(place);
   const upgradeCTA = getUpgradeCTA(place, locale);
 
-  // Check if current user has a pending claim for this place and if they favorited it
-  let hasPendingClaim = false;
-  let isPlaceFavorited = false;
-  let isUserLoggedIn = false;
-  try {
-    const stackUser = await stackServerApp?.getUser();
-    if (stackUser) {
-      isUserLoggedIn = true;
-      const dbUser = await getUserByStackAuthId(stackUser.id);
-      if (dbUser) {
-        const [claimsResult, favoriteStatus] = await Promise.all([
-          getClaims({
-            placeId: place.id,
-            userId: dbUser.id,
-            status: "pending",
-            limit: 1,
-          }),
-          isFavorite(dbUser, place.id),
-        ]);
-        hasPendingClaim = claimsResult.claims.length > 0;
-        isPlaceFavorited = favoriteStatus;
-      }
-    }
-  } catch {
-    // Silently fail if auth check fails
-  }
+  // Note: Auth-dependent features (favorites, claims) are now handled client-side
+  // This prevents SSR bailout and allows proper 404 status codes
+  // The FavoriteButton component handles its own auth state
+  // The ClaimPlaceCTA shows the claim form which handles auth on submission
 
   // Extract scraped content for personalized AI generation
   const scrapedContent = place.scrapedContent as {
@@ -501,7 +475,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
               />
             </div>
             <div className="flex flex-col gap-2 min-w-[200px]">
-              <FavoriteButton placeId={place.id} initialIsFavorite={isPlaceFavorited} variant="default" />
+              <FavoriteButton placeId={place.id} initialIsFavorite={false} variant="default" />
               {place.phone && placeFeatures.canShowPhone ? (
                 <Button asChild className="bg-cpCoral hover:bg-cpCoral/90 gap-2">
                   <a href={`tel:${place.phone}`}><Phone className="h-4 w-4" />{t("callNow")}</a>
@@ -629,7 +603,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 user: review.user,
                 replies: review.replies,
               }))}
-              isLoggedIn={isUserLoggedIn}
+              isLoggedIn={false}
               locale={locale}
             />
           </div>
@@ -785,7 +759,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
             <ClaimPlaceCTA
               placeSlug={place.slug}
               businessId={place.businessId}
-              hasPendingClaim={hasPendingClaim}
+              hasPendingClaim={false}
               locale={locale}
               countrySlug={countrySlug}
               citySlug={citySlug}

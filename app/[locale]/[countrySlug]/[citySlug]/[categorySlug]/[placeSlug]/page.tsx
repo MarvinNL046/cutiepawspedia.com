@@ -50,7 +50,8 @@ interface PlacePageProps {
 }
 
 // ISR: Place details need timely updates for reviews/info, 5-minute revalidation
-export const revalidate = 300;
+// Optimized: 1 hour cache to reduce ISR writes (was 300s)
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: PlacePageProps): Promise<Metadata> {
   const { locale, countrySlug, citySlug, categorySlug, placeSlug } = await params;

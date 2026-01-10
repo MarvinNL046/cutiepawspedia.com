@@ -14,7 +14,8 @@
 import { NextResponse } from "next/server";
 import { buildSitemapXml, buildCategoryUrlsPaginated, DEFAULT_SITEMAP_CONFIG } from "@/lib/sitemap";
 
-export const revalidate = 300;
+// ISR: Optimized to 1 hour to reduce Vercel costs (was 300s)
+export const revalidate = 3600;
 
 export async function GET() {
   try {
@@ -26,7 +27,7 @@ export async function GET() {
       status: 200,
       headers: {
         "Content-Type": "application/xml",
-        "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
+        "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=7200",
       },
     });
   } catch (error) {

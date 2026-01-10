@@ -43,8 +43,8 @@ interface ProvinceCategoryPageProps {
   }>;
 }
 
-// ISR: Province-level data, 10-minute revalidation
-export const revalidate = 600;
+// ISR: Optimized to 1 hour to reduce Vercel costs (was 600s)
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: ProvinceCategoryPageProps): Promise<Metadata> {
   const { locale, countrySlug, provinceSlug, categorySlug } = await params;

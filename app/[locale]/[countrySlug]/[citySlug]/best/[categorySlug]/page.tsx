@@ -37,9 +37,9 @@ interface BestInCityPageProps {
   params: Promise<{ locale: string; countrySlug: string; citySlug: string; categorySlug: string }>;
 }
 
-// ISR: City-level data, 5-minute revalidation
+// ISR: Optimized to 1 hour to reduce Vercel costs (was 300s)
 // Pages are generated on-demand and cached - no static generation to avoid build timeouts
-export const revalidate = 300;
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: BestInCityPageProps): Promise<Metadata> {
   const { locale, countrySlug, citySlug, categorySlug } = await params;

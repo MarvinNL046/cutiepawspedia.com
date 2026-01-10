@@ -34,9 +34,9 @@ interface BlogPostPageProps {
   params: Promise<{ locale: string; slug: string }>;
 }
 
-// ISR: Revalidate every 5 minutes
+// ISR: Optimized to 1 hour to reduce Vercel costs (was 300s)
 // Pages are generated on-demand and cached - no static generation to avoid build timeouts
-export const revalidate = 300;
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const { locale, slug } = await params;

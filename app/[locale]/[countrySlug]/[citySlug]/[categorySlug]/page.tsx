@@ -29,8 +29,8 @@ interface CategoryPageProps {
   params: Promise<{ locale: string; countrySlug: string; citySlug: string; categorySlug: string }>;
 }
 
-// ISR: Category listings need frequent updates for new businesses, 5-minute revalidation
-export const revalidate = 300;
+// ISR: Optimized to 1 hour to reduce Vercel costs (was 300s)
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { locale, countrySlug, citySlug, categorySlug } = await params;

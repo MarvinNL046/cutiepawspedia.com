@@ -34,9 +34,9 @@ interface CityMapPageProps {
   params: Promise<{ locale: string; countrySlug: string; citySlug: string }>;
 }
 
-// ISR: Map data, 10-minute revalidation
+// ISR: Optimized to 1 hour to reduce Vercel costs (was 600s)
 // Pages are generated on-demand and cached - no static generation to avoid build timeouts
-export const revalidate = 600;
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: CityMapPageProps): Promise<Metadata> {
   const { locale, countrySlug, citySlug } = await params;

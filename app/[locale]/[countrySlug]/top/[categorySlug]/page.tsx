@@ -41,8 +41,8 @@ interface TopInCountryPageProps {
   params: Promise<{ locale: string; countrySlug: string; categorySlug: string }>;
 }
 
-// ISR: Rankings data, 10-minute revalidation
-export const revalidate = 600;
+// ISR: Optimized to 1 hour to reduce Vercel costs (was 600s)
+export const revalidate = 3600;
 
 const TOP_COUNT = 10;
 

@@ -30,8 +30,8 @@ interface HomePageProps {
   params: Promise<{ locale: string }>;
 }
 
-// ISR: Revalidate every 5 minutes for fresh content while maintaining performance
-export const revalidate = 300;
+// ISR: Optimized to 30 minutes to reduce Vercel costs (was 300s)
+export const revalidate = 1800;
 
 export async function generateMetadata({ params }: HomePageProps): Promise<Metadata> {
   const { locale } = await params;

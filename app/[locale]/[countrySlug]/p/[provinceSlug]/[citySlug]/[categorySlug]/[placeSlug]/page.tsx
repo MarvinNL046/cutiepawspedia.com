@@ -60,7 +60,8 @@ interface PlacePageProps {
   }>;
 }
 
-export const revalidate = 300;
+// Optimized: 1 hour cache to reduce ISR writes (was 300s)
+export const revalidate = 3600;
 
 /**
  * Get place by slug within a province-aware city

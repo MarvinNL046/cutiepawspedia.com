@@ -40,8 +40,8 @@ interface CountryCategoryPageProps {
   searchParams: Promise<{ sort?: string }>;
 }
 
-// ISR: Country-level data, 10-minute revalidation
-export const revalidate = 600;
+// ISR: Optimized to 1 hour to reduce Vercel costs (was 600s)
+export const revalidate = 3600;
 
 // Pre-generate pages for all country/category combinations
 // Each country only gets locales relevant to that market (DE=de, NL=nl/en, BE=nl/en/fr)

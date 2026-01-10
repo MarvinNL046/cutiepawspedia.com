@@ -18,8 +18,8 @@ interface BlogPageProps {
   searchParams: Promise<{ category?: string; page?: string }>;
 }
 
-// ISR: Revalidate every 5 minutes
-export const revalidate = 300;
+// ISR: Optimized to 1 hour to reduce Vercel costs (was 300s)
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: BlogPageProps): Promise<Metadata> {
   const { locale } = await params;

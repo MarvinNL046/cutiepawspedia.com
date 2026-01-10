@@ -7,7 +7,7 @@
 
 import { db, isDatabaseAvailable } from "@/db";
 import { countries, cities, provinces, categories, places, placeCategories } from "@/db/schema";
-import { eq, isNotNull, sql } from "drizzle-orm";
+import { eq, isNotNull, sql, asc } from "drizzle-orm";
 import {
   type SitemapUrl,
   type SitemapConfig,
@@ -516,7 +516,7 @@ export async function buildPlaceUrlsPaginated(
     .where(
       sql`${places.slug} IS NOT NULL AND (${places.status} IS NULL OR ${places.status} != 'permanently_closed')`
     )
-    .orderBy(places.id, categories.id) // Consistent ordering for pagination
+    .orderBy(asc(places.id), asc(categories.id)) // Consistent ordering for pagination
     .limit(placesPerPage)
     .offset(offset);
 
@@ -599,7 +599,7 @@ export async function buildCategoryUrlsPaginated(
     .innerJoin(countries, eq(cities.countryId, countries.id))
     .leftJoin(provinces, eq(cities.provinceId, provinces.id))
     .innerJoin(categories, eq(placeCategories.categoryId, categories.id))
-    .orderBy(countries.slug, cities.slug, categories.slug)
+    .orderBy(asc(countries.slug), asc(cities.slug), asc(categories.slug))
     .limit(itemsPerPage)
     .offset(offset);
 
@@ -675,7 +675,7 @@ export async function buildBestInCityUrlsPaginated(
     .innerJoin(cities, eq(places.cityId, cities.id))
     .innerJoin(countries, eq(cities.countryId, countries.id))
     .innerJoin(categories, eq(placeCategories.categoryId, categories.id))
-    .orderBy(countries.slug, cities.slug, categories.slug)
+    .orderBy(asc(countries.slug), asc(cities.slug), asc(categories.slug))
     .limit(itemsPerPage)
     .offset(offset);
 

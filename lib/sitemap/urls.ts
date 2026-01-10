@@ -497,7 +497,7 @@ export async function buildPlaceUrlsPaginated(
   // Get paginated places with their location and primary category
   // Using a subquery to get distinct place-category combinations with pagination
   const paginatedPlaces = await db
-    .selectDistinct({
+    .select({
       placeSlug: places.slug,
       placeStatus: places.status,
       citySlug: cities.slug,
@@ -513,10 +513,8 @@ export async function buildPlaceUrlsPaginated(
     .leftJoin(provinces, eq(cities.provinceId, provinces.id))
     .innerJoin(placeCategories, eq(places.id, placeCategories.placeId))
     .innerJoin(categories, eq(placeCategories.categoryId, categories.id))
-    .where(
-      sql`${places.slug} IS NOT NULL AND (${places.status} IS NULL OR ${places.status} != 'permanently_closed')`
-    )
-    .orderBy(asc(places.id), asc(categories.id)) // Consistent ordering for pagination
+    .where(isNotNull(places.slug))
+    .orderBy(asc(places.id), asc(categories.id))
     .limit(placesPerPage)
     .offset(offset);
 

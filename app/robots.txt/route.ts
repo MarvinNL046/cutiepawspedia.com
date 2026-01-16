@@ -44,8 +44,17 @@ Allow: /api/og/
 # Crawl-delay for respectful crawling
 Crawl-delay: 1
 
-# Sitemap location
+# Sitemap location - Index + key sub-sitemaps for faster discovery
 Sitemap: ${BASE_URL}/sitemap.xml
+Sitemap: ${BASE_URL}/sitemap-static.xml
+Sitemap: ${BASE_URL}/sitemap-countries.xml
+Sitemap: ${BASE_URL}/sitemap-provinces.xml
+Sitemap: ${BASE_URL}/sitemap-cities.xml
+Sitemap: ${BASE_URL}/sitemap-categories-country.xml
+Sitemap: ${BASE_URL}/sitemap-places-1.xml
+Sitemap: ${BASE_URL}/sitemap-categories-1.xml
+Sitemap: ${BASE_URL}/sitemap-gids.xml
+Sitemap: ${BASE_URL}/sitemap-toxicity.xml
 
 # LLMs.txt for AI assistants
 # https://llmstxt.org/

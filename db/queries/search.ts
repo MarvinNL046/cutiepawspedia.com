@@ -103,17 +103,6 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
 
   // Filter by city if provided
   let resolvedCityId = cityId;
-  let resolvedCityName: string | null = null; // Store city name for address validation
-
-  // If cityId is provided directly, fetch the city name for address validation
-  if (resolvedCityId && !citySlug) {
-    const cityById = await db.query.cities.findFirst({
-      where: eq(cities.id, resolvedCityId),
-    });
-    if (cityById) {
-      resolvedCityName = cityById.name;
-    }
-  }
 
   if (citySlug && !resolvedCityId) {
     // Try to find city by slug first (exact match)
@@ -158,7 +147,6 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
 
     if (city) {
       resolvedCityId = city.id;
-      resolvedCityName = city.name; // Store for address validation
     }
   }
 
@@ -306,6 +294,8 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
   }
 
   // Re-sort by plan priority if enabled, but respect user's sortBy as secondary sort
+  // NOTE: This is a client-side sort for plan priority which can't be done in DB
+  // because the plan info comes from a joined relation
   if (planPriorityFirst && results.length > 0) {
     results.sort((a, b) => {
       const aBusiness = getRelation(a.business);
@@ -337,46 +327,9 @@ export async function searchPlaces(options: SearchOptions): Promise<SearchResult
     });
   }
 
-  // Filter out places that don't actually match the city (data quality fix)
-  // Some places have wrong cityId because they were discovered via broad Google searches
-  // We filter by checking if the city name appears in the address or if another city is mentioned
-  if (resolvedCityName && resolvedCityId) {
-    const cityNameLower = resolvedCityName.toLowerCase();
-
-    // Common Dutch/Belgian city names that might appear in addresses
-    // This helps detect when a place is actually in a different city
-    const otherCityIndicators = [
-      "uitgeest", "vreeland", "aalsmeer", "amstelveen", "diemen", "weesp",
-      "zaandam", "purmerend", "haarlem", "hilversum", "almere", "hoofddorp",
-      "schiphol", "abcoude", "bussum", "naarden", "muiden", "landsmeer",
-      "brussel", "bruxelles", "antwerpen", "gent", "brugge", "leuven",
-      "mechelen", "hasselt", "luik", "liège", "charleroi", "namur",
-      "laarne", "haaltert", "temse", "dilbeek", "zaventem", "grimbergen"
-    ];
-
-    results = results.filter((place) => {
-      const addressLower = (place.address || "").toLowerCase();
-
-      // Check if the city name appears in the address - strong positive signal
-      if (addressLower && addressLower.includes(cityNameLower)) return true;
-
-      // Check if another city name appears in the address - strong negative signal
-      // This catches places like "5+ jaar actief ⋅ Uitgeest" in the address field
-      for (const otherCity of otherCityIndicators) {
-        if (otherCity !== cityNameLower && addressLower.includes(otherCity)) {
-          return false; // Place is in a different city
-        }
-      }
-
-      // If no address but place has specific city in its metadata, trust it
-      const cityRel = getRelation(place.city);
-      if (cityRel?.name?.toLowerCase() === cityNameLower) return true;
-
-      // For places with no address and no matching city relation,
-      // only include if we have no indication it's elsewhere
-      return !addressLower;
-    });
-  }
+  // NOTE: Removed JS-based city filtering (was causing performance issues)
+  // Data quality issues should be fixed in the database directly, not at query time
+  // The cityId filter in the WHERE clause is sufficient
 
   // Check if there are more results
   const hasMore = results.length > limit;

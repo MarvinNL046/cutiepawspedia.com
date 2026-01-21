@@ -180,8 +180,9 @@ export function NotificationDropdown({
   useEffect(() => {
     fetchNotifications();
 
-    // Poll every 60 seconds
-    const interval = setInterval(fetchNotifications, 60000);
+    // Poll every 5 minutes (300000ms) - reduced from 60s to lower DB load
+    // Notifications are not time-critical, users can refresh manually
+    const interval = setInterval(fetchNotifications, 300000);
     return () => clearInterval(interval);
   }, [fetchNotifications]);
 

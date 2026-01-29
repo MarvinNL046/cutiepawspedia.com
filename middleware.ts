@@ -1,7 +1,8 @@
 import createMiddleware from 'next-intl/middleware';
+import { NextRequest } from 'next/server';
 import { locales, defaultLocale } from '@/i18n/config';
 
-export default createMiddleware({
+const intlMiddleware = createMiddleware({
   // Supported locales
   locales,
 
@@ -12,13 +13,21 @@ export default createMiddleware({
   localePrefix: 'always',
 
   // Disable cookie-based locale detection to allow ISR caching
-  // Locale is already determined by URL prefix (/nl/, /en/, etc.)
   localeDetection: false,
 
-  // Disable NEXT_LOCALE cookie - it forces "private, no-cache, no-store"
-  // on all responses, completely breaking Vercel CDN caching and ISR
+  // Disable NEXT_LOCALE cookie to prevent "private, no-cache" headers
   localeCookie: false,
 });
+
+export default function middleware(request: NextRequest) {
+  const response = intlMiddleware(request);
+
+  // Remove any cache-busting headers that prevent ISR/CDN caching
+  // next-intl middleware can set cookies or headers that force dynamic rendering
+  response.headers.delete('set-cookie');
+
+  return response;
+};
 
 export const config = {
   // Match all pathnames except:

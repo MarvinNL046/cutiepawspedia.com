@@ -164,6 +164,7 @@ export async function generateMetadata({ params }: PlacePageProps): Promise<Meta
 
 export default async function PlacePage({ params }: PlacePageProps) {
   const { locale, countrySlug, provinceSlug, citySlug, categorySlug, placeSlug } = await params;
+  setRequestLocale(locale);
 
   const t = await getTranslations("place");
   const tCommon = await getTranslations("common");

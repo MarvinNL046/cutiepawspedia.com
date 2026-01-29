@@ -126,6 +126,7 @@ export async function generateMetadata({ params }: BestInCityPageProps): Promise
 
 export default async function BestInCityPage({ params }: BestInCityPageProps) {
   const { locale, countrySlug, citySlug, categorySlug } = await params;
+  setRequestLocale(locale);
 
   const t = await getTranslations("categoryPages");
 

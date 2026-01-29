@@ -76,6 +76,7 @@ export async function generateMetadata({ params }: PlacePageProps): Promise<Meta
 
 export default async function PlacePage({ params }: PlacePageProps) {
   const { locale, countrySlug, citySlug, categorySlug, placeSlug } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("place");
 
   // Wrap database query in try-catch to handle errors gracefully

@@ -42,6 +42,7 @@ export async function generateMetadata({ params }: BlogPageProps): Promise<Metad
 
 export default async function BlogPage({ params, searchParams }: BlogPageProps) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const { category, page = "1" } = await searchParams;
   const t = await getTranslations({ locale, namespace: "blog" });
 

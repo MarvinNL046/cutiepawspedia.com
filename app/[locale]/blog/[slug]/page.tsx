@@ -250,6 +250,7 @@ function extractTocItemsWithIds(content: string) {
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { locale, slug } = await params;
+  setRequestLocale(locale);
 
   const post = await getPostBySlug(slug, locale as Locale);
 

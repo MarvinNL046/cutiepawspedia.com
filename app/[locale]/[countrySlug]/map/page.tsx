@@ -95,6 +95,7 @@ export async function generateMetadata({ params }: CountryMapPageProps): Promise
 
 export default async function CountryMapPage({ params }: CountryMapPageProps) {
   const { locale, countrySlug } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("mapPages");
 
   const [country, places, center, categoriesWithPlaces] = await Promise.all([

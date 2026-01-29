@@ -595,6 +595,7 @@ function SpecialAwardCard({
 
 export default async function AwardsPage({ params }: AwardsPageProps) {
   const { locale, year } = await params;
+  setRequestLocale(locale);
   const yearNum = parseInt(year, 10);
   const currentYear = new Date().getFullYear();
 

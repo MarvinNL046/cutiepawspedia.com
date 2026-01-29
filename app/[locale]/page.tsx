@@ -64,6 +64,7 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
 
 export default async function HomePage({ params }: HomePageProps) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("homepage");
 
   const [countries, categories, totalPlaces, totalCities, latestPosts, homepageSponsorAd, popularPlaces, featuredReviews] = await Promise.all([

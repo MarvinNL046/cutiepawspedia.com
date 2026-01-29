@@ -122,6 +122,7 @@ export async function generateMetadata({ params }: CountryCategoryPageProps): Pr
 
 export default async function CountryCategoryPage({ params, searchParams }: CountryCategoryPageProps) {
   const { locale, countrySlug, categorySlug } = await params;
+  setRequestLocale(locale);
   const { sort: sortBy } = await searchParams;
 
   const t = await getTranslations("categoryPages");

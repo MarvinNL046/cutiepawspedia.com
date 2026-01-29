@@ -119,6 +119,7 @@ export async function generateMetadata({ params }: ProvinceCategoryPageProps): P
 
 export default async function ProvinceCategoryPage({ params }: ProvinceCategoryPageProps) {
   const { locale, countrySlug, provinceSlug, categorySlug } = await params;
+  setRequestLocale(locale);
 
   const t = await getTranslations("categoryPages");
 

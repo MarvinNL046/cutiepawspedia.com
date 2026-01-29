@@ -129,6 +129,7 @@ export async function generateMetadata({ params }: ComparisonPageProps): Promise
 export default async function ComparisonPage({ params }: ComparisonPageProps) {
   const resolvedParams = await params;
   const { locale, countrySlug } = resolvedParams;
+  setRequestLocale(locale);
   const cityParam = resolvedParams.comparison;
   const categorySlug = resolvedParams.categorySlug;
 

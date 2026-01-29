@@ -129,6 +129,7 @@ export async function generateMetadata({ params }: TopInCountryPageProps): Promi
 
 export default async function TopInCountryPage({ params }: TopInCountryPageProps) {
   const { locale, countrySlug, categorySlug } = await params;
+  setRequestLocale(locale);
 
   const t = await getTranslations("categoryPages");
 

@@ -122,6 +122,7 @@ export async function generateMetadata({ params }: BestInCountryPageProps): Prom
 
 export default async function BestInCountryPage({ params }: BestInCountryPageProps) {
   const { locale, countrySlug, categorySlug } = await params;
+  setRequestLocale(locale);
 
   const t = await getTranslations("categoryPages");
 

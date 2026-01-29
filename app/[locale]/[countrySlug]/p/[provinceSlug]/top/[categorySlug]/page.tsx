@@ -142,6 +142,7 @@ export async function generateMetadata({ params }: TopInProvincePageProps): Prom
 
 export default async function TopInProvincePage({ params }: TopInProvincePageProps) {
   const { locale, countrySlug, provinceSlug, categorySlug } = await params;
+  setRequestLocale(locale);
 
   const t = await getTranslations("categoryPages");
   const tProvince = await getTranslations("provinceTopPages");

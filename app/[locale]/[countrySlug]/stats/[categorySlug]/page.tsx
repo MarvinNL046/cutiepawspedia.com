@@ -136,6 +136,7 @@ export async function generateMetadata({ params }: StatsPageProps): Promise<Meta
 
 export default async function StatsPage({ params }: StatsPageProps) {
   const { locale, countrySlug, categorySlug } = await params;
+  setRequestLocale(locale);
 
   const t = await getTranslations("stats");
 

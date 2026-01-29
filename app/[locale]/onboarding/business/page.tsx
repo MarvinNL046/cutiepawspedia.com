@@ -33,6 +33,7 @@ export async function generateMetadata({ params }: OnboardingPageProps): Promise
 
 export default async function OnboardingPage({ params, searchParams }: OnboardingPageProps) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const { plan: initialPlan, cancelled } = await searchParams;
 
   // Check if user is logged in

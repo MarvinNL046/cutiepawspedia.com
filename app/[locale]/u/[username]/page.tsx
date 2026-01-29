@@ -68,6 +68,7 @@ export async function generateMetadata({
 
 export default async function PublicProfilePage({ params }: PublicProfilePageProps) {
   const { username, locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("profile");
 
   // Get public profile

@@ -170,6 +170,7 @@ function groupPlacesByTimePeriod(places: any[], locale: string) {
 
 export default async function NewCategoryPage({ params, searchParams }: NewCategoryPageProps) {
   const { locale, countrySlug, categorySlug } = await params;
+  setRequestLocale(locale);
   const { days: daysParam } = await searchParams;
   const days = daysParam ? parseInt(daysParam, 10) : 90; // Default to 90 days for more content
 

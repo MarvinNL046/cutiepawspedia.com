@@ -11,8 +11,10 @@ export default createMiddleware({
   // Always show locale prefix in URL (e.g., /nl/about, /de/about)
   localePrefix: 'always',
 
-  // Locale detection from Accept-Language header
-  localeDetection: true,
+  // Disable cookie-based locale detection to allow ISR caching
+  // Locale is already determined by URL prefix (/nl/, /en/, etc.)
+  // Cookie "NEXT_LOCALE" forces "private, no-cache" on all responses
+  localeDetection: false,
 });
 
 export const config = {

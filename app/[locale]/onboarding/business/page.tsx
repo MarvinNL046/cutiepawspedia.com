@@ -10,7 +10,7 @@
 
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { stackServerApp } from "@/lib/auth/stack";
 import { getUserByStackAuthId, getBusinessesForUser, upsertUserFromStackAuth } from "@/db/queries";
 import { OnboardingWizard } from "@/components/onboarding/OnboardingWizard";
@@ -22,6 +22,7 @@ interface OnboardingPageProps {
 
 export async function generateMetadata({ params }: OnboardingPageProps): Promise<Metadata> {
   const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "onboarding.metadata" });
 
   return {

@@ -7,7 +7,7 @@
 
 import type { Metadata } from "next";
 import { notFound, redirect, permanentRedirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -61,7 +61,7 @@ interface PlacePageProps {
 }
 
 // Optimized: 1 hour cache to reduce ISR writes (was 300s)
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 /**
  * Get place by slug within a province-aware city
@@ -135,6 +135,7 @@ async function findPlaceBySlugOnly(placeSlug: string) {
 
 export async function generateMetadata({ params }: PlacePageProps): Promise<Metadata> {
   const { locale, countrySlug, provinceSlug, citySlug, categorySlug, placeSlug } = await params;
+  setRequestLocale(locale);
   let place = await getPlaceBySlugWithProvince(placeSlug, citySlug, provinceSlug, countrySlug);
 
   // If not found here, check if exists elsewhere (for redirect cases)

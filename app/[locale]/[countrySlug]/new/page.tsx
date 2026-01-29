@@ -29,7 +29,7 @@ import {
   itemListSchema,
   type ContentLocale,
 } from "@/lib/seo";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 
 interface NewAdditionsPageProps {
   params: Promise<{ locale: string; countrySlug: string }>;
@@ -38,10 +38,11 @@ interface NewAdditionsPageProps {
 
 // ISR: 1-hour revalidation for fresh content
 // Pages are generated on-demand and cached - no static generation to avoid build timeouts
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 export async function generateMetadata({ params, searchParams }: NewAdditionsPageProps): Promise<Metadata> {
   const { locale, countrySlug } = await params;
+  setRequestLocale(locale);
   const { days: daysParam } = await searchParams;
   const days = daysParam ? parseInt(daysParam, 10) : 30;
 

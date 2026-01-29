@@ -10,7 +10,7 @@
 import { NextResponse } from "next/server";
 import { buildSitemapXml, buildCityUrls, DEFAULT_SITEMAP_CONFIG } from "@/lib/sitemap";
 
-export const revalidate = 1800;
+export const revalidate = 86400;
 
 export async function GET() {
   try {
@@ -21,7 +21,7 @@ export async function GET() {
       status: 200,
       headers: {
         "Content-Type": "application/xml",
-        "Cache-Control": "public, max-age=1800, s-maxage=1800, stale-while-revalidate=43200",
+        "Cache-Control": "public, max-age=86400, s-maxage=86400, stale-while-revalidate=172800",
       },
     });
   } catch (error) {

@@ -3,7 +3,7 @@
  */
 
 import { notFound, redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getPlaceBySlug } from "@/db/queries";
 import { getClaims } from "@/db/queries/claims";
@@ -36,6 +36,7 @@ export async function generateMetadata({ params }: ClaimPageProps): Promise<Meta
 
 export default async function ClaimPage({ params }: ClaimPageProps) {
   const { locale, countrySlug, citySlug, categorySlug, placeSlug } = await params;
+  setRequestLocale(locale);
 
   const t = await getTranslations("claim");
   const tCommon = await getTranslations("common");

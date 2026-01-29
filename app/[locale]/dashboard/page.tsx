@@ -13,7 +13,7 @@ import { getUserByStackAuthId, getBusinessesForUser } from "@/db/queries";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Building2, Plus, Shield, ArrowRight } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 
 interface DashboardPageProps {
   params: Promise<{ locale: string }>;
@@ -21,6 +21,7 @@ interface DashboardPageProps {
 
 export default async function DashboardPage({ params }: DashboardPageProps) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("dashboard");
 
   // Get current user

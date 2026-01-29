@@ -27,7 +27,7 @@ import {
   buildAlternateUrls,
   type ContentLocale,
 } from "@/lib/seo";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { Map as MapIcon } from "lucide-react";
 
 interface CityMapPageProps {
@@ -36,10 +36,11 @@ interface CityMapPageProps {
 
 // ISR: Optimized to 1 hour to reduce Vercel costs (was 600s)
 // Pages are generated on-demand and cached - no static generation to avoid build timeouts
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 export async function generateMetadata({ params }: CityMapPageProps): Promise<Metadata> {
   const { locale, countrySlug, citySlug } = await params;
+  setRequestLocale(locale);
 
   const [country, city] = await Promise.all([
     getCountryBySlug(countrySlug),

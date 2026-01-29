@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MapPin, Star, CheckCircle, Crown } from "lucide-react";
 import { FavoriteButton } from "@/components/favorites/FavoriteButton";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 
 export const metadata: Metadata = {
   title: "Saved Places | CutiePawsPedia",
@@ -20,6 +20,7 @@ interface FavoritesPageProps {
 
 export default async function FavoritesPage({ params }: FavoritesPageProps) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("favorites");
 
   // Get authenticated user

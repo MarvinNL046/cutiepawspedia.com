@@ -14,7 +14,7 @@ import { NextResponse } from "next/server";
 import { buildSitemapIndexXml, type SitemapSection, DEFAULT_SITEMAP_CONFIG, getPlaceSitemapPageCount, getCategorySitemapPageCount, getBestInCitySitemapPageCount } from "@/lib/sitemap";
 
 // ISR: Sitemap index changes rarely, 1-hour revalidation
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 /**
  * Define all sitemap sections
@@ -141,7 +141,7 @@ export async function GET() {
       status: 200,
       headers: {
         "Content-Type": "application/xml",
-        "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
+        "Cache-Control": "public, max-age=86400, s-maxage=86400, stale-while-revalidate=172800",
       },
     });
   } catch (error) {
@@ -160,7 +160,7 @@ export async function GET() {
       status: 200,
       headers: {
         "Content-Type": "application/xml",
-        "Cache-Control": "public, max-age=3600",
+        "Cache-Control": "public, max-age=86400",
       },
     });
   }

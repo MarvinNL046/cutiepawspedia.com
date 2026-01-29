@@ -19,7 +19,7 @@ import { DeleteAccountSection } from "./DeleteAccountSection";
 import { TrustLevelBadge } from "@/components/profile/TrustLevelBadge";
 import { User, Award, Star } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 
 interface ProfilePageProps {
   params: Promise<{ locale: string }>;
@@ -27,6 +27,7 @@ interface ProfilePageProps {
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("profile");
 
   // Check authentication

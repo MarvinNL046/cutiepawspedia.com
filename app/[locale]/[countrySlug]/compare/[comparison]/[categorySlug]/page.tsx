@@ -12,7 +12,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,7 +45,7 @@ interface ComparisonPageProps {
 
 // ISR: Comparison data doesn't change frequently, 1-hour revalidation
 // Pages are generated on-demand and cached - no static generation to avoid build timeouts
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 /**
  * Parse the city slugs from the URL parameter

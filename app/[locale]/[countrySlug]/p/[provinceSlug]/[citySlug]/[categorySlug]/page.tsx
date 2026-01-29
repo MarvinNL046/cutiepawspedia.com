@@ -19,7 +19,7 @@ import { getCategoryMetadata, getLocalizedCategoryName, type ContentLocale } fro
 import { generateContent } from "@/lib/ai/generateContent";
 import { extractFaqsFromAiContent, generateDefaultFaqs } from "@/lib/ai/faq";
 import { getInternalLinksForPage } from "@/lib/internalLinks";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { PlaceCard, CategoryCard, getCategoryIcon } from "@/components/directory";
 import { CategoryAffiliateBlockLazy as CategoryAffiliateBlock } from "@/components/affiliate";
 import { PageHeader, SectionHeader } from "@/components/layout";
@@ -39,10 +39,11 @@ interface CategoryPageProps {
 }
 
 // ISR: Optimized to 1 hour to reduce Vercel costs (was 300s)
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { locale, countrySlug, provinceSlug, citySlug, categorySlug } = await params;
+  setRequestLocale(locale);
 
   const [province, category] = await Promise.all([
     getProvinceBySlugAndCountry(provinceSlug, countrySlug),

@@ -37,7 +37,7 @@ export async function GET(request: Request, { params }: RouteParams) {
       status: 200,
       headers: {
         "Content-Type": "application/xml",
-        "Cache-Control": "public, max-age=3600, s-maxage=3600",
+        "Cache-Control": "public, max-age=86400, s-maxage=86400",
       },
     });
   }
@@ -66,7 +66,7 @@ export async function GET(request: Request, { params }: RouteParams) {
       status: 200,
       headers: {
         "Content-Type": "application/xml",
-        "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
+        "Cache-Control": "public, max-age=86400, s-maxage=86400, stale-while-revalidate=172800",
       },
     });
   } catch (error) {

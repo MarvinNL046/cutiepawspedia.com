@@ -4,7 +4,7 @@ import { getUserByStackAuthId, upsertUserFromStackAuth } from "@/db/queries/user
 import { getOrCreateNotificationSettings, DEFAULT_NOTIFICATION_SETTINGS } from "@/db/queries/notifications";
 import { NotificationSettingsForm } from "./NotificationSettingsForm";
 import { Bell } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 
 interface NotificationsPageProps {
   params: Promise<{ locale: string }>;
@@ -12,6 +12,7 @@ interface NotificationsPageProps {
 
 export default async function NotificationsPage({ params }: NotificationsPageProps) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("notifications");
 
   // Check authentication (already checked in layout, but double-check)

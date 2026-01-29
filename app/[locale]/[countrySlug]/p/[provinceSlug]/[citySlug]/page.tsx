@@ -8,7 +8,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { Badge } from "@/components/ui/badge";
 import {
   getCityBySlugAndProvince,
@@ -40,10 +40,11 @@ interface CityPageProps {
   }>;
 }
 
-export const revalidate = 1800;
+export const revalidate = 86400;
 
 export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
   const { locale, countrySlug, provinceSlug, citySlug } = await params;
+  setRequestLocale(locale);
   const city = await getCityBySlugAndProvince(citySlug, provinceSlug, countrySlug);
 
   if (!city) {

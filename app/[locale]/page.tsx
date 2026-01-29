@@ -24,17 +24,18 @@ import {
   type ContentLocale,
 } from "@/lib/seo";
 import { Search, Star, CheckCircle } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 
 interface HomePageProps {
   params: Promise<{ locale: string }>;
 }
 
 // ISR: Optimized to 30 minutes to reduce Vercel costs (was 300s)
-export const revalidate = 1800;
+export const revalidate = 86400;
 
 export async function generateMetadata({ params }: HomePageProps): Promise<Metadata> {
   const { locale } = await params;
+  setRequestLocale(locale);
 
   const seo = await generateSeoData("home", { locale });
 

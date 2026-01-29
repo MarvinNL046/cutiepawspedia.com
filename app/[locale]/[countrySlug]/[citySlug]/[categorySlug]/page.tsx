@@ -30,7 +30,7 @@ interface CategoryPageProps {
 }
 
 // ISR: Optimized to 1 hour to reduce Vercel costs (was 300s)
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { locale, countrySlug, citySlug, categorySlug } = await params;

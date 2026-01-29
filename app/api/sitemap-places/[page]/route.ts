@@ -11,7 +11,8 @@
 import { NextResponse } from "next/server";
 import {
   buildSitemapXml,
-  buildPlaceUrls,
+  buildPlaceUrlsPaginated,
+  getPlaceSitemapPageCount,
   DEFAULT_SITEMAP_CONFIG,
 } from "@/lib/sitemap";
 
@@ -36,16 +37,13 @@ export async function GET(request: Request, { params }: RouteParams) {
       status: 200,
       headers: {
         "Content-Type": "application/xml",
-        "Cache-Control": "public, max-age=3600, s-maxage=3600",
+        "Cache-Control": "public, max-age=86400, s-maxage=86400",
       },
     });
   }
 
   try {
-    // Load all place URLs
-    const allUrls = await buildPlaceUrls(DEFAULT_SITEMAP_CONFIG);
-    const maxPerPage = DEFAULT_SITEMAP_CONFIG.maxUrlsPerSitemap;
-    const totalPages = Math.ceil(allUrls.length / maxPerPage);
+    const totalPages = await getPlaceSitemapPageCount(DEFAULT_SITEMAP_CONFIG);
 
     // If page is beyond available data, return empty sitemap
     if (pageNumber > totalPages) {
@@ -58,10 +56,8 @@ export async function GET(request: Request, { params }: RouteParams) {
       });
     }
 
-    // Slice URLs for this page
-    const startIndex = (pageNumber - 1) * maxPerPage;
-    const endIndex = Math.min(startIndex + maxPerPage, allUrls.length);
-    const pageUrls = allUrls.slice(startIndex, endIndex);
+    // DB-level pagination - only loads this page's URLs
+    const pageUrls = await buildPlaceUrlsPaginated(pageNumber, DEFAULT_SITEMAP_CONFIG);
 
     const xml = buildSitemapXml(pageUrls);
 
@@ -69,7 +65,7 @@ export async function GET(request: Request, { params }: RouteParams) {
       status: 200,
       headers: {
         "Content-Type": "application/xml",
-        "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
+        "Cache-Control": "public, max-age=86400, s-maxage=86400, stale-while-revalidate=86400",
       },
     });
   } catch (error) {

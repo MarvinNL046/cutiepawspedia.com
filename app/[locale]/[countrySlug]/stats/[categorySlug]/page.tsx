@@ -19,7 +19,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import {
   BarChart3,
   TrendingUp,
@@ -60,6 +60,7 @@ export const revalidate = 86400;
 
 export async function generateMetadata({ params }: StatsPageProps): Promise<Metadata> {
   const { locale, countrySlug, categorySlug } = await params;
+  setRequestLocale(locale);
 
   const [country, category, stats] = await Promise.all([
     getCountryBySlug(countrySlug),

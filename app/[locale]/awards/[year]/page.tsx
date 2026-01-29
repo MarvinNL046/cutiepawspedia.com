@@ -9,7 +9,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import {
   Trophy,
   Medal,
@@ -287,6 +287,7 @@ export async function generateMetadata({
   params,
 }: AwardsPageProps): Promise<Metadata> {
   const { locale, year } = await params;
+  setRequestLocale(locale);
   const yearNum = parseInt(year, 10);
   const currentYear = new Date().getFullYear();
 

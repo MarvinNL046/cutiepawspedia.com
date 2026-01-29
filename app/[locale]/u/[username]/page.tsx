@@ -31,7 +31,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { BadgeDisplay } from "../../account/profile/BadgeDisplay";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 
 interface PublicProfilePageProps {
   params: Promise<{ locale: string; username: string }>;
@@ -42,6 +42,7 @@ export async function generateMetadata({
   params,
 }: PublicProfilePageProps): Promise<Metadata> {
   const { username, locale } = await params;
+  setRequestLocale(locale);
   const profile = await getPublicProfile(username);
 
   if (!profile) {

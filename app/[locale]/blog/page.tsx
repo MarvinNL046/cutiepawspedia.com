@@ -9,7 +9,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { getPublishedPosts, getAllBlogCategories, getPublishedPostCount, type Locale } from "@/db/queries";
 import { Calendar, Clock, ArrowRight } from "lucide-react";
 
@@ -19,10 +19,11 @@ interface BlogPageProps {
 }
 
 // ISR: Optimized to 1 hour to reduce Vercel costs (was 300s)
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 export async function generateMetadata({ params }: BlogPageProps): Promise<Metadata> {
   const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "blog" });
 
   const title = t("metaTitle");

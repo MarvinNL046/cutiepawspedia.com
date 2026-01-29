@@ -28,7 +28,7 @@ import { Calendar, Clock, ArrowLeft, ArrowRight, Tag } from "lucide-react";
 import { TableOfContents, extractTocItems, PhotoCredit } from "@/components/blog";
 import { BlogSidebarAd, BetweenContentAd } from "@/components/ads";
 import { EditorialByline } from "@/components/seo";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 
 interface BlogPostPageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -36,10 +36,11 @@ interface BlogPostPageProps {
 
 // ISR: Optimized to 1 hour to reduce Vercel costs (was 300s)
 // Pages are generated on-demand and cached - no static generation to avoid build timeouts
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const { locale, slug } = await params;
+  setRequestLocale(locale);
 
   const seo = await getPostSeoBySlug(slug, locale as Locale);
 

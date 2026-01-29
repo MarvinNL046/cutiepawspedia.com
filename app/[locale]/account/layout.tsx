@@ -3,7 +3,7 @@ import { stackServerApp } from "@/lib/auth/stack";
 import { getUserByStackAuthId, upsertUserFromStackAuth, getBusinessesForUser } from "@/db/queries";
 import Link from "next/link";
 import { Heart, Clock, User, Settings, Bell, Building2, ChevronRight, Plus, Shield } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 interface AccountLayoutProps {
   children: React.ReactNode;
@@ -21,6 +21,7 @@ export default async function AccountLayout({
   params,
 }: AccountLayoutProps) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("account");
 
   // Check if StackAuth is configured

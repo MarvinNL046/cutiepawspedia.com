@@ -10,7 +10,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { Badge } from "@/components/ui/badge";
 import { getCityBySlugAndCountry, getCategories, getTopRatedPlacesByCity, getPlaceCountByCity } from "@/db/queries";
 import {
@@ -33,10 +33,11 @@ interface CityPageProps {
 }
 
 // ISR: City pages with top places need moderate freshness, 30-minute revalidation
-export const revalidate = 1800;
+export const revalidate = 86400;
 
 export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
   const { locale, countrySlug, citySlug } = await params;
+  setRequestLocale(locale);
   const city = await getCityBySlugAndCountry(citySlug, countrySlug);
 
   if (!city) {

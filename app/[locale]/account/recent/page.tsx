@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, Star, CheckCircle, Crown } from "lucide-react";
 import { FavoriteButton } from "@/components/favorites/FavoriteButton";
 import { getFavoritePlaceIdsForUser } from "@/db/queries/favorites";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 
 export const metadata: Metadata = {
   title: "Recently Viewed | CutiePawsPedia",
@@ -21,6 +21,7 @@ interface RecentViewsPageProps {
 
 export default async function RecentViewsPage({ params }: RecentViewsPageProps) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("recentViews");
 
   // Get authenticated user

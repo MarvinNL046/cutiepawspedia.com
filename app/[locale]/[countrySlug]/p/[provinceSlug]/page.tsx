@@ -22,17 +22,18 @@ import {
 import { CityCard, CategoryCard, getCategoryIcon, getCountryFlag } from "@/components/directory";
 import { PageHeader, SectionHeader } from "@/components/layout";
 import { MapPin, Building2 } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 
 interface ProvincePageProps {
   params: Promise<{ locale: string; countrySlug: string; provinceSlug: string }>;
 }
 
 // ISR: Province data changes infrequently, 1-hour revalidation is sufficient
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 export async function generateMetadata({ params }: ProvincePageProps): Promise<Metadata> {
   const { locale, countrySlug, provinceSlug } = await params;
+  setRequestLocale(locale);
 
   const [country, province] = await Promise.all([
     getCountryBySlug(countrySlug),

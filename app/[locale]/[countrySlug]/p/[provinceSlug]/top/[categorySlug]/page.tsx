@@ -32,7 +32,7 @@ import {
 } from "@/lib/seo";
 import { generateContent } from "@/lib/ai/generateContent";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 
 interface TopInProvincePageProps {
   params: Promise<{
@@ -45,12 +45,13 @@ interface TopInProvincePageProps {
 
 // ISR: Optimized to 1 hour to reduce Vercel costs (was 600s)
 // Pages are generated on-demand and cached - no static generation to avoid build timeouts
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 const TOP_COUNT = 10;
 
 export async function generateMetadata({ params }: TopInProvincePageProps): Promise<Metadata> {
   const { locale, countrySlug, provinceSlug, categorySlug } = await params;
+  setRequestLocale(locale);
 
   const [country, province, category, places] = await Promise.all([
     getCountryBySlug(countrySlug),

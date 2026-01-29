@@ -30,7 +30,7 @@ import {
   getLocalizedCategoryName,
   type ContentLocale,
 } from "@/lib/seo";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { Map as MapIcon } from "lucide-react";
 
 interface CountryCategoryMapPageProps {
@@ -39,10 +39,11 @@ interface CountryCategoryMapPageProps {
 
 // ISR: Optimized to 1 hour to reduce Vercel costs (was 600s)
 // Pages are generated on-demand and cached - no static generation to avoid build timeouts
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 export async function generateMetadata({ params }: CountryCategoryMapPageProps): Promise<Metadata> {
   const { locale, countrySlug, categorySlug } = await params;
+  setRequestLocale(locale);
 
   const [country, category] = await Promise.all([
     getCountryBySlug(countrySlug),

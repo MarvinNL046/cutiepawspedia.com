@@ -32,7 +32,7 @@ import {
   type ContentLocale,
 } from "@/lib/seo";
 import { generateContent } from "@/lib/ai/generateContent";
-import { getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 
 interface ProvinceCategoryPageProps {
   params: Promise<{
@@ -44,10 +44,11 @@ interface ProvinceCategoryPageProps {
 }
 
 // ISR: Optimized to 1 hour to reduce Vercel costs (was 600s)
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 export async function generateMetadata({ params }: ProvinceCategoryPageProps): Promise<Metadata> {
   const { locale, countrySlug, provinceSlug, categorySlug } = await params;
+  setRequestLocale(locale);
 
   const [country, province, category, places] = await Promise.all([
     getCountryBySlug(countrySlug),

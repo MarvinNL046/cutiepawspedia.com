@@ -48,6 +48,11 @@ const nextConfig: NextConfig = {
 
   // Experimental features for better performance
   experimental: {
+    // Client-side router cache: match ISR revalidation period (24 hours)
+    staleTimes: {
+      dynamic: 86400,
+      static: 86400,
+    },
     // Enable optimized package imports
     optimizePackageImports: [
       "lucide-react",

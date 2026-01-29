@@ -313,6 +313,11 @@ function getWhyDangerous(substanceName: string, substanceType: string, animalPlu
 }
 
 // Generate metadata with conditional index/noindex based on importance
+// Enable ISR: return empty array so nothing is pre-built, but on-demand requests are cached
+export function generateStaticParams() {
+  return [];
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale, substanceSlug, animal } = await params;
   const substance = getSubstanceBySlug(substanceSlug);

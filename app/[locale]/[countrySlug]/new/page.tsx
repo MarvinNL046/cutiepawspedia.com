@@ -39,6 +39,11 @@ interface NewAdditionsPageProps {
 // ISR: 1-hour revalidation for fresh content
 // Pages are generated on-demand and cached - no static generation to avoid build timeouts
 export const revalidate = 86400;
+// Enable ISR: return empty array so nothing is pre-built, but on-demand requests are cached
+export function generateStaticParams() {
+  return [];
+}
+
 
 export async function generateMetadata({ params, searchParams }: NewAdditionsPageProps): Promise<Metadata> {
   const { locale, countrySlug } = await params;

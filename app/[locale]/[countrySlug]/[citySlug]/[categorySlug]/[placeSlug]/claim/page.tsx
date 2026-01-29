@@ -25,6 +25,11 @@ interface ClaimPageProps {
   }>;
 }
 
+// Enable ISR: return empty array so nothing is pre-built, but on-demand requests are cached
+export function generateStaticParams() {
+  return [];
+}
+
 export async function generateMetadata({ params }: ClaimPageProps): Promise<Metadata> {
   const { placeSlug } = await params;
   const title = `Claim ${placeSlug.replace(/-/g, " ")} | CutiePawsPedia`;

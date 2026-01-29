@@ -62,6 +62,11 @@ interface PlacePageProps {
 
 // Optimized: 1 hour cache to reduce ISR writes (was 300s)
 export const revalidate = 86400;
+// Enable ISR: return empty array so nothing is pre-built, but on-demand requests are cached
+export function generateStaticParams() {
+  return [];
+}
+
 
 /**
  * Get place by slug within a province-aware city

@@ -31,6 +31,11 @@ interface CountryPageProps {
 // ISR: Country data changes infrequently, 1-hour revalidation is sufficient
 export const revalidate = 86400;
 
+// Enable ISR: return empty array so nothing is pre-built, but on-demand requests are cached
+export function generateStaticParams() {
+  return [];
+}
+
 export async function generateMetadata({ params }: CountryPageProps): Promise<Metadata> {
   const { locale, countrySlug } = await params;
   setRequestLocale(locale);

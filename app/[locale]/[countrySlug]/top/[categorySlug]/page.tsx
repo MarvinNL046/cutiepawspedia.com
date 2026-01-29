@@ -44,6 +44,11 @@ interface TopInCountryPageProps {
 // ISR: Optimized to 1 hour to reduce Vercel costs (was 600s)
 // Pages are generated on-demand and cached - no static generation to reduce build time/costs
 export const revalidate = 86400;
+// Enable ISR: return empty array so nothing is pre-built, but on-demand requests are cached
+export function generateStaticParams() {
+  return [];
+}
+
 
 const TOP_COUNT = 10;
 

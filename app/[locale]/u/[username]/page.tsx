@@ -38,6 +38,11 @@ interface PublicProfilePageProps {
 }
 
 // Generate metadata for SEO
+// Enable ISR: return empty array so nothing is pre-built, but on-demand requests are cached
+export function generateStaticParams() {
+  return [];
+}
+
 export async function generateMetadata({
   params,
 }: PublicProfilePageProps): Promise<Metadata> {

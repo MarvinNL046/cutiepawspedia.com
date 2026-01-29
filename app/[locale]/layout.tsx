@@ -16,6 +16,11 @@ interface LocaleLayoutProps {
   params: Promise<{ locale: string }>;
 }
 
+// Force all fetch() calls in sub-pages to use cache by default
+// Neon serverless uses fetch() internally, and Next.js 15+ defaults to no-store
+// Without this, every DB query forces dynamic rendering
+export const fetchCache = 'default-cache';
+
 // Generate static params for all locales
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));

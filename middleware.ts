@@ -13,8 +13,11 @@ export default createMiddleware({
 
   // Disable cookie-based locale detection to allow ISR caching
   // Locale is already determined by URL prefix (/nl/, /en/, etc.)
-  // Cookie "NEXT_LOCALE" forces "private, no-cache" on all responses
   localeDetection: false,
+
+  // Disable NEXT_LOCALE cookie - it forces "private, no-cache, no-store"
+  // on all responses, completely breaking Vercel CDN caching and ISR
+  localeCookie: false,
 });
 
 export const config = {
